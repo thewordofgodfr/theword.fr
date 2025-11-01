@@ -25,6 +25,7 @@ export default function Reading() {
   const { t } = useTranslation();
 
   const NAV_H = 64;
+  const HIGHLIGHT_EXTRA_OFFSET = 64; // +26px vs 38px pour que le verset apparaisse plus bas après une recherche
 
   const commandBarRef = useRef<HTMLDivElement>(null);
   const [cmdH, setCmdH] = useState(0);
@@ -180,7 +181,7 @@ export default function Reading() {
   // *** Show more characters on mobile ***
   const shortBookName = (book: BibleBook | null) => {
     const full = getBookName(book);
-    const max = 14; // <- was 10; allow longer names before ellipsis
+    const max = 14;
     return full.length > max ? full.slice(0, max) + '…' : full;
   };
 
@@ -429,7 +430,7 @@ export default function Reading() {
       const v = (scrollTargetVerse ?? highlightedVerse);
       if (v !== null) {
         const isHighlight = highlightedVerse !== null && v === highlightedVerse;
-        scrollToVerseNumber(v, isHighlight, isHighlight ? 38 : 0);
+        scrollToVerseNumber(v, isHighlight, isHighlight ? HIGHLIGHT_EXTRA_OFFSET : 0);
         return;
       }
       if (Date.now() < programmaticScrollUntil.current) return;
@@ -593,15 +594,16 @@ export default function Reading() {
             <div ref={commandBarRef} className="sticky z-40 -mx-4 sm:mx-0" style={{ top: `${NAV_H}px` }}>
               <div className={`${isDark ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur border-b ${isDark ? 'border-gray-700' : 'border-gray-200'} rounded-none sm:rounded-md shadow md:shadow-lg px-4 py-2 md:p-3`}>
                 <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-2 w-full">
-                  <div className="flex flex-col w/full md:w-auto">
+                  <div className="flex flex-col w-full md:w-auto">
                     <h2 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'} text-sm md:text-base flex flex-col md:flex-row md:items-center gap-2 w-full`}>
-                      <div className="flex w-full items-center gap-2 overflow-hidden">
-                        {/* Livre (mobile) — allow more characters */}
+                      {/* Bloc MOBILE uniquement */}
+                      <div className="flex w-full items-center gap-2 overflow-hidden md:hidden">
+                        {/* Livre (mobile) */}
                         <button
                           type="button"
                           onClick={() => setShowBookPicker(true)}
                           aria-expanded={showBookPicker}
-                          className={`min-w-0 inline-flex items-center justify-between gap-1 rounded-md px-2 py-1 text-xs font-semibold shadow active:scale-95 focus:outline-none focus:ring-2 md:hidden ${
+                          className={`min-w-0 inline-flex items-center justify-between gap-1 rounded-md px-2 py-1 text-sm leading-none font-semibold shadow active:scale-95 focus:outline-none focus:ring-2 ${
                             isDark
                               ? `${activeTheme ? activeTheme.mobileBtn : 'bg-blue-600 text-white'} ${activeTheme ? activeTheme.mobileBtnHover : 'hover:bg-blue-500'} focus:ring-blue-400`
                               : `${activeTheme ? activeTheme.mobileBtn : 'bg-blue-600 text-white'} ${activeTheme ? activeTheme.mobileBtnHover : 'hover:bg-blue-500'} focus:ring-blue-400`
@@ -609,17 +611,16 @@ export default function Reading() {
                           title={getBookName(selectedBook)}
                           aria-label={state.settings.language === 'fr' ? 'Choisir un livre' : 'Choose a book'}
                         >
-                          {/* <-- change here if you want even more: w-[13ch] */}
                           <span className="truncate w-[13ch]">{shortBookName(selectedBook)}</span>
-                          <ChevronDown className="w-3 h-3 opacity-90" />
+                          <ChevronDown className="w-3.5 h-3.5 opacity-90" />
                         </button>
 
-                        {/* Chapitre (mobile) — fixed width, priority */}
+                        {/* Chapitre (mobile) */}
                         <button
                           type="button"
                           onClick={() => setShowChapterPicker(true)}
                           aria-expanded={showChapterPicker}
-                          className={`min-w-0 inline-flex items-center justify-between gap-1 rounded-md px-2 py-1 text-xs font-semibold shadow active:scale-95 focus:outline-none focus:ring-2 md:hidden ${
+                          className={`min-w-0 inline-flex items-center justify-between gap-1 rounded-md px-2 py-1 text-sm leading-none font-semibold shadow active:scale-95 focus:outline-none focus:ring-2 ${
                             isDark
                               ? `${activeTheme ? (SLOT_THEMES[activeSlot as SlotKey]?.mobileBtn ?? 'bg-blue-600 text-white') : 'bg-blue-600 text-white'} ${activeTheme ? (SLOT_THEMES[activeSlot as SlotKey]?.mobileBtnHover ?? '') : 'hover:bg-blue-500'} focus:ring-blue-400`
                               : `${activeTheme ? (SLOT_THEMES[activeSlot as SlotKey]?.mobileBtn ?? 'bg-blue-600 text-white') : 'bg-blue-600 text-white'} ${activeTheme ? (SLOT_THEMES[activeSlot as SlotKey]?.mobileBtnHover ?? '') : 'hover:bg-blue-500'} focus:ring-blue-400`
@@ -631,10 +632,10 @@ export default function Reading() {
                             <span className="md:hidden">Ch.</span>
                             <span className="hidden md:inline">{t('chapter')}</span> {selectedChapter}
                           </span>
-                          <ChevronDown className="w-3 h-3 opacity-90" />
+                          <ChevronDown className="w-3.5 h-3.5 opacity-90" />
                         </button>
 
-                        {/* Loupe + slots 1/2/3 (mobile) */}
+                        {/* Loupe + slots (mobile) */}
                         <div className="flex items-center gap-2 md:hidden">
                           {[0, 1, 2, 3].map((i) => {
                             const s = quickSlots[i];
@@ -666,9 +667,9 @@ export default function Reading() {
                         </div>
                       </div>
 
-                      {/* Desktop : livre • chapitre */}
+                      {/* Bloc DESKTOP uniquement */}
                       <div className="hidden md:flex md:items-center md:gap-2">
-                        <span className="truncate">{getBookName(selectedBook)} •</span>
+                        <span className="truncate max-w-[28ch]">{getBookName(selectedBook)} •</span>
                         <span>{t('chapter')} {selectedChapter}</span>
                       </div>
                     </h2>
@@ -718,7 +719,7 @@ export default function Reading() {
                         onClick={() => handlePrevUnit()}
                         className={`p-1.5 rounded-md transition-all ${
                           selectedBook && selectedChapter <= 1 && books.findIndex(b => b.name === selectedBook.name) === 0
-                            ? isDark ? 'bg-gray-700 text.white/70 cursor-not-allowed' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                            ? isDark ? 'bg-gray-700 text-white/70 cursor-not-allowed' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                             : isDark ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-600 hover:bg-gray-300 hover:text-gray-800'
                         }`}
                         title={state.settings.language === 'fr' ? 'Chapitre précédent' : 'Previous chapter'}
@@ -746,7 +747,7 @@ export default function Reading() {
                         onClick={() => handleNextUnit()}
                         className={`p-1.5 rounded-md transition-all ${
                           selectedBook && selectedChapter >= selectedBook.chapters && books.findIndex(b => b.name === selectedBook.name) === books.length - 1
-                            ? isDark ? 'bg-gray-700 text.white/70 cursor-not-allowed' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                            ? isDark ? 'bg-gray-700 text-white/70 cursor-not-allowed' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                             : isDark ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-600 hover:bg-gray-300 hover:text-gray-800'
                         }`}
                         title={state.settings.language === 'fr' ? 'Chapitre suivant' : 'Next chapter'}
@@ -774,7 +775,7 @@ export default function Reading() {
                     {state.settings.language === 'fr' ? 'Copier' : 'Copy'}
                   </button>
                   <button onClick={shareSelection} className="inline-flex items-center px-3 py-2 rounded bg-gray-700 text-white hover:opacity-90">
-                    <ShareIcon size={16} className="mr-2" />
+                    <Share2 as={Share2 as any} size={16} className="mr-2" />
                     {state.settings.language === 'fr' ? 'Partager' : 'Share'}
                   </button>
                   <button onClick={() => setSelectedVerses([])} className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700'} px-3 py-2 rounded hover:opacity-90`}>
@@ -938,7 +939,7 @@ export default function Reading() {
                   {state.settings.language === 'fr' ? 'Copier' : 'Copy'}
                 </button>
                 <button onClick={shareSelection} className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700'} px-3 py-1.5 rounded-full inline-flex items-center`}>
-                  <ShareIcon size={16} className="mr-1" />
+                  <Share2 as={Share2 as any} size={16} className="mr-1" />
                   {state.settings.language === 'fr' ? 'Partager' : 'Share'}
                 </button>
                 <button onClick={() => setSelectedVerses([])} className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700'} px-3 py-1.5 rounded-full`}>
