@@ -76,11 +76,7 @@ function buildNormalizedWithMap(input: string) {
   return { norm, map };
 }
 
-/** Match “flexible” :
- *  - si la requête se termine par un espace → expression exacte (mots entiers)
- *  - sinon → dernier mot en *préfixe* (ex: "conspi" → "conspiration")
- *  - insensible aux accents/ligatures/casse
- */
+/** Match “flexible” (espace final = expression exacte ; sinon préfixe du dernier mot) */
 function matchesFlexible(text: string, query: string) {
   const normText = normalizeForSearch(text);
   const normQuery = normalizeForSearch(query);
@@ -89,11 +85,7 @@ function matchesFlexible(text: string, query: string) {
   const endsWithSpace = /\s$/.test(query);
   const paddedText = ` ${normText} `;
 
-  if (endsWithSpace) {
-    // mots entiers
-    return paddedText.includes(` ${normQuery} `);
-  }
-  // préfixe du dernier mot (et plus généralement: début de mot)
+  if (endsWithSpace) return paddedText.includes(` ${normQuery} `);
   return paddedText.includes(` ${normQuery}`);
 }
 
@@ -115,7 +107,7 @@ function countMatchesFlexible(text: string, query: string): number {
     const pos = haystack.indexOf(needle, from);
     if (pos === -1) break;
     count++;
-    from = pos + needle.length; // pas de chevauchement attendu (séparateurs = espaces)
+    from = pos + needle.length;
   }
   return count;
 }
@@ -137,7 +129,7 @@ function highlightFlexible(text: string, query: string) {
   if (!norm) return escapeHtml(text);
 
   const endsWithSpace = /\s$/.test(query);
-  const padded = ` ${norm}`; // pas d’espace final ici
+  const padded = ` ${norm}`;
   const needle = endsWithSpace ? ` ${normQuery} ` : ` ${normQuery}`;
 
   const matches: Array<{ start: number; end: number }> = [];
@@ -152,16 +144,14 @@ function highlightFlexible(text: string, query: string) {
   }
   if (!matches.length) return escapeHtml(text);
 
-  // Conversion → indices d’origine
   const ranges = matches
     .map(({ start, end }) => {
       const origStart = map[Math.max(0, start)];
-      const origEnd = (map[Math.min(map.length - 1, end - 1)] ?? map[map.length - 1]) + 1; // exclu
+      const origEnd = (map[Math.min(map.length - 1, end - 1)] ?? map[map.length - 1]) + 1;
       return { start: origStart, end: origEnd };
     })
     .sort((a, b) => a.start - b.start);
 
-  // Fusion des recouvrements
   const merged: typeof ranges = [];
   for (const r of ranges) {
     const last = merged[merged.length - 1];
@@ -169,7 +159,6 @@ function highlightFlexible(text: string, query: string) {
     else last.end = Math.max(last.end, r.end);
   }
 
-  // Construction HTML
   let html = '';
   let cursor = 0;
   for (const r of merged) {
@@ -186,6 +175,28 @@ function highlightFlexible(text: string, query: string) {
 export default function Search() {
   const { state, navigateToVerse } = useApp();
   const isDark = state.settings.theme === 'dark';
+
+  // Fix "flash blanc" sous Android lors de l’ouverture du clavier
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtmlBg = html.style.backgroundColor;
+    const prevBodyBg = body.style.backgroundColor;
+    const prevScheme = (html.style as any).colorScheme;
+    const prevOverscroll = html.style.overscrollBehaviorY;
+
+    html.style.backgroundColor = '#0f172a'; // gray-900
+    body.style.backgroundColor = '#0f172a';
+    (html.style as any).colorScheme = 'dark';
+    html.style.overscrollBehaviorY = 'contain';
+
+    return () => {
+      html.style.backgroundColor = prevHtmlBg;
+      body.style.backgroundColor = prevBodyBg;
+      (html.style as any).colorScheme = prevScheme;
+      html.style.overscrollBehaviorY = prevOverscroll;
+    };
+  }, []);
 
   const queryKey = `twog:search:lastQuery:${state.settings.language}`;
   const expandedKey = (q: string) =>
@@ -218,12 +229,10 @@ export default function Search() {
     return idx === -1 ? 9999 : idx;
   };
 
-  // Titre de page
   useEffect(() => {
     document.title = state.settings.language === 'fr' ? 'Recherche biblique' : 'Bible Search';
   }, [state.settings.language]);
 
-  // Lancer la recherche (debounce)
   useEffect(() => {
     if (query.trim().length < 2) {
       setResults([]);
@@ -232,9 +241,7 @@ export default function Search() {
     const handle = setTimeout(async () => {
       setLoading(true);
       try {
-        // Moissonnage côté service
         const res = await searchInBible(query, state.settings.language);
-        // Enrichissement avec le nombre d'occurrences, puis filtrage
         const enriched: ResultItem[] = [];
         for (const v of res) {
           const occ = countMatchesFlexible(v.text, query);
@@ -248,7 +255,6 @@ export default function Search() {
     return () => clearTimeout(handle);
   }, [query, state.settings.language]);
 
-  // Groupement par livre + somme des occurrences
   const grouped: Grouped[] = useMemo(() => {
     const map = new Map<string, ResultItem[]>();
     for (const v of results) {
@@ -267,7 +273,6 @@ export default function Search() {
     return arr;
   }, [results, state.settings.language, books]);
 
-  // Restauration états d’ouverture
   useEffect(() => {
     if (!grouped.length) {
       setExpanded({});
@@ -300,7 +305,6 @@ export default function Search() {
     } catch {}
   }, [expanded, grouped, query, state.settings.language]);
 
-  // Restauration du scroll
   useEffect(() => {
     if (!grouped.length || loading) return;
     const raw = sessionStorage.getItem(scrollKey(query));
@@ -358,18 +362,18 @@ export default function Search() {
           {state.settings.language === 'fr' ? 'Recherche' : 'Search'}
         </h1>
 
-        {/* Petit masque collant */}
+        {/* Masque collant (plus haut pour cacher ce qui passe derrière) */}
         <div
           className={`sticky top-0 z-20 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}
-          style={{ height: 8 }}
+          style={{ height: 20 }}
           aria-hidden
         />
 
-        {/* Barre de recherche (sticky) */}
+        {/* Barre de recherche (remontée) */}
         <div
           className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow border ${
             isDark ? 'border-gray-700' : 'border-gray-200'
-          } p-3 sticky top-20 sm:top-16 z-30`}
+          } p-3 sticky top-12 sm:top-12 z-30`}
         >
           <form onSubmit={e => e.preventDefault()} className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -408,7 +412,7 @@ export default function Search() {
             </div>
           </form>
 
-          {/* Ligne d’infos + actions — une seule ligne */}
+          {/* Ligne d’infos + actions */}
           <div className="mt-2 text-sm flex items-center justify-between gap-2">
             <div className={`${isDark ? 'text-white' : 'text-gray-600'} flex-1 min-w-0 truncate`}>
               {loading ? (
@@ -418,8 +422,7 @@ export default function Search() {
                 </>
               ) : query.trim().length >= 2 ? (
                 <>
-                  {state.settings.language === 'fr' ? 'Résultats' : 'Results'} "{query}"
-                  {' '}({totalOccurrences})
+                  {state.settings.language === 'fr' ? 'Résultats' : 'Results'} "{query}" ({totalOccurrences})
                 </>
               ) : (
                 state.settings.language === 'fr'
