@@ -355,7 +355,7 @@ export default function Search() {
       <div className="max-w-4xl mx-auto px-4 py-5">
         {/* En-tête / titre */}
         <h1 className={`text-xl font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-          {state.settings.language === 'fr' ? 'Recherche' : 'Search'}
+          {state.settings.language === 'fr' ? '' : ''}
         </h1>
 
         {/* Petit masque collant */}
@@ -422,7 +422,7 @@ export default function Search() {
                 </>
               ) : (
                 state.settings.language === 'fr'
-                  ? 'Saisissez au moins 2 caractères pour lancer la recherche.'
+                  ? 'Saisissez au moins 2 caractères'
                   : 'Type at least 2 characters to search.'
               )}
             </div>
