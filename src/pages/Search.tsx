@@ -22,7 +22,7 @@ type Grouped = {
   occ: number; // total occurrences in this book
 };
 
-/* ========= Utils (accents/ligatures, préfixe, etc.) ========= */
+/* ========= Utils ========= */
 
 function normalizeLigatures(s: string) {
   return s.replace(/œ/g, 'oe').replace(/Œ/g, 'oe').replace(/æ/g, 'ae').replace(/Æ/g, 'ae');
@@ -31,11 +31,7 @@ function normalizeLigatures(s: string) {
 function normalizeForSearch(s: string) {
   const noLig = normalizeLigatures(s);
   const deAccented = noLig.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  return deAccented
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/gi, ' ')
-    .trim()
-    .replace(/\s+/g, ' ');
+  return deAccented.toLowerCase().replace(/[^a-z0-9]+/gi, ' ').trim().replace(/\s+/g, ' ');
 }
 
 function buildNormalizedWithMap(input: string) {
@@ -76,7 +72,7 @@ function buildNormalizedWithMap(input: string) {
   return { norm, map };
 }
 
-/** Compte le nombre d’occurrences selon la même logique que matchesFlexible */
+/** Compte occurrences selon la même logique */
 function countMatchesFlexible(text: string, query: string): number {
   const normQuery = normalizeForSearch(query);
   if (!normQuery) return 0;
@@ -107,7 +103,7 @@ function escapeHtml(s: string) {
     .replace(/"/g, '&quot;');
 }
 
-/** Surlignage aligné sur la logique de recherche */
+/** Surlignage aligné sur la recherche */
 function highlightFlexible(text: string, query: string) {
   const normQuery = normalizeForSearch(query);
   if (!normQuery) return escapeHtml(text);
@@ -161,17 +157,16 @@ export default function Search() {
   const { state, navigateToVerse } = useApp();
   const isDark = state.settings.theme === 'dark';
 
-  /* ---- Couverture anti-flash blanc clavier ---- */
+  /* ---- Anti-flash clavier + overscroll ---- */
   const [kbInset, setKbInset] = useState(0);
   const [fallbackCover, setFallbackCover] = useState(false);
 
   useEffect(() => {
     const vv = (window as any).visualViewport as VisualViewport | undefined;
-    if (!vv) return; // fallback géré via focus/blur
+    if (!vv) return;
 
     const onChange = () => {
       const inset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      // on ignore les micro-variations (< 6px)
       setKbInset(inset > 6 ? inset : 0);
     };
     vv.addEventListener('resize', onChange);
@@ -183,18 +178,28 @@ export default function Search() {
     };
   }, []);
 
-  // Forcer fond sombre global (au cas où)
   useEffect(() => {
     const html = document.documentElement;
     const body = document.body;
     const prevHtmlBg = html.style.backgroundColor;
     const prevBodyBg = body.style.backgroundColor;
+    const prevHtmlOver = html.style.overscrollBehaviorY;
+    const prevBodyOver = body.style.overscrollBehaviorY;
+    const prevBodyOX = body.style.overflowX;
+
     (html.style as any).colorScheme = 'dark';
     html.style.backgroundColor = '#0f172a';
     body.style.backgroundColor = '#0f172a';
+    html.style.overscrollBehaviorY = 'contain';
+    body.style.overscrollBehaviorY = 'contain';
+    body.style.overflowX = 'hidden';
+
     return () => {
       html.style.backgroundColor = prevHtmlBg;
       body.style.backgroundColor = prevBodyBg;
+      html.style.overscrollBehaviorY = prevHtmlOver;
+      body.style.overscrollBehaviorY = prevBodyOver;
+      body.style.overflowX = prevBodyOX;
     };
   }, []);
 
@@ -356,30 +361,35 @@ export default function Search() {
 
   /* ---- UI ---- */
 
-  // Hauteur identique pour le masque et le sticky offset (descendu ~3 mm)
-  const stickyTopPx = 56; // ~3.5rem ≈ 56px (top-14)
+  // Collage sous le menu : légèrement plus bas qu’avant (~2–3 mm)
+  const stickyTopPx = 64; // ≈ 4rem
   const kbCoverHeight = kbInset || (fallbackCover ? 300 : 0);
+  const idle = !loading && results.length === 0 && query.trim().length < 2;
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} transition-colors`}>
-      {/* Overlay anti-flash blanc (collé en bas, sous le contenu) */}
+    <div
+      className={`${isDark ? 'bg-gray-900' : 'bg-gray-50'} transition-colors ${
+        idle ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'
+      }`}
+    >
+      {/* Overlay anti-flash (très haut dans la pile, ne capte pas les clics) */}
       {kbCoverHeight > 0 && (
         <div
           aria-hidden
           className="fixed inset-x-0 bottom-0 bg-gray-900 pointer-events-none"
-          style={{ height: kbCoverHeight, zIndex: 1 }}
+          style={{ height: kbCoverHeight, zIndex: 50 }}
         />
       )}
 
       <div className="max-w-4xl mx-auto px-4 py-5 relative z-10">
-        {/* Masque collant (aligne visuellement avec la barre sticky) */}
+        {/* Masque collant qui évite de voir passer du contenu derrière la barre */}
         <div
           className={`sticky top-0 z-20 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}
           style={{ height: stickyTopPx }}
           aria-hidden
         />
 
-        {/* Barre de recherche (sticky, abaissée) */}
+        {/* Barre de recherche (collée sous le menu) */}
         <div
           className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow border ${
             isDark ? 'border-gray-700' : 'border-gray-200'
@@ -393,7 +403,7 @@ export default function Search() {
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
-              onFocus={() => setFallbackCover(true)}  // fallback si visualViewport indisponible
+              onFocus={() => setFallbackCover(true)}
               onBlur={() => setFallbackCover(false)}
               type="text"
               inputMode="search"
@@ -422,7 +432,7 @@ export default function Search() {
             </div>
           </form>
 
-          {/* Statut + actions (wrap sur 2 lignes si besoin) */}
+          {/* Statut + actions (wrap 2 lignes possible) */}
           <div className="mt-2 text-xs sm:text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div
               className={`${isDark ? 'text-white/90' : 'text-gray-700'} flex-1 whitespace-normal break-words leading-5`}
@@ -538,5 +548,4 @@ export default function Search() {
     </div>
   );
 }
-
 
