@@ -22,7 +22,7 @@ type Grouped = {
   occ: number; // total occurrences in this book
 };
 
-/* ========= Utils ========= */
+/* ========= Utils (accents/ligatures, préfixe, etc.) ========= */
 
 function normalizeLigatures(s: string) {
   return s.replace(/œ/g, 'oe').replace(/Œ/g, 'oe').replace(/æ/g, 'ae').replace(/Æ/g, 'ae');
@@ -31,7 +31,11 @@ function normalizeLigatures(s: string) {
 function normalizeForSearch(s: string) {
   const noLig = normalizeLigatures(s);
   const deAccented = noLig.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  return deAccented.toLowerCase().replace(/[^a-z0-9]+/gi, ' ').trim().replace(/\s+/g, ' ');
+  return deAccented
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/gi, ' ')
+    .trim()
+    .replace(/\s+/g, ' ');
 }
 
 function buildNormalizedWithMap(input: string) {
@@ -72,7 +76,28 @@ function buildNormalizedWithMap(input: string) {
   return { norm, map };
 }
 
-/** Compte occurrences selon la même logique */
+/** Match “flexible” :
+ *  - si la requête se termine par un espace → expression exacte (mots entiers)
+ *  - sinon → dernier mot en *préfixe* (ex: "conspi" → "conspiration")
+ *  - insensible aux accents/ligatures/casse
+ */
+function matchesFlexible(text: string, query: string) {
+  const normText = normalizeForSearch(text);
+  const normQuery = normalizeForSearch(query);
+  if (!normQuery) return false;
+
+  const endsWithSpace = /\s$/.test(query);
+  const paddedText = ` ${normText} `;
+
+  if (endsWithSpace) {
+    // mots entiers
+    return paddedText.includes(` ${normQuery} `);
+  }
+  // préfixe du dernier mot (et plus généralement: début de mot)
+  return paddedText.includes(` ${normQuery}`);
+}
+
+/** Compte le nombre d’occurrences selon la même logique que matchesFlexible */
 function countMatchesFlexible(text: string, query: string): number {
   const normQuery = normalizeForSearch(query);
   if (!normQuery) return 0;
@@ -90,7 +115,7 @@ function countMatchesFlexible(text: string, query: string): number {
     const pos = haystack.indexOf(needle, from);
     if (pos === -1) break;
     count++;
-    from = pos + needle.length;
+    from = pos + needle.length; // pas de chevauchement attendu (séparateurs = espaces)
   }
   return count;
 }
@@ -103,7 +128,7 @@ function escapeHtml(s: string) {
     .replace(/"/g, '&quot;');
 }
 
-/** Surlignage aligné sur la recherche */
+/** Surlignage aligné sur matchesFlexible */
 function highlightFlexible(text: string, query: string) {
   const normQuery = normalizeForSearch(query);
   if (!normQuery) return escapeHtml(text);
@@ -112,7 +137,7 @@ function highlightFlexible(text: string, query: string) {
   if (!norm) return escapeHtml(text);
 
   const endsWithSpace = /\s$/.test(query);
-  const padded = ` ${norm}`;
+  const padded = ` ${norm}`; // pas d’espace final ici
   const needle = endsWithSpace ? ` ${normQuery} ` : ` ${normQuery}`;
 
   const matches: Array<{ start: number; end: number }> = [];
@@ -120,19 +145,23 @@ function highlightFlexible(text: string, query: string) {
   while (true) {
     const pos = padded.indexOf(needle, from);
     if (pos === -1) break;
-    matches.push({ start: pos, end: pos + normQuery.length });
+    const startInNorm = pos;
+    const endInNorm = pos + normQuery.length; // exclusif
+    matches.push({ start: startInNorm, end: endInNorm });
     from = pos + needle.length;
   }
   if (!matches.length) return escapeHtml(text);
 
+  // Conversion → indices d’origine
   const ranges = matches
     .map(({ start, end }) => {
       const origStart = map[Math.max(0, start)];
-      const origEnd = (map[Math.min(map.length - 1, end - 1)] ?? map[map.length - 1]) + 1;
+      const origEnd = (map[Math.min(map.length - 1, end - 1)] ?? map[map.length - 1]) + 1; // exclu
       return { start: origStart, end: origEnd };
     })
     .sort((a, b) => a.start - b.start);
 
+  // Fusion des recouvrements
   const merged: typeof ranges = [];
   for (const r of ranges) {
     const last = merged[merged.length - 1];
@@ -140,6 +169,7 @@ function highlightFlexible(text: string, query: string) {
     else last.end = Math.max(last.end, r.end);
   }
 
+  // Construction HTML
   let html = '';
   let cursor = 0;
   for (const r of merged) {
@@ -156,52 +186,6 @@ function highlightFlexible(text: string, query: string) {
 export default function Search() {
   const { state, navigateToVerse } = useApp();
   const isDark = state.settings.theme === 'dark';
-
-  /* ---- Anti-flash clavier + overscroll ---- */
-  const [kbInset, setKbInset] = useState(0);
-  const [fallbackCover, setFallbackCover] = useState(false);
-
-  useEffect(() => {
-    const vv = (window as any).visualViewport as VisualViewport | undefined;
-    if (!vv) return;
-
-    const onChange = () => {
-      const inset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      setKbInset(inset > 6 ? inset : 0);
-    };
-    vv.addEventListener('resize', onChange);
-    vv.addEventListener('scroll', onChange);
-    onChange();
-    return () => {
-      vv.removeEventListener('resize', onChange);
-      vv.removeEventListener('scroll', onChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    const html = document.documentElement;
-    const body = document.body;
-    const prevHtmlBg = html.style.backgroundColor;
-    const prevBodyBg = body.style.backgroundColor;
-    const prevHtmlOver = html.style.overscrollBehaviorY;
-    const prevBodyOver = body.style.overscrollBehaviorY;
-    const prevBodyOX = body.style.overflowX;
-
-    (html.style as any).colorScheme = 'dark';
-    html.style.backgroundColor = '#0f172a';
-    body.style.backgroundColor = '#0f172a';
-    html.style.overscrollBehaviorY = 'contain';
-    body.style.overscrollBehaviorY = 'contain';
-    body.style.overflowX = 'hidden';
-
-    return () => {
-      html.style.backgroundColor = prevHtmlBg;
-      body.style.backgroundColor = prevBodyBg;
-      html.style.overscrollBehaviorY = prevHtmlOver;
-      body.style.overscrollBehaviorY = prevBodyOver;
-      body.style.overflowX = prevBodyOX;
-    };
-  }, []);
 
   const queryKey = `twog:search:lastQuery:${state.settings.language}`;
   const expandedKey = (q: string) =>
@@ -234,10 +218,12 @@ export default function Search() {
     return idx === -1 ? 9999 : idx;
   };
 
+  // Titre de page
   useEffect(() => {
     document.title = state.settings.language === 'fr' ? 'Recherche biblique' : 'Bible Search';
   }, [state.settings.language]);
 
+  // Lancer la recherche (debounce)
   useEffect(() => {
     if (query.trim().length < 2) {
       setResults([]);
@@ -246,7 +232,9 @@ export default function Search() {
     const handle = setTimeout(async () => {
       setLoading(true);
       try {
+        // Moissonnage côté service
         const res = await searchInBible(query, state.settings.language);
+        // Enrichissement avec le nombre d'occurrences, puis filtrage
         const enriched: ResultItem[] = [];
         for (const v of res) {
           const occ = countMatchesFlexible(v.text, query);
@@ -260,6 +248,7 @@ export default function Search() {
     return () => clearTimeout(handle);
   }, [query, state.settings.language]);
 
+  // Groupement par livre + somme des occurrences
   const grouped: Grouped[] = useMemo(() => {
     const map = new Map<string, ResultItem[]>();
     for (const v of results) {
@@ -278,6 +267,7 @@ export default function Search() {
     return arr;
   }, [results, state.settings.language, books]);
 
+  // Restauration états d’ouverture
   useEffect(() => {
     if (!grouped.length) {
       setExpanded({});
@@ -310,6 +300,7 @@ export default function Search() {
     } catch {}
   }, [expanded, grouped, query, state.settings.language]);
 
+  // Restauration du scroll
   useEffect(() => {
     if (!grouped.length || loading) return;
     const raw = sessionStorage.getItem(scrollKey(query));
@@ -359,42 +350,26 @@ export default function Search() {
     [results]
   );
 
-  /* ---- UI ---- */
-
-  // Collage sous le menu : légèrement plus bas qu’avant (~2–3 mm)
-  const stickyTopPx = 64; // ≈ 4rem
-  const kbCoverHeight = kbInset || (fallbackCover ? 300 : 0);
-  const idle = !loading && results.length === 0 && query.trim().length < 2;
-
   return (
-    <div
-      className={`${isDark ? 'bg-gray-900' : 'bg-gray-50'} transition-colors ${
-        idle ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'
-      }`}
-    >
-      {/* Overlay anti-flash (très haut dans la pile, ne capte pas les clics) */}
-      {kbCoverHeight > 0 && (
-        <div
-          aria-hidden
-          className="fixed inset-x-0 bottom-0 bg-gray-900 pointer-events-none"
-          style={{ height: kbCoverHeight, zIndex: 50 }}
-        />
-      )}
+    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} transition-colors`}>
+      <div className="max-w-4xl mx-auto px-4 py-5">
+        {/* En-tête / titre */}
+        <h1 className={`text-xl font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          {state.settings.language === 'fr' ? 'Recherche' : 'Search'}
+        </h1>
 
-      <div className="max-w-4xl mx-auto px-4 py-5 relative z-10">
-        {/* Masque collant qui évite de voir passer du contenu derrière la barre */}
+        {/* Petit masque collant */}
         <div
           className={`sticky top-0 z-20 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}
-          style={{ height: stickyTopPx }}
+          style={{ height: 8 }}
           aria-hidden
         />
 
-        {/* Barre de recherche (collée sous le menu) */}
+        {/* Barre de recherche (sticky) */}
         <div
           className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow border ${
             isDark ? 'border-gray-700' : 'border-gray-200'
-          } p-3 sticky z-30`}
-          style={{ top: stickyTopPx }}
+          } p-3 sticky top-20 sm:top-16 z-30`}
         >
           <form onSubmit={e => e.preventDefault()} className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -403,11 +378,12 @@ export default function Search() {
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
-              onFocus={() => setFallbackCover(true)}
-              onBlur={() => setFallbackCover(false)}
               type="text"
-              inputMode="search"
-              placeholder={state.settings.language === 'fr' ? 'Tapez votre recherche' : 'Type your search'}
+              placeholder={
+                state.settings.language === 'fr'
+                  ? 'Tapez votre recherche'
+                  : 'Type your search'
+              }
               className={`w-full pl-10 pr-20 py-3 rounded-lg border-2 focus:outline-none transition ${
                 isDark
                   ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-400 focus:border-blue-500'
@@ -432,11 +408,9 @@ export default function Search() {
             </div>
           </form>
 
-          {/* Statut + actions (wrap 2 lignes possible) */}
-          <div className="mt-2 text-xs sm:text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <div
-              className={`${isDark ? 'text-white/90' : 'text-gray-700'} flex-1 whitespace-normal break-words leading-5`}
-            >
+          {/* Ligne d’infos + actions — une seule ligne */}
+          <div className="mt-2 text-sm flex items-center justify-between gap-2">
+            <div className={`${isDark ? 'text-white' : 'text-gray-600'} flex-1 min-w-0 truncate`}>
               {loading ? (
                 <>
                   <Loader2 className="inline mr-2 animate-spin" size={16} />
@@ -454,7 +428,7 @@ export default function Search() {
             </div>
 
             {grouped.length > 1 && totalOccurrences > 0 && !loading && (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-shrink-0 space-x-2">
                 <button
                   onClick={expandAll}
                   className="text-xs px-2 py-1 rounded border border-transparent bg-blue-600 text-white hover:bg-blue-500"
