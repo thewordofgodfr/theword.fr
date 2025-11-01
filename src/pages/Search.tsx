@@ -76,19 +76,6 @@ function buildNormalizedWithMap(input: string) {
   return { norm, map };
 }
 
-/** Match “flexible” (espace final = expression exacte ; sinon préfixe du dernier mot) */
-function matchesFlexible(text: string, query: string) {
-  const normText = normalizeForSearch(text);
-  const normQuery = normalizeForSearch(query);
-  if (!normQuery) return false;
-
-  const endsWithSpace = /\s$/.test(query);
-  const paddedText = ` ${normText} `;
-
-  if (endsWithSpace) return paddedText.includes(` ${normQuery} `);
-  return paddedText.includes(` ${normQuery}`);
-}
-
 /** Compte le nombre d’occurrences selon la même logique que matchesFlexible */
 function countMatchesFlexible(text: string, query: string): number {
   const normQuery = normalizeForSearch(query);
@@ -120,7 +107,7 @@ function escapeHtml(s: string) {
     .replace(/"/g, '&quot;');
 }
 
-/** Surlignage aligné sur matchesFlexible */
+/** Surlignage aligné sur la logique de recherche */
 function highlightFlexible(text: string, query: string) {
   const normQuery = normalizeForSearch(query);
   if (!normQuery) return escapeHtml(text);
@@ -137,9 +124,7 @@ function highlightFlexible(text: string, query: string) {
   while (true) {
     const pos = padded.indexOf(needle, from);
     if (pos === -1) break;
-    const startInNorm = pos;
-    const endInNorm = pos + normQuery.length; // exclusif
-    matches.push({ start: startInNorm, end: endInNorm });
+    matches.push({ start: pos, end: pos + normQuery.length });
     from = pos + needle.length;
   }
   if (!matches.length) return escapeHtml(text);
@@ -176,25 +161,40 @@ export default function Search() {
   const { state, navigateToVerse } = useApp();
   const isDark = state.settings.theme === 'dark';
 
-  // Fix "flash blanc" sous Android lors de l’ouverture du clavier
+  /* ---- Couverture anti-flash blanc clavier ---- */
+  const [kbInset, setKbInset] = useState(0);
+  const [fallbackCover, setFallbackCover] = useState(false);
+
+  useEffect(() => {
+    const vv = (window as any).visualViewport as VisualViewport | undefined;
+    if (!vv) return; // fallback géré via focus/blur
+
+    const onChange = () => {
+      const inset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      // on ignore les micro-variations (< 6px)
+      setKbInset(inset > 6 ? inset : 0);
+    };
+    vv.addEventListener('resize', onChange);
+    vv.addEventListener('scroll', onChange);
+    onChange();
+    return () => {
+      vv.removeEventListener('resize', onChange);
+      vv.removeEventListener('scroll', onChange);
+    };
+  }, []);
+
+  // Forcer fond sombre global (au cas où)
   useEffect(() => {
     const html = document.documentElement;
     const body = document.body;
     const prevHtmlBg = html.style.backgroundColor;
     const prevBodyBg = body.style.backgroundColor;
-    const prevScheme = (html.style as any).colorScheme;
-    const prevOverscroll = html.style.overscrollBehaviorY;
-
-    html.style.backgroundColor = '#0f172a'; // gray-900
-    body.style.backgroundColor = '#0f172a';
     (html.style as any).colorScheme = 'dark';
-    html.style.overscrollBehaviorY = 'contain';
-
+    html.style.backgroundColor = '#0f172a';
+    body.style.backgroundColor = '#0f172a';
     return () => {
       html.style.backgroundColor = prevHtmlBg;
       body.style.backgroundColor = prevBodyBg;
-      (html.style as any).colorScheme = prevScheme;
-      html.style.overscrollBehaviorY = prevOverscroll;
     };
   }, []);
 
@@ -354,26 +354,37 @@ export default function Search() {
     [results]
   );
 
+  /* ---- UI ---- */
+
+  // Hauteur identique pour le masque et le sticky offset (descendu ~3 mm)
+  const stickyTopPx = 56; // ~3.5rem ≈ 56px (top-14)
+  const kbCoverHeight = kbInset || (fallbackCover ? 300 : 0);
+
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} transition-colors`}>
-      <div className="max-w-4xl mx-auto px-4 py-5">
-        {/* En-tête / titre */}
-        <h1 className={`text-xl font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-          {state.settings.language === 'fr' ? 'Recherche' : 'Search'}
-        </h1>
+      {/* Overlay anti-flash blanc (collé en bas, sous le contenu) */}
+      {kbCoverHeight > 0 && (
+        <div
+          aria-hidden
+          className="fixed inset-x-0 bottom-0 bg-gray-900 pointer-events-none"
+          style={{ height: kbCoverHeight, zIndex: 1 }}
+        />
+      )}
 
-        {/* Masque collant (plus haut pour cacher ce qui passe derrière) */}
+      <div className="max-w-4xl mx-auto px-4 py-5 relative z-10">
+        {/* Masque collant (aligne visuellement avec la barre sticky) */}
         <div
           className={`sticky top-0 z-20 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}
-          style={{ height: 20 }}
+          style={{ height: stickyTopPx }}
           aria-hidden
         />
 
-        {/* Barre de recherche (remontée) */}
+        {/* Barre de recherche (sticky, abaissée) */}
         <div
           className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow border ${
             isDark ? 'border-gray-700' : 'border-gray-200'
-          } p-3 sticky top-12 sm:top-12 z-30`}
+          } p-3 sticky z-30`}
+          style={{ top: stickyTopPx }}
         >
           <form onSubmit={e => e.preventDefault()} className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -382,12 +393,11 @@ export default function Search() {
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
+              onFocus={() => setFallbackCover(true)}  // fallback si visualViewport indisponible
+              onBlur={() => setFallbackCover(false)}
               type="text"
-              placeholder={
-                state.settings.language === 'fr'
-                  ? 'Tapez votre recherche'
-                  : 'Type your search'
-              }
+              inputMode="search"
+              placeholder={state.settings.language === 'fr' ? 'Tapez votre recherche' : 'Type your search'}
               className={`w-full pl-10 pr-20 py-3 rounded-lg border-2 focus:outline-none transition ${
                 isDark
                   ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-400 focus:border-blue-500'
@@ -412,9 +422,11 @@ export default function Search() {
             </div>
           </form>
 
-          {/* Ligne d’infos + actions */}
-          <div className="mt-2 text-sm flex items-center justify-between gap-2">
-            <div className={`${isDark ? 'text-white' : 'text-gray-600'} flex-1 min-w-0 truncate`}>
+          {/* Statut + actions (wrap sur 2 lignes si besoin) */}
+          <div className="mt-2 text-xs sm:text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div
+              className={`${isDark ? 'text-white/90' : 'text-gray-700'} flex-1 whitespace-normal break-words leading-5`}
+            >
               {loading ? (
                 <>
                   <Loader2 className="inline mr-2 animate-spin" size={16} />
@@ -432,7 +444,7 @@ export default function Search() {
             </div>
 
             {grouped.length > 1 && totalOccurrences > 0 && !loading && (
-              <div className="flex flex-shrink-0 space-x-2">
+              <div className="flex flex-wrap gap-2">
                 <button
                   onClick={expandAll}
                   className="text-xs px-2 py-1 rounded border border-transparent bg-blue-600 text-white hover:bg-blue-500"
@@ -526,4 +538,5 @@ export default function Search() {
     </div>
   );
 }
+
 
