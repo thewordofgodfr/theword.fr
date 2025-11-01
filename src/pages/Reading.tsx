@@ -25,7 +25,7 @@ export default function Reading() {
   const { t } = useTranslation();
 
   const NAV_H = 64;
-  const HIGHLIGHT_EXTRA_OFFSET = 64; // +26px vs 38px pour que le verset apparaisse plus bas après une recherche
+  const HIGHLIGHT_EXTRA_OFFSET = 64; // verset un peu plus bas après une recherche
 
   const commandBarRef = useRef<HTMLDivElement>(null);
   const [cmdH, setCmdH] = useState(0);
@@ -178,7 +178,7 @@ export default function Reading() {
   const getBookName = (book: BibleBook | null) =>
     state.settings.language === 'fr' ? (book?.nameFr ?? '') : (book?.nameEn ?? '');
 
-  // *** Show more characters on mobile ***
+  // *** Mobile: autoriser un peu plus de caractères ***
   const shortBookName = (book: BibleBook | null) => {
     const full = getBookName(book);
     const max = 14;
@@ -275,6 +275,11 @@ export default function Reading() {
     (activeSlot === 1 || activeSlot === 2 || activeSlot === 3)
       ? SLOT_THEMES[activeSlot as SlotKey]
       : null;
+
+  // -------- Pavé couleur (PC) pour afficher Livre • Chapitre ----------
+  const desktopChipBase =
+    'inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm whitespace-nowrap';
+  const desktopChipColors = activeTheme ? activeTheme.solid : 'bg-blue-600 text-white';
 
   const [hasLoadedContext, setHasLoadedContext] = useState(false);
 
@@ -596,7 +601,7 @@ export default function Reading() {
                 <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-2 w-full">
                   <div className="flex flex-col w-full md:w-auto">
                     <h2 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'} text-sm md:text-base flex flex-col md:flex-row md:items-center gap-2 w-full`}>
-                      {/* Bloc MOBILE uniquement */}
+                      {/* MOBILE uniquement */}
                       <div className="flex w-full items-center gap-2 overflow-hidden md:hidden">
                         {/* Livre (mobile) */}
                         <button
@@ -667,10 +672,13 @@ export default function Reading() {
                         </div>
                       </div>
 
-                      {/* Bloc DESKTOP uniquement */}
+                      {/* DESKTOP : pavé couleur = slot actif */}
                       <div className="hidden md:flex md:items-center md:gap-2">
-                        <span className="truncate max-w-[28ch]">{getBookName(selectedBook)} •</span>
-                        <span>{t('chapter')} {selectedChapter}</span>
+                        <span className={`${desktopChipBase} ${desktopChipColors}`}>
+                          <span className="truncate max-w-[28ch]">{getBookName(selectedBook)}</span>
+                          <span>•</span>
+                          <span>{t('chapter')} {selectedChapter}</span>
+                        </span>
                       </div>
                     </h2>
                   </div>
@@ -775,7 +783,7 @@ export default function Reading() {
                     {state.settings.language === 'fr' ? 'Copier' : 'Copy'}
                   </button>
                   <button onClick={shareSelection} className="inline-flex items-center px-3 py-2 rounded bg-gray-700 text-white hover:opacity-90">
-                    <Share2 as={Share2 as any} size={16} className="mr-2" />
+                    <ShareIcon size={16} className="mr-2" />
                     {state.settings.language === 'fr' ? 'Partager' : 'Share'}
                   </button>
                   <button onClick={() => setSelectedVerses([])} className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700'} px-3 py-2 rounded hover:opacity-90`}>
@@ -939,7 +947,7 @@ export default function Reading() {
                   {state.settings.language === 'fr' ? 'Copier' : 'Copy'}
                 </button>
                 <button onClick={shareSelection} className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700'} px-3 py-1.5 rounded-full inline-flex items-center`}>
-                  <Share2 as={Share2 as any} size={16} className="mr-1" />
+                  <ShareIcon size={16} className="mr-1" />
                   {state.settings.language === 'fr' ? 'Partager' : 'Share'}
                 </button>
                 <button onClick={() => setSelectedVerses([])} className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700'} px-3 py-1.5 rounded-full`}>
