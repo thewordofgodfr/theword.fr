@@ -33,7 +33,6 @@ export default function Settings() {
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return;
     const onControllerChange = () => {
-      // Quand le nouveau SW prend le contrôle -> rechargement propre
       window.location.reload();
     };
     navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
@@ -52,10 +51,8 @@ export default function Settings() {
         setUpdateStatus('unavailable');
         return;
       }
-
       const previousWaiting = reg.waiting || null;
-      await reg.update(); // force un check de MAJ
-
+      await reg.update();
       setTimeout(() => {
         if (reg.waiting && reg.waiting !== previousWaiting) {
           setWaitingSW(reg.waiting);
@@ -78,6 +75,40 @@ export default function Settings() {
     }
   };
 
+  // --- Bouton langue réutilisable (corrige contraste sélection) ---
+  const LangButton: React.FC<{
+    active: boolean;
+    flag: string;
+    title: string;
+    subtitle: string;
+    onClick: () => void;
+  }> = ({ active, flag, title, subtitle, onClick }) => {
+    return (
+      <button
+        onClick={onClick}
+        className={`w-full flex items-center justify-between px-6 py-4 rounded-xl border-2 transition-all duration-200
+          ${active
+            ? 'bg-blue-600 border-blue-600 text-white'
+            : (isDark
+                ? 'bg-gray-700 border-gray-600 text-white hover:border-gray-500'
+                : 'bg-white border-gray-300 text-gray-800 hover:border-gray-400')}`}
+      >
+        <div className="flex items-center space-x-3">
+          <span className="text-2xl">{flag}</span>
+          <div className="text-left">
+            <div className={`font-semibold ${active ? 'text-white' : (isDark ? 'text-white' : 'text-gray-800')}`}>
+              {title}
+            </div>
+            <div className={`text-sm ${active ? 'text-white/90' : (isDark ? 'text-white/80' : 'text-gray-600')}`}>
+              {subtitle}
+            </div>
+          </div>
+        </div>
+        {active && <div className="w-3 h-3 rounded-full bg-white" />}
+      </button>
+    );
+  };
+
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} transition-colors duration-200`}>
       <div className="container mx-auto px-4 py-8">
@@ -97,87 +128,20 @@ export default function Settings() {
             </h2>
 
             <div className="space-y-4">
-              {/* FR */}
-              <button
+              <LangButton
+                active={state.settings.language === 'fr'}
+                flag="🇫🇷"
+                title="Français"
+                subtitle="Louis Segond 1910 révision 2025"
                 onClick={() => updateSettings({ language: 'fr' })}
-                className={`w-full flex items-center justify-between px-6 py-4 rounded-xl border-2 transition-all duration-200 ${
-                  state.settings.language === 'fr'
-                    ? 'border-blue-500 bg-blue-50'
-                    : isDark
-                    ? 'border-gray-600 bg-gray-700 hover:border-gray-500'
-                    : 'border-gray-300 bg-gray-50 hover:border-gray-400'
-                }`}
-              >
-                <div className="flex items-center space-x-3">
-                  <span className="text-2xl">🇫🇷</span>
-                  <div className="text-left">
-                    <div
-                      className={`font-semibold ${
-                        state.settings.language === 'fr'
-                          ? 'text-blue-900'
-                          : isDark
-                          ? 'text-white'
-                          : 'text-gray-800'
-                      }`}
-                    >
-                      Français
-                    </div>
-                    <div
-                      className={`text-sm ${
-                        state.settings.language === 'fr'
-                          ? 'text-blue-700'
-                          : isDark
-                          ? 'text-white/80'
-                          : 'text-gray-600'
-                      }`}
-                    >
-                      Louis Segond 1910 révision 2025
-                    </div>
-                  </div>
-                </div>
-                {state.settings.language === 'fr' && <div className="w-3 h-3 bg-blue-500 rounded-full" />}
-              </button>
-
-              {/* EN */}
-              <button
+              />
+              <LangButton
+                active={state.settings.language === 'en'}
+                flag="🇺🇸"
+                title="English"
+                subtitle="King James Version"
                 onClick={() => updateSettings({ language: 'en' })}
-                className={`w-full flex items-center justify-between px-6 py-4 rounded-xl border-2 transition-all duration-200 ${
-                  state.settings.language === 'en'
-                    ? 'border-blue-500 bg-blue-50'
-                    : isDark
-                    ? 'border-gray-600 bg-gray-700 hover:border-gray-500'
-                    : 'border-gray-300 bg-gray-50 hover:border-gray-400'
-                }`}
-              >
-                <div className="flex items-center space-x-3">
-                  <span className="text-2xl">🇺🇸</span>
-                  <div className="text-left">
-                    <div
-                      className={`font-semibold ${
-                        state.settings.language === 'en'
-                          ? 'text-blue-900'
-                          : isDark
-                          ? 'text-white'
-                          : 'text-gray-800'
-                      }`}
-                    >
-                      English
-                    </div>
-                    <div
-                      className={`text-sm ${
-                        state.settings.language === 'en'
-                          ? 'text-blue-700'
-                          : isDark
-                          ? 'text-white/80'
-                          : 'text-gray-600'
-                      }`}
-                    >
-                      King James Version
-                    </div>
-                  </div>
-                </div>
-                {state.settings.language === 'en' && <div className="w-3 h-3 bg-blue-500 rounded-full" />}
-              </button>
+              />
             </div>
           </div>
 
@@ -346,4 +310,3 @@ export default function Settings() {
     </div>
   );
 }
-
