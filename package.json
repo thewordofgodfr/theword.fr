@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "prebuild": "node scripts/stamp-version.cjs --bump-sw",
-    "build": "node scripts/stamp-version.cjs --bump-sw && vite build",
+    "build": "vite build",
     "postbuild": "node -e \"try{require('fs').cpSync('sw-v7.js','dist/sw-v7.js',{force:true})}catch(e){try{require('fs').cpSync('public/sw-v7.js','dist/sw-v7.js',{force:true})}catch{}}\"",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -34,3 +34,4 @@
     "vite": "^5.4.2"
   }
 }
+
