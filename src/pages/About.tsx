@@ -51,7 +51,7 @@ export default function About() {
                       </p>
                       <p className={`text-xs ${isDark ? 'text-white' : 'text-gray-500'} mt-2`}>
                         {state.settings.language === 'fr'
-                          ? 'Version de référence pour la Bible en français, traduite par Louis Segond en 1910 et révisé en 2025.'
+                          ? 'Version de référence pour la Bible en français, traduite par Louis Segond en 1910.'
                           : 'Reference version for the Bible in French, translated by Louis Segond in 1910.'}
                       </p>
                     </div>
