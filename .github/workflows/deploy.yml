@@ -1,3 +1,4 @@
+# .github/workflows/deploy.yml
 name: Deploy to GitHub Pages (Vite)
 
 on:
@@ -6,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write       # <- pour pouvoir push la MAJ de version.json & sw-v7.js
   pages: write
   id-token: write
 
@@ -25,12 +26,31 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - run: npm install
+      - run: npm ci
       - run: npm run build
+
+      # Affiche la version générée (debug)
+      - run: cat public/version.json || true
+
+      # ✅ Commit & push du bump de version (évite de rester bloqué à la même valeur)
+      - name: Commit version bump
+        run: |
+          set -e
+          CHANGED=$(git status --porcelain public/version.json sw-v7.js | wc -l)
+          if [ "$CHANGED" -gt 0 ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add public/version.json sw-v7.js
+            VERSION=$(node -p "JSON.parse(require('fs').readFileSync('public/version.json','utf8')).version")
+            git commit -m "chore: bump version to ${VERSION} [skip ci]"
+            git push
+          else
+            echo "Aucun fichier de version modifié."
+          fi
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist    # dossier généré par Vite
+          path: dist
 
   deploy:
     runs-on: ubuntu-latest
