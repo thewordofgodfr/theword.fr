@@ -36,7 +36,7 @@ const translations = {
     aboutTitle: '',
     aboutDescription: 'The Word vous permet de découvrir la parole de Dieu à travers des versets aléatoires et une lecture complète de la Bible.',
     bibleVersions: 'Versions de la Bible',
-    frenchVersion: 'Français : Louis Segond 1910 (LSG) - Libre de droit',
+    frenchVersion: 'Français : Louis Segond 1910 (LSG)- Révision 2025 - Libre de droit',
     englishVersion: 'Anglais : King James Version (KJV) - Libre de droit',
     randomFeature: 'Fonctionnalité Aléatoire',
     randomFeatureDesc: 'Notre générateur de versets aléatoires sélectionne parmi plus de 31,000 versets bibliques pour vous offrir une inspiration quotidienne.',
