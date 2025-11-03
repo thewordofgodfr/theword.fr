@@ -1,82 +1,85 @@
 // scripts/stamp-version.js
-// Génère public/version.json + (optionnel) bump CACHE_VERSION dans sw-v7.js
-// Usage: node scripts/stamp-version.js --bump-sw
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const fs = require('fs');
-const path = require('path');
-const cp = require('child_process');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT = path.resolve(__dirname, "..");
 
-const ROOT = path.resolve(__dirname, '..');
-const PUBLIC_DIR = path.join(ROOT, 'public');
-const VERSION_JSON = path.join(PUBLIC_DIR, 'version.json');
+const args = new Set(process.argv.slice(2));
 
-// 1) Lire version package.json (si présent)
-let pkgVersion = '0.0.0';
-try {
-  const pkg = require(path.join(ROOT, 'package.json'));
-  pkgVersion = pkg.version || '0.0.0';
-} catch {}
+const pkgPath = path.join(ROOT, "package.json");
+const swCandidates = [path.join(ROOT, "sw-v7.js"), path.join(ROOT, "public", "sw-v7.js")];
+const publicDir = path.join(ROOT, "public");
+const versionJsonPath = path.join(publicDir, "version.json");
 
-// 2) Récup git short SHA
-let shortSha = '';
-try {
-  shortSha = cp.execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] })
-    .toString().trim();
-} catch { shortSha = 'local'; }
-
-// 3) Timestamp ISO
-const builtAt = new Date().toISOString();
-
-// 4) Version finale (éventuellement enrichie du numéro de run CI)
-const runNumber = process.env.GITHUB_RUN_NUMBER;
-const version = runNumber ? `${pkgVersion}+${runNumber}` : pkgVersion;
-
-// 5) Lecture/maj sw-v7.js
-const SW_CANDIDATES = [
-  path.join(ROOT, 'sw-v7.js'),
-  path.join(PUBLIC_DIR, 'sw-v7.js'),
-];
-let swPath = SW_CANDIDATES.find(p => fs.existsSync(p)) || null;
-
-const RX_CACHE_VERSION = /const\s+CACHE_VERSION\s*=\s*['"]([^'"]+)['"]\s*;/;
-
-let swCache = null;
-const shouldBump = process.argv.includes('--bump-sw');
-
-if (swPath) {
-  let text = fs.readFileSync(swPath, 'utf8');
-  const m = text.match(RX_CACHE_VERSION);
-
-  if (m) {
-    const prev = m[1];
-    if (shouldBump) {
-      // Tag lisible : vYYYYMMDDHHmm-<sha> ou fallback
-      const stamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 12);
-      const next = `v${stamp}-${shortSha}`;
-      text = text.replace(RX_CACHE_VERSION, `const CACHE_VERSION = '${next}';`);
-      fs.writeFileSync(swPath, text, 'utf8');
-      swCache = next;
-      console.log(`[stamp-version] CACHE_VERSION: ${prev} -> ${next} in ${path.relative(ROOT, swPath)}`);
-    } else {
-      swCache = prev;
-      console.log(`[stamp-version] CACHE_VERSION (unchanged): ${prev}`);
-    }
-  } else {
-    console.warn(`[stamp-version] WARN: CACHE_VERSION not found in ${path.relative(ROOT, swPath)}`);
-  }
-} else {
-  console.warn('[stamp-version] WARN: sw-v7.js not found (root/public)');
+function readText(p) {
+  return readFileSync(p, "utf8");
+}
+function writeText(p, s) {
+  writeFileSync(p, s, "utf8");
 }
 
-// 6) Écrire public/version.json
-if (!fs.existsSync(PUBLIC_DIR)) fs.mkdirSync(PUBLIC_DIR, { recursive: true });
+function findSwPath() {
+  for (const p of swCandidates) if (existsSync(p)) return p;
+  return null;
+}
 
-const payload = {
-  version,
-  commit: shortSha,
-  builtAt,
-  ...(swCache ? { swCache } : {})
-};
+function getCacheVersionFromSw(text) {
+  // matches: const CACHE_VERSION = 'v12';
+  const m = text.match(/const\s+CACHE_VERSION\s*=\s*['"]v(\d+)['"]\s*;/);
+  return m ? Number(m[1]) : null;
+}
 
-fs.writeFileSync(VERSION_JSON, JSON.stringify(payload, null, 2), 'utf8');
-console.log(`[stamp-version] Wrote ${path.relative(ROOT, VERSION_JSON)}:\n`, payload);
+function bumpCacheVersionInSw(text) {
+  return text.replace(
+    /(const\s+CACHE_VERSION\s*=\s*['"]v)(\d+)(['"]\s*;)/,
+    (_all, a, num, c) => a + (Number(num) + 1) + c
+  );
+}
+
+function stampVersionJson({ appVersion, swCacheVersion }) {
+  const data = {
+    appVersion,
+    swCacheVersion: swCacheVersion != null ? `v${swCacheVersion}` : null,
+    builtAt: new Date().toISOString(),
+    ciCommit: process.env.GITHUB_SHA ? String(process.env.GITHUB_SHA).slice(0, 7) : null
+  };
+  if (!existsSync(publicDir)) mkdirSync(publicDir, { recursive: true });
+  writeText(versionJsonPath, JSON.stringify(data, null, 2));
+  console.log(`Wrote ${versionJsonPath}:`, data);
+}
+
+(function main() {
+  // read package.json to expose appVersion in version.json
+  const pkg = JSON.parse(readText(pkgPath));
+  let appVersion = pkg.version || "0.0.0";
+
+  // handle SW bump if requested
+  const swPath = findSwPath();
+  let swCacheVersion = null;
+
+  if (swPath && existsSync(swPath)) {
+    let swText = readText(swPath);
+    const current = getCacheVersionFromSw(swText);
+    swCacheVersion = current;
+
+    if (args.has("--bump-sw")) {
+      if (current != null) {
+        swText = bumpCacheVersionInSw(swText);
+        writeText(swPath, swText);
+        const after = getCacheVersionFromSw(swText);
+        swCacheVersion = after;
+        console.log(`Service Worker CACHE_VERSION bumped: v${current} -> v${after} (${path.basename(swPath)})`);
+      } else {
+        console.warn("CACHE_VERSION not found in Service Worker; no bump applied.");
+      }
+    }
+  } else {
+    console.warn("Service Worker not found (looked in repo root or public/). Skipping bump.");
+  }
+
+  // Always (re)write version.json for the app
+  stampVersionJson({ appVersion, swCacheVersion });
+})();
