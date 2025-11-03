@@ -1,78 +1,30 @@
 // src/pages/Settings.tsx
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import QuickSlotsHelp from '../components/QuickSlotsHelp';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { Globe, Palette, RefreshCcw } from 'lucide-react';
-
-/** Petites icônes drapeaux en SVG pour une apparence fiable (desktop/mobile) */
-function FlagSvg({ code, size = 24 }: { code: 'fr' | 'us'; size?: number }) {
-  if (code === 'fr') {
-    // Tricolore vertical bleu/blanc/rouge
-    return (
-      <svg
-        width={size}
-        height={(size * 2) / 3}
-        viewBox="0 0 3 2"
-        aria-hidden="true"
-        role="img"
-      >
-        <rect width="1" height="2" x="0" y="0" fill="#0055A4" />
-        <rect width="1" height="2" x="1" y="0" fill="#FFFFFF" />
-        <rect width="1" height="2" x="2" y="0" fill="#EF4135" />
-      </svg>
-    );
-  }
-  // US : bandes + canton simplifié (étoiles stylisées)
-  return (
-    <svg
-      width={size}
-      height={(size * 2) / 3}
-      viewBox="0 0 19 10"
-      aria-hidden="true"
-      role="img"
-    >
-      {/* Bandes rouges */}
-      {[0,2,4,6,8].map((y) => (
-        <rect key={y} x="0" y={y} width="19" height="1" fill="#B22234" />
-      ))}
-      {/* Bandes blanches */}
-      {[1,3,5,7,9].map((y) => (
-        <rect key={y} x="0" y={y} width="19" height="1" fill="#FFFFFF" />
-      ))}
-      {/* Canton bleu */}
-      <rect x="0" y="0" width="8" height="7" fill="#3C3B6E" />
-      {/* Étoiles simplifiées */}
-      {Array.from({ length: 9 }).map((_, r) =>
-        Array.from({ length: r % 2 === 0 ? 4 : 3 }).map((__, c) => {
-          const cx = r % 2 === 0 ? 1 + c * 2 : 2 + c * 2;
-          const cy = 0.7 + r * 0.75;
-          return <circle key={`${r}-${c}`} cx={cx} cy={cy} r="0.12" fill="#FFFFFF" />;
-        })
-      )}
-    </svg>
-  );
-}
 
 export default function Settings() {
   const { state, updateSettings } = useApp();
   const { t } = useTranslation();
 
-  // Forcer sombre (ton choix global)
+  // Forcer le mode sombre au montage (sécurité globale)
   useEffect(() => {
     if (state.settings.theme !== 'dark') {
       updateSettings({ theme: 'dark' });
     }
   }, [state.settings.theme, updateSettings]);
 
+  // UI forcée en sombre
   const isDark = true;
 
-  // Tailles (mobile prioritaire)
+  // Tailles (du plus petit au plus grand)
   const fontSizes = [21, 23, 25, 27];
   const XL_FONT = 42;
 
-  // --- Gestion MAJ (Service Worker) ---
+  // --- Gestion mise à jour (SW) ---
   const [updateStatus, setUpdateStatus] = useState<
     'idle' | 'checking' | 'ready' | 'upToDate' | 'unavailable' | 'error'
   >('idle');
@@ -81,56 +33,11 @@ export default function Settings() {
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return;
     const onControllerChange = () => {
-      // Nouveau SW actif -> rechargement propre
       window.location.reload();
     };
     navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
-    return () =>
-      navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
+    return () => navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
   }, []);
-
-  async function waitForServiceWorker(reg: ServiceWorkerRegistration): Promise<'ready' | 'upToDate'> {
-    if (reg.waiting) return 'ready';
-
-    let settled = false;
-    return new Promise<'ready' | 'upToDate'>((resolve) => {
-      const finish = (status: 'ready' | 'upToDate') => {
-        if (!settled) {
-          settled = true;
-          cleanup();
-          resolve(status);
-        }
-      };
-
-      const onInstallingChange = () => {
-        const sw = reg.installing;
-        if (!sw) return;
-        if (sw.state === 'installed') {
-          if (reg.waiting) finish('ready');
-          else finish('upToDate');
-        }
-      };
-
-      const onUpdateFound = () => {
-        const sw = reg.installing;
-        if (sw) sw.addEventListener('statechange', onInstallingChange);
-      };
-
-      const cleanup = () => {
-        reg.removeEventListener('updatefound', onUpdateFound);
-        if (reg.installing) reg.installing.removeEventListener('statechange', onInstallingChange);
-      };
-
-      reg.addEventListener('updatefound', onUpdateFound);
-      if (reg.installing) onInstallingChange();
-
-      // Filet de sécurité
-      setTimeout(() => {
-        if (reg.waiting) finish('ready');
-        else finish('upToDate');
-      }, 10000);
-    });
-  }
 
   const handleCheckUpdates = async () => {
     if (!('serviceWorker' in navigator)) {
@@ -144,19 +51,18 @@ export default function Settings() {
         setUpdateStatus('unavailable');
         return;
       }
+      const previousWaiting = reg.waiting || null;
 
-      await reg.update(); // déclenche une vérification réseau
-      const status = await waitForServiceWorker(reg);
+      await reg.update(); // force un check
 
-      if (status === 'ready') {
-        setWaitingSW(reg.waiting);
-        setUpdateStatus('ready');
-      } else {
-        setUpdateStatus('upToDate');
-      }
-
-      // On en profite pour rafraîchir l'info version
-      fetchVersionInfo();
+      setTimeout(() => {
+        if (reg.waiting && reg.waiting !== previousWaiting) {
+          setWaitingSW(reg.waiting);
+          setUpdateStatus('ready');
+        } else {
+          setUpdateStatus('upToDate');
+        }
+      }, 800);
     } catch {
       setUpdateStatus('error');
     }
@@ -171,68 +77,10 @@ export default function Settings() {
     }
   };
 
-  // --- Version / Build (public/version.json) ---
-  type VersionInfo = {
-    version?: string;      // ex: "1.4.3"
-    commit?: string;       // ex: "a1b2c3d"
-    builtAt?: string;      // ISO date
-    swCache?: string;      // ex: "v12" (optionnel: aligné avec CACHE_VERSION du SW)
-  };
-  const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
-
-  const fetchVersionInfo = async () => {
-    try {
-      // 1) Essai réseau sans cache
-      const res = await fetch('/version.json', { cache: 'no-store' });
-      if (res.ok) {
-        const v = (await res.json()) as VersionInfo;
-        setVersionInfo(v);
-        return;
-      }
-      throw new Error('no-store fetch failed');
-    } catch {
-      // 2) Essai normal (la PWA peut te renvoyer la version du cache)
-      try {
-        const res2 = await fetch('/version.json');
-        if (res2.ok) {
-          const v2 = (await res2.json()) as VersionInfo;
-          setVersionInfo(v2);
-          return;
-        }
-      } catch {}
-      // 3) Filet via CacheStorage (si dispo)
-      try {
-        const match = await caches.match('/version.json');
-        if (match) {
-          const v3 = (await match.json()) as VersionInfo;
-          setVersionInfo(v3);
-          return;
-        }
-      } catch {}
-      // 4) Fallback
-      setVersionInfo(null);
-    }
-  };
-
-  useEffect(() => {
-    fetchVersionInfo();
-  }, []);
-
-  const builtAtHuman = useMemo(() => {
-    if (!versionInfo?.builtAt) return null;
-    try {
-      return new Date(versionInfo.builtAt).toLocaleString(
-        state.settings.language === 'fr' ? 'fr-FR' : 'en-US'
-      );
-    } catch {
-      return versionInfo.builtAt;
-    }
-  }, [versionInfo?.builtAt, state.settings.language]);
-
-  // --- Bouton langue (avec SVG drapeaux fiables) ---
+  // --- Bouton langue réutilisable (contraste OK + drapeaux) ---
   const LangButton: React.FC<{
     active: boolean;
-    flag: 'fr' | 'us';
+    flag: string;
     title: string;
     subtitle: string;
     onClick: () => void;
@@ -241,21 +89,19 @@ export default function Settings() {
       <button
         onClick={onClick}
         className={`w-full flex items-center justify-between px-6 py-4 rounded-xl border-2 transition-all duration-200
-          ${
-            active
-              ? 'bg-blue-600 border-blue-600 text-white'
-              : isDark
-              ? 'bg-gray-700 border-gray-600 text-white hover:border-gray-500'
-              : 'bg-white border-gray-300 text-gray-800 hover:border-gray-400'
-          }`}
+          ${active
+            ? 'bg-blue-600 border-blue-600 text-white'
+            : (isDark
+                ? 'bg-gray-700 border-gray-600 text-white hover:border-gray-500'
+                : 'bg-white border-gray-300 text-gray-800 hover:border-gray-400')}`}
       >
         <div className="flex items-center space-x-3">
-          <FlagSvg code={flag} />
+          <span className="text-2xl">{flag}</span>
           <div className="text-left">
-            <div className={`font-semibold ${active ? 'text-white' : isDark ? 'text-white' : 'text-gray-800'}`}>
+            <div className={`font-semibold ${active ? 'text-white' : (isDark ? 'text-white' : 'text-gray-800')}`}>
               {title}
             </div>
-            <div className={`text-sm ${active ? 'text-white/90' : isDark ? 'text-white/80' : 'text-gray-600'}`}>
+            <div className={`text-sm ${active ? 'text-white/90' : (isDark ? 'text-white/80' : 'text-gray-600')}`}>
               {subtitle}
             </div>
           </div>
@@ -264,6 +110,38 @@ export default function Settings() {
       </button>
     );
   };
+
+  // --- Lecture de /version.json pour l'affichage en bas de page ---
+  type VersionInfo = {
+    appVersion?: string | null;
+    swCacheVersion?: string | null;
+    builtAt?: string | null;
+    ciCommit?: string | null;
+  };
+  const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
+  const [versionError, setVersionError] = useState<boolean>(false);
+
+  useEffect(() => {
+    let canceled = false;
+    (async () => {
+      try {
+        const res = await fetch('/version.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error('version.json not ok');
+        const data = (await res.json()) as VersionInfo;
+        if (!canceled) {
+          setVersionInfo(data);
+          setVersionError(false);
+        }
+      } catch {
+        if (!canceled) {
+          setVersionInfo(null);
+          setVersionError(true);
+        }
+      }
+    })();
+    return () => { canceled = true; };
+    // on peut recharger après un check pour mettre à jour l'affichage
+  }, [updateStatus]);
 
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} transition-colors duration-200`}>
@@ -286,14 +164,14 @@ export default function Settings() {
             <div className="space-y-4">
               <LangButton
                 active={state.settings.language === 'fr'}
-                flag="fr"
+                flag="🇫🇷"
                 title="Français"
                 subtitle="Louis Segond 1910 révision 2025"
                 onClick={() => updateSettings({ language: 'fr' })}
               />
               <LangButton
                 active={state.settings.language === 'en'}
-                flag="us"
+                flag="🇺🇸"
                 title="English"
                 subtitle="King James Version"
                 onClick={() => updateSettings({ language: 'en' })}
@@ -301,7 +179,7 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* 2) Apparence + Taille de police */}
+          {/* 2) Apparence (sombre forcé) + Taille de police */}
           <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 mb-6`}>
             <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-white' : 'text-gray-800'} flex items-center`}>
               <Palette size={24} className="mr-3" />
@@ -372,9 +250,15 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* 3) Raccourcis de lecture — (titre déjà dans QuickSlotsHelp) */}
+          {/* 3) Raccourcis de lecture */}
           <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 mb-6`}>
-            <div className={`${isDark ? 'text-white' : 'text-gray-800'} w-full text-base leading-relaxed [&>*]:w-full [&_*]:max-w-none`}>
+            <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+              {state.settings.language === 'fr' ? 'Raccourcis de lecture' : 'Reading shortcuts'}
+            </h2>
+            <div
+              className={`${isDark ? 'text-white' : 'text-gray-800'} w-full text-base leading-relaxed 
+              [&>*]:w-full [&_*]:max-w-none`}
+            >
               <QuickSlotsHelp />
             </div>
           </div>
@@ -453,22 +337,19 @@ export default function Settings() {
                 </p>
               )}
             </div>
+          </div>
 
-            {/* Footer version en bas de page Settings */}
-            <div className="mt-8 pt-4 border-t border-gray-700/40 text-center text-xs">
-              {versionInfo ? (
-                <p className={isDark ? 'text-white/70' : 'text-gray-600'}>
-                  {state.settings.language === 'fr' ? 'Version' : 'Version'} {versionInfo.version ?? '—'}
-                  {versionInfo.commit ? ` • ${versionInfo.commit}` : ''}
-                  {builtAtHuman ? ` • ${builtAtHuman}` : ''}
-                  {versionInfo.swCache ? ` • SW ${versionInfo.swCache}` : ''}
-                </p>
-              ) : (
-                <p className={isDark ? 'text-white/50' : 'text-gray-500'}>
-                  {state.settings.language === 'fr' ? 'Version inconnue' : 'Unknown version'}
-                </p>
-              )}
-            </div>
+          {/* Pied de page : infos version */}
+          <div className="mt-8 text-center text-xs text-white/60">
+            {versionInfo ? (
+              <>
+                Version app {versionInfo.appVersion ?? '0.0.0'} • SW {versionInfo.swCacheVersion ?? 'n/a'}
+                {versionInfo.builtAt ? <> • {new Date(versionInfo.builtAt).toLocaleString()}</> : null}
+                {versionInfo.ciCommit ? <> • {versionInfo.ciCommit}</> : null}
+              </>
+            ) : (
+              versionError ? 'version.json indisponible' : '…'
+            )}
           </div>
         </div>
       </div>
