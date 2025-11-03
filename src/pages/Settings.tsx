@@ -1,7 +1,7 @@
 // src/pages/Settings.tsx
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import QuickSlotsHelp from '../components/QuickSlotsHelp';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { Globe, Palette, RefreshCcw } from 'lucide-react';
@@ -77,7 +77,50 @@ export default function Settings() {
     }
   };
 
-  // --- Bouton langue réutilisable (contraste OK + drapeaux) ---
+  // --- Lecture de /version.json pour l'affichage en bas de page ---
+  type VersionInfo = {
+    version?: string | null;   // ex: "2025.11.14"
+    builtAt?: string | null;   // ex: "2025-11-03"
+    swCache?: string | null;   // ex: "v14"
+  };
+  const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
+  const [versionError, setVersionError] = useState<boolean>(false);
+
+  useEffect(() => {
+    let canceled = false;
+    (async () => {
+      try {
+        const res = await fetch('/version.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error('version.json not ok');
+        const data = (await res.json()) as VersionInfo;
+        if (!canceled) {
+          setVersionInfo(data);
+          setVersionError(false);
+        }
+      } catch {
+        if (!canceled) {
+          setVersionInfo(null);
+          setVersionError(true);
+        }
+      }
+    })();
+    return () => { canceled = true; };
+    // on peut recharger après un check pour mettre à jour l'affichage
+  }, [updateStatus]);
+
+  // >>> Modification 1 : date sans l'heure
+  const builtAtHuman = useMemo(() => {
+    if (!versionInfo?.builtAt) return null;
+    try {
+      return new Date(versionInfo.builtAt).toLocaleDateString(
+        state.settings.language === 'fr' ? 'fr-FR' : 'en-US'
+      );
+    } catch {
+      return versionInfo.builtAt;
+    }
+  }, [versionInfo?.builtAt, state.settings.language]);
+
+  // --- Bouton langue réutilisable (contraste OK + drapeaux)
   const LangButton: React.FC<{
     active: boolean;
     flag: string;
@@ -110,38 +153,6 @@ export default function Settings() {
       </button>
     );
   };
-
-  // --- Lecture de /version.json pour l'affichage en bas de page ---
-  type VersionInfo = {
-    appVersion?: string | null;
-    swCacheVersion?: string | null;
-    builtAt?: string | null;
-    ciCommit?: string | null;
-  };
-  const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
-  const [versionError, setVersionError] = useState<boolean>(false);
-
-  useEffect(() => {
-    let canceled = false;
-    (async () => {
-      try {
-        const res = await fetch('/version.json', { cache: 'no-store' });
-        if (!res.ok) throw new Error('version.json not ok');
-        const data = (await res.json()) as VersionInfo;
-        if (!canceled) {
-          setVersionInfo(data);
-          setVersionError(false);
-        }
-      } catch {
-        if (!canceled) {
-          setVersionInfo(null);
-          setVersionError(true);
-        }
-      }
-    })();
-    return () => { canceled = true; };
-    // on peut recharger après un check pour mettre à jour l'affichage
-  }, [updateStatus]);
 
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} transition-colors duration-200`}>
@@ -339,16 +350,18 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* Pied de page : infos version */}
-          <div className="mt-8 text-center text-xs text-white/60">
+          {/* >>> Modification 2 : Pied de page version/date/SW */}
+          <div className="mt-8 text-center text-xs">
             {versionInfo ? (
-              <>
-                Version app {versionInfo.appVersion ?? '0.0.0'} • SW {versionInfo.swCacheVersion ?? 'n/a'}
-                {versionInfo.builtAt ? <> • {new Date(versionInfo.builtAt).toLocaleString()}</> : null}
-                {versionInfo.ciCommit ? <> • {versionInfo.ciCommit}</> : null}
-              </>
+              <p className={isDark ? 'text-white/70' : 'text-gray-600'}>
+                {state.settings.language === 'fr' ? 'Version' : 'Version'} {versionInfo?.version ?? '0.0.0'}
+                {builtAtHuman ? ` • ${builtAtHuman}` : ''}
+                {versionInfo?.swCache ? ` • SW ${versionInfo.swCache}` : ''}
+              </p>
             ) : (
-              versionError ? 'version.json indisponible' : '…'
+              <p className={isDark ? 'text-white/50' : 'text-gray-500'}>
+                {versionError ? 'version.json indisponible' : '…'}
+              </p>
             )}
           </div>
         </div>
