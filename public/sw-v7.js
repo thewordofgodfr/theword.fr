@@ -148,7 +148,7 @@ self.addEventListener('fetch', (event) => {
         try {
           const preload = await event.preloadResponse; if (preload) return preload;
           // Utiliser la requête d'origine telle quelle
-          const net = await fetch(req);
+          const net = await fetch(new Request(req.url, { cache: 'no-store' }));
           return net;
         } catch {
           const cache = await caches.open(CACHE_NAME);
