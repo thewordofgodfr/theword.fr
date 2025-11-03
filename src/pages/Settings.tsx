@@ -166,7 +166,7 @@ export default function Settings() {
                   return (
                     <button
                       key={value}
-                      onClick={() => updateSettings({ fontSize: value })}
+                      onClick={() => updateSettings({ fontSize: Math.max(18, Math.min(value, 42)) })}
                       aria-pressed={isSelected}
                       className={`px-4 py-3 rounded-lg border-2 font-medium transition-all duration-200 ${
                         isSelected
@@ -187,7 +187,7 @@ export default function Settings() {
                   const isXL = state.settings.fontSize === XL_FONT;
                   return (
                     <button
-                      onClick={() => updateSettings({ fontSize: XL_FONT })}
+                      onClick={() => updateSettings({ fontSize: Math.max(18, Math.min(XL_FONT, 42)) })}
                       aria-pressed={isXL}
                       className={`w-full px-4 py-4 rounded-lg border-2 font-semibold tracking-wide transition-all duration-200 ${
                         isXL
