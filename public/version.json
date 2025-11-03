@@ -1,6 +1,1 @@
-{
-  "version": "1.0.0",
-  "commit": "abc1234",
-  "builtAt": "2025-11-02T09:45:00Z",
-  "swCache": "v12"
-}
+{ "version": "YYYY.MM.N", "builtAt": "YYYY-MM-DD", "swCache": "vN" }
