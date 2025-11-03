@@ -1,7 +1,7 @@
 // src/pages/Settings.tsx
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import QuickSlotsHelp from '../components/QuickSlotsHelp';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { Globe, Palette, RefreshCcw } from 'lucide-react';
@@ -10,51 +10,34 @@ export default function Settings() {
   const { state, updateSettings } = useApp();
   const { t } = useTranslation();
 
-  // Forcer le mode sombre au montage (sécurité globale)
   useEffect(() => {
-    if (state.settings.theme !== 'dark') {
-      updateSettings({ theme: 'dark' });
-    }
+    if (state.settings.theme !== 'dark') updateSettings({ theme: 'dark' });
   }, [state.settings.theme, updateSettings]);
 
-  // UI forcée en sombre
   const isDark = true;
 
-  // Tailles (du plus petit au plus grand)
   const fontSizes = [21, 23, 25, 27];
   const XL_FONT = 42;
 
-  // --- Gestion mise à jour (SW) ---
-  const [updateStatus, setUpdateStatus] = useState<
-    'idle' | 'checking' | 'ready' | 'upToDate' | 'unavailable' | 'error'
-  >('idle');
+  const [updateStatus, setUpdateStatus] =
+    useState<'idle' | 'checking' | 'ready' | 'upToDate' | 'unavailable' | 'error'>('idle');
   const [waitingSW, setWaitingSW] = useState<ServiceWorker | null>(null);
 
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return;
-    const onControllerChange = () => {
-      window.location.reload();
-    };
+    const onControllerChange = () => window.location.reload();
     navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
     return () => navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
   }, []);
 
   const handleCheckUpdates = async () => {
-    if (!('serviceWorker' in navigator)) {
-      setUpdateStatus('unavailable');
-      return;
-    }
+    if (!('serviceWorker' in navigator)) { setUpdateStatus('unavailable'); return; }
     try {
       setUpdateStatus('checking');
       const reg = await navigator.serviceWorker.getRegistration();
-      if (!reg) {
-        setUpdateStatus('unavailable');
-        return;
-      }
+      if (!reg) { setUpdateStatus('unavailable'); return; }
       const previousWaiting = reg.waiting || null;
-
-      await reg.update(); // force un check
-
+      await reg.update();
       setTimeout(() => {
         if (reg.waiting && reg.waiting !== previousWaiting) {
           setWaitingSW(reg.waiting);
@@ -77,14 +60,10 @@ export default function Settings() {
     }
   };
 
-  // --- Lecture de /version.json pour l'affichage en bas de page ---
-  type VersionInfo = {
-    version?: string | null;   // ex: "2025.11.14"
-    builtAt?: string | null;   // ex: "2025-11-03"
-    swCache?: string | null;   // ex: "v14"
-  };
+  // --- Version minimaliste depuis /version.json ---
+  type VersionInfo = { version?: string | null };
   const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
-  const [versionError, setVersionError] = useState<boolean>(false);
+  const [versionError, setVersionError] = useState(false);
 
   useEffect(() => {
     let canceled = false;
@@ -93,66 +72,45 @@ export default function Settings() {
         const res = await fetch('/version.json', { cache: 'no-store' });
         if (!res.ok) throw new Error('version.json not ok');
         const data = (await res.json()) as VersionInfo;
-        if (!canceled) {
-          setVersionInfo(data);
-          setVersionError(false);
-        }
+        if (!canceled) { setVersionInfo(data); setVersionError(false); }
       } catch {
-        if (!canceled) {
-          setVersionInfo(null);
-          setVersionError(true);
-        }
+        if (!canceled) { setVersionInfo(null); setVersionError(true); }
       }
     })();
     return () => { canceled = true; };
-    // on peut recharger après un check pour mettre à jour l'affichage
   }, [updateStatus]);
 
-  // >>> Modification 1 : date sans l'heure
-  const builtAtHuman = useMemo(() => {
-    if (!versionInfo?.builtAt) return null;
-    try {
-      return new Date(versionInfo.builtAt).toLocaleDateString(
-        state.settings.language === 'fr' ? 'fr-FR' : 'en-US'
-      );
-    } catch {
-      return versionInfo.builtAt;
-    }
-  }, [versionInfo?.builtAt, state.settings.language]);
-
-  // --- Bouton langue réutilisable (contraste OK + drapeaux)
+  // --- Bouton langue réutilisable ---
   const LangButton: React.FC<{
     active: boolean;
     flag: string;
     title: string;
     subtitle: string;
     onClick: () => void;
-  }> = ({ active, flag, title, subtitle, onClick }) => {
-    return (
-      <button
-        onClick={onClick}
-        className={`w-full flex items-center justify-between px-6 py-4 rounded-xl border-2 transition-all duration-200
-          ${active
-            ? 'bg-blue-600 border-blue-600 text-white'
-            : (isDark
-                ? 'bg-gray-700 border-gray-600 text-white hover:border-gray-500'
-                : 'bg-white border-gray-300 text-gray-800 hover:border-gray-400')}`}
-      >
-        <div className="flex items-center space-x-3">
-          <span className="text-2xl">{flag}</span>
-          <div className="text-left">
-            <div className={`font-semibold ${active ? 'text-white' : (isDark ? 'text-white' : 'text-gray-800')}`}>
-              {title}
-            </div>
-            <div className={`text-sm ${active ? 'text-white/90' : (isDark ? 'text-white/80' : 'text-gray-600')}`}>
-              {subtitle}
-            </div>
+  }> = ({ active, flag, title, subtitle, onClick }) => (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center justify-between px-6 py-4 rounded-xl border-2 transition-all duration-200
+        ${active
+          ? 'bg-blue-600 border-blue-600 text-white'
+          : (isDark
+              ? 'bg-gray-700 border-gray-600 text-white hover:border-gray-500'
+              : 'bg-white border-gray-300 text-gray-800 hover:border-gray-400')}`}
+    >
+      <div className="flex items-center space-x-3">
+        <span className="text-2xl">{flag}</span>
+        <div className="text-left">
+          <div className={`font-semibold ${active ? 'text-white' : (isDark ? 'text-white' : 'text-gray-800')}`}>
+            {title}
+          </div>
+          <div className={`text-sm ${active ? 'text-white/90' : (isDark ? 'text-white/80' : 'text-gray-600')}`}>
+            {subtitle}
           </div>
         </div>
-        {active && <div className="w-3 h-3 rounded-full bg-white" />}
-      </button>
-    );
-  };
+      </div>
+      {active && <div className="w-3 h-3 rounded-full bg-white" />}
+    </button>
+  );
 
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} transition-colors duration-200`}>
@@ -190,14 +148,13 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* 2) Apparence (sombre forcé) + Taille de police */}
+          {/* 2) Apparence + Taille de police */}
           <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 mb-6`}>
             <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-white' : 'text-gray-800'} flex items-center`}>
               <Palette size={24} className="mr-3" />
               {t('appearance')}
             </h2>
 
-            {/* Taille de police */}
             <div>
               <div className={`block text-sm font-medium mb-4 ${isDark ? 'text-white' : 'text-gray-700'}`}>
                 {state.settings.language === 'fr' ? 'Taille de police' : 'Font size'}
@@ -225,7 +182,6 @@ export default function Settings() {
                 })}
               </div>
 
-              {/* Mode Malvoyant (XL = 42px) */}
               <div className="mt-4">
                 {(() => {
                   const isXL = state.settings.fontSize === XL_FONT;
@@ -247,12 +203,8 @@ export default function Settings() {
                 })()}
               </div>
 
-              {/* Aperçu */}
               <div className={`mt-4 p-4 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg`}>
-                <p
-                  className={`${isDark ? 'text-white' : 'text-gray-700'}`}
-                  style={{ fontSize: `${state.settings.fontSize}px` }}
-                >
+                <p className={`${isDark ? 'text-white' : 'text-gray-700'}`} style={{ fontSize: `${state.settings.fontSize}px` }}>
                   {state.settings.language === 'fr'
                     ? 'Aperçu de la taille de police sélectionnée.'
                     : 'Preview of the selected font size.'}
@@ -266,10 +218,7 @@ export default function Settings() {
             <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-white' : 'text-gray-800'}`}>
               {state.settings.language === 'fr' ? 'Raccourcis de lecture' : 'Reading shortcuts'}
             </h2>
-            <div
-              className={`${isDark ? 'text-white' : 'text-gray-800'} w-full text-base leading-relaxed 
-              [&>*]:w-full [&_*]:max-w-none`}
-            >
+            <div className={`${isDark ? 'text-white' : 'text-gray-800'} w-full text-base leading-relaxed [&>*]:w-full [&_*]:max-w-none`}>
               <QuickSlotsHelp />
             </div>
           </div>
@@ -350,13 +299,11 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* >>> Modification 2 : Pied de page version/date/SW */}
+          {/* Footer : Version uniquement */}
           <div className="mt-8 text-center text-xs">
             {versionInfo ? (
               <p className={isDark ? 'text-white/70' : 'text-gray-600'}>
                 {state.settings.language === 'fr' ? 'Version' : 'Version'} {versionInfo?.version ?? '0.0.0'}
-                {builtAtHuman ? ` • ${builtAtHuman}` : ''}
-                {versionInfo?.swCache ? ` • SW ${versionInfo.swCache}` : ''}
               </p>
             ) : (
               <p className={isDark ? 'text-white/50' : 'text-gray-500'}>
