@@ -68,8 +68,8 @@ export default function About() {
                       </p>
                       <p className={`text-xs ${isDark ? 'text-white' : 'text-gray-500'} mt-2`}>
                         {state.settings.language === 'fr'
-                          ? 'Version classique de la Bible en anglais, publiée en 1611 et révisée en 1769.'
-                          : 'Classic version of the Bible in English, published in 1611 and revised in 1769.'}
+                          ? 'Version classique de la Bible en anglais, publiée en 1611, révisée en 1769 et révision limitée en 2025.'
+                          : 'Classic version of the Bible in English, published in 1611, revised in 1769 and a limited review in 2025.'}
                       </p>
                     </div>
                   </div>
