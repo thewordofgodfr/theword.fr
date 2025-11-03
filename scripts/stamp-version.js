@@ -27,7 +27,7 @@ function findSwPath() {
 }
 
 function getCacheVersionFromSw(text) {
-  // matches: const CACHE_VERSION = 'v12';
+  // ex: const CACHE_VERSION = 'v12';
   const m = text.match(/const\s+CACHE_VERSION\s*=\s*['"]v(\d+)['"]\s*;/);
   return m ? Number(m[1]) : null;
 }
@@ -52,11 +52,9 @@ function stampVersionJson({ appVersion, swCacheVersion }) {
 }
 
 (function main() {
-  // read package.json to expose appVersion in version.json
   const pkg = JSON.parse(readText(pkgPath));
-  let appVersion = pkg.version || "0.0.0";
+  const appVersion = pkg.version || "0.0.0";
 
-  // handle SW bump if requested
   const swPath = findSwPath();
   let swCacheVersion = null;
 
@@ -73,13 +71,14 @@ function stampVersionJson({ appVersion, swCacheVersion }) {
         swCacheVersion = after;
         console.log(`Service Worker CACHE_VERSION bumped: v${current} -> v${after} (${path.basename(swPath)})`);
       } else {
-        console.warn("CACHE_VERSION not found in Service Worker; no bump applied.");
+        console.warn("CACHE_VERSION introuvable dans le SW ; pas de bump.");
       }
     }
   } else {
-    console.warn("Service Worker not found (looked in repo root or public/). Skipping bump.");
+    console.warn("Service Worker introuvable (racine ou public/). Bump ignoré.");
   }
 
-  // Always (re)write version.json for the app
+  // Génère (ou met à jour) public/version.json
   stampVersionJson({ appVersion, swCacheVersion });
 })();
+
