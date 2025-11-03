@@ -1,4 +1,3 @@
-# .github/workflows/deploy.yml
 name: Deploy to GitHub Pages (Vite)
 
 on:
@@ -7,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write       # <- pour pouvoir push la MAJ de version.json & sw-v7.js
+  contents: write     # pour pouvoir committer/pusher
   pages: write
   id-token: write
 
@@ -29,23 +28,42 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      # Affiche la version générée (debug)
+      # Juste pour vérif visuelle dans les logs
       - run: cat public/version.json || true
 
-      # ✅ Commit & push du bump de version (évite de rester bloqué à la même valeur)
+      # ✅ Commit uniquement ce qui existe ET a changé
       - name: Commit version bump
+        shell: bash
         run: |
           set -e
-          CHANGED=$(git status --porcelain public/version.json sw-v7.js | wc -l)
-          if [ "$CHANGED" -gt 0 ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add public/version.json sw-v7.js
-            VERSION=$(node -p "JSON.parse(require('fs').readFileSync('public/version.json','utf8')).version")
-            git commit -m "chore: bump version to ${VERSION} [skip ci]"
-            git push
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          FILES=()
+          [ -f public/version.json ] && FILES+=("public/version.json")
+          [ -f sw-v7.js ] && FILES+=("sw-v7.js")
+          [ -f public/sw-v7.js ] && FILES+=("public/sw-v7.js")
+
+          if [ ${#FILES[@]} -eq 0 ]; then
+            echo "Aucun fichier de version/SW trouvé."
           else
-            echo "Aucun fichier de version modifié."
+            CHANGED=0
+            for f in "${FILES[@]}"; do
+              # si le fichier a changé
+              if ! git diff --quiet -- "$f"; then
+                git add "$f"
+                CHANGED=1
+              fi
+            done
+            if [ "$CHANGED" -eq 1 ]; then
+              VERSION=$(node -p "JSON.parse(require('fs').readFileSync('public/version.json','utf8')).version")
+              # rebase pour éviter un reject si un push est passé entre-temps
+              git pull --rebase origin "${GITHUB_REF_NAME:-main}" || true
+              git commit -m "chore: bump version to ${VERSION} [skip ci]"
+              git push
+            else
+              echo "Aucun changement à committer."
+            fi
           fi
 
       - uses: actions/upload-pages-artifact@v3
