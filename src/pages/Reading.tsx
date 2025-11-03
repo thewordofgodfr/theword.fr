@@ -592,7 +592,7 @@ export default function Reading() {
   };
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} transition-colors duration-200`}>
+    <div className={`min-h-[100svh] ${isDark ? 'bg-gray-900' : 'bg-gray-50'} transition-colors duration-200`}>
       <div className="container mx-auto px-4 pb-6">
         <div className="max-w-6xl mx-auto">
           {selectedBook && (
