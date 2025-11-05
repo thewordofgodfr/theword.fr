@@ -1,5 +1,6 @@
 // src/types/collections.ts
-export type VerseRef = {
+export type VerseRef = { book: string; chapter: number; verse: number; text?: string };
+export type { Collection, CollectionItem } from '../services/collectionsService';
   /** Identifiant du livre (ex: "GEN", "PSA", etc. ou ton id interne) */
   bookId: string;
   /** Nom affichable optionnel au moment de l’ajout (pour éviter un recalcul) */
