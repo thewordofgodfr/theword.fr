@@ -3,6 +3,43 @@ import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { Book, Globe, ExternalLink, Heart, Shuffle } from 'lucide-react';
 
+/** Même composant Flag que sur Settings, copié ici pour éviter un import externe */
+const FlagIcon: React.FC<{ code: 'fr' | 'us'; size?: number; className?: string }> = ({
+  code,
+  size = 24,
+  className = '',
+}) => {
+  if (code === 'fr') {
+    return (
+      <span className={`inline-block ${className}`} style={{ width: size * (4 / 3), height: size }}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="France" role="img">
+          <rect width="1" height="2" x="0" fill="#0055A4" />
+          <rect width="1" height="2" x="1" fill="#FFFFFF" />
+          <rect width="1" height="2" x="2" fill="#EF4135" />
+        </svg>
+      </span>
+    );
+  }
+  return (
+    <span className={`inline-block ${className}`} style={{ width: size * (4 / 3), height: size }}>
+      <svg viewBox="0 0 19 10" width="100%" height="100%" aria-label="United States" role="img">
+        {Array.from({ length: 13 }).map((_, i) => (
+          <rect key={i} x="0" y={(i * 10) / 13} width="19" height={10 / 13} fill={i % 2 === 0 ? '#B22234' : '#FFFFFF'} />
+        ))}
+        <rect x="0" y="0" width="7.6" height={(7 / 13) * 10} fill="#3C3B6E" />
+        {Array.from({ length: 9 }).map((_, row) =>
+          Array.from({ length: row % 2 === 0 ? 6 : 5 }).map((__, col) => {
+            const cols = row % 2 === 0 ? 6 : 5;
+            const cx = 0.6 + (col + 1) * (7.6 / (cols + 1));
+            const cy = 0.5 + (row + 1) * ((7 / 13) * 10 / 10);
+            return <circle key={`${row}-${col}`} cx={cx} cy={cy} r="0.15" fill="#FFFFFF" />;
+          })
+        )}
+      </svg>
+    </span>
+  );
+};
+
 export default function About() {
   const { state } = useApp();
   const { t } = useTranslation();
@@ -43,7 +80,7 @@ export default function About() {
               <div className="space-y-6">
                 <div className={`p-4 ${isDark ? 'bg-gray-700' : 'bg-blue-50'} rounded-lg`}>
                   <div className="flex items-start space-x-3">
-                    <span className="text-2xl">🇫🇷</span>
+                    <FlagIcon code="fr" />
                     <div>
                       <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>Français</h3>
                       <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-600'} mt-1`}>
@@ -60,7 +97,7 @@ export default function About() {
 
                 <div className={`p-4 ${isDark ? 'bg-gray-700' : 'bg-green-50'} rounded-lg`}>
                   <div className="flex items-start space-x-3">
-                    <span className="text-2xl">🇺🇸</span>
+                    <FlagIcon code="us" />
                     <div>
                       <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>English</h3>
                       <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-600'} mt-1`}>
@@ -187,3 +224,4 @@ export default function About() {
     </div>
   );
 }
+
