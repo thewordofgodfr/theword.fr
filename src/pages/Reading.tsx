@@ -378,15 +378,34 @@ export default function Reading() {
   const [listsForModal, setListsForModal] = useState(getAllLists());
   const [selectedListId, setSelectedListId] = useState<string>('');
   const [newListTitle, setNewListTitle] = useState<string>('');
-  const openAddToList = () => { setListsForModal(getAllLists()); setSelectedListId(listsForModal[0]?.id ?? ''); setNewListTitle(''); setShowAddToList(true); };
+  const openAddToList = () => {
+    const all = getAllLists();
+    setListsForModal(all);
+    setSelectedListId(''); // ← PAR DÉFAUT : aucune (évite le bug)
+    setNewListTitle('');
+    setShowAddToList(true);
+  };
+
   const confirmAddToList = () => {
     if (!selectedBook || !chapter || selectedVerses.length === 0) return;
 
-    let targetId = selectedListId;
-    if (!targetId && newListTitle.trim()) {
-      const list = createList(newListTitle.trim());
-      targetId = list.id;
+    // 1) Si un titre est saisi → on crée OU on réutilise (prioritaire)
+    const typed = newListTitle.trim();
+    let targetId = '';
+
+    if (typed) {
+      const existing = getAllLists().find(l => l.title.trim().toLowerCase() === typed.toLowerCase());
+      if (existing) {
+        targetId = existing.id; // réutilise
+      } else {
+        const list = createList(typed); // crée
+        targetId = list.id;
+      }
+    } else {
+      // 2) Sinon on prend la sélection existante
+      targetId = selectedListId || '';
     }
+
     if (!targetId) return;
 
     const chosen = chapter.verses
@@ -840,7 +859,7 @@ export default function Reading() {
                       >
                         <option value="">{state.settings.language === 'fr' ? '— Aucune —' : '— None —'}</option>
                         {listsForModal.map(l => (
-                          <option key={l.id} value={l.id}>{l.title} ({l.items.length})</option>
+                          <option key={l.id} value={l.id}>{l.title}</option> {/* ← nom seul */}
                         ))}
                       </select>
                     </div>
