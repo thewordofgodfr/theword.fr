@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { getAllLists, createList, renameList, deleteList, removeVerseAt, shareList, exportListAsText, getListById } from '../services/collectionsService';
-import type { VerseList } from '../services/collectionsService';
+import type { VerseList } from '../types/collections';
 import { List as ListIcon, Edit3, Trash2, Share2, Plus, BookOpen, Clipboard } from 'lucide-react';
 
 export default function Notes() {
