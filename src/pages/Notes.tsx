@@ -1,9 +1,28 @@
+// src/pages/Notes.tsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
-import { getAllLists, createList, renameList, deleteList, removeVerseAt, shareList, exportListAsText, getListById } from '../services/collectionsService';
+import {
+  getAllLists, createList, renameList, deleteList,
+  removeVerseAt, shareList, getListById
+} from '../services/collectionsService';
 import type { VerseList } from '../types/collections';
-import { List as ListIcon, Edit3, Trash2, Share2, Plus, BookOpen, Clipboard } from 'lucide-react';
+import { List as ListIcon, Edit3, Trash2, Share2, Plus, BookOpen, Copy } from 'lucide-react';
+
+function buildPlainListText(list: VerseList): string {
+  const lines: string[] = [];
+  lines.push((list.title || '').trim());
+  for (const it of list.items) {
+    const ref = `${(it.bookName ?? it.bookId) || ''} ${it.chapter}:${it.verse}`;
+    lines.push(ref.trim());
+    if (it.text && String(it.text).trim()) lines.push(String(it.text).trim());
+    lines.push(''); // ligne vide entre les items
+  }
+  // supprimer les lignes vides de fin
+  while (lines.length && lines[lines.length - 1] === '') lines.pop();
+  lines.push(''); // terminer par un \n
+  return lines.join('\n');
+}
 
 export default function Notes() {
   const { state, setPage } = useApp();
@@ -21,6 +40,7 @@ export default function Notes() {
     verses: state.settings.language === 'fr' ? 'versets' : 'verses',
     openReading: state.settings.language === 'fr' ? 'Ouvrir la lecture' : 'Open Reading',
     copied: state.settings.language === 'fr' ? 'Copié' : 'Copied',
+    backAll: state.settings.language === 'fr' ? '← Toutes les listes' : '← All lists',
   }), [state.settings.language]);
 
   const refresh = () => setLists(getAllLists());
@@ -28,14 +48,29 @@ export default function Notes() {
 
   const doCreate = () => {
     const title = prompt(label.placeholder) ?? '';
-    if (!title.trim()) return;
-    createList(title.trim());
+    const trimmed = title.trim();
+    if (!trimmed) return;
+    // éviter doublons de titre (insensible à la casse)
+    const exists = getAllLists().find(l => (l.title || '').trim().toLowerCase() === trimmed.toLowerCase());
+    if (exists) {
+      setExpandedId(exists.id);
+      return;
+    }
+    const created = createList(trimmed);
     refresh();
+    setExpandedId(created.id);
   };
   const doRename = (id: string, current: string) => {
     const title = prompt(label.placeholder, current) ?? '';
-    if (!title.trim()) return;
-    renameList(id, title.trim());
+    const trimmed = title.trim();
+    if (!trimmed) return;
+    // si un autre a déjà ce titre, on interdit (simple et clair)
+    const exists = getAllLists().find(l => l.id !== id && (l.title || '').trim().toLowerCase() === trimmed.toLowerCase());
+    if (exists) {
+      alert(state.settings.language === 'fr' ? 'Un titre identique existe déjà.' : 'A list with the same title already exists.');
+      return;
+    }
+    renameList(id, trimmed);
     refresh();
   };
   const doDelete = (id: string) => {
@@ -51,15 +86,18 @@ export default function Notes() {
     if (!list) return;
     await shareList(list);
   };
-  const copyRaw = async (id: string) => {
+  const copyListText = async (id: string) => {
     const list = getListById(id);
     if (!list) return;
-    const txt = exportListAsText(list, { header: true, includeRef: true, linePrefix: '• ' });
+    const txt = buildPlainListText(list);
     try {
       await navigator.clipboard.writeText(txt);
       alert(label.copied + ' ✅');
     } catch {}
   };
+
+  // quand une liste est ouverte, n'afficher qu'elle
+  const shownLists = expandedId ? lists.filter(l => l.id === expandedId) : lists;
 
   return (
     <div className={`min-h-[100svh] ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -69,44 +107,65 @@ export default function Notes() {
             <ListIcon className="w-6 h-6" />
             {label.title}
           </h1>
-          <button onClick={doCreate} className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-500">
-            <Plus size={18} />
-            {label.create}
-          </button>
+
+          {!expandedId && (
+            <button onClick={doCreate} className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-500">
+              <Plus size={18} />
+              {label.create}
+            </button>
+          )}
         </div>
 
-        {lists.length === 0 ? (
+        {expandedId && (
+          <div className="mb-4">
+            <button
+              onClick={() => setExpandedId(null)}
+              className={`${isDark ? 'text-white bg-gray-700' : 'text-gray-700 bg-gray-200'} px-3 py-1.5 rounded`}
+            >
+              {label.backAll}
+            </button>
+          </div>
+        )}
+
+        {shownLists.length === 0 ? (
           <div className={`${isDark ? 'text-white/80' : 'text-gray-600'} text-center py-16`}>
             {label.empty}
           </div>
         ) : (
           <div className="space-y-4">
-            {lists.map(list => {
+            {shownLists.map(list => {
               const isOpen = expandedId === list.id;
               return (
                 <div key={list.id} className={`${isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} rounded-xl shadow p-4`}>
                   <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0">
+                    {/* Titre cliquable pour ouvrir/fermer */}
+                    <button
+                      onClick={() => setExpandedId(isOpen ? null : list.id)}
+                      className="min-w-0 text-left"
+                      style={{ WebkitTapHighlightColor: 'transparent' }}
+                      aria-expanded={isOpen}
+                    >
                       <div className="font-semibold truncate">{list.title}</div>
                       <div className={`text-xs ${isDark ? 'text-white/60' : 'text-gray-500'}`}>
                         {list.items.length} {label.verses} • {new Date(list.updatedAt).toLocaleString()}
                       </div>
-                    </div>
+                    </button>
+
                     <div className="flex items-center gap-2">
-                      <button onClick={() => setExpandedId(isOpen ? null : list.id)}
-                        className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded`}>
-                        {isOpen ? (state.settings.language === 'fr' ? 'Fermer' : 'Close') : (state.settings.language === 'fr' ? 'Voir' : 'View')}
-                      </button>
-                      <button onClick={() => doShare(list.id)} className="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-500">
+                      {/* Partager */}
+                      <button onClick={() => doShare(list.id)} className="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-500" title="Partager">
                         <Share2 size={16} />
                       </button>
-                      <button onClick={() => copyRaw(list.id)} className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded`}>
-                        <Clipboard size={16} />
+                      {/* Copier (nouveau format) */}
+                      <button onClick={() => copyListText(list.id)} className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded`} title="Copier">
+                        <Copy size={16} />
                       </button>
-                      <button onClick={() => doRename(list.id, list.title)} className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded`}>
+                      {/* Renommer */}
+                      <button onClick={() => doRename(list.id, list.title)} className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded`} title="Renommer">
                         <Edit3 size={16} />
                       </button>
-                      <button onClick={() => doDelete(list.id)} className="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-500">
+                      {/* Supprimer */}
+                      <button onClick={() => doDelete(list.id)} className="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-500" title="Supprimer">
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -122,15 +181,16 @@ export default function Notes() {
                         <ul className="space-y-2">
                           {list.items.map((it, idx) => (
                             <li key={idx} className="flex items-start justify-between gap-3">
-                              <div className="text-sm">
-                                <span className="font-semibold">{it.bookName ?? it.bookId} {it.chapter}:{it.verse}</span>
-                                {it.text ? <span> — {it.text}</span> : null}
+                              <div className="text-sm leading-6">
+                                <div className="font-semibold">
+                                  {it.bookName ?? it.bookId} {it.chapter}:{it.verse}
+                                </div>
+                                {it.text ? <div>{it.text}</div> : null}
                               </div>
                               <div className="flex items-center gap-2">
                                 <button
                                   onClick={() => {
-                                    // Aller lire ce verset
-                                    // On bascule sur "reading" avec un contexte simple via URL
+                                    // Aller lire ce verset (ouvre Reading avec paramètres)
                                     const url = new URL(window.location.href);
                                     url.searchParams.set('b', it.bookId);
                                     url.searchParams.set('c', String(it.chapter));
@@ -146,6 +206,7 @@ export default function Notes() {
                                 <button
                                   onClick={() => { removeVerseAt(list.id, idx); refresh(); }}
                                   className="px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-500"
+                                  title="Supprimer le verset"
                                 >
                                   <Trash2 size={16} />
                                 </button>
