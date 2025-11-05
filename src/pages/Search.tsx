@@ -369,7 +369,7 @@ export default function Search() {
         <div
           className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow border ${
             isDark ? 'border-gray-700' : 'border-gray-200'
-          } p-3 sticky top-20 sm:top-16 z-30`}
+          } p-3 sticky top-[var(--nav-h)] z-30`}
         >
           <form onSubmit={e => e.preventDefault()} className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
