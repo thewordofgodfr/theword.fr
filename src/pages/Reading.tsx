@@ -859,7 +859,7 @@ export default function Reading() {
                       >
                         <option value="">{state.settings.language === 'fr' ? '— Aucune —' : '— None —'}</option>
                         {listsForModal.map(l => (
-                          <option key={l.id} value={l.id}>{l.title}</option> {/* ← nom seul */}
+                          <option key={l.id} value={l.id}>{l.title}</option>
                         ))}
                       </select>
                     </div>
