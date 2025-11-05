@@ -1,8 +1,12 @@
+// src/pages/Notes.tsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
-import { getAllLists, createList, renameList, deleteList, removeVerseAt, shareList, exportListAsText, getListById } from '../services/collectionsService';
-import type { VerseList } from '../services/collectionsService';
+import {
+  getAllLists, createList, renameList, deleteList,
+  removeVerseAt, shareList, exportListAsText, getListById
+} from '../services/collectionsService';
+import type { VerseList } from '../types/collections';
 import { List as ListIcon, Edit3, Trash2, Share2, Plus, BookOpen, Clipboard } from 'lucide-react';
 
 export default function Notes() {
@@ -39,9 +43,7 @@ export default function Notes() {
     refresh();
   };
   const doDelete = (id: string) => {
-    if (!confirm(state.settings.language === 'fr'
-      ? 'Supprimer cette liste ?'
-      : 'Delete this list?')) return;
+    if (!confirm(state.settings.language === 'fr' ? 'Supprimer cette liste ?' : 'Delete this list?')) return;
     deleteList(id);
     refresh();
     if (expandedId === id) setExpandedId(null);
@@ -129,8 +131,7 @@ export default function Notes() {
                               <div className="flex items-center gap-2">
                                 <button
                                   onClick={() => {
-                                    // Aller lire ce verset
-                                    // On bascule sur "reading" avec un contexte simple via URL
+                                    // Aller lire ce verset (via URL)
                                     const url = new URL(window.location.href);
                                     url.searchParams.set('b', it.bookId);
                                     url.searchParams.set('c', String(it.chapter));
@@ -165,3 +166,4 @@ export default function Notes() {
     </div>
   );
 }
+
