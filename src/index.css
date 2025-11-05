@@ -119,3 +119,8 @@ html.theme-dark-blue .bg-white\/95 { background-color: color-mix(in srgb, var(--
 html.theme-dark-blue .shadow,
 html.theme-dark-blue .shadow-lg,
 html.theme-dark-blue .shadow-xl { box-shadow: 0 10px 24px rgba(0,0,0,.35) !important; }
+
+/* Cache proprement les barres de défilement horizontales (Android/Chrome) */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
