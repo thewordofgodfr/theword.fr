@@ -6,13 +6,76 @@ import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { Globe, Palette, RefreshCcw } from 'lucide-react';
 
+/** Petit composant Flag inline SVG pour compatibilité desktop/mobile */
+const FlagIcon: React.FC<{ code: 'fr' | 'us'; size?: number; className?: string }> = ({
+  code,
+  size = 24,
+  className = '',
+}) => {
+  if (code === 'fr') {
+    // Drapeau France (bleu/blanc/rouge)
+    return (
+      <span className={`inline-block ${className}`} style={{ width: size * (4 / 3), height: size }}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="France" role="img">
+          <rect width="1" height="2" x="0" fill="#0055A4" />
+          <rect width="1" height="2" x="1" fill="#FFFFFF" />
+          <rect width="1" height="2" x="2" fill="#EF4135" />
+        </svg>
+      </span>
+    );
+  }
+  // Drapeau USA (stripes + canton simplifié)
+  return (
+    <span className={`inline-block ${className}`} style={{ width: size * (4 / 3), height: size }}>
+      <svg viewBox="0 0 19 10" width="100%" height="100%" aria-label="United States" role="img">
+        {/* Stripes */}
+        {Array.from({ length: 13 }).map((_, i) => (
+          <rect key={i} x="0" y={(i * 10) / 13} width="19" height={10 / 13} fill={i % 2 === 0 ? '#B22234' : '#FFFFFF'} />
+        ))}
+        {/* Canton */}
+        <rect x="0" y="0" width="7.6" height={(7 / 13) * 10} fill="#3C3B6E" />
+        {/* Étoiles simplifiées (points) */}
+        {Array.from({ length: 9 }).map((_, row) =>
+          Array.from({ length: row % 2 === 0 ? 6 : 5 }).map((__, col) => {
+            const cols = row % 2 === 0 ? 6 : 5;
+            const cx = 0.6 + (col + 1) * (7.6 / (cols + 1));
+            const cy = 0.5 + (row + 1) * ((7 / 13) * 10 / 10);
+            return <circle key={`${row}-${col}`} cx={cx} cy={cy} r="0.15" fill="#FFFFFF" />;
+          })
+        )}
+      </svg>
+    </span>
+  );
+};
+
 export default function Settings() {
   const { state, updateSettings } = useApp();
   const { t } = useTranslation();
 
+  // Force le thème sombre si besoin (inchangé)
   useEffect(() => {
     if (state.settings.theme !== 'dark') updateSettings({ theme: 'dark' });
   }, [state.settings.theme, updateSettings]);
+
+  // --- Police par défaut à 25px au tout premier lancement ---
+  useEffect(() => {
+    try {
+      const KEY = 'tw_firstRun_v2';
+      const seen = typeof window !== 'undefined' ? localStorage.getItem(KEY) : '1';
+      const current = state.settings.fontSize as number | undefined;
+
+      const allowed = new Set([21, 23, 25, 27, 42]);
+      const currentLooksInvalid =
+        typeof current !== 'number' || current < 18 || current > 42 || !allowed.has(current);
+
+      if (!seen && currentLooksInvalid) {
+        updateSettings({ fontSize: 25 }); // défaut demandé
+        localStorage.setItem(KEY, '1');
+      }
+    } catch {
+      // silencieux
+    }
+  }, [state.settings.fontSize, updateSettings]);
 
   const isDark = true;
 
@@ -83,7 +146,7 @@ export default function Settings() {
   // --- Bouton langue réutilisable ---
   const LangButton: React.FC<{
     active: boolean;
-    flag: string;
+    flag: React.ReactNode; // <— accepte un ReactNode pour nos SVG
     title: string;
     subtitle: string;
     onClick: () => void;
@@ -98,7 +161,7 @@ export default function Settings() {
               : 'bg-white border-gray-300 text-gray-800 hover:border-gray-400')}`}
     >
       <div className="flex items-center space-x-3">
-        <span className="text-2xl">{flag}</span>
+        <span className="shrink-0">{flag}</span>
         <div className="text-left">
           <div className={`font-semibold ${active ? 'text-white' : (isDark ? 'text-white' : 'text-gray-800')}`}>
             {title}
@@ -133,14 +196,14 @@ export default function Settings() {
             <div className="space-y-4">
               <LangButton
                 active={state.settings.language === 'fr'}
-                flag="🇫🇷"
+                flag={<FlagIcon code="fr" />}
                 title="Français"
                 subtitle="Louis Segond 1910 révision 2025"
                 onClick={() => updateSettings({ language: 'fr' })}
               />
               <LangButton
                 active={state.settings.language === 'en'}
-                flag="🇺🇸"
+                flag={<FlagIcon code="us" />}
                 title="English"
                 subtitle="King James Version"
                 onClick={() => updateSettings({ language: 'en' })}
