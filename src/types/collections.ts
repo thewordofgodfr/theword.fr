@@ -1,21 +1,23 @@
 // src/types/collections.ts
-export type VerseRef = { book: string; chapter: number; verse: number; text?: string };
-export type { Collection, CollectionItem } from '../services/collectionsService';
-  /** Identifiant du livre (ex: "GEN", "PSA", etc. ou ton id interne) */
+
+/** Référence d’un verset stockée dans une liste */
+export type VerseRef = {
+  /** Identifiant canonique du livre (utilise ton book.name : p.ex. "John", "ROM", etc.) */
   bookId: string;
-  /** Nom affichable optionnel au moment de l’ajout (pour éviter un recalcul) */
+  /** Nom affichable capturé au moment de l’ajout (FR/EN) */
   bookName?: string;
   chapter: number;
   verse: number;
-  /** Texte du verset au moment de l’ajout (optionnel, utile pour partager offline) */
+  /** Texte du verset capturé au moment de l’ajout (utile offline/partage) */
   text?: string;
-  /** "fr", "en", etc. si tu veux distinguer la source */
+  /** "fr", "en", etc. pour savoir d’où vient le verset */
   translation?: string;
 };
 
+/** Une liste de versets (ex: "Foi", "Espérance") */
 export type VerseList = {
-  id: string;         // uuid
-  title: string;      // ex: "Foi", "Courage"
+  id: string;       // uuid-like
+  title: string;    // ex: "Foi"
   createdAt: number;
   updatedAt: number;
   items: VerseRef[];
