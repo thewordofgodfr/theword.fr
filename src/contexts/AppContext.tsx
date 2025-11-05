@@ -40,6 +40,8 @@ const STORAGE_KEYS = {
   language: 'bibleApp_language',
 } as const;
 
+const FIRST_RUN_KEY = 'tw_firstRun_v2';
+
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 /** Langue initiale */
@@ -57,10 +59,18 @@ const getInitialLanguage = (): Language => {
   return 'en';
 };
 
+/** Normalise la taille de police ; défaut 25 si invalide/absente */
+function normalizeFontSize(value: unknown): number {
+  const n = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(n)) return 25;
+  if (n < 18 || n > 42) return 25;
+  return n;
+}
+
 const initialState: AppState = {
   settings: {
-    theme: 'dark',           // ✅ défaut sombre (ta “référence”)
-    fontSize: 16,
+    theme: 'dark',           // défaut sombre
+    fontSize: 25,            // ✅ défaut 25px (exigence)
     language: getInitialLanguage(),
   },
   currentPage: 'home',
@@ -90,7 +100,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
             chapter: action.payload.chapter,
             timestamp: Date.now(),
           },
-        },
+        } as AppSettings,
       };
     default:
       return state;
@@ -113,15 +123,35 @@ function ensureMeta(name: string, defaultContent = ''): HTMLMetaElement | null {
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
-  /** Charger les préférences */
+  /** Charger les préférences (et migrer fontSize si besoin) */
   useEffect(() => {
     try {
       const saved = typeof localStorage !== 'undefined'
         ? localStorage.getItem(STORAGE_KEYS.settings)
         : null;
+
       if (saved) {
-        const settings = JSON.parse(saved);
-        dispatch({ type: 'LOAD_SETTINGS', payload: { ...initialState.settings, ...settings } });
+        const parsed = JSON.parse(saved) as Partial<AppSettings>;
+        const merged: AppSettings = {
+          ...initialState.settings, // contient fontSize:25 par défaut
+          ...parsed,
+          fontSize: normalizeFontSize((parsed as any)?.fontSize),
+        };
+        dispatch({ type: 'LOAD_SETTINGS', payload: merged });
+
+        // Si migration (ex: ancien 16) → réécrire une seule fois en localStorage
+        if (!parsed.fontSize || normalizeFontSize(parsed.fontSize) !== parsed.fontSize) {
+          try {
+            localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(merged));
+          } catch {}
+        }
+      } else {
+        // Première ouverture → marquer la clé, l'état initial (25px) sera sauvegardé par l'effet suivant
+        try {
+          if (!localStorage.getItem(FIRST_RUN_KEY)) {
+            localStorage.setItem(FIRST_RUN_KEY, '1');
+          }
+        } catch {}
       }
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -140,12 +170,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [state.settings]);
 
   /**
-   * 👉 Appliquer le thème choisi + gérer le cas “téléphone sombre + appli claire”
-   * Règle:
-   *   - Si app = dark  -> dark + palette bleue
-   *   - Si app = light ET OS = dark -> on active quand même la palette sombre bleue
-   *       → évite l’auto-dark grisâtre, texte blanc franc (index.css fait le reste)
-   *   - Si app = light ET OS = light -> clair normal
+   * Appliquer le thème choisi + gérer le cas “téléphone sombre + appli claire”
    */
   useEffect(() => {
     try {
@@ -208,7 +233,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           dispatch({ type: 'SET_THEME', payload: value as Theme });
           break;
         case 'fontSize':
-          dispatch({ type: 'SET_FONT_SIZE', payload: value as number });
+          dispatch({ type: 'SET_FONT_SIZE', payload: normalizeFontSize(value) });
           break;
         case 'language':
           dispatch({ type: 'SET_LANGUAGE', payload: value as Language });
@@ -248,3 +273,4 @@ export function useApp() {
   }
   return context;
 }
+
