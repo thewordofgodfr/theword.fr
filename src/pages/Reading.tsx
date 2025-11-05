@@ -5,27 +5,20 @@ import { useTranslation } from '../hooks/useTranslation';
 import { getBibleBooks, getChapter, getRandomVerse, copyToClipboard } from '../services/bibleService';
 import { BibleBook, BibleChapter } from '../types/bible';
 import {
-  ChevronDown,
-  Book,
-  ChevronLeft,
-  ChevronRight,
-  Copy as CopyIcon,
-  Check,
-  Search as SearchIcon,
-  Share2 as ShareIcon,
+  ChevronDown, Book, ChevronLeft, ChevronRight,
+  Copy as CopyIcon, Check, Search as SearchIcon, Share2 as ShareIcon,
+  ListPlus as ListPlusIcon
 } from 'lucide-react';
-import {
-  readSlot as readQuickSlot,
-  saveSlot as saveQuickSlot,
-  type QuickSlot,
-} from '../services/readingSlots';
+import { readSlot as readQuickSlot, saveSlot as saveQuickSlot, type QuickSlot } from '../services/readingSlots';
+import { getAllLists, createList, addVersesToList } from '../services/collectionsService';
+import type { VerseRef } from '../types/collections';
 
 export default function Reading() {
   const { state, dispatch, saveReadingPosition } = useApp();
   const { t } = useTranslation();
 
   const NAV_H = 64;
-  const HIGHLIGHT_EXTRA_OFFSET = 64; // verset un peu plus bas après une recherche
+  const HIGHLIGHT_EXTRA_OFFSET = 64;
 
   const commandBarRef = useRef<HTMLDivElement>(null);
   const [cmdH, setCmdH] = useState(0);
@@ -36,7 +29,7 @@ export default function Reading() {
     return () => window.removeEventListener('resize', compute);
   }, []);
 
-  const [books] = useState<BibleBook[]>(getBibleBooks());
+  const [books] = useState(getBibleBooks());
   const [selectedBook, setSelectedBook] = useState<BibleBook | null>(null);
   const [selectedChapter, setSelectedChapter] = useState<number>(1);
   const [chapter, setChapter] = useState<BibleChapter | null>(null);
@@ -63,23 +56,16 @@ export default function Reading() {
   }, [state.settings.language]);
 
   const isDark = state.settings.theme === 'dark';
-
   useEffect(() => {
     const prevBg = document.body.style.backgroundColor;
     const prevOverflowX = document.body.style.overflowX;
     document.body.style.backgroundColor = isDark ? '#111827' : '#F9FAFB';
     document.body.style.overflowX = 'hidden';
-    return () => {
-      document.body.style.backgroundColor = prevBg;
-      document.body.style.overflowX = prevOverflowX;
-    };
+    return () => { document.body.style.backgroundColor = prevBg; document.body.style.overflowX = prevOverflowX; };
   }, [isDark]);
 
   type SlotKey = 1 | 2 | 3;
-  const SLOT_THEMES: Record<SlotKey, {
-    solid: string; solidHover: string; ring: string;
-    mobileBtn: string; mobileBtnHover: string; lightPaper: string;
-  }> = {
+  const SLOT_THEMES: Record<SlotKey, { solid: string; solidHover: string; ring: string; mobileBtn: string; mobileBtnHover: string; lightPaper: string; }> = {
     1: { solid: 'bg-amber-600 text-white', solidHover: 'hover:bg-amber-500', ring: 'ring-amber-400', mobileBtn: 'bg-amber-600 text-white', mobileBtnHover: 'hover:bg-amber-500', lightPaper: 'bg-amber-50' },
     2: { solid: 'bg-violet-600 text-white', solidHover: 'hover:bg-violet-500', ring: 'ring-violet-400', mobileBtn: 'bg-violet-600 text-white', mobileBtnHover: 'hover:bg-violet-500', lightPaper: 'bg-violet-50' },
     3: { solid: 'bg-emerald-600 text-white', solidHover: 'hover:bg-emerald-500', ring: 'ring-emerald-400', mobileBtn: 'bg-emerald-600 text-white', mobileBtnHover: 'hover:bg-emerald-500', lightPaper: 'bg-emerald-50' },
@@ -87,14 +73,9 @@ export default function Reading() {
 
   const fetchChapter = async (book: BibleBook, chapterNum: number) => {
     setLoading(true);
-    try {
-      const chapterData = await getChapter(book.name, chapterNum, state.settings.language);
-      setChapter(chapterData);
-    } catch (error) {
-      console.error('Error fetching chapter:', error);
-    } finally {
-      setLoading(false);
-    }
+    try { setChapter(await getChapter(book.name, chapterNum, state.settings.language)); }
+    catch (error) { console.error('Error fetching chapter:', error); }
+    finally { setLoading(false); }
   };
 
   const saveScrollForCurrent = () => {
@@ -109,76 +90,51 @@ export default function Reading() {
 
   const handleBookSelect = (book: BibleBook) => {
     saveScrollForCurrent();
-    setSelectedBook(book);
-    setSelectedChapter(1);
-    setSelectedVerses([]);
-    setHighlightedVerse(null);
-    setScrollTargetVerse(null);
+    setSelectedBook(book); setSelectedChapter(1);
+    setSelectedVerses([]); setHighlightedVerse(null); setScrollTargetVerse(null);
     setShowBookPicker(false);
-    fetchChapter(book, 1);
-    saveReadingPosition(book.name, 1);
+    fetchChapter(book, 1); saveReadingPosition(book.name, 1);
     try { window.scrollTo({ top: 0 }); } catch {}
   };
-
   const handleChapterSelect = (chapterNum: number) => {
-    saveScrollForCurrent();
-    setSelectedChapter(chapterNum);
+    saveScrollForCurrent(); setSelectedChapter(chapterNum);
     if (selectedBook) {
-      setSelectedVerses([]);
-      setHighlightedVerse(null);
-      setScrollTargetVerse(null);
+      setSelectedVerses([]); setHighlightedVerse(null); setScrollTargetVerse(null);
       try { window.scrollTo({ top: 0 }); } catch {}
-      fetchChapter(selectedBook, chapterNum);
-      saveReadingPosition(selectedBook.name, chapterNum);
+      fetchChapter(selectedBook, chapterNum); saveReadingPosition(selectedBook.name, chapterNum);
     }
   };
 
   const handleNextUnit = () => {
     if (!selectedBook) return;
-    if (selectedChapter < selectedBook.chapters) {
-      handleChapterSelect(selectedChapter + 1);
-      return;
-    }
+    if (selectedChapter < selectedBook.chapters) { handleChapterSelect(selectedChapter + 1); return; }
     const idx = books.findIndex(b => b.name === selectedBook.name);
     if (idx >= 0 && idx < books.length - 1) {
       const nextBook = books[idx + 1];
-      setSelectedBook(nextBook);
-      setSelectedChapter(1);
-      setSelectedVerses([]);
-      setHighlightedVerse(null);
-      setScrollTargetVerse(null);
+      setSelectedBook(nextBook); setSelectedChapter(1);
+      setSelectedVerses([]); setHighlightedVerse(null); setScrollTargetVerse(null);
       try { window.scrollTo({ top: 0 }); } catch {}
-      fetchChapter(nextBook, 1);
-      saveReadingPosition(nextBook.name, 1);
+      fetchChapter(nextBook, 1); saveReadingPosition(nextBook.name, 1);
     }
   };
-
   const handlePrevUnit = () => {
     if (!selectedBook) return;
-    if (selectedChapter > 1) {
-      handleChapterSelect(selectedChapter - 1);
-      return;
-    }
+    if (selectedChapter > 1) { handleChapterSelect(selectedChapter - 1); return; }
     const idx = books.findIndex(b => b.name === selectedBook.name);
     if (idx > 0) {
       const prevBook = books[idx - 1];
-      setSelectedBook(prevBook);
-      setSelectedChapter(prevBook.chapters);
-      setSelectedVerses([]);
-      setHighlightedVerse(null);
-      setScrollTargetVerse(null);
+      setSelectedBook(prevBook); setSelectedChapter(prevBook.chapters);
+      setSelectedVerses([]); setHighlightedVerse(null); setScrollTargetVerse(null);
       try { window.scrollTo({ top: 0 }); } catch {}
-      fetchChapter(prevBook, prevBook.chapters);
-      saveReadingPosition(prevBook.name, prevBook.chapters);
+      fetchChapter(prevBook, prevBook.chapters); saveReadingPosition(prevBook.name, prevBook.chapters);
     }
   };
 
-  const oldTestamentBooks = books.filter(book => book.testament === 'old');
-  const newTestamentBooks = books.filter(book => book.testament === 'new');
+  const oldTestamentBooks = books.filter(b => b.testament === 'old');
+  const newTestamentBooks = books.filter(b => b.testament === 'new');
   const getBookName = (book: BibleBook | null) =>
     state.settings.language === 'fr' ? (book?.nameFr ?? '') : (book?.nameEn ?? '');
 
-  // *** Mobile: autoriser un peu plus de caractères ***
   const shortBookName = (book: BibleBook | null) => {
     const full = getBookName(book);
     const max = 14;
@@ -188,10 +144,8 @@ export default function Reading() {
   const resolveBook = (bookIdentifier: string): BibleBook | null => {
     let found = books.find(b => b.name === bookIdentifier);
     if (found) return found;
-    found = books.find(b => b.nameEn === bookIdentifier);
-    if (found) return found;
-    found = books.find(b => b.nameFr === bookIdentifier);
-    if (found) return found;
+    found = books.find(b => b.nameEn === bookIdentifier); if (found) return found;
+    found = books.find(b => b.nameFr === bookIdentifier); if (found) return found;
     return null;
   };
 
@@ -202,87 +156,54 @@ export default function Reading() {
       const qc = u.searchParams.get('c') || u.searchParams.get('chapter');
       const qv = u.searchParams.get('v') || u.searchParams.get('verse');
       return { qb, qc, qv };
-    } catch {
-      return { qb: null, qc: null, qv: null };
-    }
+    } catch { return { qb: null, qc: null, qv: null }; }
   }
 
   const [quickSlots, setQuickSlots] = useState<QuickSlot[]>([null, null, null, null]);
   const [activeSlot, setActiveSlot] = useState<number | null>(null);
   const [lastTappedSlot, setLastTappedSlot] = useState<number | null>(null);
-
-  function readAllSlots(): QuickSlot[] { return [0, 1, 2, 3].map(i => readQuickSlot(i)); }
+  function readAllSlots(): QuickSlot[] { return [0,1,2,3].map(i => readQuickSlot(i)); }
   function refreshSlots() { try { setQuickSlots(readAllSlots()); } catch {} }
   useEffect(() => { refreshSlots(); }, []);
-
   useEffect(() => {
     if (!selectedBook) return;
     if (activeSlot !== null && activeSlot !== 0) {
-      try {
-        saveQuickSlot(activeSlot, { book: selectedBook.name, chapter: selectedChapter });
-        refreshSlots();
-      } catch {}
+      try { saveQuickSlot(activeSlot, { book: selectedBook.name, chapter: selectedChapter }); refreshSlots(); } catch {}
     }
   }, [selectedBook?.name, selectedChapter, activeSlot]);
-
-  useEffect(() => {
-    try { if (activeSlot && activeSlot !== 0) localStorage.setItem('twog:qs:lastActive', String(activeSlot)); } catch {}
-  }, [activeSlot]);
-
-  function setTapped(i: number) {
-    setLastTappedSlot(i);
-    try { localStorage.setItem('twog:qs:lastTapped', String(i)); } catch {}
-  }
+  useEffect(() => { try { if (activeSlot && activeSlot !== 0) localStorage.setItem('twog:qs:lastActive', String(activeSlot)); } catch {} }, [activeSlot]);
+  function setTapped(i: number) { setLastTappedSlot(i); try { localStorage.setItem('twog:qs:lastTapped', String(i)); } catch {} }
 
   function jumpToSlot(i: number) {
     const slot = readQuickSlot(i);
     setTapped(i);
-
     if (i === 0) {
       setActiveSlot(null);
       if (!slot) return;
       const b = resolveBook(slot.book); if (!b) return;
-      setSelectedBook(b);
-      setSelectedChapter(slot.chapter);
-      setSelectedVerses([]);
-      setHighlightedVerse(slot.verse ?? null);
-      setScrollTargetVerse(slot.verse ?? null);
+      setSelectedBook(b); setSelectedChapter(slot.chapter);
+      setSelectedVerses([]); setHighlightedVerse(slot.verse ?? null); setScrollTargetVerse(slot.verse ?? null);
       try { window.scrollTo({ top: 0 }); } catch {}
-      fetchChapter(b, slot.chapter);
-      saveReadingPosition(b.name, slot.chapter);
+      fetchChapter(b, slot.chapter); saveReadingPosition(b.name, slot.chapter);
       return;
     }
-
     setActiveSlot(i);
     if (!slot) {
       if (!selectedBook) return;
-      saveQuickSlot(i, { book: selectedBook.name, chapter: selectedChapter });
-      refreshSlots();
-      return;
+      saveQuickSlot(i, { book: selectedBook.name, chapter: selectedChapter }); refreshSlots(); return;
     }
     const book = resolveBook(slot.book); if (!book) return;
-    setSelectedBook(book);
-    setSelectedChapter(slot.chapter);
-    setSelectedVerses([]);
-    setHighlightedVerse(null);
-    setScrollTargetVerse(slot.verse ?? null);
+    setSelectedBook(book); setSelectedChapter(slot.chapter);
+    setSelectedVerses([]); setHighlightedVerse(null); setScrollTargetVerse(slot.verse ?? null);
     try { window.scrollTo({ top: 0 }); } catch {}
-    fetchChapter(book, slot.chapter);
-    saveReadingPosition(book.name, slot.chapter);
+    fetchChapter(book, slot.chapter); saveReadingPosition(book.name, slot.chapter);
   }
 
-  const activeTheme =
-    (activeSlot === 1 || activeSlot === 2 || activeSlot === 3)
-      ? SLOT_THEMES[activeSlot as SlotKey]
-      : null;
-
-  // -------- Pavé couleur (PC) pour afficher Livre • Chapitre ----------
-  const desktopChipBase =
-    'inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm whitespace-nowrap';
+  const activeTheme = (activeSlot === 1 || activeSlot === 2 || activeSlot === 3) ? SLOT_THEMES[activeSlot as SlotKey] : null;
+  const desktopChipBase = 'inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm whitespace-nowrap';
   const desktopChipColors = activeTheme ? activeTheme.solid : 'bg-blue-600 text-white';
 
   const [hasLoadedContext, setHasLoadedContext] = useState(false);
-
   useEffect(() => {
     if (hasLoadedContext) return;
 
@@ -292,19 +213,10 @@ export default function Reading() {
       const chapNum = parseInt(qc, 10);
       const verseNum = qv ? parseInt(qv, 10) : NaN;
       if (book && Number.isFinite(chapNum) && chapNum >= 1 && chapNum <= book.chapters) {
-        setSelectedBook(book);
-        setSelectedChapter(chapNum);
-        fetchChapter(book, chapNum);
+        setSelectedBook(book); setSelectedChapter(chapNum); fetchChapter(book, chapNum);
         setSelectedVerses([]);
-        if (Number.isFinite(verseNum)) {
-          setHighlightedVerse(verseNum);
-          setScrollTargetVerse(verseNum);
-          setTapped(0);
-          setActiveSlot(null);
-        } else {
-          setHighlightedVerse(null);
-          setScrollTargetVerse(null);
-        }
+        if (Number.isFinite(verseNum)) { setHighlightedVerse(verseNum); setScrollTargetVerse(verseNum); setTapped(0); setActiveSlot(null); }
+        else { setHighlightedVerse(null); setScrollTargetVerse(null); }
         saveReadingPosition(book.name, chapNum);
         setHasLoadedContext(true);
         return;
@@ -314,15 +226,9 @@ export default function Reading() {
     if (state.readingContext && state.readingContext.book && state.readingContext.chapter > 0) {
       const book = resolveBook(state.readingContext.book);
       if (book) {
-        setSelectedBook(book);
-        setSelectedChapter(state.readingContext.chapter);
-        fetchChapter(book, state.readingContext.chapter);
-        setSelectedVerses([]);
-        setHighlightedVerse(state.readingContext.verse ?? null);
-        setScrollTargetVerse(state.readingContext.verse ?? null);
-        setTapped(0);
-        setActiveSlot(null);
-        saveReadingPosition(book.name, state.readingContext.chapter);
+        setSelectedBook(book); setSelectedChapter(state.readingContext.chapter); fetchChapter(book, state.readingContext.chapter);
+        setSelectedVerses([]); setHighlightedVerse(state.readingContext.verse ?? null); setScrollTargetVerse(state.readingContext.verse ?? null);
+        setTapped(0); setActiveSlot(null); saveReadingPosition(book.name, state.readingContext.chapter);
         setHasLoadedContext(true);
         dispatch({ type: 'SET_READING_CONTEXT', payload: { book: '', chapter: 0 } });
         return;
@@ -336,16 +242,9 @@ export default function Reading() {
         if (s0) {
           const b = resolveBook(s0.book);
           if (b) {
-            setSelectedBook(b);
-            setSelectedChapter(s0.chapter);
-            fetchChapter(b, s0.chapter);
-            setSelectedVerses([]);
-            setHighlightedVerse(s0.verse ?? null);
-            setScrollTargetVerse(s0.verse ?? null);
-            setTapped(0);
-            setActiveSlot(null);
-            setHasLoadedContext(true);
-            return;
+            setSelectedBook(b); setSelectedChapter(s0.chapter); fetchChapter(b, s0.chapter);
+            setSelectedVerses([]); setHighlightedVerse(s0.verse ?? null); setScrollTargetVerse(s0.verse ?? null);
+            setTapped(0); setActiveSlot(null); setHasLoadedContext(true); return;
           }
         }
       }
@@ -359,41 +258,27 @@ export default function Reading() {
         if (s) {
           const b = resolveBook(s.book);
           if (b) {
-            setSelectedBook(b);
-            setSelectedChapter(s.chapter);
-            fetchChapter(b, s.chapter);
-            setSelectedVerses([]);
-            setHighlightedVerse(null);
-            setScrollTargetVerse(s.verse ?? null);
-            setActiveSlot(i);
-            setLastTappedSlot(i);
-            setHasLoadedContext(true);
-            return;
+            setSelectedBook(b); setSelectedChapter(s.chapter); fetchChapter(b, s.chapter);
+            setSelectedVerses([]); setHighlightedVerse(null); setScrollTargetVerse(s.verse ?? null);
+            setActiveSlot(i); setLastTappedSlot(i); setHasLoadedContext(true); return;
           }
         }
       }
     } catch {}
 
-    const last = state.settings.lastReadingPosition;
+    const last = (state.settings as any).lastReadingPosition;
     if (last && last.book && last.chapter > 0) {
       const book = resolveBook(last.book);
       if (book) {
-        setSelectedBook(book);
-        setSelectedChapter(last.chapter);
-        fetchChapter(book, last.chapter);
-        setSelectedVerses([]);
-        setHighlightedVerse(null);
-        setScrollTargetVerse((last as any).verse ?? null);
-        setHasLoadedContext(true);
-        return;
+        setSelectedBook(book); setSelectedChapter(last.chapter); fetchChapter(book, last.chapter);
+        setSelectedVerses([]); setHighlightedVerse(null); setScrollTargetVerse(last.verse ?? null);
+        setHasLoadedContext(true); return;
       }
     }
 
     const john = resolveBook('John');
     if (john) {
-      setSelectedBook(john);
-      setSelectedChapter(1);
-      fetchChapter(john, 1);
+      setSelectedBook(john); setSelectedChapter(1); fetchChapter(john, 1);
       try { window.scrollTo({ top: 0 }); } catch {}
       setHasLoadedContext(true);
     }
@@ -401,19 +286,11 @@ export default function Reading() {
 
   const suppressAutoSaveUntil = useRef<number>(0);
   const programmaticScrollUntil = useRef<number>(0);
-
   function scrollToVerseNumber(v: number, smooth: boolean, extraTop = 0) {
-    const now = Date.now();
-    const lockMs = 2500;
-    suppressAutoSaveUntil.current = now + lockMs;
-    programmaticScrollUntil.current = now + lockMs;
-
-    const baseOffset = NAV_H + cmdH + 14;
-    const offset = baseOffset + extraTop;
-
-    let tries = 0;
-    const maxTries = 24;
-
+    const now = Date.now(); const lockMs = 2500;
+    suppressAutoSaveUntil.current = now + lockMs; programmaticScrollUntil.current = now + lockMs;
+    const baseOffset = NAV_H + cmdH + 14; const offset = baseOffset + extraTop;
+    let tries = 0; const maxTries = 24;
     const tick = () => {
       const el = document.getElementById(`verse-${v}`);
       if (el) {
@@ -430,7 +307,6 @@ export default function Reading() {
 
   useEffect(() => {
     if (!chapter || !selectedBook) return;
-
     const doScroll = () => {
       const v = (scrollTargetVerse ?? highlightedVerse);
       if (v !== null) {
@@ -439,24 +315,16 @@ export default function Reading() {
         return;
       }
       if (Date.now() < programmaticScrollUntil.current) return;
-
       try {
-        const raw = sessionStorage.getItem(
-          `twog:reading:scroll:${state.settings.language}:${selectedBook.name}:${selectedChapter}`
-        );
+        const raw = sessionStorage.getItem(`twog:reading:scroll:${state.settings.language}:${selectedBook.name}:${selectedChapter}`);
         const y = raw ? parseInt(raw, 10) : 0;
         if (Number.isFinite(y) && y > 0) {
-          const now = Date.now();
-          const lockMs = 800;
-          suppressAutoSaveUntil.current = now + lockMs;
-          programmaticScrollUntil.current = now + lockMs;
+          const now = Date.now(); const lockMs = 800;
+          suppressAutoSaveUntil.current = now + lockMs; programmaticScrollUntil.current = now + lockMs;
           window.scrollTo({ top: y, behavior: 'auto' });
-        } else {
-          window.scrollTo({ top: 0, behavior: 'auto' });
-        }
+        } else { window.scrollTo({ top: 0, behavior: 'auto' }); }
       } catch {}
     };
-
     const t = setTimeout(doScroll, 50);
     return () => clearTimeout(t);
   }, [chapter, highlightedVerse, scrollTargetVerse, state.settings.language]);
@@ -464,7 +332,6 @@ export default function Reading() {
   const toggleSelectVerse = (num: number) => {
     setSelectedVerses(prev => (prev.includes(num) ? prev.filter(n => n !== num) : [...prev, num]));
   };
-
   const compressRanges = (nums: number[]) => {
     if (nums.length === 0) return '';
     const sorted = [...nums].sort((a, b) => a - b);
@@ -473,11 +340,9 @@ export default function Reading() {
     const push = () => (start === prev ? parts.push(`${start}`) : parts.push(`${start}-${prev}`));
     for (let i = 1; i < sorted.length; i++) {
       const n = sorted[i];
-      if (n === prev + 1) prev = n;
-      else { push(); start = n; prev = n; }
+      if (n === prev + 1) prev = n; else { push(); start = n; prev = n; }
     }
-    push();
-    return parts.join(',');
+    push(); return parts.join(',');
   };
 
   const copySelection = async () => {
@@ -490,7 +355,6 @@ export default function Reading() {
     const ok = await copyToClipboard(payload);
     if (ok) { setCopiedKey('selection'); setTimeout(() => setCopiedKey(''), 1500); setSelectedVerses([]); }
   };
-
   const shareSelection = async () => {
     if (!selectedBook || !chapter || selectedVerses.length === 0) return;
     const chosen = chapter.verses.filter(v => selectedVerses.includes(v.verse)).sort((a, b) => a.verse - b.verse);
@@ -509,25 +373,49 @@ export default function Reading() {
     } catch (e) { console.error('share error', e); }
   };
 
+  // ---- Ajout à une liste (modal simple) ----
+  const [showAddToList, setShowAddToList] = useState(false);
+  const [listsForModal, setListsForModal] = useState(getAllLists());
+  const [selectedListId, setSelectedListId] = useState<string>('');
+  const [newListTitle, setNewListTitle] = useState<string>('');
+  const openAddToList = () => { setListsForModal(getAllLists()); setSelectedListId(listsForModal[0]?.id ?? ''); setNewListTitle(''); setShowAddToList(true); };
+  const confirmAddToList = () => {
+    if (!selectedBook || !chapter || selectedVerses.length === 0) return;
+
+    let targetId = selectedListId;
+    if (!targetId && newListTitle.trim()) {
+      const list = createList(newListTitle.trim());
+      targetId = list.id;
+    }
+    if (!targetId) return;
+
+    const chosen = chapter.verses
+      .filter(v => selectedVerses.includes(v.verse))
+      .sort((a, b) => a.verse - b.verse)
+      .map<VerseRef>(v => ({
+        bookId: selectedBook.name,
+        bookName: getBookName(selectedBook),
+        chapter: v.chapter,
+        verse: v.verse,
+        text: v.text,
+        translation: state.settings.language,
+      }));
+
+    addVersesToList(targetId, chosen);
+    setShowAddToList(false);
+    setSelectedVerses([]);
+    setCopiedKey('added-to-list');
+    setTimeout(() => setCopiedKey(''), 1600);
+  };
+
   const swipeStart = useRef<{ x: number; y: number; time: number } | null>(null);
   const swipeHandled = useRef(false);
-
-  const onTouchStart = (e: React.TouchEvent) => {
-    const t = e.touches[0];
-    swipeStart.current = { x: t.clientX, y: t.clientY, time: Date.now() };
-    swipeHandled.current = false;
-  };
+  const onTouchStart = (e: React.TouchEvent) => { const t = e.touches[0]; swipeStart.current = { x: t.clientX, y: t.clientY, time: Date.now() }; swipeHandled.current = false; };
   const onTouchMove = (e: React.TouchEvent) => {
     if (!swipeStart.current || swipeHandled.current || loading || !selectedBook) return;
-    const t = e.touches[0];
-    const dx = t.clientX - swipeStart.current.x;
-    const dy = t.clientY - swipeStart.current.y;
-    const absDx = Math.abs(dx);
-    const absDy = Math.abs(dy);
-    if (absDx > 60 && absDx > absDy * 1.4) {
-      swipeHandled.current = true;
-      if (dx < 0) handleNextUnit(); else handlePrevUnit();
-    }
+    const t = e.touches[0]; const dx = t.clientX - swipeStart.current.x; const dy = t.clientY - swipeStart.current.y;
+    const absDx = Math.abs(dx); const absDy = Math.abs(dy);
+    if (absDx > 60 && absDx > absDy * 1.4) { swipeHandled.current = true; if (dx < 0) handleNextUnit(); else handlePrevUnit(); }
   };
   const onTouchEnd = () => { swipeStart.current = null; swipeHandled.current = false; };
 
@@ -539,18 +427,15 @@ export default function Reading() {
     const onScroll = () => {
       if (!chapter || !selectedBook) return;
       if (Date.now() < suppressAutoSaveUntil.current) return;
-
       if (scrollDebounce.current) window.clearTimeout(scrollDebounce.current);
       scrollDebounce.current = window.setTimeout(() => {
         try {
           const offset = NAV_H + cmdH + 16;
           let bestVerse = 1;
           for (const v of chapter.verses) {
-            const el = document.getElementById(`verse-${v.verse}`);
-            if (!el) continue;
+            const el = document.getElementById(`verse-${v.verse}`); if (!el) continue;
             const top = el.getBoundingClientRect().top;
-            if (top - offset <= 0) bestVerse = v.verse;
-            else break;
+            if (top - offset <= 0) bestVerse = v.verse; else break;
           }
           if (activeSlot && activeSlot !== 0) {
             saveQuickSlot(activeSlot, { book: selectedBook.name, chapter: selectedChapter, verse: bestVerse });
@@ -559,16 +444,12 @@ export default function Reading() {
           const nearBottom =
             window.innerHeight + (window.scrollY || document.documentElement.scrollTop || 0)
             >= (document.documentElement.scrollHeight || document.body.scrollHeight) - 180;
-
           setShowBottomRandom(nearBottom && lastTappedSlot === 0 && selectedVerses.length === 0);
         } catch {}
       }, 160);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (scrollDebounce.current) window.clearTimeout(scrollDebounce.current);
-    };
+    return () => { window.removeEventListener('scroll', onScroll); if (scrollDebounce.current) window.clearTimeout(scrollDebounce.current); };
   }, [chapter, selectedBook?.name, selectedChapter, activeSlot, cmdH, lastTappedSlot, selectedVerses.length]);
 
   const pickNewRandom = async () => {
@@ -577,15 +458,10 @@ export default function Reading() {
       if (!v) return;
       saveQuickSlot(0, { book: v.book, chapter: v.chapter, verse: v.verse });
       const b = resolveBook(v.book); if (!b) return;
-      setSelectedBook(b);
-      setSelectedChapter(v.chapter);
-      setSelectedVerses([]);
-      setHighlightedVerse(v.verse);
-      setScrollTargetVerse(v.verse);
-      setTapped(0);
-      setActiveSlot(null);
-      fetchChapter(b, v.chapter);
-      saveReadingPosition(b.name, v.chapter);
+      setSelectedBook(b); setSelectedChapter(v.chapter);
+      setSelectedVerses([]); setHighlightedVerse(v.verse); setScrollTargetVerse(v.verse);
+      setTapped(0); setActiveSlot(null);
+      fetchChapter(b, v.chapter); saveReadingPosition(b.name, v.chapter);
       setShowBottomRandom(false);
       try { window.scrollTo({ top: 0 }); } catch {}
     } catch (e) { console.error('random error', e); }
@@ -609,9 +485,8 @@ export default function Reading() {
                           onClick={() => setShowBookPicker(true)}
                           aria-expanded={showBookPicker}
                           className={`min-w-0 inline-flex items-center justify-between gap-1 rounded-md px-2 py-1 text-sm leading-none font-semibold shadow active:scale-95 focus:outline-none focus:ring-2 ${
-                            isDark
-                              ? `${activeTheme ? activeTheme.mobileBtn : 'bg-blue-600 text-white'} ${activeTheme ? activeTheme.mobileBtnHover : 'hover:bg-blue-500'} focus:ring-blue-400`
-                              : `${activeTheme ? activeTheme.mobileBtn : 'bg-blue-600 text-white'} ${activeTheme ? activeTheme.mobileBtnHover : 'hover:bg-blue-500'} focus:ring-blue-400`
+                            isDark ? `${activeTheme ? activeTheme.mobileBtn : 'bg-blue-600 text-white'} ${activeTheme ? activeTheme.mobileBtnHover : 'hover:bg-blue-500'} focus:ring-blue-400`
+                                   : `${activeTheme ? activeTheme.mobileBtn : 'bg-blue-600 text-white'} ${activeTheme ? activeTheme.mobileBtnHover : 'hover:bg-blue-500'} focus:ring-blue-400`
                           } flex-1`}
                           title={getBookName(selectedBook)}
                           aria-label={state.settings.language === 'fr' ? 'Choisir un livre' : 'Choose a book'}
@@ -626,17 +501,13 @@ export default function Reading() {
                           onClick={() => setShowChapterPicker(true)}
                           aria-expanded={showChapterPicker}
                           className={`min-w-0 inline-flex items-center justify-between gap-1 rounded-md px-2 py-1 text-sm leading-none font-semibold shadow active:scale-95 focus:outline-none focus:ring-2 ${
-                            isDark
-                              ? `${activeTheme ? (SLOT_THEMES[activeSlot as SlotKey]?.mobileBtn ?? 'bg-blue-600 text-white') : 'bg-blue-600 text-white'} ${activeTheme ? (SLOT_THEMES[activeSlot as SlotKey]?.mobileBtnHover ?? '') : 'hover:bg-blue-500'} focus:ring-blue-400`
-                              : `${activeTheme ? (SLOT_THEMES[activeSlot as SlotKey]?.mobileBtn ?? 'bg-blue-600 text-white') : 'bg-blue-600 text-white'} ${activeTheme ? (SLOT_THEMES[activeSlot as SlotKey]?.mobileBtnHover ?? '') : 'hover:bg-blue-500'} focus:ring-blue-400`
+                            isDark ? `${activeTheme ? (SLOT_THEMES[activeSlot as SlotKey]?.mobileBtn ?? 'bg-blue-600 text-white') : 'bg-blue-600 text-white'} ${activeTheme ? (SLOT_THEMES[activeSlot as SlotKey]?.mobileBtnHover ?? '') : 'hover:bg-blue-500'} focus:ring-blue-400`
+                                   : `${activeTheme ? (SLOT_THEMES[activeSlot as SlotKey]?.mobileBtn ?? 'bg-blue-600 text-white') : 'bg-blue-600 text-white'} ${activeTheme ? (SLOT_THEMES[activeSlot as SlotKey]?.mobileBtnHover ?? '') : 'hover:bg-blue-500'} focus:ring-blue-400`
                           } flex-none shrink-0 whitespace-nowrap`}
                           title={state.settings.language === 'fr' ? 'Choisir un chapitre' : 'Choose a chapter'}
                           aria-label={state.settings.language === 'fr' ? 'Choisir un chapitre' : 'Choose a chapter'}
                         >
-                          <span className="truncate">
-                            <span className="md:hidden">Ch.</span>
-                            <span className="hidden md:inline">{t('chapter')}</span> {selectedChapter}
-                          </span>
+                          <span className="truncate"><span className="md:hidden">Ch.</span><span className="hidden md:inline">{t('chapter')}</span> {selectedChapter}</span>
                           <ChevronDown className="w-3.5 h-3.5 opacity-90" />
                         </button>
 
@@ -648,11 +519,8 @@ export default function Reading() {
                             const base = 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1';
                             let cls = '';
                             if (i === 0) {
-                              if (lastTappedSlot === 0) {
-                                cls = 'bg-blue-600 text-white hover:bg-blue-500';
-                              } else {
-                                cls = isDark ? 'border border-blue-400/60 text-blue-200' : 'bg-white border border-blue-300 text-blue-700';
-                              }
+                              cls = lastTappedSlot === 0 ? 'bg-blue-600 text-white hover:bg-blue-500' :
+                                (isDark ? 'border border-blue-400/60 text-blue-200' : 'bg-white border border-blue-300 text-blue-700');
                             } else {
                               const theme = SLOT_THEMES[i as SlotKey];
                               cls = filled ? `${theme.solid} ${theme.solidHover}` :
@@ -672,7 +540,7 @@ export default function Reading() {
                         </div>
                       </div>
 
-                      {/* DESKTOP : pavé couleur = slot actif */}
+                      {/* DESKTOP */}
                       <div className="hidden md:flex md:items-center md:gap-2">
                         <span className={`${desktopChipBase} ${desktopChipColors}`}>
                           <span className="truncate max-w-[28ch]">{getBookName(selectedBook)}</span>
@@ -686,17 +554,14 @@ export default function Reading() {
                   {/* Desktop : actions à droite */}
                   <div className="hidden md:flex items-center gap-2 ml-auto">
                     <div className="flex items-center gap-2 mr-2">
-                      {[0, 1, 2, 3].map((i) => {
+                      {[0,1,2,3].map((i) => {
                         const s = quickSlots[i];
                         const filled = s !== null;
                         const base = 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1';
                         let cls = '';
                         if (i === 0) {
-                          if (lastTappedSlot === 0) {
-                            cls = 'bg-blue-600 text-white hover:bg-blue-500';
-                          } else {
-                            cls = isDark ? 'border border-blue-400/60 text-blue-200' : 'bg-white border border-blue-300 text-blue-700';
-                          }
+                          cls = lastTappedSlot === 0 ? 'bg-blue-600 text-white hover:bg-blue-500' :
+                            (isDark ? 'border border-blue-400/60 text-blue-200' : 'bg-white border border-blue-300 text-blue-700');
                         } else {
                           const theme = SLOT_THEMES[i as SlotKey];
                           cls = filled ? `${theme.solid} ${theme.solidHover}` :
@@ -715,10 +580,7 @@ export default function Reading() {
                       })}
                     </div>
 
-                    <button
-                      onClick={() => setShowBookPicker(true)}
-                      className={`px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm ${isDark ? 'bg-blue-600 text-white hover:bg-blue-500' : 'bg-blue-600 text-white hover:bg-blue-500'}`}
-                    >
+                    <button onClick={() => setShowBookPicker(true)} className={`px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm ${isDark ? 'bg-blue-600 text-white hover:bg-blue-500' : 'bg-blue-600 text-white hover:bg-blue-500'}`}>
                       {state.settings.language === 'fr' ? 'Livres' : 'Books'}
                     </button>
 
@@ -731,9 +593,7 @@ export default function Reading() {
                             : isDark ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-600 hover:bg-gray-300 hover:text-gray-800'
                         }`}
                         title={state.settings.language === 'fr' ? 'Chapitre précédent' : 'Previous chapter'}
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                      </button>
+                      ><ChevronLeft className="w-4 h-4" /></button>
 
                       <div className="relative">
                         <select
@@ -742,11 +602,7 @@ export default function Reading() {
                           className={`appearance-none ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} border rounded-md px-3 py-1.5 pr-7 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
                           title={state.settings.language === 'fr' ? 'Choisir chapitre' : 'Choose chapter'}
                         >
-                          {selectedBook
-                            ? Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map(num => (
-                                <option key={num} value={num}>{num}</option>
-                              ))
-                            : null}
+                          {selectedBook ? Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map(num => (<option key={num} value={num}>{num}</option>)) : null}
                         </select>
                         <ChevronDown className={`w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 ${isDark ? 'text-white/80' : 'text-gray-600'}`} />
                       </div>
@@ -759,9 +615,7 @@ export default function Reading() {
                             : isDark ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-600 hover:bg-gray-300 hover:text-gray-800'
                         }`}
                         title={state.settings.language === 'fr' ? 'Chapitre suivant' : 'Next chapter'}
-                      >
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
+                      ><ChevronRight className="w-4 h-4" /></button>
                     </div>
                   </div>
                 </div>
@@ -769,6 +623,7 @@ export default function Reading() {
             </div>
           )}
 
+          {/* BARRE SELECTION (desktop) */}
           {selectedVerses.length > 0 && (
             <div className="hidden md:block sticky z-40 mb-3" style={{ top: `${NAV_H + cmdH + 8}px` }}>
               <div className={`${isDark ? 'bg-gray-800 text-white border border-gray-700' : 'bg-white text-gray-800 border border-gray-200'} rounded-lg shadow px-4 py-3 flex items-center justify-between`}>
@@ -778,6 +633,10 @@ export default function Reading() {
                     : `${selectedVerses.length} verse${selectedVerses.length > 1 ? 's' : ''} selected`}
                 </div>
                 <div className="flex items-center gap-2">
+                  <button onClick={openAddToList} className="inline-flex items-center px-3 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-500">
+                    <ListPlusIcon size={16} className="mr-2" />
+                    {state.settings.language === 'fr' ? 'Ajouter à une liste' : 'Add to list'}
+                  </button>
                   <button onClick={copySelection} className="inline-flex items-center px-3 py-2 rounded bg-blue-600 text-white hover:bg-blue-500">
                     <CopyIcon size={16} className="mr-2" />
                     {state.settings.language === 'fr' ? 'Copier' : 'Copy'}
@@ -797,10 +656,7 @@ export default function Reading() {
           {selectedBook ? (
             <div
               className={`${isDark ? 'bg-gray-800' : 'bg-white'} -mx-4 sm:mx-0 sm:rounded-xl sm:shadow-lg px-4 py-2 sm:p-6 min-h-96`}
-              onTouchStart={onTouchStart}
-              onTouchMove={onTouchMove}
-              onTouchEnd={onTouchEnd}
-              style={{ touchAction: 'manipulation' }}
+              onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} style={{ touchAction: 'manipulation' }}
             >
               {loading ? (
                 <div className="flex items-center justify-center py-16">
@@ -853,14 +709,13 @@ export default function Reading() {
             </div>
           )}
 
+          {/* Pickers ... (inchangés) */}
           {showBookPicker && (
             <div className="fixed inset-0 z-50">
               <div className="absolute inset-0 bg-black/60" onClick={() => setShowBookPicker(false)} aria-hidden="true" />
               <div className={`absolute inset-0 ${isDark ? 'bg-gray-900' : 'bg-white'} p-4 overflow-y-auto`}>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>
-                    {state.settings.language === 'fr' ? 'Choisir un livre' : 'Choose a book'}
-                  </h3>
+                  <h3 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>{state.settings.language === 'fr' ? 'Choisir un livre' : 'Choose a book'}</h3>
                   <button onClick={() => setShowBookPicker(false)} className={`${isDark ? 'text-white bg-gray-700' : 'text-gray-700 bg-gray-200'} px-3 py-1 rounded`}>
                     {state.settings.language === 'fr' ? 'Fermer' : 'Close'}
                   </button>
@@ -869,15 +724,11 @@ export default function Reading() {
                 <h4 className={`text-sm uppercase tracking-wide mb-2 ${isDark ? 'text-white/80' : 'text-gray-600'}`}>{t('oldTestament')}</h4>
                 <div className="columns-2 md:columns-3 lg:columns-4 gap-2 mb-6">
                   {oldTestamentBooks.map(book => (
-                    <button
-                      key={`ot-${book.name}`}
-                      onClick={() => handleBookSelect(book)}
+                    <button key={`ot-${book.name}`} onClick={() => handleBookSelect(book)}
                       className={`w-full inline-block mb-2 break-inside-avoid px-3 py-2 rounded-lg text-sm ${
-                        selectedBook?.name === book.name
-                          ? isDark ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800'
-                          : isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                      }`}
-                    >
+                        selectedBook?.name === book.name ? (isDark ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800')
+                        : (isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-800 hover:bg-gray-200')
+                      }`}>
                       {state.settings.language === 'fr' ? book.nameFr : book.nameEn}
                     </button>
                   ))}
@@ -886,15 +737,11 @@ export default function Reading() {
                 <h4 className={`text-sm uppercase tracking-wide mb-2 ${isDark ? 'text-white/80' : 'text-gray-600'}`}>{t('newTestament')}</h4>
                 <div className="columns-2 md:columns-3 lg:columns-4 gap-2 pb-10">
                   {newTestamentBooks.map(book => (
-                    <button
-                      key={`nt-${book.name}`}
-                      onClick={() => handleBookSelect(book)}
+                    <button key={`nt-${book.name}`} onClick={() => handleBookSelect(book)}
                       className={`w-full inline-block mb-2 break-inside-avoid px-3 py-2 rounded-lg text-sm ${
-                        selectedBook?.name === book.name
-                          ? isDark ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800'
-                          : isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                      }`}
-                    >
+                        selectedBook?.name === book.name ? (isDark ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800')
+                        : (isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-800 hover:bg-gray-200')
+                      }`}>
                       {state.settings.language === 'fr' ? book.nameFr : book.nameEn}
                     </button>
                   ))}
@@ -908,9 +755,7 @@ export default function Reading() {
               <div className="absolute inset-0 bg-black/60" onClick={() => setShowChapterPicker(false)} aria-hidden="true" />
               <div className={`absolute inset-0 ${isDark ? 'bg-gray-900' : 'bg-white'} p-4 overflow-y-auto`}>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>
-                    {state.settings.language === 'fr' ? 'Choisir un chapitre' : 'Choose a chapter'}
-                  </h3>
+                  <h3 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>{state.settings.language === 'fr' ? 'Choisir un chapitre' : 'Choose a chapter'}</h3>
                   <button onClick={() => setShowChapterPicker(false)} className={`${isDark ? 'text-white bg-gray-700' : 'text-gray-700 bg-gray-200'} px-3 py-1 rounded`}>
                     {state.settings.language === 'fr' ? 'Fermer' : 'Close'}
                   </button>
@@ -918,18 +763,12 @@ export default function Reading() {
 
                 <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 pb-10">
                   {Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map((num) => {
-                    const active =
-                      num === selectedChapter
-                        ? (isDark ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800')
-                        : (isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-800 hover:bg-gray-200');
-
+                    const active = num === selectedChapter
+                      ? (isDark ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800')
+                      : (isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-800 hover:bg-gray-200');
                     return (
-                      <button
-                        key={`chap-${num}`}
-                        onClick={() => { handleChapterSelect(num); setShowChapterPicker(false); }}
-                        className={`h-10 rounded-lg text-sm font-medium ${active}`}
-                        aria-current={num === selectedChapter ? 'page' : undefined}
-                      >
+                      <button key={`chap-${num}`} onClick={() => { handleChapterSelect(num); setShowChapterPicker(false); }}
+                        className={`h-10 rounded-lg text-sm font-medium ${active}`} aria-current={num === selectedChapter ? 'page' : undefined}>
                         {num}
                       </button>
                     );
@@ -939,9 +778,14 @@ export default function Reading() {
             </div>
           )}
 
+          {/* BARRE SELECTION (mobile) */}
           {selectedVerses.length > 0 && (
             <div className="sm:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
               <div className={`${isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} shadow-lg rounded-full px-3 py-2 flex items-center space-x-2`}>
+                <button onClick={openAddToList} className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-600 text-white">
+                  <ListPlusIcon size={16} className="mr-1" />
+                  {state.settings.language === 'fr' ? 'Liste' : 'List'}
+                </button>
                 <button onClick={copySelection} className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-600 text-white">
                   <CopyIcon size={16} className="mr-1" />
                   {state.settings.language === 'fr' ? 'Copier' : 'Copy'}
@@ -957,14 +801,7 @@ export default function Reading() {
             </div>
           )}
 
-          {false && showBottomRandom && (
-            <div className="fixed bottom-4 right-4 z-40 sm:right-6 sm:bottom-6">
-              <button onClick={pickNewRandom} className="px-3 py-2 rounded-full shadow-lg bg-indigo-600 text-white text-sm active:scale-95">
-                {state.settings.language === 'fr' ? 'Nouveau aléatoire' : 'New random'}
-              </button>
-            </div>
-          )}
-
+          {/* TOASTS */}
           {copiedKey === 'selection' && (
             <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-green-600 text-white z-50">
               {state.settings.language === 'fr' ? 'Sélection copiée' : 'Selection copied'}
@@ -973,6 +810,81 @@ export default function Reading() {
           {copiedKey === 'shared-fallback' && (
             <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-blue-600 text-white z-50">
               {state.settings.language === 'fr' ? 'Texte prêt à partager (copié)' : 'Text ready to share (copied)'}
+            </div>
+          )}
+          {copiedKey === 'added-to-list' && (
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-emerald-600 text-white z-50">
+              {state.settings.language === 'fr' ? 'Ajouté à la liste' : 'Added to list'}
+            </div>
+          )}
+
+          {/* MODAL "Ajouter à une liste" */}
+          {showAddToList && (
+            <div className="fixed inset-0 z-[60]">
+              <div className="absolute inset-0 bg-black/60" onClick={() => setShowAddToList(false)} aria-hidden="true" />
+              <div className={`absolute inset-x-0 bottom-0 sm:inset-0 sm:m-auto sm:max-w-md ${isDark ? 'bg-gray-900' : 'bg-white'} sm:rounded-xl p-4 sm:p-6 shadow-2xl`}>
+                <h3 className={`text-lg font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+                  {state.settings.language === 'fr' ? 'Ajouter à une liste' : 'Add to a list'}
+                </h3>
+
+                <div className="space-y-3">
+                  {listsForModal.length > 0 && (
+                    <div>
+                      <label className={`block text-sm mb-1 ${isDark ? 'text-white/80' : 'text-gray-700'}`}>
+                        {state.settings.language === 'fr' ? 'Liste existante' : 'Existing list'}
+                      </label>
+                      <select
+                        value={selectedListId}
+                        onChange={(e) => setSelectedListId(e.target.value)}
+                        className={`w-full rounded-md border px-3 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                      >
+                        <option value="">{state.settings.language === 'fr' ? '— Aucune —' : '— None —'}</option>
+                        {listsForModal.map(l => (
+                          <option key={l.id} value={l.id}>{l.title} ({l.items.length})</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className={`block text-sm mb-1 ${isDark ? 'text-white/80' : 'text-gray-700'}`}>
+                      {state.settings.language === 'fr' ? 'Nouvelle liste (facultatif)' : 'New list (optional)'}
+                    </label>
+                    <input
+                      value={newListTitle}
+                      onChange={(e) => setNewListTitle(e.target.value)}
+                      placeholder={state.settings.language === 'fr' ? 'Titre…' : 'Title…'}
+                      className={`w-full rounded-md border px-3 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white placeholder:text-white/40' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'}`}
+                    />
+                    <p className={`mt-1 text-xs ${isDark ? 'text-white/60' : 'text-gray-500'}`}>
+                      {state.settings.language === 'fr'
+                        ? 'Choisis une liste existante ou indique un titre pour en créer une.'
+                        : 'Pick an existing list or enter a title to create one.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex items-center justify-end gap-2">
+                  <button onClick={() => setShowAddToList(false)} className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'} px-4 py-2 rounded`}>
+                    {state.settings.language === 'fr' ? 'Annuler' : 'Cancel'}
+                  </button>
+                  <button
+                    onClick={confirmAddToList}
+                    className="px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-500"
+                    disabled={selectedVerses.length === 0}
+                  >
+                    {state.settings.language === 'fr' ? 'Ajouter' : 'Add'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {false && showBottomRandom && (
+            <div className="fixed bottom-4 right-4 z-40 sm:right-6 sm:bottom-6">
+              <button onClick={pickNewRandom} className="px-3 py-2 rounded-full shadow-lg bg-indigo-600 text-white text-sm active:scale-95">
+                {state.settings.language === 'fr' ? 'Nouveau aléatoire' : 'New random'}
+              </button>
             </div>
           )}
 
@@ -990,4 +902,5 @@ export default function Reading() {
     </div>
   );
 }
+
 
