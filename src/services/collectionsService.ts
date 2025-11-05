@@ -1,125 +1,124 @@
 // src/services/collectionsService.ts
-// Service "Listes de versets" (localStorage) + alias compatibles avec tes imports existants
+// Gestion des listes de versets dans localStorage
+// API alignée avec Notes.tsx & Reading.tsx
 
-import type { VerseRef } from '../types/collections';
-
-export type CollectionItem = {
-  key: string;            // book|chapter|verse
-  book: string;
-  chapter: number;
-  verse: number;
-  text?: string;
-};
-
-export type Collection = {
-  id: string;
-  name: string;
-  createdAt: number;
-  updatedAt: number;
-  items: CollectionItem[];
-};
+import type { VerseList, VerseRef } from '../types/collections';
 
 const LS_KEY = 'twog:collections:v1';
 
+/* ---------- utils stockage ---------- */
 function safeParse<T>(raw: string | null, fallback: T): T {
   if (!raw) return fallback;
   try { return JSON.parse(raw) as T; } catch { return fallback; }
 }
-function readAll(): Collection[] {
-  try { return safeParse<Collection[]>(localStorage.getItem(LS_KEY), []); } catch { return []; }
+function readAll(): VerseList[] {
+  try { return safeParse<VerseList[]>(localStorage.getItem(LS_KEY), []); } catch { return []; }
 }
-function writeAll(all: Collection[]) {
+function writeAll(all: VerseList[]) {
   try { localStorage.setItem(LS_KEY, JSON.stringify(all)); } catch {}
 }
+function makeId() {
+  return 'l_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+}
+function makeKey(v: VerseRef) {
+  return `${v.bookId}|${v.chapter}|${v.verse}`;
+}
 
-function makeId() { return 'c_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8); }
-function makeKey(v: VerseRef) { return `${v.book}|${v.chapter}|${v.verse}`; }
-
-/* ===== API "canonique" ===== */
-
-export function listCollections(): Collection[] {
+/* ---------- API LISTES ---------- */
+export function getAllLists(): VerseList[] {
   return readAll().sort((a, b) => b.updatedAt - a.updatedAt);
 }
-export function getCollection(id: string): Collection | null {
-  return readAll().find(c => c.id === id) ?? null;
+export function getListById(id: string): VerseList | null {
+  return readAll().find(l => l.id === id) ?? null;
 }
-export function createCollection(name: string): Collection {
+export function createList(title: string): VerseList {
   const now = Date.now();
-  const c: Collection = {
-    id: makeId(),
-    name: name?.trim() || 'Nouvelle liste',
-    createdAt: now,
-    updatedAt: now,
-    items: [],
-  };
+  const list: VerseList = { id: makeId(), title: title?.trim() || 'Nouvelle liste', createdAt: now, updatedAt: now, items: [] };
   const all = readAll();
-  all.unshift(c);
+  all.unshift(list);
   writeAll(all);
-  return c;
+  return list;
 }
-export function renameCollection(id: string, newName: string): Collection | null {
+export function renameList(id: string, newTitle: string): VerseList | null {
   const all = readAll();
-  const i = all.findIndex(c => c.id === id);
+  const i = all.findIndex(l => l.id === id);
   if (i < 0) return null;
-  all[i] = { ...all[i], name: newName?.trim() || all[i].name, updatedAt: Date.now() };
+  all[i] = { ...all[i], title: newTitle?.trim() || all[i].title, updatedAt: Date.now() };
   writeAll(all);
   return all[i];
 }
-export function deleteCollection(id: string): boolean {
+export function deleteList(id: string): boolean {
   const all = readAll();
-  const next = all.filter(c => c.id !== id);
+  const next = all.filter(l => l.id !== id);
   writeAll(next);
   return next.length !== all.length;
 }
-export function addVerse(id: string, v: VerseRef): Collection | null {
+
+/* ---------- API ÉLÉMENTS ---------- */
+export function addVerseToList(id: string, v: VerseRef): VerseList | null {
   const all = readAll();
-  const i = all.findIndex(c => c.id === id);
+  const i = all.findIndex(l => l.id === id);
   if (i < 0) return null;
 
+  const present = new Set(all[i].items.map(x => makeKey(x)));
   const key = makeKey(v);
-  if (!all[i].items.some(it => it.key === key)) {
-    all[i].items.push({ key, book: v.book, chapter: v.chapter, verse: v.verse, text: v.text });
+  if (!present.has(key)) {
+    all[i].items.push(v);
+    all[i].updatedAt = Date.now();
+    writeAll(all);
   }
-  all[i].updatedAt = Date.now();
-  writeAll(all);
   return all[i];
 }
-export function addVerses(id: string, verses: VerseRef[]): Collection | null {
+export function addVersesToList(id: string, verses: VerseRef[]): VerseList | null {
   const all = readAll();
-  const i = all.findIndex(c => c.id === id);
+  const i = all.findIndex(l => l.id === id);
   if (i < 0) return null;
 
-  const present = new Set(all[i].items.map(it => it.key));
+  const present = new Set(all[i].items.map(x => makeKey(x)));
+  let added = 0;
   for (const v of verses) {
     const key = makeKey(v);
-    if (!present.has(key)) {
-      all[i].items.push({ key, book: v.book, chapter: v.chapter, verse: v.verse, text: v.text });
-      present.add(key);
-    }
+    if (!present.has(key)) { all[i].items.push(v); present.add(key); added++; }
   }
-  all[i].updatedAt = Date.now();
-  writeAll(all);
+  if (added > 0) { all[i].updatedAt = Date.now(); writeAll(all); }
   return all[i];
 }
-export function removeItem(id: string, itemKey: string): Collection | null {
+/** Supprime un verset par index dans la liste */
+export function removeVerseAt(id: string, index: number): VerseList | null {
   const all = readAll();
-  const i = all.findIndex(c => c.id === id);
+  const i = all.findIndex(l => l.id === id);
   if (i < 0) return null;
-
-  all[i].items = all[i].items.filter(it => it.key !== itemKey);
-  all[i].updatedAt = Date.now();
-  writeAll(all);
+  if (index >= 0 && index < all[i].items.length) {
+    all[i].items.splice(index, 1);
+    all[i].updatedAt = Date.now();
+    writeAll(all);
+  }
   return all[i];
 }
 
-/* ===== Alias 100% compatibles avec tes imports existants =====
-   (tu n’as rien à changer dans Reading.tsx / Notes.tsx) */
+/* ---------- export / partage ---------- */
+type ExportOptions = { header?: boolean; includeRef?: boolean; linePrefix?: string; };
+export function exportListAsText(list: VerseList, opts: ExportOptions = {}): string {
+  const { header = true, includeRef = true, linePrefix = '' } = opts;
+  const lines: string[] = [];
+  if (header) {
+    const date = new Date(list.updatedAt).toLocaleString();
+    lines.push(`${list.title} — ${date}`);
+    lines.push('');
+  }
+  for (const it of list.items) {
+    const ref = `${it.bookName ?? it.bookId} ${it.chapter}:${it.verse}`;
+    const text = it.text ?? '';
+    lines.push(linePrefix + (includeRef ? `${ref} — ${text}` : text));
+  }
+  return lines.join('\n');
+}
+export async function shareList(list: VerseList): Promise<void> {
+  const text = exportListAsText(list, { header: true, includeRef: true });
+  try {
+    const nav: any = navigator;
+    if (nav?.share) { await nav.share({ title: list.title, text }); return; }
+  } catch {}
+  try { await navigator.clipboard.writeText(text); } catch {}
+}
 
-export const getAllLists      = listCollections;
-export const getList          = getCollection;
-export const createList       = createCollection;
-export const renameList       = renameCollection;
-export const deleteList       = deleteCollection;
-export const addVerseToList   = addVerse;
-export const addVersesToList  = addVerses;
-export const removeFromList   = removeItem;
