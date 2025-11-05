@@ -2,7 +2,7 @@
 
 /** Référence d’un verset stockée dans une liste */
 export type VerseRef = {
-  /** Identifiant du livre (utilise ton book.name : "John", "ROM", etc.) */
+  /** Identifiant du livre : ex. "John", "ROM" (utilise ton book.name) */
   bookId: string;
   /** Nom affichable capturé au moment de l’ajout (FR/EN) */
   bookName?: string;
