@@ -848,7 +848,7 @@ export default function Reading() {
 
                   <div>
                     <label className={`block text-sm mb-1 ${isDark ? 'text-white/80' : 'text-gray-700'}`}>
-                      {state.settings.language === 'fr' ? 'Nouvelle liste (facultatif)' : 'New list (optional)'}
+                      {state.settings.language === 'fr' ? 'Nouvelle liste' : 'New list'}
                     </label>
                     <input
                       value={newListTitle}
