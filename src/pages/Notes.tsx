@@ -3,22 +3,32 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import {
-  getAllLists, createList, renameList, deleteList,
-  removeVerseAt, shareList, getListById
+  getAllLists, createList, renameList, deleteList, getListById
 } from '../services/collectionsService';
 import type { VerseList } from '../types/collections';
-import { List as ListIcon, Edit3, Trash2, Share2, Plus, BookOpen, Copy } from 'lucide-react';
+import { List as ListIcon, Edit3, Trash2, Share2, Plus, Copy } from 'lucide-react';
 
+/** Mise en page "texte brut" :
+ *  Titre
+ *  (ligne vide)
+ *  Livre Chapitre:Verset
+ *  Texte
+ *  (ligne vide)
+ *  ...
+ */
 function buildPlainListText(list: VerseList): string {
   const lines: string[] = [];
   lines.push((list.title || '').trim());
+  lines.push(''); // <<< ligne vide entre le titre et le 1er verset
+
   for (const it of list.items) {
     const ref = `${(it.bookName ?? it.bookId) || ''} ${it.chapter}:${it.verse}`;
     lines.push(ref.trim());
     if (it.text && String(it.text).trim()) lines.push(String(it.text).trim());
     lines.push(''); // ligne vide entre les items
   }
-  // supprimer les lignes vides de fin
+
+  // supprimer les lignes vides terminales
   while (lines.length && lines[lines.length - 1] === '') lines.pop();
   lines.push(''); // terminer par un \n
   return lines.join('\n');
@@ -52,19 +62,16 @@ export default function Notes() {
     if (!trimmed) return;
     // éviter doublons de titre (insensible à la casse)
     const exists = getAllLists().find(l => (l.title || '').trim().toLowerCase() === trimmed.toLowerCase());
-    if (exists) {
-      setExpandedId(exists.id);
-      return;
-    }
+    if (exists) { setExpandedId(exists.id); return; }
     const created = createList(trimmed);
     refresh();
     setExpandedId(created.id);
   };
+
   const doRename = (id: string, current: string) => {
     const title = prompt(label.placeholder, current) ?? '';
     const trimmed = title.trim();
     if (!trimmed) return;
-    // si un autre a déjà ce titre, on interdit (simple et clair)
     const exists = getAllLists().find(l => l.id !== id && (l.title || '').trim().toLowerCase() === trimmed.toLowerCase());
     if (exists) {
       alert(state.settings.language === 'fr' ? 'Un titre identique existe déjà.' : 'A list with the same title already exists.');
@@ -73,6 +80,7 @@ export default function Notes() {
     renameList(id, trimmed);
     refresh();
   };
+
   const doDelete = (id: string) => {
     if (!confirm(state.settings.language === 'fr'
       ? 'Supprimer cette liste ?'
@@ -81,11 +89,23 @@ export default function Notes() {
     refresh();
     if (expandedId === id) setExpandedId(null);
   };
+
+  // Partage au même format que "Copier", avec lien en plus
   const doShare = async (id: string) => {
     const list = getListById(id);
     if (!list) return;
-    await shareList(list);
+    const payload = buildPlainListText(list) + '\nhttps://www.theword.fr\n';
+    try {
+      const nav: any = navigator;
+      if (nav?.share) {
+        await nav.share({ title: list.title || 'Notes', text: payload });
+      } else {
+        await navigator.clipboard.writeText(payload);
+        alert((state.settings.language === 'fr' ? 'Texte prêt à partager (copié)' : 'Text ready to share (copied)') + ' ✅');
+      }
+    } catch {}
   };
+
   const copyListText = async (id: string) => {
     const list = getListById(id);
     if (!list) return;
@@ -152,7 +172,7 @@ export default function Notes() {
                     </button>
 
                     <div className="flex items-center gap-2">
-                      {/* Partager */}
+                      {/* Partager (nouveau format) */}
                       <button onClick={() => doShare(list.id)} className="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-500" title="Partager">
                         <Share2 size={16} />
                       </button>
@@ -164,7 +184,7 @@ export default function Notes() {
                       <button onClick={() => doRename(list.id, list.title)} className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded`} title="Renommer">
                         <Edit3 size={16} />
                       </button>
-                      {/* Supprimer */}
+                      {/* Supprimer la liste */}
                       <button onClick={() => doDelete(list.id)} className="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-500" title="Supprimer">
                         <Trash2 size={16} />
                       </button>
@@ -178,41 +198,39 @@ export default function Notes() {
                           {state.settings.language === 'fr' ? 'Liste vide.' : 'Empty list.'}
                         </div>
                       ) : (
-                        <ul className="space-y-2">
-                          {list.items.map((it, idx) => (
-                            <li key={idx} className="flex items-start justify-between gap-3">
-                              <div className="text-sm leading-6">
+                        <ul className="space-y-3">
+                          {list.items.map((it, idx) => {
+                            const openInReading = () => {
+                              const url = new URL(window.location.href);
+                              url.searchParams.set('b', it.bookId);
+                              url.searchParams.set('c', String(it.chapter));
+                              url.searchParams.set('v', String(it.verse));
+                              window.history.replaceState({}, '', url.toString());
+                              setPage('reading');
+                            };
+                            return (
+                              <li
+                                key={idx}
+                                onClick={openInReading}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && openInReading()}
+                                className={`${isDark ? 'bg-gray-600/40 hover:bg-gray-600/60' : 'bg-white hover:bg-gray-100'} cursor-pointer rounded-md p-3 transition`}
+                              >
                                 <div className="font-semibold">
                                   {it.bookName ?? it.bookId} {it.chapter}:{it.verse}
                                 </div>
-                                {it.text ? <div>{it.text}</div> : null}
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={() => {
-                                    // Aller lire ce verset (ouvre Reading avec paramètres)
-                                    const url = new URL(window.location.href);
-                                    url.searchParams.set('b', it.bookId);
-                                    url.searchParams.set('c', String(it.chapter));
-                                    url.searchParams.set('v', String(it.verse));
-                                    window.history.replaceState({}, '', url.toString());
-                                    setPage('reading');
-                                  }}
-                                  title={label.openReading}
-                                  className={`${isDark ? 'bg-gray-600 text-white' : 'bg-white text-gray-800 border border-gray-300'} px-3 py-1.5 rounded`}
-                                >
-                                  <BookOpen size={16} />
-                                </button>
-                                <button
-                                  onClick={() => { removeVerseAt(list.id, idx); refresh(); }}
-                                  className="px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-500"
-                                  title="Supprimer le verset"
-                                >
-                                  <Trash2 size={16} />
-                                </button>
-                              </div>
-                            </li>
-                          ))}
+                                {it.text ? (
+                                  <div
+                                    style={{ fontSize: `${state.settings.fontSize}px`, lineHeight: '1.55' }}
+                                    className={isDark ? 'text-white' : 'text-gray-800'}
+                                  >
+                                    {it.text}
+                                  </div>
+                                ) : null}
+                              </li>
+                            );
+                          })}
                         </ul>
                       )}
                     </div>
