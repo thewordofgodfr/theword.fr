@@ -378,10 +378,16 @@ export default function Reading() {
   const [listsForModal, setListsForModal] = useState(getAllLists());
   const [selectedListId, setSelectedListId] = useState<string>('');
   const [newListTitle, setNewListTitle] = useState<string>('');
+
+  // MODIF: tri alphabétique insensible à la casse + présélection 1ère liste (et suppression "— Aucune —")
+  const sortListsByTitle = (arr: ReturnType<typeof getAllLists>) =>
+    [...arr].sort((a, b) => (a.title || '').localeCompare(b.title || '', undefined, { sensitivity: 'base' }));
+
   const openAddToList = () => {
-    const all = getAllLists();
+    const all = sortListsByTitle(getAllLists());
     setListsForModal(all);
-    setSelectedListId(''); // ← PAR DÉFAUT : aucune (évite le bug)
+    // S'il y a au moins une liste, on sélectionne la première par défaut
+    setSelectedListId(all.length > 0 ? all[0].id : '');
     setNewListTitle('');
     setShowAddToList(true);
   };
@@ -402,7 +408,7 @@ export default function Reading() {
         targetId = list.id;
       }
     } else {
-      // 2) Sinon on prend la sélection existante
+      // 2) Sinon on prend la sélection existante (déjà présélectionnée s'il y a des listes)
       targetId = selectedListId || '';
     }
 
@@ -492,7 +498,7 @@ export default function Reading() {
         <div className="max-w-6xl mx-auto">
           {selectedBook && (
             <div ref={commandBarRef} className="sticky z-40 -mx-4 sm:mx-0" style={{ top: `${NAV_H}px` }}>
-              <div className={`${isDark ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur border-b ${isDark ? 'border-gray-700' : 'border-gray-200'} rounded-none sm:rounded-md shadow md:shadow-lg px-4 py-2 md:p-3`}>
+              <div className={`${isDark ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur border ${isDark ? 'border-gray-700' : 'border-gray-200'} rounded-none sm:rounded-md shadow md:shadow-lg px-4 py-2 md:p-3`}>
                 <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-2 w-full">
                   <div className="flex flex-col w-full md:w-auto">
                     <h2 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'} text-sm md:text-base flex flex-col md:flex-row md:items-center gap-2 w-full`}>
@@ -857,7 +863,7 @@ export default function Reading() {
                         onChange={(e) => setSelectedListId(e.target.value)}
                         className={`w-full rounded-md border px-3 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                       >
-                        <option value="">{state.settings.language === 'fr' ? '— Aucune —' : '— None —'}</option>
+                        {/* MODIF: plus d'option "— Aucune —" */}
                         {listsForModal.map(l => (
                           <option key={l.id} value={l.id}>{l.title}</option>
                         ))}
@@ -921,5 +927,4 @@ export default function Reading() {
     </div>
   );
 }
-
 
