@@ -205,10 +205,8 @@ export default function Reading() {
 
   const [hasLoadedContext, setHasLoadedContext] = useState(false);
 
-  // ---- Correction : traiter toujours les intentions explicites (URL / readingContext),
-  // même si hasLoadedContext === true. Les fallbacks ne s'exécutent que s'il n'y a pas d'intention.
+  // --- Intention: URL / readingContext prioritaires, fallbacks sinon
   useEffect(() => {
-    // Helper pour éviter les ré-applies inutiles
     const applyIfChanged = (book: BibleBook, chapNum: number, verseNum: number | null) => {
       const alreadyThere =
         selectedBook?.name === book.name &&
@@ -230,7 +228,7 @@ export default function Reading() {
       return true;
     };
 
-    // 1) INTENTION VIA URL (prioritaire)
+    // 1) URL
     const { qb, qc, qv } = readUrlIntent();
     if (qb && qc) {
       const book = resolveBook(qb);
@@ -240,28 +238,27 @@ export default function Reading() {
         const v = Number.isFinite(verseNum) ? verseNum : null;
         const changed = applyIfChanged(book, chapNum, v);
         if (!hasLoadedContext) setHasLoadedContext(true);
-        if (changed) return; // on a appliqué l'intention URL
+        if (changed) return;
       }
     }
 
-    // 2) INTENTION VIA readingContext (consommée et prioritaire)
+    // 2) readingContext
     const ctx = state.readingContext;
     if (ctx && ctx.book && ctx.chapter > 0) {
       const book2 = resolveBook(ctx.book);
       if (book2) {
         const v2 = ctx.verse ?? null;
         const changed = applyIfChanged(book2, ctx.chapter, v2);
-        // Consommer l'intention pour éviter de la rejouer
         dispatch({ type: 'SET_READING_CONTEXT', payload: { book: '', chapter: 0 } });
         if (!hasLoadedContext) setHasLoadedContext(true);
-        if (changed) return; // on a appliqué l'intention readingContext
+        if (changed) return;
       }
     }
 
-    // 3) Si on avait déjà chargé un contexte et qu'il n'y a pas de nouvelle intention, ne rien faire
+    // 3) si déjà chargé et pas de nouvelle intention
     if (hasLoadedContext) return;
 
-    // 4) Fallbacks (premier rendu sans intention explicite)
+    // 4) fallbacks
     try {
       const rawTapped = localStorage.getItem('twog:qs:lastTapped');
       if (rawTapped === '0') {
@@ -311,7 +308,6 @@ export default function Reading() {
       applyIfChanged(john, 1, null);
       setHasLoadedContext(true);
     }
-  // Dépendances : lorsqu'on change lecture/verset, ou qu'une intention change, on recontrôle
   }, [
     state.readingContext,
     state.settings.lastReadingPosition,
@@ -457,7 +453,6 @@ export default function Reading() {
         translation: state.settings.language,
       }));
 
-    // Fermer immédiatement + toast + clear sélection, puis ajouter
     setShowAddToList(false);
     setSelectedVerses([]);
     setCopiedKey('added-to-list');
@@ -527,9 +522,465 @@ export default function Reading() {
 
   return (
     <div className={`min-h-[100svh] ${isDark ? 'bg-gray-900' : 'bg-gray-50'} transition-colors duration-200`}>
-      {/* ... (le reste du rendu est identique à ta version fournie) ... */}
-      {/* Pour garder ce message concis, j’ai laissé tout le JSX tel quel.
-          Copie-colle simplement ce fichier complet : seules les parties au-dessus (useEffect d’intentions) ont changé. */}
+      <div className="container mx-auto px-4 pb-6">
+        <div className="max-w-6xl mx-auto">
+          {selectedBook && (
+            <div ref={commandBarRef} className="sticky z-40 -mx-4 sm:mx-0" style={{ top: `${NAV_H}px` }}>
+              <div className={`${isDark ? 'bg-gray-800/95' : 'bg-white/95'} backdrop-blur border ${isDark ? 'border-gray-700' : 'border-gray-200'} rounded-none sm:rounded-md shadow md:shadow-lg px-4 py-2 md:p-3`}>
+                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-2 w-full">
+                  <div className="flex flex-col w-full md:w-auto">
+                    <h2 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'} text-sm md:text-base flex flex-col md:flex-row md:items-center gap-2 w-full`}>
+                      {/* MOBILE */}
+                      <div className="flex w-full items-center gap-2 overflow-hidden md:hidden">
+                        {/* Livre (mobile) */}
+                        <button
+                          type="button"
+                          onClick={() => setShowBookPicker(true)}
+                          aria-expanded={showBookPicker}
+                          className={`min-w-0 inline-flex items-center justify-between gap-1 rounded-md px-2 py-1 text-sm leading-none font-semibold shadow active:scale-95 focus:outline-none focus:ring-2 ${
+                            isDark ? `${activeTheme ? activeTheme.mobileBtn : 'bg-blue-600 text-white'} ${activeTheme ? activeTheme.mobileBtnHover : 'hover:bg-blue-500'} focus:ring-blue-400`
+                                   : `${activeTheme ? activeTheme.mobileBtn : 'bg-blue-600 text-white'} ${activeTheme ? activeTheme.mobileBtnHover : 'hover:bg-blue-500'} focus:ring-blue-400`
+                          } flex-1`}
+                          title={getBookName(selectedBook)}
+                          aria-label={state.settings.language === 'fr' ? 'Choisir un livre' : 'Choose a book'}
+                        >
+                          <span className="truncate w-[13ch]">{shortBookName(selectedBook)}</span>
+                          <ChevronDown className="w-3.5 h-3.5 opacity-90" />
+                        </button>
+
+                        {/* Chapitre (mobile) */}
+                        <button
+                          type="button"
+                          onClick={() => setShowChapterPicker(true)}
+                          aria-expanded={showChapterPicker}
+                          className={`min-w-0 inline-flex items-center justify-between gap-1 rounded-md px-2 py-1 text-sm leading-none font-semibold shadow active:scale-95 focus:outline-none focus:ring-2 ${
+                            isDark ? `${activeTheme ? (SLOT_THEMES[activeSlot as SlotKey]?.mobileBtn ?? 'bg-blue-600 text-white') : 'bg-blue-600 text-white'} ${activeTheme ? (SLOT_THEMES[activeSlot as SlotKey]?.mobileBtnHover ?? '') : 'hover:bg-blue-500'} focus:ring-blue-400`
+                                   : `${activeTheme ? (SLOT_THEMES[activeSlot as SlotKey]?.mobileBtn ?? 'bg-blue-600 text-white') : 'bg-blue-600 text-white'} ${activeTheme ? (SLOT_THEMES[activeSlot as SlotKey]?.mobileBtnHover ?? '') : 'hover:bg-blue-500'} focus:ring-blue-400`
+                          } flex-none shrink-0 whitespace-nowrap`}
+                          title={state.settings.language === 'fr' ? 'Choisir un chapitre' : 'Choose a chapter'}
+                          aria-label={state.settings.language === 'fr' ? 'Choisir un chapitre' : 'Choose a chapter'}
+                        >
+                          <span className="truncate"><span className="md:hidden">Ch.</span><span className="hidden md:inline">{t('chapter')}</span> {selectedChapter}</span>
+                          <ChevronDown className="w-3.5 h-3.5 opacity-90" />
+                        </button>
+
+                        {/* Loupe + slots (mobile) */}
+                        <div className="flex items-center gap-2 md:hidden">
+                          {[0, 1, 2, 3].map((i) => {
+                            const s = quickSlots[i];
+                            const filled = s !== null;
+                            const base = 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1';
+                            let cls = '';
+                            if (i === 0) {
+                              cls = lastTappedSlot === 0 ? 'bg-blue-600 text-white hover:bg-blue-500' :
+                                (isDark ? 'border border-blue-400/60 text-blue-200' : 'bg-white border border-blue-300 text-blue-700');
+                            } else {
+                              const theme = SLOT_THEMES[i as SlotKey];
+                              cls = filled ? `${theme.solid} ${theme.solidHover}` :
+                                (isDark ? 'bg-gray-800 text-white border border-gray-600' : 'bg-white text-gray-800 border border-gray-300');
+                              if (activeSlot === i) cls += ` ring-2 ring-offset-1 ${theme.ring}`;
+                            }
+                            const title =
+                              i === 0
+                                ? (s ? `Recherche : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : 'Recherche (vide)')
+                                : (s ? `Mémoire ${i} : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : `Mémoire ${i} (vide)`);
+                            return (
+                              <button key={`qs-m-${i}`} className={`${base} ${cls}`} onClick={() => jumpToSlot(i)} aria-label={title} title={title}>
+                                {i === 0 ? <SearchIcon className="w-4 h-4" /> : <span>{i}</span>}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* DESKTOP */}
+                      <div className="hidden md:flex md:items-center md:gap-2">
+                        <span className={`${desktopChipBase} ${desktopChipColors}`}>
+                          <span className="truncate max-w-[28ch]">{getBookName(selectedBook)}</span>
+                          <span>•</span>
+                          <span>{t('chapter')} {selectedChapter}</span>
+                        </span>
+                      </div>
+                    </h2>
+                  </div>
+
+                  {/* Desktop : actions à droite */}
+                  <div className="hidden md:flex items-center gap-2 ml-auto">
+                    <div className="flex items-center gap-2 mr-2">
+                      {[0,1,2,3].map((i) => {
+                        const s = quickSlots[i];
+                        const filled = s !== null;
+                        const base = 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1';
+                        let cls = '';
+                        if (i === 0) {
+                          cls = lastTappedSlot === 0 ? 'bg-blue-600 text-white hover:bg-blue-500' :
+                            (isDark ? 'border border-blue-400/60 text-blue-200' : 'bg-white border border-blue-300 text-blue-700');
+                        } else {
+                          const theme = SLOT_THEMES[i as SlotKey];
+                          cls = filled ? `${theme.solid} ${theme.solidHover}` :
+                            (isDark ? 'bg-gray-800 text-white border border-gray-600' : 'bg-white text-gray-800 border border-gray-300');
+                          if (activeSlot === i) cls += ` ring-2 ring-offset-1 ${theme.ring}`;
+                        }
+                        const title =
+                          i === 0
+                            ? (s ? `Recherche : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : 'Recherche (vide)')
+                            : (s ? `Mémoire ${i} : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : `Mémoire ${i} (vide)`);
+                        return (
+                          <button key={`qs-d-${i}`} className={`${base} ${cls}`} onClick={() => jumpToSlot(i)} aria-label={title} title={title}>
+                            {i === 0 ? <SearchIcon className="w-4 h-4" /> : <span>{i}</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <button onClick={() => setShowBookPicker(true)} className={`px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm ${isDark ? 'bg-blue-600 text-white hover:bg-blue-500' : 'bg-blue-600 text-white hover:bg-blue-500'}`}>
+                      {state.settings.language === 'fr' ? 'Livres' : 'Books'}
+                    </button>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handlePrevUnit()}
+                        className={`p-1.5 rounded-md transition-all ${
+                          selectedBook && selectedChapter <= 1 && books.findIndex(b => b.name === selectedBook.name) === 0
+                            ? isDark ? 'bg-gray-700 text-white/70 cursor-not-allowed' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                            : isDark ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-600 hover:bg-gray-300 hover:text-gray-800'
+                        }`}
+                        title={state.settings.language === 'fr' ? 'Chapitre précédent' : 'Previous chapter'}
+                      ><ChevronLeft className="w-4 h-4" /></button>
+
+                      <div className="relative">
+                        <select
+                          value={selectedChapter}
+                          onChange={(e) => handleChapterSelect(Number(e.target.value))}
+                          className={`appearance-none ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} border rounded-md px-3 py-1.5 pr-7 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
+                          title={state.settings.language === 'fr' ? 'Choisir chapitre' : 'Choose chapter'}
+                        >
+                          {selectedBook ? Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map(num => (<option key={num} value={num}>{num}</option>)) : null}
+                        </select>
+                        <ChevronDown className={`w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 ${isDark ? 'text-white/80' : 'text-gray-600'}`} />
+                      </div>
+
+                      <button
+                        onClick={() => handleNextUnit()}
+                        className={`p-1.5 rounded-md transition-all ${
+                          selectedBook && selectedChapter >= selectedBook.chapters && books.findIndex(b => b.name === selectedBook.name) === books.length - 1
+                            ? isDark ? 'bg-gray-700 text-white/70 cursor-not-allowed' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                            : isDark ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-600 hover:bg-gray-300 hover:text-gray-800'
+                        }`}
+                        title={state.settings.language === 'fr' ? 'Chapitre suivant' : 'Next chapter'}
+                      ><ChevronRight className="w-4 h-4" /></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* BARRE SELECTION (desktop) */}
+          {selectedVerses.length > 0 && (
+            <div className="hidden md:block sticky z-40 mb-3" style={{ top: `${NAV_H + cmdH + 8}px` }}>
+              <div className={`${isDark ? 'bg-gray-800 text-white border border-gray-700' : 'bg-white text-gray-800 border border-gray-200'} rounded-lg shadow px-4 py-3 flex items-center justify-between`}>
+                <div className="text-sm">
+                  {state.settings.language === 'fr'
+                    ? `${selectedVerses.length} verset${selectedVerses.length > 1 ? 's' : ''} sélectionné${selectedVerses.length > 1 ? 's' : ''}`
+                    : `${selectedVerses.length} verse${selectedVerses.length > 1 ? 's' : ''} selected`}
+                </div>
+                <div className="flex items-center gap-2">
+                  <button onClick={openAddToList} className="inline-flex items-center px-3 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-500">
+                    <ListPlusIcon size={16} className="mr-2" />
+                    {state.settings.language === 'fr' ? 'Ajouter à une liste' : 'Add to list'}
+                  </button>
+                  <button onClick={copySelection} className="inline-flex items-center px-3 py-2 rounded bg-blue-600 text-white hover:bg-blue-500">
+                    <CopyIcon size={16} className="mr-2" />
+                    {state.settings.language === 'fr' ? 'Copier' : 'Copy'}
+                  </button>
+                  <button onClick={shareSelection} className="inline-flex items-center px-3 py-2 rounded bg-gray-700 text-white hover:opacity-90">
+                    <ShareIcon size={16} className="mr-2" />
+                    {state.settings.language === 'fr' ? 'Partager' : 'Share'}
+                  </button>
+                  <button onClick={() => setSelectedVerses([])} className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700'} px-3 py-2 rounded hover:opacity-90`}>
+                    {state.settings.language === 'fr' ? 'Annuler' : 'Clear'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {selectedBook ? (
+            <div
+              className={`${isDark ? 'bg-gray-800' : 'bg-white'} -mx-4 sm:mx-0 sm:rounded-xl sm:shadow-lg px-4 py-2 sm:p-6 min-h-96`}
+              onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} style={{ touchAction: 'manipulation' }}
+            >
+              {loading ? (
+                <div className="flex items-center justify-center py-16">
+                  <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${isDark ? 'border-blue-400' : 'border-blue-600'}`} />
+                  <span className={`ml-4 text-lg ${isDark ? 'text-white' : 'text-gray-600'}`}>{t('loading')}</span>
+                </div>
+              ) : chapter ? (
+                <div>
+                  <div className="space-y-0">
+                    {chapter.verses.map((v) => {
+                      const isHighlighted = highlightedVerse === v.verse;
+                      const isSelected = selectedVerses.includes(v.verse);
+                      const selectedBg = isSelected ? (isDark ? 'bg-blue-900/30' : 'bg-blue-50') : '';
+                      const highlightCls = isHighlighted
+                        ? (isDark ? 'bg-indigo-500/20 ring-2 ring-indigo-400/80' : 'bg-indigo-50 ring-2 ring-indigo-300')
+                        : '';
+                      return (
+                        <div
+                          key={v.verse}
+                          id={`verse-${v.verse}`}
+                          onClick={() => toggleSelectVerse(v.verse)}
+                          style={{ scrollMarginTop: stickyOffset }}
+                          className={`relative cursor-pointer px-1 sm:px-2 py-2 sm:py-2.5 rounded-md transition-colors ${selectedBg} ${highlightCls}`}
+                        >
+                          <span className={`absolute right-2 top-0.5 sm:top-1 text-[11px] sm:text-xs select-none pointer-events-none ${isDark ? 'text-white/80' : 'text-gray-500'}`}>
+                            {state.settings.language === 'fr' ? 'verset' : 'verse'} {v.verse}
+                            {isSelected && <Check size={14} className={`inline ml-1 ${isDark ? 'text-blue-300' : 'text-blue-600'}`} />}
+                          </span>
+                          <div className={`${isDark ? 'text-white' : 'text-gray-700'}`} style={{ fontSize: `${state.settings.fontSize}px`, lineHeight: '1.55' }}>
+                            {v.text}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <div className={`text-center py-16 ${isDark ? 'text-white/80' : 'text-gray-500'}`}>
+                  <p className="text-lg mb-2">{t('selectChapter')}</p>
+                  <p className="text-sm">
+                    {getBookName(selectedBook)} - {selectedBook.chapters} {t('chapter')}{selectedBook.chapters > 1 ? 's' : ''}
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className={`${isDark ? 'text-white/80' : 'text-gray-500'} text-center py-16`}>
+              <Book size={48} className="mx-auto mb-4 opacity-50" />
+              <p className="text-lg">{t('selectBook')}</p>
+            </div>
+          )}
+
+          {/* Pickers */}
+          {showBookPicker && (
+            <div className="fixed inset-0 z-50">
+              <div className="absolute inset-0 bg-black/60" onClick={() => setShowBookPicker(false)} aria-hidden="true" />
+              <div className={`absolute inset-0 ${isDark ? 'bg-gray-900' : 'bg-white'} p-4 overflow-y-auto`}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>{state.settings.language === 'fr' ? 'Choisir un livre' : 'Choose a book'}</h3>
+                  <button onClick={() => setShowBookPicker(false)} className={`${isDark ? 'text-white bg-gray-700' : 'text-gray-700 bg-gray-200'} px-3 py-1 rounded`}>
+                    {state.settings.language === 'fr' ? 'Fermer' : 'Close'}
+                  </button>
+                </div>
+
+                <h4 className={`text-sm uppercase tracking-wide mb-2 ${isDark ? 'text-white/80' : 'text-gray-600'}`}>{t('oldTestament')}</h4>
+                <div className="columns-2 md:columns-3 lg:columns-4 gap-2 mb-6">
+                  {oldTestamentBooks.map(book => (
+                    <button key={`ot-${book.name}`} onClick={() => handleBookSelect(book)}
+                      className={`w-full inline-block mb-2 break-inside-avoid px-3 py-2 rounded-lg text-sm ${
+                        selectedBook?.name === book.name ? (isDark ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800')
+                        : (isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-800 hover:bg-gray-200')
+                      }`}>
+                      {state.settings.language === 'fr' ? book.nameFr : book.nameEn}
+                    </button>
+                  ))}
+                </div>
+
+                <h4 className={`text-sm uppercase tracking-wide mb-2 ${isDark ? 'text-white/80' : 'text-gray-600'}`}>{t('newTestament')}</h4>
+                <div className="columns-2 md:columns-3 lg:columns-4 gap-2 pb-10">
+                  {newTestamentBooks.map(book => (
+                    <button key={`nt-${book.name}`} onClick={() => handleBookSelect(book)}
+                      className={`w-full inline-block mb-2 break-inside-avoid px-3 py-2 rounded-lg text-sm ${
+                        selectedBook?.name === book.name ? (isDark ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800')
+                        : (isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-800 hover:bg-gray-200')
+                      }`}>
+                      {state.settings.language === 'fr' ? book.nameFr : book.nameEn}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showChapterPicker && selectedBook && (
+            <div className="fixed inset-0 z-50">
+              <div className="absolute inset-0 bg-black/60" onClick={() => setShowChapterPicker(false)} aria-hidden="true" />
+              <div className={`absolute inset-0 ${isDark ? 'bg-gray-900' : 'bg-white'} p-4 overflow-y-auto`}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>{state.settings.language === 'fr' ? 'Choisir un chapitre' : 'Choose a chapter'}</h3>
+                  <button onClick={() => setShowChapterPicker(false)} className={`${isDark ? 'text-white bg-gray-700' : 'text-gray-700 bg-gray-200'} px-3 py-1 rounded`}>
+                    {state.settings.language === 'fr' ? 'Fermer' : 'Close'}
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 pb-10">
+                  {Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map((num) => {
+                    const active = num === selectedChapter
+                      ? (isDark ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800')
+                      : (isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-800 hover:bg-gray-200');
+                    return (
+                      <button key={`chap-${num}`} onClick={() => { handleChapterSelect(num); setShowChapterPicker(false); }}
+                        className={`h-10 rounded-lg text-sm font-medium ${active}`} aria-current={num === selectedChapter ? 'page' : undefined}>
+                        {num}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* BARRE SELECTION (mobile) */}
+          {selectedVerses.length > 0 && (
+            <div className="sm:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
+              <div className={`${isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} shadow-lg rounded-full px-3 py-2 flex items-center space-x-2`}>
+                <button onClick={openAddToList} className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-600 text-white">
+                  <ListPlusIcon size={16} className="mr-1" />
+                  {state.settings.language === 'fr' ? 'Liste' : 'List'}
+                </button>
+                <button onClick={copySelection} className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-600 text-white">
+                  <CopyIcon size={16} className="mr-1" />
+                  {state.settings.language === 'fr' ? 'Copier' : 'Copy'}
+                </button>
+                <button onClick={shareSelection} className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700'} px-3 py-1.5 rounded-full inline-flex items-center`}>
+                  <ShareIcon size={16} className="mr-1" />
+                  {state.settings.language === 'fr' ? 'Partager' : 'Share'}
+                </button>
+                <button onClick={() => setSelectedVerses([])} className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700'} px-3 py-1.5 rounded-full`}>
+                  {state.settings.language === 'fr' ? 'Annuler' : 'Clear'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* TOASTS */}
+          {copiedKey === 'selection' && (
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-green-600 text-white z-50">
+              {state.settings.language === 'fr' ? 'Sélection copiée' : 'Selection copied'}
+            </div>
+          )}
+          {copiedKey === 'shared-fallback' && (
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-blue-600 text-white z-50">
+              {state.settings.language === 'fr' ? 'Texte prêt à partager (copié)' : 'Text ready to share (copied)'}
+            </div>
+          )}
+          {copiedKey === 'added-to-list' && (
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-emerald-600 text-white z-50">
+              {state.settings.language === 'fr' ? 'Ajouté à la liste' : 'Added to list'}
+            </div>
+          )}
+
+          {/* MODAL "Ajouter à une liste" */}
+          {showAddToList && (
+            <div className="fixed inset-0 z-[60]">
+              <div className="absolute inset-0 bg-black/60" onClick={() => setShowAddToList(false)} aria-hidden="true" />
+              <div className={`absolute inset-x-0 bottom-0 sm:inset-0 sm:m-auto sm:max-w-md ${isDark ? 'bg-gray-900' : 'bg-white'} sm:rounded-xl p-4 sm:p-6 shadow-2xl`}>
+                <form onSubmit={confirmAddToList}>
+                  <h3 className={`text-lg font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+                    {state.settings.language === 'fr' ? 'Ajouter à une liste' : 'Add to a list'}
+                  </h3>
+
+                  <div className="space-y-3">
+                    {listsForModal.length > 0 && (
+                      <div>
+                        <label className={`block text-sm mb-1 ${isDark ? 'text-white/80' : 'text-gray-700'}`}>
+                          {state.settings.language === 'fr' ? 'Liste existante' : 'Existing list'}
+                        </label>
+
+                        <div
+                          role="radiogroup"
+                          className={`max-h-48 overflow-y-auto rounded-md border p-2 space-y-1 ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'}`}
+                        >
+                          {listsForModal.map(l => {
+                            const checked = selectedListId === l.id;
+                            return (
+                              <label
+                                key={l.id}
+                                className={`flex items-center gap-3 rounded px-2 py-2 cursor-pointer border ${
+                                  checked
+                                    ? (isDark ? 'border-emerald-500 bg-emerald-500/10' : 'border-emerald-500 bg-emerald-50')
+                                    : (isDark ? 'border-transparent hover:bg-gray-700' : 'border-transparent hover:bg-gray-50')
+                                }`}
+                              >
+                                <input
+                                  type="radio"
+                                  name="existingList"
+                                  className="accent-emerald-600"
+                                  checked={checked}
+                                  onChange={() => setSelectedListId(l.id)}
+                                />
+                                <span className={isDark ? 'text-white' : 'text-gray-800'}>{l.title}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <label className={`block text-sm mb-1 ${isDark ? 'text-white/80' : 'text-gray-700'}`}>
+                        {state.settings.language === 'fr' ? 'Nouvelle liste' : 'New list'}
+                      </label>
+                      <input
+                        ref={newListInputRef}
+                        value={newListTitle}
+                        onChange={(e) => setNewListTitle(e.target.value)}
+                        placeholder={state.settings.language === 'fr' ? 'Titre…' : 'Title…'}
+                        className={`w-full rounded-md border px-3 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white placeholder:text-white/40' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'}`}
+                      />
+                      <p className={`mt-1 text-xs ${isDark ? 'text-white/60' : 'text-gray-500'}`}>
+                        {state.settings.language === 'fr'
+                          ? 'Choisis une liste existante ou indique un titre pour en créer une (le titre est prioritaire).'
+                          : 'Pick an existing list or enter a title to create one (title takes priority).'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddToList(false)}
+                      className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'} px-4 py-2 rounded`}
+                    >
+                      {state.settings.language === 'fr' ? 'Annuler' : 'Cancel'}
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-500"
+                      disabled={
+                        selectedVerses.length === 0 ||
+                        (!selectedListId && !newListTitle.trim())
+                      }
+                    >
+                      {state.settings.language === 'fr' ? 'Effectué' : 'Done'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {false && showBottomRandom && (
+            <div className="fixed bottom-4 right-4 z-40 sm:right-6 sm:bottom-6">
+              <button onClick={pickNewRandom} className="px-3 py-2 rounded-full shadow-lg bg-indigo-600 text-white text-sm active:scale-95">
+                {state.settings.language === 'fr' ? 'Nouveau aléatoire' : 'New random'}
+              </button>
+            </div>
+          )}
+
+          {showSwipeHint && (
+            <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
+              <div className="w-1/2 max-w-xs text-center px-4 py-3 rounded-2xl text-base font-bold shadow-2xl ring-2 ring-blue-200 bg-blue-600/95 text-white flex items-center justify-center">
+                <span className="opacity-90 mr-2">◀</span>
+                {state.settings.language === 'fr' ? 'Glissez' : 'Swipe'}
+                <span className="opacity-90 ml-2">▶</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
+
