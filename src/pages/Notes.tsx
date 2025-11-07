@@ -8,8 +8,8 @@ import {
   renameList,
   deleteList,
   getListById,
-  // ⚠️ utilisé pour persister les réordonnancements / suppressions / ajouts
   setListItems,
+  moveItemInList,
 } from '../services/collectionsService';
 import type { VerseList, VerseRef } from '../types/collections';
 import {
@@ -29,19 +29,9 @@ import {
 const TEXT_SENTINEL = '__TEXT__';
 
 type AnyItem = VerseRef & {
-  // champ facultatif si tu veux typer côté service
   kind?: 'text' | 'verse';
 };
 
-/** Mise en page "texte brut" :
- *  Titre
- *  (ligne vide)
- *  Livre Chapitre:Verset
- *  Texte
- *  (ligne vide)
- *  ...
- *  + support des blocs de texte (sans référence)
- */
 function buildPlainListText(list: VerseList): string {
   const lines: string[] = [];
   const title = (list.title || '').trim();
@@ -65,9 +55,8 @@ function buildPlainListText(list: VerseList): string {
     lines.push('');
   }
 
-  // supprimer les lignes vides terminales
   while (lines.length && lines[lines.length - 1] === '') lines.pop();
-  lines.push(''); // terminer par un \n
+  lines.push('');
   return lines.join('\n');
 }
 
@@ -287,9 +276,7 @@ export default function Notes() {
           <div className="mb-4 flex items-center gap-2">
             <button
               onClick={() => setExpandedId(null)}
-              className={`${
-                isDark ? 'text-white bg-gray-700' : 'text-gray-700 bg-gray-200'
-              } px-3 py-1.5 rounded`}
+              className={`${isDark ? 'text-white bg-gray-700' : 'text-gray-700 bg-gray-200'} px-3 py-1.5 rounded`}
             >
               {label.backAll}
             </button>
