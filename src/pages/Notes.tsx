@@ -475,24 +475,6 @@ export default function Notes() {
                                       {label.moveDown}
                                     </button>
 
-                                    {isText && (
-                                      <button
-                                        onClick={() => editTextBlock(list.id, idx, String(it.text || ''))}
-                                        className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-emerald-600 text-white hover:bg-emerald-500"
-                                      >
-                                        <EditTextIcon size={16} />
-                                        {label.editTextBlock}
-                                      </button>
-                                    )}
-
-                                    <button
-                                      onClick={() => removeItem(list.id, idx)}
-                                      className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-red-600 text-white hover:bg-red-500"
-                                    >
-                                      <Trash2 size={16} />
-                                      {label.deleteItem}
-                                    </button>
-
                                     <button
                                       onClick={() => setOpenItemMenu(null)}
                                       className={`ml-auto px-2 py-1.5 rounded ${
@@ -502,6 +484,17 @@ export default function Notes() {
                                       }`}
                                     >
                                       {label.cancel}
+                                    </button>
+
+                                    <button
+                                      onClick={() => setOpenItemMenu(null)}
+                                      className={`ml-auto px-2 py-1.5 rounded ${
+                                        isDark
+                                          ? 'bg-green-600 text-white'
+                                          : 'bg-white text-gray-800'
+                                      }`}
+                                    >
+                                      OK
                                     </button>
                                   </div>
                                 )}
