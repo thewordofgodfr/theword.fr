@@ -378,23 +378,28 @@ export default function Reading() {
   const [listsForModal, setListsForModal] = useState(getAllLists());
   const [selectedListId, setSelectedListId] = useState<string>('');
   const [newListTitle, setNewListTitle] = useState<string>('');
+  const newListInputRef = useRef<HTMLInputElement>(null);
 
-  // Tri alphabétique insensible à la casse + présélection 1ère liste (pas d'option « — Aucune — »)
   const sortListsByTitle = (arr: ReturnType<typeof getAllLists>) =>
     [...arr].sort((a, b) => (a.title || '').localeCompare(b.title || '', undefined, { sensitivity: 'base' }));
 
   const openAddToList = () => {
     const all = sortListsByTitle(getAllLists());
     setListsForModal(all);
-    setSelectedListId(all.length > 0 ? all[0].id : ''); // présélection si dispo
+    setSelectedListId(all.length > 0 ? all[0].id : '');
     setNewListTitle('');
     setShowAddToList(true);
   };
 
-  const confirmAddToList = () => {
+  const cancelExistingChoice = () => {
+    setSelectedListId('');
+    setTimeout(() => newListInputRef.current?.focus(), 0);
+  };
+
+  const confirmAddToList = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!selectedBook || !chapter || selectedVerses.length === 0) return;
 
-    // Si un titre est saisi → crée ou réutilise
     const typed = newListTitle.trim();
     let targetId = '';
 
@@ -402,10 +407,8 @@ export default function Reading() {
       const existing = getAllLists().find(l => l.title.trim().toLowerCase() === typed.toLowerCase());
       targetId = existing ? existing.id : createList(typed).id;
     } else {
-      // sinon utiliser la liste sélectionnée
       targetId = selectedListId || '';
     }
-
     if (!targetId) return;
 
     const chosen = chapter.verses
@@ -420,12 +423,13 @@ export default function Reading() {
         translation: state.settings.language,
       }));
 
-    addVersesToList(targetId, chosen);
-    // Fermeture immédiate + feedback
+    // Feedback immédiat : fermer + toast + clear, puis ajouter
     setShowAddToList(false);
     setSelectedVerses([]);
     setCopiedKey('added-to-list');
     setTimeout(() => setCopiedKey(''), 1600);
+
+    try { addVersesToList(targetId, chosen); } catch (err) { console.error('addVerses error', err); }
   };
 
   const swipeStart = useRef<{ x: number; y: number; time: number } | null>(null);
@@ -736,7 +740,7 @@ export default function Reading() {
               <div className={`absolute inset-0 ${isDark ? 'bg-gray-900' : 'bg-white'} p-4 overflow-y-auto`}>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>{state.settings.language === 'fr' ? 'Choisir un livre' : 'Choose a book'}</h3>
-                <button onClick={() => setShowBookPicker(false)} className={`${isDark ? 'text-white bg-gray-700' : 'text-gray-700 bg-gray-200'} px-3 py-1 rounded`}>
+                  <button onClick={() => setShowBookPicker(false)} className={`${isDark ? 'text-white bg-gray-700' : 'text-gray-700 bg-gray-200'} px-3 py-1 rounded`}>
                     {state.settings.language === 'fr' ? 'Fermer' : 'Close'}
                   </button>
                 </div>
@@ -843,58 +847,97 @@ export default function Reading() {
             <div className="fixed inset-0 z-[60]">
               <div className="absolute inset-0 bg-black/60" onClick={() => setShowAddToList(false)} aria-hidden="true" />
               <div className={`absolute inset-x-0 bottom-0 sm:inset-0 sm:m-auto sm:max-w-md ${isDark ? 'bg-gray-900' : 'bg-white'} sm:rounded-xl p-4 sm:p-6 shadow-2xl`}>
-                <h3 className={`text-lg font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-800'}`}>
-                  {state.settings.language === 'fr' ? 'Ajouter à une liste' : 'Add to a list'}
-                </h3>
+                <form onSubmit={confirmAddToList}>
+                  <h3 className={`text-lg font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+                    {state.settings.language === 'fr' ? 'Ajouter à une liste' : 'Add to a list'}
+                  </h3>
 
-                <div className="space-y-3">
-                  {listsForModal.length > 0 && (
+                  <div className="space-y-3">
+                    {listsForModal.length > 0 && (
+                      <div>
+                        <div className="flex items-baseline justify-between">
+                          <label className={`block text-sm mb-1 ${isDark ? 'text-white/80' : 'text-gray-700'}`}>
+                            {state.settings.language === 'fr' ? 'Liste existante' : 'Existing list'}
+                          </label>
+                          <button
+                            type="button"
+                            onClick={cancelExistingChoice}
+                            className={`text-xs underline ${
+                              isDark ? 'text-white/70 hover:text-white' : 'text-gray-600 hover:text-gray-800'
+                            }`}
+                          >
+                            {state.settings.language === 'fr' ? 'Annuler la sélection' : 'Clear selection'}
+                          </button>
+                        </div>
+
+                        {/* Liste radio custom (pas de Préc./Suivant natifs) */}
+                        <div role="radiogroup" className="max-h-48 overflow-y-auto rounded-md border p-2 space-y-1
+                          ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'}">
+                          {listsForModal.map(l => {
+                            const checked = selectedListId === l.id;
+                            return (
+                              <label
+                                key={l.id}
+                                className={`flex items-center gap-3 rounded px-2 py-2 cursor-pointer border
+                                  ${checked
+                                    ? (isDark ? 'border-emerald-500 bg-emerald-500/10' : 'border-emerald-500 bg-emerald-50')
+                                    : (isDark ? 'border-transparent hover:bg-gray-700' : 'border-transparent hover:bg-gray-50')
+                                  }`}
+                              >
+                                <input
+                                  type="radio"
+                                  name="existingList"
+                                  className="accent-emerald-600"
+                                  checked={checked}
+                                  onChange={() => setSelectedListId(l.id)}
+                                />
+                                <span className={isDark ? 'text-white' : 'text-gray-800'}>{l.title}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
                     <div>
                       <label className={`block text-sm mb-1 ${isDark ? 'text-white/80' : 'text-gray-700'}`}>
-                        {state.settings.language === 'fr' ? 'Liste existante' : 'Existing list'}
+                        {state.settings.language === 'fr' ? 'Nouvelle liste' : 'New list'}
                       </label>
-                      <select
-                        value={selectedListId}
-                        onChange={(e) => setSelectedListId(e.target.value)}
-                        className={`w-full rounded-md border px-3 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
-                      >
-                        {listsForModal.map(l => (
-                          <option key={l.id} value={l.id}>{l.title}</option>
-                        ))}
-                      </select>
+                      <input
+                        ref={newListInputRef}
+                        value={newListTitle}
+                        onChange={(e) => setNewListTitle(e.target.value)}
+                        placeholder={state.settings.language === 'fr' ? 'Titre…' : 'Title…'}
+                        className={`w-full rounded-md border px-3 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white placeholder:text-white/40' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'}`}
+                      />
+                      <p className={`mt-1 text-xs ${isDark ? 'text-white/60' : 'text-gray-500'}`}>
+                        {state.settings.language === 'fr'
+                          ? 'Choisis une liste existante ou indique un titre pour en créer une.'
+                          : 'Pick an existing list or enter a title to create one.'}
+                      </p>
                     </div>
-                  )}
-
-                  <div>
-                    <label className={`block text-sm mb-1 ${isDark ? 'text-white/80' : 'text-gray-700'}`}>
-                      {state.settings.language === 'fr' ? 'Nouvelle liste' : 'New list'}
-                    </label>
-                    <input
-                      value={newListTitle}
-                      onChange={(e) => setNewListTitle(e.target.value)}
-                      placeholder={state.settings.language === 'fr' ? 'Titre…' : 'Title…'}
-                      className={`w-full rounded-md border px-3 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white placeholder:text-white/40' : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'}`}
-                    />
-                    <p className={`mt-1 text-xs ${isDark ? 'text-white/60' : 'text-gray-500'}`}>
-                      {state.settings.language === 'fr'
-                        ? 'Choisis une liste existante ou indique un titre pour en créer une.'
-                        : 'Pick an existing list or enter a title to create one.'}
-                    </p>
                   </div>
-                </div>
 
-                <div className="mt-4 flex items-center justify-end gap-2">
-                  <button onClick={() => setShowAddToList(false)} className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'} px-4 py-2 rounded`}>
-                    {state.settings.language === 'fr' ? 'Annuler' : 'Cancel'}
-                  </button>
-                  <button
-                    onClick={confirmAddToList}
-                    className="px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-500"
-                    disabled={selectedVerses.length === 0}
-                  >
-                    {state.settings.language === 'fr' ? 'Effectué' : 'Done'}
-                  </button>
-                </div>
+                  <div className="mt-4 flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddToList(false)}
+                      className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'} px-4 py-2 rounded`}
+                    >
+                      {state.settings.language === 'fr' ? 'Annuler' : 'Cancel'}
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-500"
+                      disabled={
+                        selectedVerses.length === 0 ||
+                        (!selectedListId && !newListTitle.trim())
+                      }
+                    >
+                      {state.settings.language === 'fr' ? 'Effectué' : 'Done'}
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           )}
