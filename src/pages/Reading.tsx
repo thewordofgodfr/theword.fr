@@ -379,15 +379,14 @@ export default function Reading() {
   const [selectedListId, setSelectedListId] = useState<string>('');
   const [newListTitle, setNewListTitle] = useState<string>('');
 
-  // MODIF: tri alphabétique insensible à la casse + présélection 1ère liste (et suppression "— Aucune —")
+  // Tri alphabétique insensible à la casse + présélection 1ère liste (pas d'option « — Aucune — »)
   const sortListsByTitle = (arr: ReturnType<typeof getAllLists>) =>
     [...arr].sort((a, b) => (a.title || '').localeCompare(b.title || '', undefined, { sensitivity: 'base' }));
 
   const openAddToList = () => {
     const all = sortListsByTitle(getAllLists());
     setListsForModal(all);
-    // S'il y a au moins une liste, on sélectionne la première par défaut
-    setSelectedListId(all.length > 0 ? all[0].id : '');
+    setSelectedListId(all.length > 0 ? all[0].id : ''); // présélection si dispo
     setNewListTitle('');
     setShowAddToList(true);
   };
@@ -395,20 +394,15 @@ export default function Reading() {
   const confirmAddToList = () => {
     if (!selectedBook || !chapter || selectedVerses.length === 0) return;
 
-    // 1) Si un titre est saisi → on crée OU on réutilise (prioritaire)
+    // Si un titre est saisi → crée ou réutilise
     const typed = newListTitle.trim();
     let targetId = '';
 
     if (typed) {
       const existing = getAllLists().find(l => l.title.trim().toLowerCase() === typed.toLowerCase());
-      if (existing) {
-        targetId = existing.id; // réutilise
-      } else {
-        const list = createList(typed); // crée
-        targetId = list.id;
-      }
+      targetId = existing ? existing.id : createList(typed).id;
     } else {
-      // 2) Sinon on prend la sélection existante (déjà présélectionnée s'il y a des listes)
+      // sinon utiliser la liste sélectionnée
       targetId = selectedListId || '';
     }
 
@@ -427,6 +421,7 @@ export default function Reading() {
       }));
 
     addVersesToList(targetId, chosen);
+    // Fermeture immédiate + feedback
     setShowAddToList(false);
     setSelectedVerses([]);
     setCopiedKey('added-to-list');
@@ -741,7 +736,7 @@ export default function Reading() {
               <div className={`absolute inset-0 ${isDark ? 'bg-gray-900' : 'bg-white'} p-4 overflow-y-auto`}>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>{state.settings.language === 'fr' ? 'Choisir un livre' : 'Choose a book'}</h3>
-                  <button onClick={() => setShowBookPicker(false)} className={`${isDark ? 'text-white bg-gray-700' : 'text-gray-700 bg-gray-200'} px-3 py-1 rounded`}>
+                <button onClick={() => setShowBookPicker(false)} className={`${isDark ? 'text-white bg-gray-700' : 'text-gray-700 bg-gray-200'} px-3 py-1 rounded`}>
                     {state.settings.language === 'fr' ? 'Fermer' : 'Close'}
                   </button>
                 </div>
@@ -863,7 +858,6 @@ export default function Reading() {
                         onChange={(e) => setSelectedListId(e.target.value)}
                         className={`w-full rounded-md border px-3 py-2 ${isDark ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                       >
-                        {/* MODIF: plus d'option "— Aucune —" */}
                         {listsForModal.map(l => (
                           <option key={l.id} value={l.id}>{l.title}</option>
                         ))}
@@ -898,7 +892,7 @@ export default function Reading() {
                     className="px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-500"
                     disabled={selectedVerses.length === 0}
                   >
-                    {state.settings.language === 'fr' ? 'Ajouter' : 'Add'}
+                    {state.settings.language === 'fr' ? 'Effectué' : 'Done'}
                   </button>
                 </div>
               </div>
@@ -927,4 +921,3 @@ export default function Reading() {
     </div>
   );
 }
-
