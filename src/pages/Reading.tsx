@@ -159,6 +159,16 @@ export default function Reading() {
     } catch { return { qb: null, qc: null, qv: null }; }
   }
 
+  // NEW: consommer/effacer les paramètres d’URL une fois appliqués
+  function clearUrlIntent() {
+    try {
+      const u = new URL(window.location.href);
+      ['b', 'book', 'c', 'chapter', 'v', 'verse'].forEach(k => u.searchParams.delete(k));
+      const next = u.pathname + (u.search || '') + (u.hash || '');
+      window.history.replaceState({}, '', next);
+    } catch {}
+  }
+
   const [quickSlots, setQuickSlots] = useState<QuickSlot[]>([null, null, null, null]);
   const [activeSlot, setActiveSlot] = useState<number | null>(null);
   const [lastTappedSlot, setLastTappedSlot] = useState<number | null>(null);
@@ -238,6 +248,8 @@ export default function Reading() {
         const v = Number.isFinite(verseNum) ? verseNum : null;
         const changed = applyIfChanged(book, chapNum, v);
         if (!hasLoadedContext) setHasLoadedContext(true);
+        // NEW: consommer l'URL dans tous les cas (même si rien n'a changé)
+        clearUrlIntent();
         if (changed) return;
       }
     }
@@ -983,4 +995,5 @@ export default function Reading() {
     </div>
   );
 }
+
 
