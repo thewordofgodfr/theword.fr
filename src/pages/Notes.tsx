@@ -9,7 +9,6 @@ import {
   deleteList,
   getListById,
   setListItems,
-  moveItemInList,
 } from '../services/collectionsService';
 import type { VerseList, VerseRef } from '../types/collections';
 import {
@@ -22,7 +21,6 @@ import {
   ArrowUp,
   ArrowDown,
   Type as TextIcon,
-  Edit2 as EditTextIcon,
 } from 'lucide-react';
 
 /** Sentinelle pour distinguer un bloc de texte libre d'un verset */
@@ -405,18 +403,12 @@ export default function Notes() {
                                     )
                                   }
                                 >
+                                  {/* En-tête : pour un verset on montre la réf, pour un bloc texte on n'affiche plus "T Bloc de texte" */}
                                   {!isText ? (
                                     <div className="font-semibold">
                                       {(it.bookName ?? it.bookId) || ''} {it.chapter}:{it.verse}
                                     </div>
-                                  ) : (
-                                    <div className="flex items-center gap-2 font-semibold">
-                                      <TextIcon className="w-4 h-4 opacity-80" />
-                                      {state.settings.language === 'fr'
-                                        ? 'Bloc de texte'
-                                        : 'Text block'}
-                                    </div>
-                                  )}
+                                  ) : null}
 
                                   {it.text ? (
                                     <div
@@ -475,9 +467,20 @@ export default function Notes() {
                                       {label.moveDown}
                                     </button>
 
+                                    {/* Corbeille pour supprimer l'élément sélectionné */}
+                                    <button
+                                      onClick={() => removeItem(list.id, idx)}
+                                      className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-red-600 text-white hover:bg-red-500"
+                                      title={label.deleteItem}
+                                    >
+                                      <Trash2 size={16} />
+                                      {label.deleteItem}
+                                    </button>
+
+                                    {/* Annuler (fermer le menu) */}
                                     <button
                                       onClick={() => setOpenItemMenu(null)}
-                                      className={`ml-auto px-2 py-1.5 rounded ${
+                                      className={`px-2 py-1.5 rounded ${
                                         isDark
                                           ? 'bg-gray-700 text-white'
                                           : 'bg-white text-gray-800'
@@ -486,13 +489,10 @@ export default function Notes() {
                                       {label.cancel}
                                     </button>
 
+                                    {/* OK visible à droite */}
                                     <button
                                       onClick={() => setOpenItemMenu(null)}
-                                      className={`ml-auto px-2 py-1.5 rounded ${
-                                        isDark
-                                          ? 'bg-green-600 text-white'
-                                          : 'bg-white text-gray-800'
-                                      }`}
+                                      className="ml-auto px-2 py-1.5 rounded bg-green-600 text-white hover:bg-green-500"
                                     >
                                       OK
                                     </button>
