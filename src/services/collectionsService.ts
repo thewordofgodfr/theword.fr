@@ -148,8 +148,9 @@ export function exportListAsText(list: VerseList, opts: ExportOptions = {}): str
       continue;
     }
 
-    const ref = `${it.bookName ?? it.bookId} ${it.chapter}:${it.verse}`;
-    lines.push(linePrefix + (includeRef ? `${ref} — ${text}` : text));
+    const ref = `${it.bookName ?? it.bookId} ${it.chapter}:${it.verse}`.trim();
+    if (ref) lines.push(ref);
+    if (it.text && String(it.text).trim()) lines.push(String(it.text).trim());
   }
   return lines.join('\n');
 }
