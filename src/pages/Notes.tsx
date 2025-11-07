@@ -21,6 +21,7 @@ import {
   ArrowUp,
   ArrowDown,
   Type as TextIcon,
+  Edit2 as EditTextIcon, // <- icône crayon pour modifier un bloc texte
 } from 'lucide-react';
 
 /** Sentinelle pour distinguer un bloc de texte libre d'un verset */
@@ -259,7 +260,7 @@ export default function Notes() {
             {label.title}
           </h1>
 
-          {!expandedId && (
+        {!expandedId && (
             <button
               onClick={doCreate}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-500"
@@ -403,7 +404,7 @@ export default function Notes() {
                                     )
                                   }
                                 >
-                                  {/* En-tête : pour un verset on montre la réf, pour un bloc texte on n'affiche plus "T Bloc de texte" */}
+                                  {/* En-tête : pour un verset on montre la réf, pour un bloc texte on n'affiche plus de titre */}
                                   {!isText ? (
                                     <div className="font-semibold">
                                       {(it.bookName ?? it.bookId) || ''} {it.chapter}:{it.verse}
@@ -436,6 +437,18 @@ export default function Notes() {
                                         className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-500"
                                       >
                                         {label.open}
+                                      </button>
+                                    )}
+
+                                    {/* Modifier (uniquement pour bloc de texte) */}
+                                    {isText && (
+                                      <button
+                                        onClick={() => editTextBlock(list.id, idx, String(it.text || ''))}
+                                        className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500"
+                                        title={label.editTextBlock}
+                                      >
+                                        <EditTextIcon size={16} />
+                                        {label.editTextBlock}
                                       </button>
                                     )}
 
@@ -514,3 +527,4 @@ export default function Notes() {
     </div>
   );
 }
+
