@@ -5,6 +5,7 @@
 import type { VerseList, VerseRef } from '../types/collections';
 
 const LS_KEY = 'twog:collections:v1';
+const TEXT_SENTINEL = '__TEXT__'; // pour blocs de texte libres
 
 /* ---------- utils stockage ---------- */
 function safeParse<T>(raw: string | null, fallback: T): T {
@@ -84,7 +85,7 @@ export function addVersesToList(id: string, verses: VerseRef[]): VerseList | nul
   if (added > 0) { all[i].updatedAt = Date.now(); writeAll(all); }
   return all[i];
 }
-/** Supprime un verset par son index dans la liste */
+/** Supprime un élément par son index dans la liste */
 export function removeVerseAt(id: string, index: number): VerseList | null {
   const all = readAll();
   const i = all.findIndex(l => l.id === id);
@@ -94,6 +95,36 @@ export function removeVerseAt(id: string, index: number): VerseList | null {
     all[i].updatedAt = Date.now();
     writeAll(all);
   }
+  return all[i];
+}
+
+/** Remplace entièrement les items d'une liste (utilisé par Notes pour réordonner/supprimer/ajouter des blocs texte). */
+export function setListItems(id: string, items: VerseRef[]): VerseList | null {
+  const all = readAll();
+  const i = all.findIndex(l => l.id === id);
+  if (i < 0) return null;
+  all[i] = { ...all[i], items: Array.isArray(items) ? items : [], updatedAt: Date.now() };
+  writeAll(all);
+  return all[i];
+}
+
+/** Déplace un item d'un index à un autre (optionnel, pratique si tu préfères l'appeler depuis l'UI). */
+export function moveItemInList(id: string, from: number, to: number): VerseList | null {
+  const all = readAll();
+  const i = all.findIndex(l => l.id === id);
+  if (i < 0) return null;
+
+  const arr = [...all[i].items];
+  const src = Math.max(0, Math.min(arr.length - 1, from));
+  const dst = Math.max(0, Math.min(arr.length - 1, to));
+  if (src === dst) return all[i];
+
+  const [moved] = arr.splice(src, 1);
+  arr.splice(dst, 0, moved);
+
+  all[i].items = arr;
+  all[i].updatedAt = Date.now();
+  writeAll(all);
   return all[i];
 }
 
@@ -108,8 +139,16 @@ export function exportListAsText(list: VerseList, opts: ExportOptions = {}): str
     lines.push('');
   }
   for (const it of list.items) {
+    const isText = it.bookId === TEXT_SENTINEL;
+    const text = (it.text ?? '').toString();
+
+    if (isText) {
+      // Bloc de texte libre : pas de référence
+      lines.push(linePrefix + text);
+      continue;
+    }
+
     const ref = `${it.bookName ?? it.bookId} ${it.chapter}:${it.verse}`;
-    const text = it.text ?? '';
     lines.push(linePrefix + (includeRef ? `${ref} — ${text}` : text));
   }
   return lines.join('\n');
@@ -122,4 +161,3 @@ export async function shareList(list: VerseList): Promise<void> {
   } catch {}
   try { await navigator.clipboard.writeText(text); } catch {}
 }
-
