@@ -10,6 +10,9 @@ const QuickSlotsHelpInline: React.FC = () => {
   const isDark = state.settings.theme === 'dark';
   const lang = state.settings.language === 'fr' ? 'fr' : 'en';
 
+  // Taille de base liée aux réglages (fallback 19px)
+  const base = Math.max(16, Math.round((state.settings as any)?.fontSize || 19));
+
   // Styles harmonisés avec la page Lecture (pills)
   const CHIP_BASE =
     'inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95';
@@ -31,11 +34,11 @@ const QuickSlotsHelpInline: React.FC = () => {
 
   return (
     <section
-      className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-2xl p-5 md:p-6 shadow-lg`}
+      className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-2xl p-4 shadow-md`}
     >
       {/* Aperçu des raccourcis (aligné sur Lecture) */}
       <div
-        className={`flex flex-wrap items-center gap-2 md:gap-3 rounded-2xl px-3 md:px-4 py-3
+        className={`flex flex-wrap items-center gap-2 rounded-2xl px-3 py-3
           ${isDark ? 'bg-gray-900/40 border border-gray-700' : 'bg-gray-50 border border-gray-200'}`}
         aria-label={lang === 'fr' ? 'Illustration des raccourcis' : 'Shortcuts illustration'}
       >
@@ -63,10 +66,10 @@ const QuickSlotsHelpInline: React.FC = () => {
         </span>
       </div>
 
-      {/* Texte explicatif (19px mini) */}
+      {/* Texte explicatif lié au réglage de taille */}
       <p
-        className={`${isDark ? 'text-white' : 'text-gray-900'} mt-4 md:mt-5`}
-        style={{ fontSize: '19px', lineHeight: 1.7 }}
+        className={`${isDark ? 'text-white' : 'text-gray-900'} mt-3`}
+        style={{ fontSize: `${base}px`, lineHeight: 1.7 }}
       >
         {copy.intro}
       </p>
@@ -80,25 +83,22 @@ export default function About() {
 
   const isDark = state.settings.theme === 'dark';
 
-  // Titre conditionnel : caché si vide OU s'il vaut la clé "aboutTitle"
-  const rawTitle = (t('aboutTitle') ?? '').trim();
-  const showTitle =
-    rawTitle.length > 0 &&
-    rawTitle !== 'aboutTitle' &&
-    rawTitle.toLowerCase() !== 'abouttitle';
+  // Tailles liées au réglage utilisateur (mobile-first)
+  const base = Math.max(16, Math.round((state.settings as any)?.fontSize || 19)); // texte
+  const titleSize = base + 2; // titre "légèrement" plus gros que l'intro
+  const h2Size = base + 1; // sous-titres des blocs
 
+  // Intro (FR/EN)
   const aboutIntro =
     state.settings.language === 'fr'
-      ? "TheWord : Lecture de la Bible hors-ligne, recherche instantanée, notes thématiques, partage en un geste. Retrouvez aussi TheWord sur le web : www.theword.fr"
-      : "TheWord: offline reading, instant search, thematic notes, one-tap sharing. You can also use TheWord on the web: www.theword.fr";
+      ? 'TheWord : Lecture de la Bible hors-ligne, recherche instantanée, notes thématiques, partage en un geste. Retrouvez aussi TheWord sur le web : www.theword.fr'
+      : 'TheWord: offline reading, instant search, thematic notes, one-tap sharing. You can also use TheWord on the web: www.theword.fr';
 
   const notesTitle = state.settings.language === 'fr' ? 'Notes' : 'Notes';
-
   const notesIntro =
     state.settings.language === 'fr'
-      ? "Organisez vos passages favoris et vos pensées dans des listes thématiques."
-      : "Organize favorite passages and personal thoughts into thematic lists.";
-
+      ? 'Organisez vos passages favoris et vos pensées dans des listes thématiques.'
+      : 'Organize favorite passages and personal thoughts into thematic lists.';
   const notesPoints =
     state.settings.language === 'fr'
       ? [
@@ -114,109 +114,127 @@ export default function About() {
 
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} transition-colors duration-200`}>
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-12">
-            {showTitle && (
-              <h1 className={`text-3xl md:text-4xl font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-800'}`}>
-                {rawTitle}
-              </h1>
-            )}
-            <p
-              className={`${isDark ? 'text-white' : 'text-gray-700'} max-w-3xl mx-auto leading-relaxed`}
-              style={{ fontSize: '19px', lineHeight: 1.7 }}
+      <div className="mx-auto w-full max-w-3xl px-4 py-6">
+        {/* ====== 1) INTRO (titre + paragraphe) ====== */}
+        <header className="mb-5 text-center">
+          <h1
+            className={`font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}
+            style={{ fontSize: `${titleSize}px`, lineHeight: 1.25 }}
+          >
+            The Word
+          </h1>
+
+          <p
+            className={`${isDark ? 'text-white/90' : 'text-gray-700'} mt-3 leading-relaxed`}
+            style={{ fontSize: `${base}px`, lineHeight: 1.7 }}
+          >
+            {aboutIntro}
+          </p>
+        </header>
+
+        <div className="flex flex-col gap-5">
+          {/* ====== 2) FONCTIONNALITÉ ALÉATOIRE ====== */}
+          <section className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-md p-4`}>
+            <h2
+              className={`mb-4 font-bold flex items-center ${isDark ? 'text-white' : 'text-gray-900'}`}
+              style={{ fontSize: `${h2Size}px` }}
             >
-              {aboutIntro}
-            </p>
-          </div>
+              <Shuffle size={22} className="mr-2 opacity-90" />
+              {t('randomFeature')}
+            </h2>
 
-          {/* Cards */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-            {/* Random Feature */}
-            <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-8`}>
-              <h2 className={`text-2xl font-bold mb-6 ${isDark ? 'text-white' : 'text-gray-800'} flex items-center`}>
-                <Shuffle size={28} className="mr-3 text-green-500" />
-                {t('randomFeature')}
-              </h2>
+            <div
+              className={`rounded-xl p-4 ${
+                isDark ? 'bg-gray-700/70' : 'bg-gradient-to-br from-green-50 to-blue-50'
+              }`}
+            >
+              <p
+                className={`${isDark ? 'text-white' : 'text-gray-700'} leading-relaxed`}
+                style={{ fontSize: `${base}px`, lineHeight: 1.7 }}
+              >
+                {t('randomFeatureDesc')}
+              </p>
 
-              <div className={`p-6 ${isDark ? 'bg-gray-700' : 'bg-gradient-to-br from-green-50 to-blue-50'} rounded-lg`}>
-                <p
-                  className={`${isDark ? 'text-white' : 'text-gray-700'} leading-relaxed mb-4`}
-                  style={{ fontSize: '19px', lineHeight: 1.7 }}
-                >
-                  {t('randomFeatureDesc')}
-                </p>
-
-                <div className="grid grid-cols-2 gap-4 mt-6">
-                  <div className="text-center">
-                    <div className={`text-2xl font-bold ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>31,000+</div>
-                    <div
-                      className={`${isDark ? 'text-white' : 'text-gray-600'}`}
-                      style={{ fontSize: '19px', lineHeight: 1.4 }}
-                    >
-                      {state.settings.language === 'fr' ? 'Versets' : 'Verses'}
-                    </div>
+              <div className="grid grid-cols-2 gap-3 mt-4">
+                <div className="text-center">
+                  <div className={`text-xl font-extrabold ${isDark ? 'text-blue-300' : 'text-blue-700'}`}>31,000+</div>
+                  <div className={`${isDark ? 'text-white/90' : 'text-gray-700'}`} style={{ fontSize: `${base - 2}px` }}>
+                    {state.settings.language === 'fr' ? 'Versets' : 'Verses'}
                   </div>
-                  <div className="text-center">
-                    <div className={`text-2xl font-bold ${isDark ? 'text-green-400' : 'text-green-600'}`}>66</div>
-                    <div
-                      className={`${isDark ? 'text-white' : 'text-gray-600'}`}
-                      style={{ fontSize: '19px', lineHeight: 1.4 }}
-                    >
-                      {state.settings.language === 'fr' ? 'Livres' : 'Books'}
-                    </div>
+                </div>
+                <div className="text-center">
+                  <div className={`text-xl font-extrabold ${isDark ? 'text-emerald-300' : 'text-emerald-700'}`}>66</div>
+                  <div className={`${isDark ? 'text-white/90' : 'text-gray-700'}`} style={{ fontSize: `${base - 2}px` }}>
+                    {state.settings.language === 'fr' ? 'Livres' : 'Books'}
                   </div>
                 </div>
               </div>
             </div>
+          </section>
 
-            {/* Notes overview */}
-            <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-8`}>
-              <h2 className={`text-2xl font-bold mb-6 ${isDark ? 'text-white' : 'text-gray-800'} flex items-center`}>
-                <ListIcon size={28} className="mr-3 text-indigo-500" />
-                {notesTitle}
-              </h2>
-              <div className={`${isDark ? 'text-white' : 'text-gray-700'} leading-relaxed`} style={{ fontSize: '19px', lineHeight: 1.7 }}>
-                <p className="mb-4">{notesIntro}</p>
-                <ul className="list-disc pl-5 space-y-2">
-                  {notesPoints.map((li, i) => (
-                    <li key={i}>{li}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          {/* Reading Shortcuts (ex-Settings) */}
-          <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 mb-8`}>
-            <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+          {/* ====== 3) RACCOURCIS DE LECTURE ====== */}
+          <section className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-md p-4`}>
+            <h2
+              className={`mb-4 font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}
+              style={{ fontSize: `${h2Size}px` }}
+            >
               {state.settings.language === 'fr' ? 'Raccourcis de lecture' : 'Reading shortcuts'}
             </h2>
-            <div className={`${isDark ? 'text-white' : 'text-gray-800'} w-full leading-relaxed [&>*]:w-full [&_*]:max-w-none`} style={{ fontSize: '19px' }}>
+            <div className={`${isDark ? 'text-white' : 'text-gray-800'} w-full leading-relaxed`}>
               <QuickSlotsHelpInline />
             </div>
-          </div>
+          </section>
 
-          {/* Footer */}
-          <div className="text-center mt-12">
-            <div className={`flex items-center justify-center mb-4 ${isDark ? 'text-red-400' : 'text-red-500'}`}>
-              <Heart size={20} className="mr-2" />
-              <span className="font-medium" style={{ fontSize: '19px' }}>
+          {/* ====== 4) NOTES ====== */}
+          <section className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-md p-4`}>
+            <h2
+              className={`mb-3 font-bold flex items-center ${isDark ? 'text-white' : 'text-gray-900'}`}
+              style={{ fontSize: `${h2Size}px` }}
+            >
+              <ListIcon size={20} className="mr-2 opacity-90" />
+              {notesTitle}
+            </h2>
+
+            <div
+              className={`${isDark ? 'text-white' : 'text-gray-700'} leading-relaxed`}
+              style={{ fontSize: `${base}px`, lineHeight: 1.7 }}
+            >
+              <p className="mb-3">{notesIntro}</p>
+              <ul className="list-disc pl-5 space-y-1.5">
+                {notesPoints.map((li, i) => (
+                  <li key={i}>{li}</li>
+                ))}
+              </ul>
+            </div>
+          </section>
+
+          {/* ====== 5) CRÉÉ AVEC AMOUR (cœur plus grand + mise en page) ====== */}
+          <section
+            className={`rounded-2xl p-4 text-center shadow-md ${
+              isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'
+            }`}
+          >
+            <div className="flex items-center justify-center gap-3">
+              <Heart className={`${isDark ? 'text-rose-300' : 'text-rose-500'}`} size={28} />
+              <span className="font-semibold" style={{ fontSize: `${base}px` }}>
                 {state.settings.language === 'fr'
                   ? 'Créé avec amour pour répandre la Parole de Dieu'
                   : "Created with love to spread God's Word"}
               </span>
             </div>
+          </section>
+
+          {/* ====== 6) COMMENTAIRE DE FIN SUR LES VERSIONS ====== */}
+          <footer className="px-1 pb-2">
             <p
-              className={`${isDark ? 'text-white' : 'text-gray-500'}`}
-              style={{ fontSize: '17px', lineHeight: 1.6 }}
+              className={`${isDark ? 'text-white/90' : 'text-gray-600'} text-center`}
+              style={{ fontSize: `${base - 2}px`, lineHeight: 1.6 }}
             >
               {state.settings.language === 'fr'
                 ? 'Toutes les versions bibliques utilisées sont dans le domaine public. Certaines ont été partiellement modernisées (vocabulaire, grammaire) tout en restant strictement fidèles aux manuscrits originaux.'
                 : 'All Bible versions used are in the public domain. Some have been partially modernized (vocabulary, grammar) while remaining strictly faithful to the original manuscripts.'}
             </p>
-          </div>
+          </footer>
         </div>
       </div>
     </div>
