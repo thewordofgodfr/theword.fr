@@ -63,10 +63,10 @@ const QuickSlotsHelpInline: React.FC = () => {
         </span>
       </div>
 
-      {/* Texte explicatif (21px mini) */}
+      {/* Texte explicatif (19px mini) */}
       <p
         className={`${isDark ? 'text-white' : 'text-gray-900'} mt-4 md:mt-5`}
-        style={{ fontSize: '21px', lineHeight: 1.7 }}
+        style={{ fontSize: '19px', lineHeight: 1.7 }}
       >
         {copy.intro}
       </p>
@@ -89,7 +89,7 @@ export default function About() {
 
   const aboutIntro =
     state.settings.language === 'fr'
-      ? "TheWord : lecture de la Bible hors-ligne, recherche instantanée, notes thématiques, partage en un geste. Retrouvez aussi TheWord sur le web : www.theword.fr"
+      ? "TheWord : Lecture de la Bible hors-ligne, recherche instantanée, notes thématiques, partage en un geste. Retrouvez aussi TheWord sur le web : www.theword.fr"
       : "TheWord: offline reading, instant search, thematic notes, one-tap sharing. You can also use TheWord on the web: www.theword.fr";
 
   const notesTitle = state.settings.language === 'fr' ? 'Notes' : 'Notes';
@@ -125,7 +125,7 @@ export default function About() {
             )}
             <p
               className={`${isDark ? 'text-white' : 'text-gray-700'} max-w-3xl mx-auto leading-relaxed`}
-              style={{ fontSize: '21px', lineHeight: 1.7 }}
+              style={{ fontSize: '19px', lineHeight: 1.7 }}
             >
               {aboutIntro}
             </p>
@@ -143,7 +143,7 @@ export default function About() {
               <div className={`p-6 ${isDark ? 'bg-gray-700' : 'bg-gradient-to-br from-green-50 to-blue-50'} rounded-lg`}>
                 <p
                   className={`${isDark ? 'text-white' : 'text-gray-700'} leading-relaxed mb-4`}
-                  style={{ fontSize: '21px', lineHeight: 1.7 }}
+                  style={{ fontSize: '19px', lineHeight: 1.7 }}
                 >
                   {t('randomFeatureDesc')}
                 </p>
@@ -153,7 +153,7 @@ export default function About() {
                     <div className={`text-2xl font-bold ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>31,000+</div>
                     <div
                       className={`${isDark ? 'text-white' : 'text-gray-600'}`}
-                      style={{ fontSize: '21px', lineHeight: 1.4 }}
+                      style={{ fontSize: '19px', lineHeight: 1.4 }}
                     >
                       {state.settings.language === 'fr' ? 'Versets' : 'Verses'}
                     </div>
@@ -162,7 +162,7 @@ export default function About() {
                     <div className={`text-2xl font-bold ${isDark ? 'text-green-400' : 'text-green-600'}`}>66</div>
                     <div
                       className={`${isDark ? 'text-white' : 'text-gray-600'}`}
-                      style={{ fontSize: '21px', lineHeight: 1.4 }}
+                      style={{ fontSize: '19px', lineHeight: 1.4 }}
                     >
                       {state.settings.language === 'fr' ? 'Livres' : 'Books'}
                     </div>
@@ -177,7 +177,7 @@ export default function About() {
                 <ListIcon size={28} className="mr-3 text-indigo-500" />
                 {notesTitle}
               </h2>
-              <div className={`${isDark ? 'text-white' : 'text-gray-700'} leading-relaxed`} style={{ fontSize: '21px', lineHeight: 1.7 }}>
+              <div className={`${isDark ? 'text-white' : 'text-gray-700'} leading-relaxed`} style={{ fontSize: '19px', lineHeight: 1.7 }}>
                 <p className="mb-4">{notesIntro}</p>
                 <ul className="list-disc pl-5 space-y-2">
                   {notesPoints.map((li, i) => (
@@ -193,7 +193,7 @@ export default function About() {
             <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-white' : 'text-gray-800'}`}>
               {state.settings.language === 'fr' ? 'Raccourcis de lecture' : 'Reading shortcuts'}
             </h2>
-            <div className={`${isDark ? 'text-white' : 'text-gray-800'} w-full leading-relaxed [&>*]:w-full [&_*]:max-w-none`} style={{ fontSize: '21px' }}>
+            <div className={`${isDark ? 'text-white' : 'text-gray-800'} w-full leading-relaxed [&>*]:w-full [&_*]:max-w-none`} style={{ fontSize: '19px' }}>
               <QuickSlotsHelpInline />
             </div>
           </div>
@@ -202,7 +202,7 @@ export default function About() {
           <div className="text-center mt-12">
             <div className={`flex items-center justify-center mb-4 ${isDark ? 'text-red-400' : 'text-red-500'}`}>
               <Heart size={20} className="mr-2" />
-              <span className="font-medium" style={{ fontSize: '21px' }}>
+              <span className="font-medium" style={{ fontSize: '19px' }}>
                 {state.settings.language === 'fr'
                   ? 'Créé avec amour pour répandre la Parole de Dieu'
                   : "Created with love to spread God's Word"}
@@ -210,7 +210,7 @@ export default function About() {
             </div>
             <p
               className={`${isDark ? 'text-white' : 'text-gray-500'}`}
-              style={{ fontSize: '21px', lineHeight: 1.6 }}
+              style={{ fontSize: '17px', lineHeight: 1.6 }}
             >
               {state.settings.language === 'fr'
                 ? 'Toutes les versions bibliques utilisées sont dans le domaine public. Certaines ont été partiellement modernisées (vocabulaire, grammaire) tout en restant strictement fidèles aux manuscrits originaux.'
