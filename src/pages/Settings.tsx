@@ -225,7 +225,7 @@ export default function Settings() {
                       <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-700'} mt-1`}>
                         {t('frenchVersion')}
                       </p>
-                      <p className={`text-xs ${isDark ? 'text-white' : 'text-gray-600'} mt-2`}>
+                      <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-600'} mt-2`}>
                         {state.settings.language === 'fr'
                           ? 'Version de référence pour la Bible en français, traduite par Louis Segond en 1910 et révisée en 2025 (modernisation du vocabulaire/grammaire, fidélité aux manuscrits).'
                           : 'Reference French Bible, translated by Louis Segond in 1910 and refreshed in 2025 (modernized wording/grammar, faithful to the manuscripts).'}
@@ -243,7 +243,7 @@ export default function Settings() {
                       <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-700'} mt-1`}>
                         {t('englishVersion')}
                       </p>
-                      <p className={`text-xs ${isDark ? 'text-white' : 'text-gray-600'} mt-2`}>
+                      <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-600'} mt-2`}>
                         {state.settings.language === 'fr'
                           ? 'Version classique en anglais (KJV), publiée en 1611, révisée en 1769 et modernisation limitée en 2025.'
                           : 'Classic English version (KJV), published in 1611, revised in 1769, with a limited 2025 refresh.'}
@@ -256,8 +256,8 @@ export default function Settings() {
               {/* Ouverture à d’autres langues */}
               <p className={`mt-3 text-xs ${isDark ? 'text-white/80' : 'text-gray-600'}`}>
                 {state.settings.language === 'fr'
-                  ? 'D’autres langues seront ajoutées prochainement.'
-                  : 'More languages will be added soon.'}
+                  ? ''
+                  : ''}
               </p>
             </div>
           </div>
