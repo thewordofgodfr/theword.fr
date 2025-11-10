@@ -271,7 +271,7 @@ export default function Settings() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                {fontSizes.map((value) => {
+                {[21, 23, 25, 27].map((value) => {
                   const isSelected = state.settings.fontSize === value;
                   return (
                     <button
@@ -295,6 +295,7 @@ export default function Settings() {
 
               <div className="mt-4">
                 {(() => {
+                  const XL_FONT = 42;
                   const isXL = state.settings.fontSize === XL_FONT;
                   return (
                     <button
@@ -315,8 +316,9 @@ export default function Settings() {
                 })()}
               </div>
 
+              {/* Aperçu = taille effective (utilise la variable) */}
               <div className={`mt-4 p-4 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg`}>
-                <p className={`${isDark ? 'text-white' : 'text-gray-700'}`} style={{ fontSize: `${state.settings.fontSize}px` }}>
+                <p className={`${isDark ? 'text-white' : 'text-gray-700'}`} style={{ fontSize: `var(--tw-body-fs, ${state.settings.fontSize}px)` }}>
                   {state.settings.language === 'fr'
                     ? 'Aperçu de la taille de police sélectionnée.'
                     : 'Preview of the selected font size.'}
@@ -401,7 +403,7 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* Footer : Version (on garde petit pour ne pas surcharger l’écran) */}
+          {/* Footer : Version */}
           <div className="mt-8 text-center text-xs">
             {versionInfo ? (
               <p className={isDark ? 'text-white/70' : 'text-gray-600'}>
