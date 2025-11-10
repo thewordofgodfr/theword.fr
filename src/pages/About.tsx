@@ -19,8 +19,8 @@ export default function About() {
 
   const aboutIntro =
     state.settings.language === 'fr'
-      ? "TheWord: lecture de la Bible hors-ligne, recherche instantanée, notes thématiques, partage en un geste. Retrouvez aussi TheWord sur le web : www.theword.fr."
-      : "TheWord: offline reading, instant search, thematic notes, one-tap sharing. You can also use TheWord on the web: www.theword.fr.";
+      ? "TheWord : lecture de la Bible hors-ligne, recherche instantanée, notes thématiques, partage en un geste. Retrouvez aussi TheWord sur le web : www.theword.fr"
+      : "TheWord : offline reading, instant search, thematic notes, one-tap sharing. You can also use TheWord on the web: www.theword.fr";
 
   const notesTitle =
     state.settings.language === 'fr' ? 'Notes' : 'Notes';
