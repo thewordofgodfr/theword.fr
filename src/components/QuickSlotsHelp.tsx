@@ -20,11 +20,11 @@ export default function QuickSlotsHelp() {
     fr: {
       // Titre supprimé pour éviter le doublon (gardé côté Settings)
       intro:
-        'Ces 4 boutons, alignés à droite du sélecteur Livre/Chapitre, permettent de revenir instantanément sur vos lectures fréquentes — pratique pour lire plusieurs livres en parallèle : utilisez 1/2/3 pour des emplacements distincts, et 🔎 pour revenir au dernier passage consulté.',
+        'Ces 4 boutons, alignés à droite du sélecteur Livre/Chapitre, permettent de revenir instantanément sur vos lectures fréquentes permettant de lire plusieurs livres en parallèle : utilisez 1/2/3 pour 3 emplacements distincts, et loupe pour revenir au dernier passage consulté (verset aléatoire ou recherche).',
     },
     en: {
       intro:
-        'These 4 buttons, aligned to the right of the Book/Chapter selector, let you jump back to frequent readings instantly — handy to read several books in parallel: use 1/2/3 for different locations, and 🔎 to resume the last passage.',
+        'These 4 buttons, aligned to the right of the Book/Chapter selector, let you jump back to frequent readings instantly to read several books in parallel: use 1/2/3 for 3 different locations, and the magnify glasse to resume the last passage (random verse or search).',
     },
   }[lang];
 
