@@ -247,6 +247,10 @@ export default function Notes() {
   // quand une liste est ouverte, n'afficher qu'elle
   const shownLists = expandedId ? lists.filter((l) => l.id === expandedId) : lists;
 
+  // format date sans heure (création / modif) — affichage simple type 31/12/2025
+  const formatDate = (d: string | number | Date) =>
+    new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' });
+
   return (
     <div className={`min-h-[100svh] ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -260,7 +264,7 @@ export default function Notes() {
             {label.title}
           </h1>
 
-        {!expandedId && (
+          {!expandedId && (
             <button
               onClick={doCreate}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-500"
@@ -299,71 +303,79 @@ export default function Notes() {
           <div className="space-y-4">
             {shownLists.map((list) => {
               const isOpen = expandedId === list.id;
+
               return (
                 <div
                   key={list.id}
+                  // Toute la carte cliquable en "liste des notes" (vue fermée)
+                  onClick={
+                    !isOpen
+                      ? () => {
+                          setOpenItemMenu(null);
+                          setExpandedId(list.id);
+                        }
+                      : undefined
+                  }
                   className={`${
                     isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
-                  } rounded-xl shadow p-4`}
+                  } rounded-xl shadow p-4 ${!isOpen ? 'cursor-pointer' : ''}`}
+                  role={!isOpen ? 'button' : undefined}
+                  aria-expanded={isOpen}
+                  style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    {/* Titre cliquable pour ouvrir/fermer */}
-                    <button
-                      onClick={() => {
-                        setOpenItemMenu(null);
-                        setExpandedId(isOpen ? null : list.id);
-                      }}
-                      className="min-w-0 text-left"
-                      style={{ WebkitTapHighlightColor: 'transparent' }}
-                      aria-expanded={isOpen}
-                    >
-                      <div className="font-semibold truncate">{list.title}</div>
-                      <div className={`text-xs ${isDark ? 'text-white/60' : 'text-gray-500'}`}>
-                        {list.items.length} {label.verses} •{' '}
-                        {new Date(list.updatedAt).toLocaleString()}
-                      </div>
-                    </button>
-
-                    <div className="flex items-center gap-2">
-                      {/* Partager */}
-                      <button
-                        onClick={() => doShare(list.id)}
-                        className="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-500"
-                        title="Partager"
-                      >
-                        <Share2 size={16} />
-                      </button>
-                      {/* Copier */}
-                      <button
-                        onClick={() => copyListText(list.id)}
-                        className={`${
-                          isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-                        } px-3 py-2 rounded`}
-                        title="Copier"
-                      >
-                        <Copy size={16} />
-                      </button>
-                      {/* Renommer */}
-                      <button
-                        onClick={() => doRename(list.id, list.title)}
-                        className={`${
-                          isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-                        } px-3 py-2 rounded`}
-                        title="Renommer"
-                      >
-                        <Edit3 size={16} />
-                      </button>
-                      {/* Supprimer la liste */}
-                      <button
-                        onClick={() => doDelete(list.id)}
-                        className="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-500"
-                        title="Supprimer"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                  {/* En-tête : Titre sur toute la largeur + infos (sans heure) */}
+                  <div className="min-w-0">
+                    <div className="text-lg md:text-xl font-semibold leading-snug whitespace-normal break-words">
+                      {list.title}
+                    </div>
+                    <div className={`mt-1 text-xs ${isDark ? 'text-white/60' : 'text-gray-500'}`}>
+                      {list.items.length} {label.verses} • {formatDate(list.updatedAt)}
                     </div>
                   </div>
 
+                  {/* En vue LISTE (fermée), on n'affiche AUCUNE icône d'action.
+                      En vue OUVERTE, on place les icônes SOUS le titre pour libérer la largeur. */}
+                  {isOpen && (
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <button
+                        onClick={() => doRename(list.id, list.title)}
+                        className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
+                        title="Renommer"
+                      >
+                        <Edit3 size={16} />
+                        Renommer
+                      </button>
+
+                      <button
+                        onClick={() => doShare(list.id)}
+                        className="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-500 inline-flex items-center gap-2"
+                        title="Partager"
+                      >
+                        <Share2 size={16} />
+                        Partager
+                      </button>
+
+                      <button
+                        onClick={() => copyListText(list.id)}
+                        className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
+                        title="Copier"
+                      >
+                        <Copy size={16} />
+                        Copier
+                      </button>
+
+                      <button
+                        onClick={() => doDelete(list.id)}
+                        className="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-500 inline-flex items-center gap-2"
+                        title="Supprimer"
+                      >
+                        <Trash2 size={16} />
+                        Supprimer
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Contenu de la liste ouverte */}
                   {isOpen && (
                     <div className={`mt-4 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-50'} p-3`}>
                       {list.items.length === 0 ? (
@@ -404,7 +416,7 @@ export default function Notes() {
                                     )
                                   }
                                 >
-                                  {/* En-tête : pour un verset on montre la réf, pour un bloc texte on n'affiche plus de titre */}
+                                  {/* En-tête : pour un verset on montre la réf, pour un bloc texte on n'affiche pas de titre */}
                                   {!isText ? (
                                     <div className="font-semibold">
                                       {(it.bookName ?? it.bookId) || ''} {it.chapter}:{it.verse}
@@ -527,4 +539,5 @@ export default function Notes() {
     </div>
   );
 }
+
 
