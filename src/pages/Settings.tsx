@@ -1,6 +1,5 @@
 // src/pages/Settings.tsx
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import QuickSlotsHelp from '../components/QuickSlotsHelp';
 import React, { useEffect, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
@@ -146,7 +145,7 @@ export default function Settings() {
   // --- Bouton langue réutilisable ---
   const LangButton: React.FC<{
     active: boolean;
-    flag: React.ReactNode; // <— accepte un ReactNode pour nos SVG
+    flag: React.ReactNode;
     title: string;
     subtitle: string;
     onClick: () => void;
@@ -208,6 +207,58 @@ export default function Settings() {
                 subtitle="King James Version"
                 onClick={() => updateSettings({ language: 'en' })}
               />
+            </div>
+
+            {/* Explications des versions (déplacées depuis About) */}
+            <div className="mt-6">
+              <h3 className={`text-lg font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+                {state.settings.language === 'fr' ? 'Versions de la Bible' : 'Bible Versions'}
+              </h3>
+
+              <div className="space-y-4">
+                {/* FR */}
+                <div className={`p-4 ${isDark ? 'bg-gray-700' : 'bg-blue-50'} rounded-lg`}>
+                  <div className="flex items-start space-x-3">
+                    <FlagIcon code="fr" />
+                    <div>
+                      <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>Français</h4>
+                      <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-700'} mt-1`}>
+                        {t('frenchVersion')}
+                      </p>
+                      <p className={`text-xs ${isDark ? 'text-white' : 'text-gray-600'} mt-2`}>
+                        {state.settings.language === 'fr'
+                          ? 'Version de référence pour la Bible en français, traduite par Louis Segond en 1910 et révisée en 2025 (modernisation du vocabulaire/grammaire, fidélité aux manuscrits).'
+                          : 'Reference French Bible, translated by Louis Segond in 1910 and refreshed in 2025 (modernized wording/grammar, faithful to the manuscripts).'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* EN */}
+                <div className={`p-4 ${isDark ? 'bg-gray-700' : 'bg-green-50'} rounded-lg`}>
+                  <div className="flex items-start space-x-3">
+                    <FlagIcon code="us" />
+                    <div>
+                      <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>English</h4>
+                      <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-700'} mt-1`}>
+                        {t('englishVersion')}
+                      </p>
+                      <p className={`text-xs ${isDark ? 'text-white' : 'text-gray-600'} mt-2`}>
+                        {state.settings.language === 'fr'
+                          ? 'Version classique en anglais (KJV), publiée en 1611, révisée en 1769 et modernisation limitée en 2025.'
+                          : 'Classic English version (KJV), published in 1611, revised in 1769, with a limited 2025 refresh.'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ouverture à d’autres langues */}
+              <p className={`mt-3 text-xs ${isDark ? 'text-white/80' : 'text-gray-600'}`}>
+                {state.settings.language === 'fr'
+                  ? 'D’autres langues seront ajoutées prochainement.'
+                  : 'More languages will be added soon.'}
+              </p>
             </div>
           </div>
 
@@ -276,17 +327,7 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* 3) Raccourcis de lecture */}
-          <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 mb-6`}>
-            <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-white' : 'text-gray-800'}`}>
-              {state.settings.language === 'fr' ? 'Raccourcis de lecture' : 'Reading shortcuts'}
-            </h2>
-            <div className={`${isDark ? 'text-white' : 'text-gray-800'} w-full text-base leading-relaxed [&>*]:w-full [&_*]:max-w-none`}>
-              <QuickSlotsHelp />
-            </div>
-          </div>
-
-          {/* 4) Mises à jour */}
+          {/* 3) Mises à jour */}
           <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6`}>
             <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-white' : 'text-gray-800'} flex items-center`}>
               <RefreshCcw size={22} className="mr-3" />
