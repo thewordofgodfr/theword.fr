@@ -153,8 +153,9 @@ export default function Settings() {
           : (isDark
               ? 'bg-gray-700 border-gray-600 text-white hover:border-gray-500'
               : 'bg-white border-gray-300 text-gray-800 hover:border-gray-400')}`}
-      style={{ fontSize: '21px' }}  {/* 21px mini dans le bouton */}
+      style={{ fontSize: '21px' }}
     >
+      {/* 21px mini dans le bouton */}
       <div className="flex items-center space-x-3">
         <span className="shrink-0">{flag}</span>
         <div className="text-left">
