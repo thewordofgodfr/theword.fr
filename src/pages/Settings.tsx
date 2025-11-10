@@ -12,7 +12,6 @@ const FlagIcon: React.FC<{ code: 'fr' | 'us'; size?: number; className?: string 
   className = '',
 }) => {
   if (code === 'fr') {
-    // Drapeau France (bleu/blanc/rouge)
     return (
       <span className={`inline-block ${className}`} style={{ width: size * (4 / 3), height: size }}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="France" role="img">
@@ -23,17 +22,13 @@ const FlagIcon: React.FC<{ code: 'fr' | 'us'; size?: number; className?: string 
       </span>
     );
   }
-  // Drapeau USA (stripes + canton simplifié)
   return (
     <span className={`inline-block ${className}`} style={{ width: size * (4 / 3), height: size }}>
       <svg viewBox="0 0 19 10" width="100%" height="100%" aria-label="United States" role="img">
-        {/* Stripes */}
         {Array.from({ length: 13 }).map((_, i) => (
           <rect key={i} x="0" y={(i * 10) / 13} width="19" height={10 / 13} fill={i % 2 === 0 ? '#B22234' : '#FFFFFF'} />
         ))}
-        {/* Canton */}
         <rect x="0" y="0" width="7.6" height={(7 / 13) * 10} fill="#3C3B6E" />
-        {/* Étoiles simplifiées (points) */}
         {Array.from({ length: 9 }).map((_, row) =>
           Array.from({ length: row % 2 === 0 ? 6 : 5 }).map((__, col) => {
             const cols = row % 2 === 0 ? 6 : 5;
@@ -51,12 +46,12 @@ export default function Settings() {
   const { state, updateSettings } = useApp();
   const { t } = useTranslation();
 
-  // Force le thème sombre si besoin (inchangé)
+  // Force le thème sombre si besoin
   useEffect(() => {
     if (state.settings.theme !== 'dark') updateSettings({ theme: 'dark' });
   }, [state.settings.theme, updateSettings]);
 
-  // --- Police par défaut à 25px au tout premier lancement ---
+  // Police par défaut à 25px au premier lancement
   useEffect(() => {
     try {
       const KEY = 'tw_firstRun_v2';
@@ -68,7 +63,7 @@ export default function Settings() {
         typeof current !== 'number' || current < 18 || current > 42 || !allowed.has(current);
 
       if (!seen && currentLooksInvalid) {
-        updateSettings({ fontSize: 25 }); // défaut demandé
+        updateSettings({ fontSize: 25 });
         localStorage.setItem(KEY, '1');
       }
     } catch {
@@ -122,7 +117,7 @@ export default function Settings() {
     }
   };
 
-  // --- Version minimaliste depuis /version.json ---
+  // Version minimaliste depuis /version.json
   type VersionInfo = { version?: string | null };
   const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
   const [versionError, setVersionError] = useState(false);
@@ -142,7 +137,7 @@ export default function Settings() {
     return () => { canceled = true; };
   }, [updateStatus]);
 
-  // --- Bouton langue réutilisable ---
+  // Bouton langue
   const LangButton: React.FC<{
     active: boolean;
     flag: React.ReactNode;
@@ -158,14 +153,15 @@ export default function Settings() {
           : (isDark
               ? 'bg-gray-700 border-gray-600 text-white hover:border-gray-500'
               : 'bg-white border-gray-300 text-gray-800 hover:border-gray-400')}`}
+      style={{ fontSize: '21px' }}  {/* 21px mini dans le bouton */}
     >
       <div className="flex items-center space-x-3">
         <span className="shrink-0">{flag}</span>
         <div className="text-left">
-          <div className={`font-semibold ${active ? 'text-white' : (isDark ? 'text-white' : 'text-gray-800')}`}>
+          <div className={`${active ? 'text-white' : (isDark ? 'text-white' : 'text-gray-800')}`} style={{ lineHeight: 1.25 }}>
             {title}
           </div>
-          <div className={`text-sm ${active ? 'text-white/90' : (isDark ? 'text-white/80' : 'text-gray-600')}`}>
+          <div className={`${active ? 'text-white/90' : (isDark ? 'text-white/80' : 'text-gray-600')}`} style={{ lineHeight: 1.25 }}>
             {subtitle}
           </div>
         </div>
@@ -209,9 +205,9 @@ export default function Settings() {
               />
             </div>
 
-            {/* Explications des versions (déplacées depuis About) */}
-            <div className="mt-6">
-              <h3 className={`text-lg font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+            {/* Explications des versions (21px mini) */}
+            <div className="mt-6" style={{ fontSize: '21px', lineHeight: 1.7 }}>
+              <h3 className={`font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-800'}`}>
                 {state.settings.language === 'fr' ? 'Versions de la Bible' : 'Bible Versions'}
               </h3>
 
@@ -222,10 +218,10 @@ export default function Settings() {
                     <FlagIcon code="fr" />
                     <div>
                       <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>Français</h4>
-                      <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-700'} mt-1`}>
+                      <p className={`${isDark ? 'text-white' : 'text-gray-700'} mt-1`}>
                         {t('frenchVersion')}
                       </p>
-                      <p className={`text-xs ${isDark ? 'text-white' : 'text-gray-600'} mt-2`}>
+                      <p className={`${isDark ? 'text-white' : 'text-gray-600'} mt-2`} style={{ opacity: 0.95 }}>
                         {state.settings.language === 'fr'
                           ? 'Version de référence pour la Bible en français, traduite par Louis Segond en 1910 et révisée en 2025 (modernisation du vocabulaire/grammaire, fidélité aux manuscrits).'
                           : 'Reference French Bible, translated by Louis Segond in 1910 and refreshed in 2025 (modernized wording/grammar, faithful to the manuscripts).'}
@@ -240,10 +236,10 @@ export default function Settings() {
                     <FlagIcon code="us" />
                     <div>
                       <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>English</h4>
-                      <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-700'} mt-1`}>
+                      <p className={`${isDark ? 'text-white' : 'text-gray-700'} mt-1`}>
                         {t('englishVersion')}
                       </p>
-                      <p className={`text-xs ${isDark ? 'text-white' : 'text-gray-600'} mt-2`}>
+                      <p className={`${isDark ? 'text-white' : 'text-gray-600'} mt-2`} style={{ opacity: 0.95 }}>
                         {state.settings.language === 'fr'
                           ? 'Version classique en anglais (KJV), publiée en 1611, révisée en 1769 et modernisation limitée en 2025.'
                           : 'Classic English version (KJV), published in 1611, revised in 1769, with a limited 2025 refresh.'}
@@ -253,8 +249,7 @@ export default function Settings() {
                 </div>
               </div>
 
-              {/* Ouverture à d’autres langues */}
-              <p className={`mt-3 text-xs ${isDark ? 'text-white/80' : 'text-gray-600'}`}>
+              <p className={`mt-3 ${isDark ? 'text-white/80' : 'text-gray-600'}`}>
                 {state.settings.language === 'fr'
                   ? 'D’autres langues seront ajoutées prochainement.'
                   : 'More languages will be added soon.'}
@@ -269,8 +264,8 @@ export default function Settings() {
               {t('appearance')}
             </h2>
 
-            <div>
-              <div className={`block text-sm font-medium mb-4 ${isDark ? 'text-white' : 'text-gray-700'}`}>
+            <div style={{ fontSize: '21px', lineHeight: 1.7 }}>
+              <div className={`block font-medium mb-4 ${isDark ? 'text-white' : 'text-gray-700'}`}>
                 {state.settings.language === 'fr' ? 'Taille de police' : 'Font size'}
               </div>
 
@@ -287,8 +282,9 @@ export default function Settings() {
                           ? 'border-green-500 bg-green-50 text-green-700'
                           : isDark
                           ? 'border-gray-600 bg-gray-700 text-white hover:border-gray-500'
-                          : 'border-gray-300 bg-gray-50 text-gray-600 hover:border-gray-400'
+                          : 'border-gray-300 bg-gray-50 text-gray-700 hover:border-gray-400'
                       }`}
+                      style={{ fontSize: '21px' }}
                     >
                       {value}px
                     </button>
@@ -310,6 +306,7 @@ export default function Settings() {
                           ? 'border-gray-500 bg-gray-700 text-white hover:border-gray-400'
                           : 'border-gray-300 bg-gray-50 text-gray-700 hover:border-gray-400'
                       }`}
+                      style={{ fontSize: '21px' }}
                     >
                       {state.settings.language === 'fr' ? 'Mode Malvoyant (XL)' : 'Low-vision mode (XL)'}
                     </button>
@@ -334,8 +331,8 @@ export default function Settings() {
               {state.settings.language === 'fr' ? 'Mises à jour' : 'Updates'}
             </h2>
 
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className={`${isDark ? 'text-white/80' : 'text-gray-700'} text-sm`}>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3" style={{ fontSize: '21px', lineHeight: 1.6 }}>
+              <div className={`${isDark ? 'text-white/80' : 'text-gray-700'}`}>
                 {state.settings.language === 'fr'
                   ? "Vérifie s'il existe une nouvelle version de l'application et applique-la."
                   : 'Check if a new version is available and apply it.'}
@@ -367,8 +364,8 @@ export default function Settings() {
               </div>
             </div>
 
-            {/* Statut */}
-            <div className="mt-4 text-sm">
+            {/* Statut (21px mini) */}
+            <div className="mt-4" style={{ fontSize: '21px', lineHeight: 1.6 }}>
               {updateStatus === 'checking' && (
                 <p className={isDark ? 'text-white/80' : 'text-gray-700'}>
                   {state.settings.language === 'fr' ? 'Vérification en cours…' : 'Checking…'}
@@ -376,7 +373,7 @@ export default function Settings() {
               )}
               {updateStatus === 'upToDate' && (
                 <p className="text-green-500">
-                  {state.settings.language === 'fr' ? "Votre application est à jour." : 'Your app is up to date.'}
+                  {state.settings.language === 'fr' ? 'Votre application est à jour.' : 'Your app is up to date.'}
                 </p>
               )}
               {updateStatus === 'ready' && (
@@ -403,7 +400,7 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* Footer : Version uniquement */}
+          {/* Footer : Version (on garde petit pour ne pas surcharger l’écran) */}
           <div className="mt-8 text-center text-xs">
             {versionInfo ? (
               <p className={isDark ? 'text-white/70' : 'text-gray-600'}>
@@ -420,4 +417,3 @@ export default function Settings() {
     </div>
   );
 }
-
