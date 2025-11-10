@@ -108,6 +108,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, [state.settings]);
 
+  // THEME
   useEffect(() => {
     try {
       const root = document.documentElement;
@@ -156,6 +157,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return () => media?.removeEventListener?.('change', onChange);
     } catch {}
   }, [state.settings.theme]);
+
+  // >>> FONTS — variable CSS unique pour toute la “copie”
+  useEffect(() => {
+    try {
+      const root = document.documentElement;
+      const fs = normalizeFontSize(state.settings.fontSize);
+      root.style.setProperty('--tw-body-fs', `${fs}px`);                 // taille “contenu”
+      root.style.setProperty('--tw-title-fs', `calc(var(--tw-body-fs) + 4px)`); // titres si besoin (+4px)
+      root.style.setProperty('--tw-chip-fs', `max(14px, calc(var(--tw-body-fs) - 5px))`); // petits chips éventuels
+      (root.style as any).webkitTextSizeAdjust = '100%'; // évite l’agrandissement auto iOS
+    } catch {}
+  }, [state.settings.fontSize]);
 
   const updateSettings = (newSettings: Partial<AppSettings>) => {
     Object.entries(newSettings).forEach(([key, value]) => {
