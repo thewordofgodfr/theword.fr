@@ -19,8 +19,8 @@ export default function About() {
 
   const aboutIntro =
     state.settings.language === 'fr'
-      ? "TheWord est une application (et un site web) simple, rapide et pensée pour le mobile : lecture de la Bible hors-ligne, recherche instantanée, notes thématiques, partage en un geste — et une interface épurée qui s’adapte à votre taille de police. Retrouvez aussi TheWord sur le web : www.theword.fr."
-      : "TheWord is a simple, fast, mobile-first Bible app (and website): offline reading, instant search, thematic notes, one-tap sharing — with a clean UI that adapts to your font size. You can also use TheWord on the web: www.theword.fr.";
+      ? "TheWord: lecture de la Bible hors-ligne, recherche instantanée, notes thématiques, partage en un geste. Retrouvez aussi TheWord sur le web : www.theword.fr."
+      : "TheWord: offline reading, instant search, thematic notes, one-tap sharing. You can also use TheWord on the web: www.theword.fr.";
 
   const notesTitle =
     state.settings.language === 'fr' ? 'Notes' : 'Notes';
@@ -32,16 +32,16 @@ export default function About() {
 
   const notesPoints = state.settings.language === 'fr'
     ? [
-        "Ajoutez des versets (avec leur texte) ou des blocs de texte libre.",
+        "Ajoutez des versets ou des blocs de texte libre.",
         "Touchez un élément pour afficher le menu (Ouvrir en Lecture, Monter/Descendre, Supprimer…).",
-        "Renommez vos listes, copiez/partagez avec une mise en page propre (lien theword.fr inclus).",
-        "Affichage en pleine largeur, police synchronisée avec vos Réglages.",
+        "Renommez vos listes, copiez/partagez.",
+        
       ]
     : [
-        "Add verses (with text) or free-text blocks.",
+        "Add verses or free-text blocks.",
         "Tap an item to open its menu (Open in Reading, Move up/down, Delete…).",
-        "Rename lists, copy/share with clean formatting (theword.fr link included).",
-        "Full-width display, font size synced with your Settings.",
+        "Rename lists, copy/share.",
+        
       ];
 
   return (
