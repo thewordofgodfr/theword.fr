@@ -4,14 +4,16 @@ import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { Heart, Shuffle, List as ListIcon, Search as SearchIcon } from 'lucide-react';
 
+/** Tailles fixes (non dynamiques) */
+const TITLE_PX = 21; // Titre principal
+const H2_PX = 20;    // Sous-titres
+const TEXT_PX = 19;  // Paragraphes et listes
+
 /** QuickSlotsHelp intégré localement pour pouvoir supprimer src/components/QuickSlotsHelp.tsx */
 const QuickSlotsHelpInline: React.FC = () => {
   const { state } = useApp();
   const isDark = state.settings.theme === 'dark';
   const lang = state.settings.language === 'fr' ? 'fr' : 'en';
-
-  // Taille de base liée aux réglages (fallback 19px)
-  const base = Math.max(16, Math.round((state.settings as any)?.fontSize || 19));
 
   // Styles harmonisés avec la page Lecture (pills)
   const CHIP_BASE =
@@ -66,10 +68,10 @@ const QuickSlotsHelpInline: React.FC = () => {
         </span>
       </div>
 
-      {/* Texte explicatif lié au réglage de taille */}
+      {/* Texte explicatif (fixe, 19px) */}
       <p
         className={`${isDark ? 'text-white' : 'text-gray-900'} mt-3`}
-        style={{ fontSize: `${base}px`, lineHeight: 1.7 }}
+        style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
       >
         {copy.intro}
       </p>
@@ -82,11 +84,6 @@ export default function About() {
   const { t } = useTranslation();
 
   const isDark = state.settings.theme === 'dark';
-
-  // Tailles liées au réglage utilisateur (mobile-first)
-  const base = Math.max(16, Math.round((state.settings as any)?.fontSize || 19)); // texte
-  const titleSize = base + 2; // titre "légèrement" plus gros que l'intro
-  const h2Size = base + 1; // sous-titres des blocs
 
   // Intro (FR/EN)
   const aboutIntro =
@@ -119,14 +116,14 @@ export default function About() {
         <header className="mb-5 text-center">
           <h1
             className={`font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}
-            style={{ fontSize: `${titleSize}px`, lineHeight: 1.25 }}
+            style={{ fontSize: `${TITLE_PX}px`, lineHeight: 1.25 }}
           >
             The Word
           </h1>
 
           <p
             className={`${isDark ? 'text-white/90' : 'text-gray-700'} mt-3 leading-relaxed`}
-            style={{ fontSize: `${base}px`, lineHeight: 1.7 }}
+            style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
           >
             {aboutIntro}
           </p>
@@ -137,7 +134,7 @@ export default function About() {
           <section className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-md p-4`}>
             <h2
               className={`mb-4 font-bold flex items-center ${isDark ? 'text-white' : 'text-gray-900'}`}
-              style={{ fontSize: `${h2Size}px` }}
+              style={{ fontSize: `${H2_PX}px` }}
             >
               <Shuffle size={22} className="mr-2 opacity-90" />
               {t('randomFeature')}
@@ -150,21 +147,37 @@ export default function About() {
             >
               <p
                 className={`${isDark ? 'text-white' : 'text-gray-700'} leading-relaxed`}
-                style={{ fontSize: `${base}px`, lineHeight: 1.7 }}
+                style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
               >
                 {t('randomFeatureDesc')}
               </p>
 
               <div className="grid grid-cols-2 gap-3 mt-4">
                 <div className="text-center">
-                  <div className={`text-xl font-extrabold ${isDark ? 'text-blue-300' : 'text-blue-700'}`}>31,000+</div>
-                  <div className={`${isDark ? 'text-white/90' : 'text-gray-700'}`} style={{ fontSize: `${base - 2}px` }}>
+                  <div
+                    className={`font-extrabold ${isDark ? 'text-blue-300' : 'text-blue-700'}`}
+                    style={{ fontSize: `${TITLE_PX}px`, lineHeight: 1.2 }}
+                  >
+                    31,000+
+                  </div>
+                  <div
+                    className={`${isDark ? 'text-white/90' : 'text-gray-700'}`}
+                    style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.4 }}
+                  >
                     {state.settings.language === 'fr' ? 'Versets' : 'Verses'}
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className={`text-xl font-extrabold ${isDark ? 'text-emerald-300' : 'text-emerald-700'}`}>66</div>
-                  <div className={`${isDark ? 'text-white/90' : 'text-gray-700'}`} style={{ fontSize: `${base - 2}px` }}>
+                  <div
+                    className={`font-extrabold ${isDark ? 'text-emerald-300' : 'text-emerald-700'}`}
+                    style={{ fontSize: `${TITLE_PX}px`, lineHeight: 1.2 }}
+                  >
+                    66
+                  </div>
+                  <div
+                    className={`${isDark ? 'text-white/90' : 'text-gray-700'}`}
+                    style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.4 }}
+                  >
                     {state.settings.language === 'fr' ? 'Livres' : 'Books'}
                   </div>
                 </div>
@@ -176,7 +189,7 @@ export default function About() {
           <section className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-md p-4`}>
             <h2
               className={`mb-4 font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}
-              style={{ fontSize: `${h2Size}px` }}
+              style={{ fontSize: `${H2_PX}px` }}
             >
               {state.settings.language === 'fr' ? 'Raccourcis de lecture' : 'Reading shortcuts'}
             </h2>
@@ -189,7 +202,7 @@ export default function About() {
           <section className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-md p-4`}>
             <h2
               className={`mb-3 font-bold flex items-center ${isDark ? 'text-white' : 'text-gray-900'}`}
-              style={{ fontSize: `${h2Size}px` }}
+              style={{ fontSize: `${H2_PX}px` }}
             >
               <ListIcon size={20} className="mr-2 opacity-90" />
               {notesTitle}
@@ -197,7 +210,7 @@ export default function About() {
 
             <div
               className={`${isDark ? 'text-white' : 'text-gray-700'} leading-relaxed`}
-              style={{ fontSize: `${base}px`, lineHeight: 1.7 }}
+              style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
             >
               <p className="mb-3">{notesIntro}</p>
               <ul className="list-disc pl-5 space-y-1.5">
@@ -208,15 +221,15 @@ export default function About() {
             </div>
           </section>
 
-          {/* ====== 5) CRÉÉ AVEC AMOUR (cœur plus grand + mise en page) ====== */}
+          {/* ====== 5) CRÉÉ AVEC AMOUR ====== */}
           <section
             className={`rounded-2xl p-4 text-center shadow-md ${
               isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'
             }`}
           >
             <div className="flex items-center justify-center gap-3">
-              <Heart className={`${isDark ? 'text-rose-300' : 'text-rose-500'}`} size={28} />
-              <span className="font-semibold" style={{ fontSize: `${base}px` }}>
+              <Heart className={`${isDark ? 'text-rose-300' : 'text-rose-500'}`} size={24} />
+              <span className="font-semibold" style={{ fontSize: `${TEXT_PX}px` }}>
                 {state.settings.language === 'fr'
                   ? 'Créé avec amour pour répandre la Parole de Dieu'
                   : "Created with love to spread God's Word"}
@@ -228,7 +241,7 @@ export default function About() {
           <footer className="px-1 pb-2">
             <p
               className={`${isDark ? 'text-white/90' : 'text-gray-600'} text-center`}
-              style={{ fontSize: `${base - 2}px`, lineHeight: 1.6 }}
+              style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.6 }}
             >
               {state.settings.language === 'fr'
                 ? 'Toutes les versions bibliques utilisées sont dans le domaine public. Certaines ont été partiellement modernisées (vocabulaire, grammaire) tout en restant strictement fidèles aux manuscrits originaux.'
@@ -240,4 +253,3 @@ export default function About() {
     </div>
   );
 }
-
