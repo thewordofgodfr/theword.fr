@@ -60,14 +60,13 @@ export default function Reading() {
 
   // Overlay d’anneau bleu lumineux (fin) pour l’état actif des boutons 1/2/3
   const LUMI_RING_OVERLAY =
-    'absolute inset-[-3px] rounded-full pointer-events-none ring-2 ring-blue-400 ' +
-    'shadow-[0_0_10px_2px_rgba(59,130,246,0.85)]';
+    'absolute inset-[-3px] rounded-full pointer-events-none ring-2 ring-blue-400 shadow-[0_0_10px_2px_rgba(59,130,246,0.85)]';
 
   type SlotKey = 1 | 2 | 3;
   const SLOT_THEMES: Record<SlotKey, { solid: string; solidHover: string; mobileBtn: string; mobileBtnHover: string; lightPaper: string; }> = {
-    1: { solid: 'bg-amber-600 text-white', solidHover: 'hover:bg-amber-500', mobileBtn: 'bg-amber-600 text-white', mobileBtnHover: 'hover:bg-amber-500', lightPaper: 'bg-amber-50' },
-    2: { solid: 'bg-violet-600 text-white', solidHover: 'hover:bg-violet-500', mobileBtn: 'bg-violet-600 text-white', mobileBtnHover: 'hover:bg-violet-500', lightPaper: 'bg-violet-50' },
-    3: { solid: 'bg-emerald-600 text-white', solidHover: 'hover:bg-emerald-500', mobileBtn: 'bg-emerald-600 text-white', mobileBtnHover: 'hover:bg-emerald-500', lightPaper: 'bg-emerald-50' },
+    1: { solid: 'bg-amber-600 text-white',   solidHover: 'hover:bg-amber-500',  mobileBtn: 'bg-amber-600 text-white',  mobileBtnHover: 'hover:bg-amber-500',  lightPaper: 'bg-amber-50' },
+    2: { solid: 'bg-violet-600 text-white',  solidHover: 'hover:bg-violet-500', mobileBtn: 'bg-violet-600 text-white', mobileBtnHover: 'hover:bg-violet-500', lightPaper: 'bg-violet-50' },
+    3: { solid: 'bg-emerald-600 text-white', solidHover: 'hover:bg-emerald-500',mobileBtn: 'bg-emerald-600 text-white',mobileBtnHover: 'hover:bg-emerald-500',lightPaper: 'bg-emerald-50' },
   };
 
   const fetchChapter = async (book: BibleBook, chapterNum: number) => {
@@ -541,12 +540,12 @@ export default function Reading() {
                     <h2 className="font-semibold text-white text-sm md:text-base flex flex-col md:flex-row md:items-center gap-2 w-full">
                       {/* MOBILE */}
                       <div className="flex w-full items-center gap-2 overflow-hidden md:hidden">
-                        {/* Livre (mobile) */}
+                        {/* Livre (mobile) — reprend la couleur du slot actif (1/2/3) */}
                         <button
                           type="button"
                           onClick={() => setShowBookPicker(true)}
                           aria-expanded={showBookPicker}
-                          className="min-w-0 inline-flex items-center justify-between gap-1 rounded-md px-2 py-1 text-sm leading-none font-semibold shadow active:scale-95 focus:outline-none focus:ring-2 bg-blue-600 text-white hover:bg-blue-500 focus:ring-blue-400 flex-1"
+                          className={`min-w-0 inline-flex items-center justify-between gap-1 rounded-md px-2 py-1 text-sm leading-none font-semibold shadow active:scale-95 focus:outline-none focus:ring-2 ${activeTheme ? `${activeTheme.mobileBtn} ${activeTheme.mobileBtnHover}` : 'bg-blue-600 text-white hover:bg-blue-500'} focus:ring-blue-400 flex-1`}
                           title={getBookName(selectedBook)}
                           aria-label={state.settings.language === 'fr' ? 'Choisir un livre' : 'Choose a book'}
                         >
@@ -554,12 +553,12 @@ export default function Reading() {
                           <ChevronDown className="w-3.5 h-3.5 opacity-90" />
                         </button>
 
-                        {/* Chapitre (mobile) */}
+                        {/* Chapitre (mobile) — idem couleur que slot actif */}
                         <button
                           type="button"
                           onClick={() => setShowChapterPicker(true)}
                           aria-expanded={showChapterPicker}
-                          className="min-w-0 inline-flex items-center justify-between gap-1 rounded-md px-2 py-1 text-sm leading-none font-semibold shadow active:scale-95 focus:outline-none focus:ring-2 bg-blue-600 text-white hover:bg-blue-500 focus:ring-blue-400 flex-none shrink-0 whitespace-nowrap"
+                          className={`min-w-0 inline-flex items-center justify-between gap-1 rounded-md px-2 py-1 text-sm leading-none font-semibold shadow active:scale-95 focus:outline-none focus:ring-2 ${activeTheme ? `${activeTheme.mobileBtn} ${activeTheme.mobileBtnHover}` : 'bg-blue-600 text-white hover:bg-blue-500'} focus:ring-blue-400 flex-none shrink-0 whitespace-nowrap`}
                           title={state.settings.language === 'fr' ? 'Choisir un chapitre' : 'Choose a chapter'}
                           aria-label={state.settings.language === 'fr' ? 'Choisir un chapitre' : 'Choose a chapter'}
                         >
@@ -573,9 +572,12 @@ export default function Reading() {
                             const s = quickSlots[i];
                             const filled = s !== null;
                             const isNumeric = i !== 0;
+
+                            // >> Taille réduite des 1/2/3 pour matcher la loupe (hauteur visuelle)
                             const base = isNumeric
-                              ? 'relative w-10 h-10 rounded-full text-sm font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all'
+                              ? 'relative w-8 h-8 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all'
                               : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all';
+
                             let cls = '';
                             if (i === 0) {
                               cls = lastTappedSlot === 0 ? 'bg-blue-600 text-white hover:bg-blue-500' :
@@ -584,11 +586,13 @@ export default function Reading() {
                               const theme = SLOT_THEMES[i as SlotKey];
                               cls = filled ? `${theme.solid} ${theme.solidHover}` : 'bg-gray-800 text-white border border-gray-600';
                             }
+
                             const title =
                               i === 0
                                 ? (s ? `Recherche : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : 'Recherche (vide)')
                                 : (s ? `Mémoire ${i} : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : `Mémoire ${i} (vide)`);
                             const isPressed = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
+
                             return (
                               <button
                                 key={`qs-m-${i}`}
@@ -628,9 +632,12 @@ export default function Reading() {
                         const s = quickSlots[i];
                         const filled = s !== null;
                         const isNumeric = i !== 0;
+
+                        // >> Taille réduite desktop aussi
                         const base = isNumeric
-                          ? 'relative w-9 h-9 rounded-full text-xs font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all'
+                          ? 'relative w-8 h-8 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all'
                           : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all';
+
                         let cls = '';
                         if (i === 0) {
                           cls = lastTappedSlot === 0 ? 'bg-blue-600 text-white hover:bg-blue-500' :
@@ -879,7 +886,7 @@ export default function Reading() {
           )}
           {copiedKey === 'shared-fallback' && (
             <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-blue-600 text-white z-50">
-              {state.settings.language === 'fr' ? 'Texte prêt à partager (copié)' : 'Text ready to share (copied)'}
+            {state.settings.language === 'fr' ? 'Texte prêt à partager (copié)' : 'Text ready to share (copied)'}
             </div>
           )}
           {copiedKey === 'added-to-list' && (
