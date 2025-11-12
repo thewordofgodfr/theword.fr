@@ -790,7 +790,7 @@ export default function Reading() {
                 <div className="columns-2 md:columns-3 lg:columns-4 gap-2 mb-6">
                   {oldTestamentBooks.map(book => (
                     <button key={`ot-${book.name}`} onClick={() => handleBookSelect(book)}
-                      className={`w-full inline-block mb-2 break-inside-avoid px-3 py-2 rounded-lg text-base ${
+                      className={`w-full inline-block mb-2 break-inside-avoid px-3 py-2 rounded-lg text-lg ${
                         selectedBook?.name === book.name ? (isDark ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800')
                         : (isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-800 hover:bg-gray-200')
                       }`}>
@@ -803,7 +803,7 @@ export default function Reading() {
                 <div className="columns-2 md:columns-3 lg:columns-4 gap-2 pb-10">
                   {newTestamentBooks.map(book => (
                     <button key={`nt-${book.name}`} onClick={() => handleBookSelect(book)}
-                      className={`w-full inline-block mb-2 break-inside-avoid px-3 py-2 rounded-lg text-base ${
+                      className={`w-full inline-block mb-2 break-inside-avoid px-3 py-2 rounded-lg text-lg ${
                         selectedBook?.name === book.name ? (isDark ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800')
                         : (isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-800 hover:bg-gray-200')
                       }`}>
@@ -833,7 +833,7 @@ export default function Reading() {
                       : (isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-100 text-gray-800 hover:bg-gray-200');
                     return (
                       <button key={`chap-${num}`} onClick={() => { handleChapterSelect(num); setShowChapterPicker(false); }}
-                        className={`h-10 rounded-lg text-base font-medium ${active}`} aria-current={num === selectedChapter ? 'page' : undefined}>
+                        className={`h-10 rounded-lg text-lg font-medium ${active}`} aria-current={num === selectedChapter ? 'page' : undefined}>
                         {num}
                       </button>
                     );
