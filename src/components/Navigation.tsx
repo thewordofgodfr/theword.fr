@@ -1,7 +1,15 @@
 import React from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
-import { Home, Search as SearchIcon, BookOpen, Settings as SettingsIcon, Info, List as ListIcon } from 'lucide-react';
+import {
+  Home,
+  Search as SearchIcon,
+  BookOpen,
+  Settings as SettingsIcon,
+  Info,
+  List as ListIcon,
+  BookMarked
+} from 'lucide-react';
 
 export default function Navigation() {
   const { state, dispatch } = useApp();
@@ -9,14 +17,16 @@ export default function Navigation() {
   const isDark = state.settings.theme === 'dark';
 
   const labelNotes = state.settings.language === 'fr' ? 'Notes' : 'Notes';
+  const labelPrincipes = state.settings.language === 'fr' ? 'Principes' : 'Studies';
 
   const navItems = [
-    { id: 'home',     icon: Home,        label: t('home') },
-    { id: 'search',   icon: SearchIcon,  label: t('search') },
-    { id: 'reading',  icon: BookOpen,    label: t('reading') },
-    { id: 'notes',    icon: ListIcon,    label: labelNotes },
-    { id: 'settings', icon: SettingsIcon,label: t('settings') },
-    { id: 'about',    icon: Info,        label: t('about') },
+    { id: 'home',       icon: Home,        label: t('home') },
+    { id: 'search',     icon: SearchIcon,  label: t('search') },
+    { id: 'reading',    icon: BookOpen,    label: t('reading') },
+    { id: 'notes',      icon: ListIcon,    label: labelNotes },
+    { id: 'principes',  icon: BookMarked,  label: labelPrincipes }, // <- NOUVEL ONGLET
+    { id: 'settings',   icon: SettingsIcon,label: t('settings') },
+    { id: 'about',      icon: Info,        label: t('about') },
   ] as const;
 
   const baseBtn  = 'transition-all duration-200 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500';
@@ -34,12 +44,10 @@ export default function Navigation() {
         isDark ? 'border-b border-gray-700 shadow-sm' : 'border-b border-gray-200 shadow-sm',
         'transition-colors duration-200',
       ].join(' ')}
-      /* safe-area Android/iOS pour éviter tout décalage visuel */
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
         <div className="h-16 flex items-center">
-          {/* Pas de wrap, défilement horizontal discret si ça ne rentre pas */}
           <div className="flex flex-1 items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar justify-between sm:justify-center">
             {navItems.map(({ id, icon: Icon, label }) => {
               const active = state.currentPage === (id as any);
@@ -52,12 +60,11 @@ export default function Navigation() {
                   className={[
                     baseBtn,
                     'px-3 py-2 flex flex-col sm:flex-row items-center sm:gap-2',
-                    'flex-shrink-0 min-w-[52px] sm:min-w-0', // évite le wrap sur mobile
+                    'flex-shrink-0 min-w-[52px] sm:min-w-0',
                     active ? activeBtn : idleBtn,
                   ].join(' ')}
                 >
                   <Icon size={20} className="shrink-0" />
-                  {/* On cache le texte < sm pour gagner de la place */}
                   <span className="hidden sm:inline text-sm leading-none">{label}</span>
                 </button>
               );
