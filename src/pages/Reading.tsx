@@ -573,7 +573,8 @@ export default function Reading() {
                             // ronds 1/2/3 plus petits, police inchangée + box-border pour garder le diamètre extérieur
                             const base = isNumeric
                               ? 'relative overflow-visible w-7 h-7 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
-                              : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all';
+                              // MODIF UNIQUEMENT LOUPE: ajouter box-border (pour que l’anneau interne n’impacte pas la taille)
+                              : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all box-border';
 
                             let cls = '';
                             if (i === 0) {
@@ -584,7 +585,7 @@ export default function Reading() {
                               cls = filled ? `${theme.solid} ${theme.solidHover}` : 'bg-gray-800 text-white border border-gray-600';
                             }
 
-                            // Cercle bleu au périmètre (pas de halo) quand actif
+                            // Cercle bleu au périmètre (pas de halo) quand actif — NE PAS TOUCHER (1/2/3)
                             const activePerimeter = isNumeric && activeSlot === i ? 'border-2 border-blue-400' : '';
 
                             const title =
@@ -593,10 +594,13 @@ export default function Reading() {
                                 : (s ? `Mémoire ${i} : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : `Mémoire ${i} (vide)`);
                             const isPressed = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
 
+                            // AJOUT UNIQUEMENT LOUPE: anneau interne visible quand sélectionnée (pas de halo externe)
+                            const loupeActiveRing = (i === 0 && isPressed) ? 'ring-2 ring-inset ring-sky-300' : '';
+
                             return (
                               <button
                                 key={`qs-m-${i}`}
-                                className={`${base} ${cls} ${activePerimeter}`}
+                                className={`${base} ${cls} ${activePerimeter} ${loupeActiveRing}`}
                                 onClick={() => jumpToSlot(i)}
                                 aria-label={title}
                                 title={title}
@@ -632,7 +636,8 @@ export default function Reading() {
 
                         const base = isNumeric
                           ? 'relative overflow-visible w-7 h-7 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
-                          : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all';
+                          // MODIF UNIQUEMENT LOUPE: ajouter box-border ici aussi
+                          : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all box-border';
 
                         let cls = '';
                         if (i === 0) {
@@ -643,7 +648,7 @@ export default function Reading() {
                           cls = filled ? `${theme.solid} ${theme.solidHover}` : 'bg-gray-800 text-white border border-gray-600';
                         }
 
-                        // Cercle bleu au périmètre (pas de halo) quand actif
+                        // Cercle bleu au périmètre (pas de halo) quand actif — NE PAS TOUCHER (1/2/3)
                         const activePerimeter = isNumeric && activeSlot === i ? 'border-2 border-blue-400' : '';
 
                         const title =
@@ -651,10 +656,14 @@ export default function Reading() {
                             ? (s ? `Recherche : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : 'Recherche (vide)')
                             : (s ? `Mémoire ${i} : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : `Mémoire ${i} (vide)`);
                         const isPressed = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
+
+                        // AJOUT UNIQUEMENT LOUPE: anneau interne visible quand sélectionnée
+                        const loupeActiveRing = (i === 0 && isPressed) ? 'ring-2 ring-inset ring-sky-300' : '';
+
                         return (
                           <button
                             key={`qs-d-${i}`}
-                            className={`${base} ${cls} ${activePerimeter}`}
+                            className={`${base} ${cls} ${activePerimeter} ${loupeActiveRing}`}
                             onClick={() => jumpToSlot(i)}
                             aria-label={title}
                             title={title}
