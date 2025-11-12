@@ -58,11 +58,7 @@ export default function Reading() {
   // Mode sombre fixe
   const isDark = true;
 
-  // Halo bleu très lumineux au périmètre des boutons 1/2/3 actifs
-  const LUMI_RING_OVERLAY =
-    'absolute inset-[-2px] rounded-full pointer-events-none ring-2 ring-blue-400 ' +
-    'shadow-[0_0_18px_6px_rgba(59,130,246,0.95)]';
-
+  // Thèmes des slots
   type SlotKey = 1 | 2 | 3;
   const SLOT_THEMES: Record<SlotKey, { solid: string; solidHover: string; mobileBtn: string; mobileBtnHover: string; lightPaper: string; }> = {
     1: { solid: 'bg-amber-600 text-white',   solidHover: 'hover:bg-amber-500',  mobileBtn: 'bg-amber-600 text-white',  mobileBtnHover: 'hover:bg-amber-500',  lightPaper: 'bg-amber-50' },
@@ -574,9 +570,9 @@ export default function Reading() {
                             const filled = s !== null;
                             const isNumeric = i !== 0;
 
-                            // *** ronds 1/2/3 plus petits, police inchangée ***
+                            // ronds 1/2/3 plus petits, police inchangée + box-border pour garder le diamètre extérieur
                             const base = isNumeric
-                              ? 'relative overflow-visible w-7 h-7 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all'
+                              ? 'relative overflow-visible w-7 h-7 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
                               : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all';
 
                             let cls = '';
@@ -588,6 +584,9 @@ export default function Reading() {
                               cls = filled ? `${theme.solid} ${theme.solidHover}` : 'bg-gray-800 text-white border border-gray-600';
                             }
 
+                            // Cercle bleu au périmètre (pas de halo) quand actif
+                            const activePerimeter = isNumeric && activeSlot === i ? 'border-2 border-blue-400' : '';
+
                             const title =
                               i === 0
                                 ? (s ? `Recherche : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : 'Recherche (vide)')
@@ -597,17 +596,13 @@ export default function Reading() {
                             return (
                               <button
                                 key={`qs-m-${i}`}
-                                className={`${base} ${cls}`}
+                                className={`${base} ${cls} ${activePerimeter}`}
                                 onClick={() => jumpToSlot(i)}
                                 aria-label={title}
                                 title={title}
                                 aria-pressed={isPressed}
                                 aria-current={isPressed ? 'true' : undefined}
                               >
-                                {/* Halo lumineux périmétrique quand actif */}
-                                {isNumeric && activeSlot === i && (
-                                  <span className={LUMI_RING_OVERLAY} aria-hidden="true" />
-                                )}
                                 {i === 0 ? <SearchIcon className="w-4 h-4" /> : <span className="relative z-[1]">{i}</span>}
                               </button>
                             );
@@ -636,7 +631,7 @@ export default function Reading() {
                         const isNumeric = i !== 0;
 
                         const base = isNumeric
-                          ? 'relative overflow-visible w-7 h-7 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all'
+                          ? 'relative overflow-visible w-7 h-7 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
                           : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all';
 
                         let cls = '';
@@ -647,6 +642,10 @@ export default function Reading() {
                           const theme = SLOT_THEMES[i as SlotKey];
                           cls = filled ? `${theme.solid} ${theme.solidHover}` : 'bg-gray-800 text-white border border-gray-600';
                         }
+
+                        // Cercle bleu au périmètre (pas de halo) quand actif
+                        const activePerimeter = isNumeric && activeSlot === i ? 'border-2 border-blue-400' : '';
+
                         const title =
                           i === 0
                             ? (s ? `Recherche : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : 'Recherche (vide)')
@@ -655,23 +654,20 @@ export default function Reading() {
                         return (
                           <button
                             key={`qs-d-${i}`}
-                            className={`${base} ${cls}`}
+                            className={`${base} ${cls} ${activePerimeter}`}
                             onClick={() => jumpToSlot(i)}
                             aria-label={title}
                             title={title}
                             aria-pressed={isPressed}
                             aria-current={isPressed ? 'true' : undefined}
                           >
-                            {isNumeric && activeSlot === i && (
-                              <span className={LUMI_RING_OVERLAY} aria-hidden="true" />
-                            )}
                             {i === 0 ? <SearchIcon className="w-4 h-4" /> : <span className="relative z-[1]">{i}</span>}
                           </button>
                         );
                       })}
                     </div>
 
-                    {/* PC = mêmes sélecteurs que mobile : 2 boutons (Livres / Chapitre) avec thème actif */}
+                    {/* PC = mêmes sélecteurs que mobile : Livres / Chapitre avec thème actif */}
                     <button
                       onClick={() => setShowBookPicker(true)}
                       className={`px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm
@@ -693,7 +689,7 @@ export default function Reading() {
                       <ChevronDown className="w-3.5 h-3.5 opacity-90" />
                     </button>
 
-                    {/* Flèches de navigation conservées */}
+                    {/* Flèches de navigation */}
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handlePrevUnit()}
