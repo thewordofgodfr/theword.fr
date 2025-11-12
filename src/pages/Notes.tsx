@@ -59,6 +59,17 @@ function buildPlainListText(list: VerseList): string {
   return lines.join('\n');
 }
 
+/** Construit le texte pour UN SEUL élément (verset ou bloc texte) */
+function buildItemPlainText(it: AnyItem): string {
+  const isText = it.bookId === TEXT_SENTINEL;
+  if (isText) {
+    return String(it.text ?? '').trim();
+  }
+  const ref = `${(it.bookName ?? it.bookId) || ''} ${it.chapter}:${it.verse}`.trim();
+  const body = String(it.text ?? '').trim();
+  return body ? `${ref}\n${body}` : ref;
+}
+
 export default function Notes() {
   const { state, setPage } = useApp();
   const { t } = useTranslation();
@@ -179,6 +190,34 @@ export default function Notes() {
       alert(label.copied + ' ✅');
     } catch {}
   };
+
+  // --- NOUVEAU : opérations de copie/partage pour UN élément (verset) ---
+  const copyItemText = async (it: AnyItem) => {
+    const txt = buildItemPlainText(it);
+    if (!txt) return;
+    try {
+      await navigator.clipboard.writeText(txt);
+      alert(label.copied + ' ✅');
+    } catch {}
+  };
+
+  const shareItem = async (it: AnyItem) => {
+    const payload = buildItemPlainText(it) + '\n\nhttps://www.theword.fr\n';
+    try {
+      const nav: any = navigator;
+      if (nav?.share) {
+        await nav.share({ title: 'Verset', text: payload });
+      } else {
+        await navigator.clipboard.writeText(payload);
+        alert(
+          (state.settings.language === 'fr'
+            ? 'Texte prêt à partager (copié)'
+            : 'Text ready to share (copied)') + ' ✅'
+        );
+      }
+    } catch {}
+  };
+  // ---------------------------------------------------------------
 
   // ---------- opérations sur items ----------
   const updateItems = (listId: string, updater: (items: AnyItem[]) => AnyItem[]) => {
@@ -444,12 +483,36 @@ export default function Notes() {
                                     }`}
                                   >
                                     {!isText && (
-                                      <button
-                                        onClick={openInReading}
-                                        className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-500"
-                                      >
-                                        {label.open}
-                                      </button>
+                                      <>
+                                        <button
+                                          onClick={openInReading}
+                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-500"
+                                        >
+                                          {label.open}
+                                        </button>
+
+                                        {/* NOUVEAU : Copier ce verset */}
+                                        <button
+                                          onClick={() => copyItemText(it)}
+                                          className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
+                                            isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
+                                          }`}
+                                          title="Copier"
+                                        >
+                                          <Copy size={16} />
+                                          Copier
+                                        </button>
+
+                                        {/* NOUVEAU : Partager ce verset */}
+                                        <button
+                                          onClick={() => shareItem(it)}
+                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500"
+                                          title="Partager"
+                                        >
+                                          <Share2 size={16} />
+                                          Partager
+                                        </button>
+                                      </>
                                     )}
 
                                     {/* Modifier (uniquement pour bloc de texte) */}
@@ -539,5 +602,4 @@ export default function Notes() {
     </div>
   );
 }
-
 
