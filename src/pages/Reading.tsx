@@ -71,6 +71,9 @@ export default function Reading() {
     3: { solid: 'bg-emerald-600 text-white', solidHover: 'hover:bg-emerald-500', ring: 'ring-emerald-400', mobileBtn: 'bg-emerald-600 text-white', mobileBtnHover: 'hover:bg-emerald-500', lightPaper: 'bg-emerald-50' },
   };
 
+  // Halo bleu commun pour l’état sélectionné des boutons 1/2/3 (mobile + desktop)
+  const SELECTED_SLOT_HALO = 'ring-2 ring-blue-400 ring-offset-1 shadow-lg';
+
   const fetchChapter = async (book: BibleBook, chapterNum: number) => {
     setLoading(true);
     try { setChapter(await getChapter(book.name, chapterNum, state.settings.language)); }
@@ -581,7 +584,7 @@ export default function Reading() {
                           {[0, 1, 2, 3].map((i) => {
                             const s = quickSlots[i];
                             const filled = s !== null;
-                            const base = 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1';
+                            const base = 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all';
                             let cls = '';
                             if (i === 0) {
                               cls = lastTappedSlot === 0 ? 'bg-blue-600 text-white hover:bg-blue-500' :
@@ -590,14 +593,22 @@ export default function Reading() {
                               const theme = SLOT_THEMES[i as SlotKey];
                               cls = filled ? `${theme.solid} ${theme.solidHover}` :
                                 (isDark ? 'bg-gray-800 text-white border border-gray-600' : 'bg-white text-gray-800 border border-gray-300');
-                              if (activeSlot === i) cls += ` ring-2 ring-offset-1 ${theme.ring}`;
+                              if (activeSlot === i) cls += ` ${SELECTED_SLOT_HALO}`;
                             }
                             const title =
                               i === 0
                                 ? (s ? `Recherche : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : 'Recherche (vide)')
                                 : (s ? `Mémoire ${i} : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : `Mémoire ${i} (vide)`);
+                            const isPressed = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
                             return (
-                              <button key={`qs-m-${i}`} className={`${base} ${cls}`} onClick={() => jumpToSlot(i)} aria-label={title} title={title}>
+                              <button
+                                key={`qs-m-${i}`}
+                                className={`${base} ${cls}`}
+                                onClick={() => jumpToSlot(i)}
+                                aria-label={title}
+                                title={title}
+                                aria-pressed={isPressed}
+                              >
                                 {i === 0 ? <SearchIcon className="w-4 h-4" /> : <span>{i}</span>}
                               </button>
                             );
@@ -622,7 +633,7 @@ export default function Reading() {
                       {[0,1,2,3].map((i) => {
                         const s = quickSlots[i];
                         const filled = s !== null;
-                        const base = 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1';
+                        const base = 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all';
                         let cls = '';
                         if (i === 0) {
                           cls = lastTappedSlot === 0 ? 'bg-blue-600 text-white hover:bg-blue-500' :
@@ -631,14 +642,22 @@ export default function Reading() {
                           const theme = SLOT_THEMES[i as SlotKey];
                           cls = filled ? `${theme.solid} ${theme.solidHover}` :
                             (isDark ? 'bg-gray-800 text-white border border-gray-600' : 'bg-white text-gray-800 border border-gray-300');
-                          if (activeSlot === i) cls += ` ring-2 ring-offset-1 ${theme.ring}`;
+                          if (activeSlot === i) cls += ` ${SELECTED_SLOT_HALO}`;
                         }
                         const title =
                           i === 0
                             ? (s ? `Recherche : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : 'Recherche (vide)')
                             : (s ? `Mémoire ${i} : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : `Mémoire ${i} (vide)`);
+                        const isPressed = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
                         return (
-                          <button key={`qs-d-${i}`} className={`${base} ${cls}`} onClick={() => jumpToSlot(i)} aria-label={title} title={title}>
+                          <button
+                            key={`qs-d-${i}`}
+                            className={`${base} ${cls}`}
+                            onClick={() => jumpToSlot(i)}
+                            aria-label={title}
+                            title={title}
+                            aria-pressed={isPressed}
+                          >
                             {i === 0 ? <SearchIcon className="w-4 h-4" /> : <span>{i}</span>}
                           </button>
                         );
@@ -995,5 +1014,4 @@ export default function Reading() {
     </div>
   );
 }
-
 
