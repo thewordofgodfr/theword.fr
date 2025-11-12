@@ -58,9 +58,10 @@ export default function Reading() {
   // Mode sombre fixe
   const isDark = true;
 
-  // Overlay d’anneau bleu lumineux (fin) pour l’état actif des boutons 1/2/3
+  // Halo bleu très lumineux au périmètre des boutons 1/2/3 actifs
   const LUMI_RING_OVERLAY =
-    'absolute inset-[-3px] rounded-full pointer-events-none ring-2 ring-blue-400 shadow-[0_0_10px_2px_rgba(59,130,246,0.85)]';
+    'absolute inset-[-2px] rounded-full pointer-events-none ring-2 ring-blue-400 ' +
+    'shadow-[0_0_18px_6px_rgba(59,130,246,0.95)]';
 
   type SlotKey = 1 | 2 | 3;
   const SLOT_THEMES: Record<SlotKey, { solid: string; solidHover: string; mobileBtn: string; mobileBtnHover: string; lightPaper: string; }> = {
@@ -540,7 +541,7 @@ export default function Reading() {
                     <h2 className="font-semibold text-white text-sm md:text-base flex flex-col md:flex-row md:items-center gap-2 w-full">
                       {/* MOBILE */}
                       <div className="flex w-full items-center gap-2 overflow-hidden md:hidden">
-                        {/* Livre (mobile) — reprend la couleur du slot actif (1/2/3) */}
+                        {/* Livre (mobile) — couleur = slot actif */}
                         <button
                           type="button"
                           onClick={() => setShowBookPicker(true)}
@@ -553,7 +554,7 @@ export default function Reading() {
                           <ChevronDown className="w-3.5 h-3.5 opacity-90" />
                         </button>
 
-                        {/* Chapitre (mobile) — idem couleur que slot actif */}
+                        {/* Chapitre (mobile) — idem */}
                         <button
                           type="button"
                           onClick={() => setShowChapterPicker(true)}
@@ -573,9 +574,9 @@ export default function Reading() {
                             const filled = s !== null;
                             const isNumeric = i !== 0;
 
-                            // >> Taille réduite des 1/2/3 pour matcher la loupe (hauteur visuelle)
+                            // *** ronds 1/2/3 plus petits, police inchangée ***
                             const base = isNumeric
-                              ? 'relative w-8 h-8 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all'
+                              ? 'relative overflow-visible w-7 h-7 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all'
                               : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all';
 
                             let cls = '';
@@ -603,7 +604,7 @@ export default function Reading() {
                                 aria-pressed={isPressed}
                                 aria-current={isPressed ? 'true' : undefined}
                               >
-                                {/* Anneau lumineux pour 1/2/3 quand actif */}
+                                {/* Halo lumineux périmétrique quand actif */}
                                 {isNumeric && activeSlot === i && (
                                   <span className={LUMI_RING_OVERLAY} aria-hidden="true" />
                                 )}
@@ -627,15 +628,15 @@ export default function Reading() {
 
                   {/* Desktop : actions à droite */}
                   <div className="hidden md:flex items-center gap-2 ml-auto">
+                    {/* Loupe + slots (desktop) — mêmes tailles/couleurs que mobile */}
                     <div className="flex items-center gap-2 mr-2">
                       {[0,1,2,3].map((i) => {
                         const s = quickSlots[i];
                         const filled = s !== null;
                         const isNumeric = i !== 0;
 
-                        // >> Taille réduite desktop aussi
                         const base = isNumeric
-                          ? 'relative w-8 h-8 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all'
+                          ? 'relative overflow-visible w-7 h-7 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all'
                           : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all';
 
                         let cls = '';
@@ -661,7 +662,6 @@ export default function Reading() {
                             aria-pressed={isPressed}
                             aria-current={isPressed ? 'true' : undefined}
                           >
-                            {/* Anneau lumineux pour 1/2/3 quand actif */}
                             {isNumeric && activeSlot === i && (
                               <span className={LUMI_RING_OVERLAY} aria-hidden="true" />
                             )}
@@ -671,28 +671,35 @@ export default function Reading() {
                       })}
                     </div>
 
-                    <button onClick={() => setShowBookPicker(true)} className="px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm bg-blue-600 text-white hover:bg-blue-500">
+                    {/* PC = mêmes sélecteurs que mobile : 2 boutons (Livres / Chapitre) avec thème actif */}
+                    <button
+                      onClick={() => setShowBookPicker(true)}
+                      className={`px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm
+                        ${activeTheme ? activeTheme.solid : 'bg-blue-600 text-white'}
+                        ${activeTheme ? activeTheme.solidHover : 'hover:bg-blue-500'}`}
+                      title={state.settings.language === 'fr' ? 'Choisir un livre' : 'Choose a book'}
+                    >
                       {state.settings.language === 'fr' ? 'Livres' : 'Books'}
                     </button>
 
+                    <button
+                      onClick={() => setShowChapterPicker(true)}
+                      className={`px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm inline-flex items-center gap-1
+                        ${activeTheme ? activeTheme.solid : 'bg-blue-600 text-white'}
+                        ${activeTheme ? activeTheme.solidHover : 'hover:bg-blue-500'}`}
+                      title={state.settings.language === 'fr' ? 'Choisir un chapitre' : 'Choose a chapter'}
+                    >
+                      {t('chapter')} {selectedChapter}
+                      <ChevronDown className="w-3.5 h-3.5 opacity-90" />
+                    </button>
+
+                    {/* Flèches de navigation conservées */}
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handlePrevUnit()}
                         className="p-1.5 rounded-md transition-all bg-gray-700 text-white hover:bg-gray-600"
                         title={state.settings.language === 'fr' ? 'Chapitre précédent' : 'Previous chapter'}
                       ><ChevronLeft className="w-4 h-4" /></button>
-
-                      <div className="relative">
-                        <select
-                          value={selectedChapter}
-                          onChange={(e) => handleChapterSelect(Number(e.target.value))}
-                          className="appearance-none bg-gray-700 border-gray-600 text-white border rounded-md px-3 py-1.5 pr-7 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                          title={state.settings.language === 'fr' ? 'Choisir chapitre' : 'Choose chapter'}
-                        >
-                          {selectedBook ? Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map(num => (<option key={num} value={num}>{num}</option>)) : null}
-                        </select>
-                        <ChevronDown className="w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-white/80" />
-                      </div>
 
                       <button
                         onClick={() => handleNextUnit()}
