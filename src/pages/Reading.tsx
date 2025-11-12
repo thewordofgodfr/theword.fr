@@ -56,6 +56,11 @@ export default function Reading() {
   }, [state.settings.language]);
 
   const isDark = state.settings.theme === 'dark';
+  // Anneau bleu très visible pour les boutons 1/2/3 actifs (cercle)
+  const RING_ON = isDark
+    ? 'ring-4 ring-blue-400 ring-offset-2 ring-offset-gray-900'
+    : 'ring-4 ring-blue-600 ring-offset-2 ring-offset-white';
+
   useEffect(() => {
     const prevBg = document.body.style.backgroundColor;
     const prevOverflowX = document.body.style.overflowX;
@@ -70,9 +75,6 @@ export default function Reading() {
     2: { solid: 'bg-violet-600 text-white', solidHover: 'hover:bg-violet-500', ring: 'ring-violet-400', mobileBtn: 'bg-violet-600 text-white', mobileBtnHover: 'hover:bg-violet-500', lightPaper: 'bg-violet-50' },
     3: { solid: 'bg-emerald-600 text-white', solidHover: 'hover:bg-emerald-500', ring: 'ring-emerald-400', mobileBtn: 'bg-emerald-600 text-white', mobileBtnHover: 'hover:bg-emerald-500', lightPaper: 'bg-emerald-50' },
   };
-
-  // Halo bleu commun pour l’état sélectionné des boutons 1/2/3 (mobile + desktop)
-  const SELECTED_SLOT_HALO = 'ring-2 ring-blue-400 ring-offset-1 shadow-lg';
 
   const fetchChapter = async (book: BibleBook, chapterNum: number) => {
     setLoading(true);
@@ -584,7 +586,10 @@ export default function Reading() {
                           {[0, 1, 2, 3].map((i) => {
                             const s = quickSlots[i];
                             const filled = s !== null;
-                            const base = 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all';
+                            const isNumeric = i !== 0;
+                            const base = isNumeric
+                              ? 'w-10 h-10 rounded-full text-sm font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all'
+                              : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all';
                             let cls = '';
                             if (i === 0) {
                               cls = lastTappedSlot === 0 ? 'bg-blue-600 text-white hover:bg-blue-500' :
@@ -593,7 +598,7 @@ export default function Reading() {
                               const theme = SLOT_THEMES[i as SlotKey];
                               cls = filled ? `${theme.solid} ${theme.solidHover}` :
                                 (isDark ? 'bg-gray-800 text-white border border-gray-600' : 'bg-white text-gray-800 border border-gray-300');
-                              if (activeSlot === i) cls += ` ${SELECTED_SLOT_HALO}`;
+                              if (activeSlot === i) cls += ` ${RING_ON}`;
                             }
                             const title =
                               i === 0
@@ -608,6 +613,7 @@ export default function Reading() {
                                 aria-label={title}
                                 title={title}
                                 aria-pressed={isPressed}
+                                aria-current={isPressed ? 'true' : undefined}
                               >
                                 {i === 0 ? <SearchIcon className="w-4 h-4" /> : <span>{i}</span>}
                               </button>
@@ -633,7 +639,10 @@ export default function Reading() {
                       {[0,1,2,3].map((i) => {
                         const s = quickSlots[i];
                         const filled = s !== null;
-                        const base = 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all';
+                        const isNumeric = i !== 0;
+                        const base = isNumeric
+                          ? 'w-9 h-9 rounded-full text-xs font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all'
+                          : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all';
                         let cls = '';
                         if (i === 0) {
                           cls = lastTappedSlot === 0 ? 'bg-blue-600 text-white hover:bg-blue-500' :
@@ -642,7 +651,7 @@ export default function Reading() {
                           const theme = SLOT_THEMES[i as SlotKey];
                           cls = filled ? `${theme.solid} ${theme.solidHover}` :
                             (isDark ? 'bg-gray-800 text-white border border-gray-600' : 'bg-white text-gray-800 border border-gray-300');
-                          if (activeSlot === i) cls += ` ${SELECTED_SLOT_HALO}`;
+                          if (activeSlot === i) cls += ` ${RING_ON}`;
                         }
                         const title =
                           i === 0
@@ -657,6 +666,7 @@ export default function Reading() {
                             aria-label={title}
                             title={title}
                             aria-pressed={isPressed}
+                            aria-current={isPressed ? 'true' : undefined}
                           >
                             {i === 0 ? <SearchIcon className="w-4 h-4" /> : <span>{i}</span>}
                           </button>
