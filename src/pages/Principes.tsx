@@ -17,42 +17,39 @@ import {
   RefreshCw
 } from 'lucide-react';
 
-/** Même sentinelle que Notes pour bloc texte */
 const TEXT_SENTINEL = '__TEXT__';
 
-type AnyItem = VerseRef & {
-  kind?: 'text' | 'verse';
-};
-
-type PList = {
-  id: string;
-  title: string;
-  items: AnyItem[];
-  createdAt: number;
-  updatedAt: number;
-};
+type AnyItem = VerseRef & { kind?: 'text' | 'verse' };
+type PList = { id: string; title: string; items: AnyItem[]; createdAt: number; updatedAt: number };
 
 const LS_KEY = 'twog_principles_lists_v1';
 
 /* ========================= OUTILS ========================= */
 
-/** mappe les noms (FR & EN) -> { id, nameCanonique } à partir de bibleBooks */
+/** Construit des maps "nom (fr/en/en canonique) → { id=canonique, name=canonique }" */
 function useBookMaps(lang: 'fr' | 'en') {
   const [byName, setByName] = useState<Record<string, { id: string; name: string }>>({});
   const [byId, setById] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    // getBibleBooks n'attend PAS de paramètre (cf. ton service)
     const books: any[] = getBibleBooks() as any[];
     const _byName: Record<string, { id: string; name: string }> = {};
     const _byId: Record<string, string> = {};
+
     books.forEach((b: any) => {
-      const canonical = (b.name || '').trim();   // nom canonique (anglais, attendu par getChapter)
-      const alt = (b.alt || '').trim();          // alias (souvent FR)
-      if (canonical) _byName[canonical.toLowerCase()] = { id: b.id, name: canonical };
-      if (alt)       _byName[alt.toLowerCase()]       = { id: b.id, name: canonical };
-      _byId[b.id] = canonical;
+      const canonical = (b.name || '').trim();   // ex: "Matthew", "Acts", "1Samuel"
+      const fr = (b.nameFr || '').trim();        // ex: "Matthieu"
+      const en = (b.nameEn || '').trim();        // ex: "Matthew"
+      if (!canonical) return;
+
+      const val = { id: canonical, name: canonical };
+      _byName[canonical.toLowerCase()] = val;
+      if (fr) _byName[fr.toLowerCase()] = val;
+      if (en) _byName[en.toLowerCase()] = val;
+
+      _byId[canonical] = canonical; // clé = canonique
     });
+
     setByName(_byName);
     setById(_byId);
   }, [lang]);
@@ -60,7 +57,7 @@ function useBookMaps(lang: 'fr' | 'en') {
   return { byName, byId };
 }
 
-/** "Jean 3:16-17,20-21" -> tableau d'items (versets atomisés) */
+/** "Actes 17:24-31" / "Matthieu 6:33" / "Luc 12:16-20" / "Matthieu 13:44-50" → items atomisés */
 function expandRefString(ref: string, byName: Record<string, { id: string; name: string }>): AnyItem[] {
   const cleaned = ref
     .replace(/\s*et\s*/gi, ',')
@@ -75,12 +72,11 @@ function expandRefString(ref: string, byName: Record<string, { id: string; name:
   const tail = m[3].trim();
 
   const book = byName[bookNameInput];
-  if (!book) return []; // livre inconnu
+  if (!book) return [];
 
-  // IMPORTANT : on force bookName en nom canonique (anglais)
-  const canonicalName = book.name;
-
+  const canonicalName = book.name; // attendu par getChapter
   const parts = tail.split(',').map(s => s.trim()).filter(Boolean);
+
   const items: AnyItem[] = [];
   for (const p of parts) {
     if (p.includes('-')) {
@@ -88,8 +84,8 @@ function expandRefString(ref: string, byName: Record<string, { id: string; name:
       if (!isNaN(a) && !isNaN(b) && b >= a) {
         for (let v = a; v <= b; v++) {
           items.push({
-            bookId: book.id,
-            bookName: canonicalName, // <- nom attendu par getChapter
+            bookId: canonicalName,      // pas de code court → on met le nom canonique
+            bookName: canonicalName,
             chapter,
             verse: v,
             text: '',
@@ -102,7 +98,7 @@ function expandRefString(ref: string, byName: Record<string, { id: string; name:
       const v = parseInt(p, 10);
       if (!isNaN(v)) {
         items.push({
-          bookId: book.id,
+          bookId: canonicalName,
           bookName: canonicalName,
           chapter,
           verse: v,
@@ -116,21 +112,19 @@ function expandRefString(ref: string, byName: Record<string, { id: string; name:
   return items;
 }
 
-/** Résout le TEXTE pour chaque verset via bibleService.getChapter(bookName, chapter, language) */
+/** Résout les textes via getChapter(bookNameCanonique, chapter, lang) */
 async function resolveVersesText(items: AnyItem[], lang: 'fr' | 'en') {
-  // groupe par (bookName canonique + chapitre) pour limiter les appels
   const byKey: Record<string, AnyItem[]> = {};
   for (const it of items) {
     if (it.bookId === TEXT_SENTINEL) continue;
-    const key = `${it.bookName}|${it.chapter}`; // <-- bookName est canonique (anglais)
+    const key = `${it.bookName}|${it.chapter}`;
     (byKey[key] ??= []).push(it);
   }
   for (const key of Object.keys(byKey)) {
     const [bookName, chapStr] = key.split('|');
     const chapter = parseInt(chapStr, 10);
     try {
-      // !!! ORDRE CORRECT: (bookName, chapter, language)
-      const chapterData = await getChapter(bookName, chapter, lang);
+      const chapterData = await getChapter(bookName, chapter, lang); // ordre correct
       const verses: any[] = (chapterData as any)?.verses || [];
       const map: Record<number, string> = {};
       verses.forEach((v: any) => { map[Number(v.verse)] = String(v.text || ''); });
@@ -139,20 +133,17 @@ async function resolveVersesText(items: AnyItem[], lang: 'fr' | 'en') {
         it.translation = lang;
       }
     } catch (e) {
-      // on laisse silencieux; l'UI affichera l'erreur de fallback si besoin
       console.error('resolveVersesText error', e);
     }
   }
   return items;
 }
 
-/** build texte simple complet (pour copier/partager) */
 function buildPlainListText(list: PList): string {
   const lines: string[] = [];
   const title = (list.title || '').trim();
   if (title) lines.push(title);
   lines.push('');
-
   for (const it of list.items) {
     const isText = it.bookId === TEXT_SENTINEL;
     if (isText) {
@@ -179,7 +170,7 @@ function buildItemPlainText(it: AnyItem): string {
   return body ? `${ref}\n${body}` : ref;
 }
 
-/* ============ BLUEPRINT (seed) depuis ton PDF : “Chercher Dieu” ============ */
+/* ============ SEED : Étude “Chercher Dieu” ============ */
 function usePrinciplesBlueprint(lang: 'fr' | 'en') {
   const { byName } = useBookMaps(lang);
   const [blueprint, setBlueprint] = useState<Array<{ title: string; blocks: Array<string | { text: string }> }>>([]);
@@ -205,7 +196,6 @@ function usePrinciplesBlueprint(lang: 'fr' | 'en') {
     ]);
   }, [lang]);
 
-  /** transforme blueprint -> listes d’items */
   const buildLists = async (): Promise<PList[]> => {
     const now = Date.now();
     const lists: PList[] = [];
@@ -282,7 +272,6 @@ export default function Principes() {
     [state.settings.language]
   );
 
-  /** charge depuis LS sinon seed blueprint, puis résout les textes */
   const loadOrSeed = async () => {
     setLoading(true);
     try {
@@ -333,7 +322,6 @@ export default function Principes() {
   const formatDate = (d: string | number | Date) =>
     new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' });
 
-  // --- actions liste ---
   const doRename = (id: string, current: string) => {
     const title = prompt(label.rename, current) ?? '';
     const trimmed = title.trim();
@@ -374,7 +362,6 @@ export default function Principes() {
     } catch {}
   };
 
-  // --- items ---
   const updateItems = (listId: string, updater: (items: AnyItem[]) => AnyItem[]) => {
     const next = lists.map(l => {
       if (l.id !== listId) return l;
@@ -529,7 +516,6 @@ export default function Principes() {
                   aria-expanded={isOpen}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
-                  {/* En-tête */}
                   <div className="min-w-0">
                     <div className="text-lg md:text-xl font-semibold leading-snug whitespace-normal break-words">
                       {list.title}
@@ -539,7 +525,6 @@ export default function Principes() {
                     </div>
                   </div>
 
-                  {/* Actions (vue ouverte) */}
                   {isOpen && (
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       <button
@@ -580,7 +565,6 @@ export default function Principes() {
                     </div>
                   )}
 
-                  {/* Contenu */}
                   {isOpen && (
                     <div className={`mt-4 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-50'} p-3`}>
                       {list.items.length === 0 ? (
