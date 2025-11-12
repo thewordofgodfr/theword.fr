@@ -7,6 +7,7 @@ import Search from './pages/Search';
 import Settings from './pages/Settings';
 import About from './pages/About';
 import Notes from './pages/Notes';
+import Principes from './pages/Principes'; // <- NOUVEAU
 import { warmBibleCache, pauseWarmup, resumeWarmup } from './services/bibleService';
 
 function AppContent() {
@@ -36,8 +37,26 @@ function AppContent() {
   useEffect(() => {
     const { language, theme } = state.settings;
     const titles = {
-      fr: { home: 'Dieu vous parle – Verset aléatoire', reading: 'Lecture', search: 'Recherche biblique', settings: 'Réglages', about: 'À propos', notes: 'Notes', fallback: 'TheWord.fr' },
-      en: { home: 'God speaks to you – Random verse', reading: 'Reading', search: 'Bible Search', settings: 'Settings', about: 'About', notes: 'Notes', fallback: 'TheWord.fr' },
+      fr: {
+        home: 'Dieu vous parle – Verset aléatoire',
+        reading: 'Lecture',
+        search: 'Recherche biblique',
+        settings: 'Réglages',
+        about: 'À propos',
+        notes: 'Notes',
+        principes: 'Principes fondamentaux', // <- NOUVEAU
+        fallback: 'TheWord.fr'
+      },
+      en: {
+        home: 'God speaks to you – Random verse',
+        reading: 'Reading',
+        search: 'Bible Search',
+        settings: 'Settings',
+        about: 'About',
+        notes: 'Notes',
+        principes: 'Core Studies', // <- NEW
+        fallback: 'TheWord.fr'
+      },
     } as const;
     const dict = language === 'fr' ? titles.fr : titles.en;
     const pageKey = (state.currentPage as keyof typeof dict) || 'fallback';
@@ -64,6 +83,7 @@ function AppContent() {
       case 'settings': return <Settings />;
       case 'about': return <About />;
       case 'notes': return <Notes />;
+      case 'principes': return <Principes />; // <- NOUVELLE ROUTE
       default: return <Home />;
     }
   };
