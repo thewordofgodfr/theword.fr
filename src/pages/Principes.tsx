@@ -9,7 +9,6 @@ import {
   Edit3,
   Trash2,
   Share2,
-  Plus,
   Copy,
   ArrowUp,
   ArrowDown,
@@ -35,34 +34,33 @@ type PList = {
 
 const LS_KEY = 'twog_principles_lists_v1';
 
-/** --- OUTILS --- */
+/* ========================= OUTILS ========================= */
 
-/** map "Matthieu" -> "MT" etc., via bibleService */
+/** mappe les noms (FR & EN) -> { id, nameCanonique } à partir de bibleBooks */
 function useBookMaps(lang: 'fr' | 'en') {
   const [byName, setByName] = useState<Record<string, { id: string; name: string }>>({});
   const [byId, setById] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    (async () => {
-      const books = await getBibleBooks(lang);
-      const _byName: Record<string, { id: string; name: string }> = {};
-      const _byId: Record<string, string> = {};
-      books.forEach((b: any) => {
-        const n1 = (b.name || '').trim();
-        const n2 = (b.alt || '').trim();
-        if (n1) _byName[n1.toLowerCase()] = { id: b.id, name: n1 };
-        if (n2) _byName[n2.toLowerCase()] = { id: b.id, name: n1 };
-        _byId[b.id] = n1 || b.id;
-      });
-      setByName(_byName);
-      setById(_byId);
-    })();
+    // getBibleBooks n'attend PAS de paramètre (cf. ton service)
+    const books: any[] = getBibleBooks() as any[];
+    const _byName: Record<string, { id: string; name: string }> = {};
+    const _byId: Record<string, string> = {};
+    books.forEach((b: any) => {
+      const canonical = (b.name || '').trim();   // nom canonique (anglais, attendu par getChapter)
+      const alt = (b.alt || '').trim();          // alias (souvent FR)
+      if (canonical) _byName[canonical.toLowerCase()] = { id: b.id, name: canonical };
+      if (alt)       _byName[alt.toLowerCase()]       = { id: b.id, name: canonical };
+      _byId[b.id] = canonical;
+    });
+    setByName(_byName);
+    setById(_byId);
   }, [lang]);
 
   return { byName, byId };
 }
 
-/** "Jean 3:16-17,20-21" -> [{...:16},{...:17},{...:20},{...:21}] */
+/** "Jean 3:16-17,20-21" -> tableau d'items (versets atomisés) */
 function expandRefString(ref: string, byName: Record<string, { id: string; name: string }>): AnyItem[] {
   const cleaned = ref
     .replace(/\s*et\s*/gi, ',')
@@ -72,15 +70,17 @@ function expandRefString(ref: string, byName: Record<string, { id: string; name:
 
   const m = cleaned.match(/^(.+?)\s+(\d+)[\.:](.+)$/);
   if (!m) return [];
-  const bookName = m[1].trim().toLowerCase();
+  const bookNameInput = m[1].trim().toLowerCase();
   const chapter = parseInt(m[2].trim(), 10);
   const tail = m[3].trim();
 
-  const book = byName[bookName];
-  if (!book) return [];
+  const book = byName[bookNameInput];
+  if (!book) return []; // livre inconnu
+
+  // IMPORTANT : on force bookName en nom canonique (anglais)
+  const canonicalName = book.name;
 
   const parts = tail.split(',').map(s => s.trim()).filter(Boolean);
-
   const items: AnyItem[] = [];
   for (const p of parts) {
     if (p.includes('-')) {
@@ -89,7 +89,7 @@ function expandRefString(ref: string, byName: Record<string, { id: string; name:
         for (let v = a; v <= b; v++) {
           items.push({
             bookId: book.id,
-            bookName: book.name,
+            bookName: canonicalName, // <- nom attendu par getChapter
             chapter,
             verse: v,
             text: '',
@@ -103,7 +103,7 @@ function expandRefString(ref: string, byName: Record<string, { id: string; name:
       if (!isNaN(v)) {
         items.push({
           bookId: book.id,
-          bookName: book.name,
+          bookName: canonicalName,
           chapter,
           verse: v,
           text: '',
@@ -116,32 +116,37 @@ function expandRefString(ref: string, byName: Record<string, { id: string; name:
   return items;
 }
 
-/** Résout le TEXTE pour chaque verset depuis bibleService.getChapter */
+/** Résout le TEXTE pour chaque verset via bibleService.getChapter(bookName, chapter, language) */
 async function resolveVersesText(items: AnyItem[], lang: 'fr' | 'en') {
+  // groupe par (bookName canonique + chapitre) pour limiter les appels
   const byKey: Record<string, AnyItem[]> = {};
   for (const it of items) {
     if (it.bookId === TEXT_SENTINEL) continue;
-    const key = `${it.bookId}|${it.chapter}`;
+    const key = `${it.bookName}|${it.chapter}`; // <-- bookName est canonique (anglais)
     (byKey[key] ??= []).push(it);
   }
   for (const key of Object.keys(byKey)) {
-    const [bookId, chapStr] = key.split('|');
+    const [bookName, chapStr] = key.split('|');
     const chapter = parseInt(chapStr, 10);
     try {
-      const chapterData: any = await getChapter(lang, bookId, chapter);
-      const verses: any[] = chapterData?.verses || [];
+      // !!! ORDRE CORRECT: (bookName, chapter, language)
+      const chapterData = await getChapter(bookName, chapter, lang);
+      const verses: any[] = (chapterData as any)?.verses || [];
       const map: Record<number, string> = {};
       verses.forEach((v: any) => { map[Number(v.verse)] = String(v.text || ''); });
       for (const it of byKey[key]) {
         it.text = map[it.verse] ?? (it.text || '');
         it.translation = lang;
       }
-    } catch {}
+    } catch (e) {
+      // on laisse silencieux; l'UI affichera l'erreur de fallback si besoin
+      console.error('resolveVersesText error', e);
+    }
   }
   return items;
 }
 
-/** copie intégrale d'une liste en texte simple + titre + lignes */
+/** build texte simple complet (pour copier/partager) */
 function buildPlainListText(list: PList): string {
   const lines: string[] = [];
   const title = (list.title || '').trim();
@@ -174,14 +179,12 @@ function buildItemPlainText(it: AnyItem): string {
   return body ? `${ref}\n${body}` : ref;
 }
 
-/** --- BLUEPRINT des études importées du PDF --- */
+/* ============ BLUEPRINT (seed) depuis ton PDF : “Chercher Dieu” ============ */
 function usePrinciplesBlueprint(lang: 'fr' | 'en') {
   const { byName } = useBookMaps(lang);
   const [blueprint, setBlueprint] = useState<Array<{ title: string; blocks: Array<string | { text: string }> }>>([]);
 
   useEffect(() => {
-    // Étude 1 — Chercher Dieu (passages & commentaires tirés du PDF)
-    // - Mt 6:33 ; Lc 12:16-20 ; Mt 13:44-50 (listés dans “Le Royaume”) ; Ac 17:24-31 (étude “Dieu”).
     setBlueprint([
       {
         title: 'Chercher Dieu',
@@ -202,7 +205,7 @@ function usePrinciplesBlueprint(lang: 'fr' | 'en') {
     ]);
   }, [lang]);
 
-  /** transforme blueprint -> listes d’items (versets étendus + textes) */
+  /** transforme blueprint -> listes d’items */
   const buildLists = async (): Promise<PList[]> => {
     const now = Date.now();
     const lists: PList[] = [];
@@ -238,7 +241,7 @@ function usePrinciplesBlueprint(lang: 'fr' | 'en') {
   return { buildLists };
 }
 
-/** --- PAGE --- */
+/* ========================= PAGE ========================= */
 export default function Principes() {
   const { state, setPage } = useApp();
   const { t } = useTranslation();
@@ -279,7 +282,7 @@ export default function Principes() {
     [state.settings.language]
   );
 
-  /** charge depuis LS sinon depuis blueprint, puis résout les textes */
+  /** charge depuis LS sinon seed blueprint, puis résout les textes */
   const loadOrSeed = async () => {
     setLoading(true);
     try {
@@ -287,18 +290,15 @@ export default function Principes() {
       if (saved) {
         const parsed: PList[] = JSON.parse(saved);
         setLists(parsed);
-        setLoading(false);
-        return;
+      } else {
+        const seeded = await buildLists();
+        for (const l of seeded) {
+          l.items = await resolveVersesText(l.items, lang);
+          l.updatedAt = Date.now();
+        }
+        localStorage.setItem(LS_KEY, JSON.stringify(seeded));
+        setLists(seeded);
       }
-      // seed depuis le blueprint
-      let seeded = await buildLists();
-      // resolve textes
-      for (const l of seeded) {
-        l.items = await resolveVersesText(l.items, lang);
-        l.updatedAt = Date.now();
-      }
-      localStorage.setItem(LS_KEY, JSON.stringify(seeded));
-      setLists(seeded);
     } catch (e) {
       console.error(e);
     } finally {
@@ -460,7 +460,7 @@ export default function Principes() {
   const shownLists = expandedId ? lists.filter((l) => l.id === expandedId) : lists;
 
   return (
-    <div className={`min-h[100svh] ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+    <div className={`min-h-[100svh] ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="flex items-center justify-between mb-6">
           <h1 className={`text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-800'} flex items-center gap-2`}>
@@ -535,7 +535,7 @@ export default function Principes() {
                       {list.title}
                     </div>
                     <div className={`mt-1 text-xs ${isDark ? 'text-white/60' : 'text-gray-500'}`}>
-                      {list.items.length} {label.verses} • {new Date(list.updatedAt).toLocaleDateString()}
+                      {list.items.length} {label.verses} • {formatDate(list.updatedAt)}
                     </div>
                   </div>
 
@@ -730,3 +730,4 @@ export default function Principes() {
     </div>
   );
 }
+
