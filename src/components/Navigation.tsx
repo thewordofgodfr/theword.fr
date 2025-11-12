@@ -29,7 +29,6 @@ export default function Navigation() {
     { id: 'about',      icon: Info,        label: t('about') },
   ] as const;
 
-  // (inchangé)
   const baseBtn  = 'transition-all duration-200 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500';
   const activeBtn= isDark ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-700';
   const idleBtn  = isDark ? 'text-white/90 hover:bg-gray-700 hover:text-white' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900';
@@ -47,12 +46,9 @@ export default function Navigation() {
       ].join(' ')}
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
-      {/* padding horizontal plus serré sur mobile */}
-      <div className="max-w-7xl mx-auto px-1 sm:px-4 lg:px-6">
-        {/* hauteur réduite pour gagner quelques px */}
-        <div className="h-14 flex items-center">
-          {/* gap réduit + pas de justify-between pour éviter l’étirement qui fait déborder la dernière icône */}
-          <div className="flex flex-1 items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar justify-start sm:justify-center">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+        <div className="h-16 flex items-center">
+          <div className="flex flex-1 items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar justify-between sm:justify-center">
             {navItems.map(({ id, icon: Icon, label }) => {
               const active = state.currentPage === (id as any);
               return (
@@ -63,16 +59,15 @@ export default function Navigation() {
                   title={label}
                   className={[
                     baseBtn,
-                    // padding horizontal réduit + petit gap entre icône/texte en ≥ sm
-                    'px-2 py-2 flex flex-col sm:flex-row items-center sm:gap-1.5',
-                    // largeur minimale réduite pour caser toutes les icônes
-                    'flex-shrink-0 min-w-[44px] sm:min-w-0',
+                    // légèrement moins large qu’avant (px-2 au lieu de px-3)
+                    'px-2 py-2 flex flex-col sm:flex-row items-center sm:gap-2',
+                    // largeur minimale un peu réduite pour tout faire rentrer
+                    'flex-shrink-0 min-w-[48px] sm:min-w-0',
                     active ? activeBtn : idleBtn,
                   ].join(' ')}
                 >
-                  {/* icône légèrement plus petite */}
-                  <Icon size={18} className="shrink-0" />
-                  {/* le libellé reste caché en mobile */}
+                  {/* taille d’icône d’origine rétablie */}
+                  <Icon size={20} className="shrink-0" />
                   <span className="hidden sm:inline text-sm leading-none">{label}</span>
                 </button>
               );
@@ -83,5 +78,4 @@ export default function Navigation() {
     </nav>
   );
 }
-
 
