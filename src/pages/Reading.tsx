@@ -780,13 +780,13 @@ export default function Reading() {
               <div className="absolute inset-0 bg-black/60" onClick={() => setShowBookPicker(false)} aria-hidden="true" />
               <div className={`absolute inset-0 ${isDark ? 'bg-gray-900' : 'bg-white'} p-4 overflow-y-auto`}>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>{state.settings.language === 'fr' ? 'Choisir un livre' : 'Choose a book'}</h3>
+                  <h3 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>{state.settings.language === 'fr' ? '' : ''}</h3>
                   <button onClick={() => setShowBookPicker(false)} className={`${isDark ? 'text-white bg-gray-700' : 'text-gray-700 bg-gray-200'} px-3 py-1 rounded`}>
                     {state.settings.language === 'fr' ? 'Fermer' : 'Close'}
                   </button>
                 </div>
 
-                <h4 className={`text-sm uppercase tracking-wide mb-2 ${isDark ? 'text-white/80' : 'text-gray-600'}`}>{t('oldTestament')}</h4>
+                <h4 className={`text-base uppercase tracking-wide mb-2 ${isDark ? 'text-white/80' : 'text-gray-600'}`}>{t('oldTestament')}</h4>
                 <div className="columns-2 md:columns-3 lg:columns-4 gap-2 mb-6">
                   {oldTestamentBooks.map(book => (
                     <button key={`ot-${book.name}`} onClick={() => handleBookSelect(book)}
@@ -799,7 +799,7 @@ export default function Reading() {
                   ))}
                 </div>
 
-                <h4 className={`text-sm uppercase tracking-wide mb-2 ${isDark ? 'text-white/80' : 'text-gray-600'}`}>{t('newTestament')}</h4>
+                <h4 className={`text-base uppercase tracking-wide mb-2 ${isDark ? 'text-white/80' : 'text-gray-600'}`}>{t('newTestament')}</h4>
                 <div className="columns-2 md:columns-3 lg:columns-4 gap-2 pb-10">
                   {newTestamentBooks.map(book => (
                     <button key={`nt-${book.name}`} onClick={() => handleBookSelect(book)}
