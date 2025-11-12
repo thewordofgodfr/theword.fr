@@ -786,7 +786,7 @@ export default function Reading() {
                   </button>
                 </div>
 
-                <h4 className={`text-base uppercase tracking-wide mb-2 ${isDark ? 'text-white/80' : 'text-gray-600'}`}>{t('oldTestament')}</h4>
+                <h4 className={`text-xl uppercase tracking-wide mb-2 ${isDark ? 'text-white/80' : 'text-gray-600'}`}>{t('oldTestament')}</h4>
                 <div className="columns-2 md:columns-3 lg:columns-4 gap-2 mb-6">
                   {oldTestamentBooks.map(book => (
                     <button key={`ot-${book.name}`} onClick={() => handleBookSelect(book)}
@@ -799,7 +799,7 @@ export default function Reading() {
                   ))}
                 </div>
 
-                <h4 className={`text-base uppercase tracking-wide mb-2 ${isDark ? 'text-white/80' : 'text-gray-600'}`}>{t('newTestament')}</h4>
+                <h4 className={`text-xl uppercase tracking-wide mb-2 ${isDark ? 'text-white/80' : 'text-gray-600'}`}>{t('newTestament')}</h4>
                 <div className="columns-2 md:columns-3 lg:columns-4 gap-2 pb-10">
                   {newTestamentBooks.map(book => (
                     <button key={`nt-${book.name}`} onClick={() => handleBookSelect(book)}
