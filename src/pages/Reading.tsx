@@ -669,7 +669,7 @@ export default function Reading() {
                         >
                           {selectedBook ? Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map(num => (<option key={num} value={num}>{num}</option>)) : null}
                         </select>
-                        <ChevronDown className={`w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 ${isDark ? 'text-white/80' : 'text-gray-600'}`} />
+                        <ChevronDown className={`w-3.5 h-3.5 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none ${isDark ? 'text-white/80' : 'text-gray-600'}`} />
                       </div>
 
                       <button
