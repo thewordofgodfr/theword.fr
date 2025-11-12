@@ -38,7 +38,7 @@ function AppContent() {
     const { language, theme } = state.settings;
     const titles = {
       fr: {
-        home: 'Dieu vous parle – Verset aléatoire',
+        home: 'The Word – Verset aléatoire',
         reading: 'Lecture',
         search: 'Recherche biblique',
         settings: 'Réglages',
@@ -48,7 +48,7 @@ function AppContent() {
         fallback: 'TheWord.fr'
       },
       en: {
-        home: 'God speaks to you – Random verse',
+        home: 'The Word – Random verse',
         reading: 'Reading',
         search: 'Bible Search',
         settings: 'Settings',
