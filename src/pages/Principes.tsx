@@ -62,16 +62,14 @@ function useBookMaps(lang: 'fr' | 'en') {
   return { byName, byId };
 }
 
-/** "Jean 3:16-17" -> [{bookId:'JN', chapter:3, verse:16}, {..:17}] */
+/** "Jean 3:16-17,20-21" -> [{...:16},{...:17},{...:20},{...:21}] */
 function expandRefString(ref: string, byName: Record<string, { id: string; name: string }>): AnyItem[] {
-  // ex: "1 Pierre 2.21-25" ou "Jean 1.1 et 14" -> on standardise aux ":" et ","
   const cleaned = ref
     .replace(/\s*et\s*/gi, ',')
     .replace(/[．。]/g, '.')
     .replace(/\s+/g, ' ')
     .trim();
 
-  // split book name vs chapter:verse part
   const m = cleaned.match(/^(.+?)\s+(\d+)[\.:](.+)$/);
   if (!m) return [];
   const bookName = m[1].trim().toLowerCase();
@@ -81,7 +79,6 @@ function expandRefString(ref: string, byName: Record<string, { id: string; name:
   const book = byName[bookName];
   if (!book) return [];
 
-  // tail like "1-5,8,14-16"
   const parts = tail.split(',').map(s => s.trim()).filter(Boolean);
 
   const items: AnyItem[] = [];
@@ -121,7 +118,6 @@ function expandRefString(ref: string, byName: Record<string, { id: string; name:
 
 /** Résout le TEXTE pour chaque verset depuis bibleService.getChapter */
 async function resolveVersesText(items: AnyItem[], lang: 'fr' | 'en') {
-  // group by bookId+chapter to reduce calls
   const byKey: Record<string, AnyItem[]> = {};
   for (const it of items) {
     if (it.bookId === TEXT_SENTINEL) continue;
@@ -178,88 +174,31 @@ function buildItemPlainText(it: AnyItem): string {
   return body ? `${ref}\n${body}` : ref;
 }
 
-/** --- BLUEPRINT des études importées du PDF (3 études préchargées) --- */
+/** --- BLUEPRINT des études importées du PDF --- */
 function usePrinciplesBlueprint(lang: 'fr' | 'en') {
   const { byName } = useBookMaps(lang);
-
   const [blueprint, setBlueprint] = useState<Array<{ title: string; blocks: Array<string | { text: string }> }>>([]);
 
   useEffect(() => {
-    // Pour limiter la longueur du message, 3 études sont préchargées entièrement.
-    // Format blocks: 
-    // - string = référence composite à développer (ex: "Jean 1:1,14" ou "Jean 8:1-11")
-    // - {text} = commentaire libre intercalé (bloc texte)
+    // Étude 1 — Chercher Dieu (passages & commentaires tirés du PDF)
+    // - Mt 6:33 ; Lc 12:16-20 ; Mt 13:44-50 (listés dans “Le Royaume”) ; Ac 17:24-31 (étude “Dieu”).
     setBlueprint([
       {
-        title: 'Qui est Jésus ?',
+        title: 'Chercher Dieu',
         blocks: [
-          { text: 'But : Découvrir Jésus et son caractère, afin de le suivre.' },
-          'Matthieu 16:13-17',
-          'Jean 1:1',
-          'Jean 1:14',
-          'Colossiens 2:9',
-          'Jean 8:1-11',
-          'Jean 2:13-17',
-          'Matthieu 26:36-39',
-          'Jean 14:6',
-          '1 Jean 2:3-6',
-          { text: 'Passages supplémentaires :' },
-          'Hébreux 1:1-3',
-          'Hébreux 4:15-16',
-          'Actes 4:12',
-          'Philippiens 2:5-11',
-          'Philippiens 3:7-10',
-          'Hébreux 2:9-11',
+          { text: 'But : Mettre Dieu en premier, chercher sa volonté et son Royaume avant le reste.' },
+          { text: 'Dieu nous a créés pour une relation avec Lui : il n’habite pas dans des rituels ; il nous appelle à le connaître personnellement.' },
+          'Actes 17:24-31',
+          { text: 'La priorité : avant nos besoins matériels, “cherchez d’abord le Royaume et la justice de Dieu”.' },
+          'Matthieu 6:33',
+          { text: 'Attention aux priorités trompeuses : la vie ne consiste pas dans l’abondance des biens.' },
+          'Luc 12:16-20',
+          { text: 'Valeur incomparable du Royaume : quand on a trouvé le trésor, on réorganise tout pour l’obtenir.' },
+          'Matthieu 13:44-50',
+          { text: 'Application : décider des choix concrets cette semaine pour placer Dieu et sa Parole au centre (temps avec Dieu, obéissance, relations, usage des biens).' },
+          { text: 'Prière : “Seigneur, apprends-moi à te chercher de tout mon cœur et à mettre ton Royaume en premier.”' },
         ],
       },
-      {
-        title: 'La Parole de Dieu',
-        blocks: [
-          { text: 'But : Voir ce que la Bible dit d’elle-même et l’incidence pour nos vies.' },
-          '2 Timothée 3:16-17',
-          'Hébreux 4:12-13',
-          'Jean 8:31-32',
-          'Jean 12:47-50',
-          'Matthieu 7:24-27',
-          'Jacques 1:22-25',
-          'Matthieu 15:1-9',
-          '2 Timothée 4:3-4',
-          'Romains 10:17',
-          { text: 'Passages supplémentaires :' },
-          '1 Timothée 4:16',
-          '2 Pierre 1:20-21',
-          'Luc 8:4-15',
-          'Jean 14:15',
-          'Jean 14:21',
-          'Jean 14:23-24',
-          'Romains 15:4',
-          '2 Pierre 3:15-16',
-          'Psaume 1:1-6',
-          'Psaume 19:8-12',
-          'Psaume 119:9-16',
-          'Ésaïe 66:1-2',
-        ],
-      },
-      {
-        title: 'Disciple de Jésus',
-        blocks: [
-          { text: 'But : Réaliser l’appel de Jésus à le suivre et comment cela se manifeste.' },
-          'Luc 6:40',
-          'Luc 11:1-4',
-          'Luc 9:23-26',
-          'Luc 14:25-33',
-          'Jean 13:34-35',
-          'Jean 15:5-8',
-          'Jean 4:36',
-          'Matthieu 28:18-20',
-          { text: 'Passages supplémentaires :' },
-          'Marc 10:28-31',
-          'Philippiens 1:20-21',
-          'Galates 2:20',
-          '1 Pierre 2:21',
-        ],
-      },
-      // 👉 Je peux ajouter ici les 9 autres études (même format) dans un prochain envoi.
     ]);
   }, [lang]);
 
@@ -316,7 +255,7 @@ export default function Principes() {
   const label = useMemo(
     () => ({
       title: state.settings.language === 'fr' ? 'Principes' : 'Studies',
-      reload: state.settings.language === 'fr' ? 'Recharger depuis le PDF' : 'Reload from PDF',
+      reload: state.settings.language === 'fr' ? 'Recharger (résoudre les versets)' : 'Reload texts',
       empty: state.settings.language === 'fr' ? 'Aucune étude.' : 'No studies yet.',
       verses: state.settings.language === 'fr' ? 'éléments' : 'items',
       openReading: state.settings.language === 'fr' ? 'Ouvrir la lecture' : 'Open Reading',
@@ -368,7 +307,7 @@ export default function Principes() {
   };
 
   useEffect(() => {
-    loadOrSeed(); // première ouverture
+    loadOrSeed();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
 
@@ -521,7 +460,7 @@ export default function Principes() {
   const shownLists = expandedId ? lists.filter((l) => l.id === expandedId) : lists;
 
   return (
-    <div className={`min-h-[100svh] ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+    <div className={`min-h[100svh] ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="flex items-center justify-between mb-6">
           <h1 className={`text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-800'} flex items-center gap-2`}>
@@ -596,11 +535,11 @@ export default function Principes() {
                       {list.title}
                     </div>
                     <div className={`mt-1 text-xs ${isDark ? 'text-white/60' : 'text-gray-500'}`}>
-                      {list.items.length} {label.verses} • {formatDate(list.updatedAt)}
+                      {list.items.length} {label.verses} • {new Date(list.updatedAt).toLocaleDateString()}
                     </div>
                   </div>
 
-                  {/* Icônes d’action (vue ouverte uniquement) */}
+                  {/* Actions (vue ouverte) */}
                   {isOpen && (
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       <button
@@ -641,7 +580,7 @@ export default function Principes() {
                     </div>
                   )}
 
-                  {/* Contenu liste */}
+                  {/* Contenu */}
                   {isOpen && (
                     <div className={`mt-4 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-50'} p-3`}>
                       {list.items.length === 0 ? (
