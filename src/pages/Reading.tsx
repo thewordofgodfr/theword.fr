@@ -18,7 +18,7 @@ export default function Reading() {
   const { t } = useTranslation();
 
   const NAV_H = 64;
-  const HIGHLIGHT_EXTRA_OFFSET = 42;
+  const HIGHLIGHT_EXTRA_OFFSET = 44;
 
   const commandBarRef = useRef<HTMLDivElement>(null);
   const [cmdH, setCmdH] = useState(0);
