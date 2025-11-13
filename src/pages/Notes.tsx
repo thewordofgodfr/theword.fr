@@ -9,6 +9,8 @@ import {
   deleteList,
   getListById,
   setListItems,
+  exportListAsCode,
+  importListFromCode,
 } from '../services/collectionsService';
 import type { VerseList, VerseRef } from '../types/collections';
 import {
@@ -104,6 +106,25 @@ export default function Notes() {
           : 'Delete this item?',
       newTextPlaceholder:
         state.settings.language === 'fr' ? 'Votre texte…' : 'Your text…',
+      // Nouveau : partage / import par code
+      shareCode: state.settings.language === 'fr' ? 'Code' : 'Code',
+      importCode: state.settings.language === 'fr' ? 'Importer un code' : 'Import code',
+      importPrompt:
+        state.settings.language === 'fr'
+          ? 'Collez ici le code de partage TheWord :'
+          : 'Paste the TheWord share code here:',
+      importError:
+        state.settings.language === 'fr'
+          ? 'Code invalide ou liste introuvable.'
+          : 'Invalid code or list not found.',
+      importSuccess:
+        state.settings.language === 'fr'
+          ? 'Liste importée avec succès ✅'
+          : 'List imported successfully ✅',
+      shareCodeCopied:
+        state.settings.language === 'fr'
+          ? 'Code copié dans le presse-papiers ✅'
+          : 'Code copied to clipboard ✅',
     }),
     [state.settings.language]
   );
@@ -189,6 +210,35 @@ export default function Notes() {
       await navigator.clipboard.writeText(txt);
       alert(label.copied + ' ✅');
     } catch {}
+  };
+
+  // --- Partage / import PAR CODE ---
+
+  const doShareCode = async (id: string) => {
+    const list = getListById(id);
+    if (!list) return;
+    const code = exportListAsCode(list);
+    try {
+      await navigator.clipboard.writeText(code);
+      alert(label.shareCodeCopied);
+    } catch {
+      // fallback : on affiche le code dans un prompt pour copier à la main
+      prompt(label.shareCode, code);
+    }
+  };
+
+  const doImportFromCode = () => {
+    const code = prompt(label.importPrompt) ?? '';
+    const trimmed = code.trim();
+    if (!trimmed) return;
+    const imported = importListFromCode(trimmed);
+    if (!imported) {
+      alert(label.importError);
+      return;
+    }
+    alert(label.importSuccess);
+    refresh();
+    setExpandedId(imported.id);
   };
 
   // --- NOUVEAU : opérations de copie/partage pour UN élément (verset) ---
@@ -304,13 +354,27 @@ export default function Notes() {
           </h1>
 
           {!expandedId && (
-            <button
-              onClick={doCreate}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-500"
-            >
-              <Plus size={18} />
-              {label.create}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={doImportFromCode}
+                className={`inline-flex items-center gap-2 px-3 py-2 rounded-md border text-sm ${
+                  isDark
+                    ? 'border-gray-500 text-gray-100'
+                    : 'border-gray-300 text-gray-800'
+                }`}
+              >
+                <Copy size={16} />
+                {label.importCode}
+              </button>
+
+              <button
+                onClick={doCreate}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-500"
+              >
+                <Plus size={18} />
+                {label.create}
+              </button>
+            </div>
           )}
         </div>
 
@@ -403,6 +467,16 @@ export default function Notes() {
                         Copier
                       </button>
 
+                      {/* Nouveau : bouton "Code" pour cette liste */}
+                      <button
+                        onClick={() => doShareCode(list.id)}
+                        className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
+                        title={label.shareCode}
+                      >
+                        <Copy size={16} />
+                        {label.shareCode}
+                      </button>
+
                       <button
                         onClick={() => doDelete(list.id)}
                         className="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-500 inline-flex items-center gap-2"
@@ -491,7 +565,7 @@ export default function Notes() {
                                           {label.open}
                                         </button>
 
-                                        {/* NOUVEAU : Copier ce verset */}
+                                        {/* Copier ce verset */}
                                         <button
                                           onClick={() => copyItemText(it)}
                                           className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
@@ -503,7 +577,7 @@ export default function Notes() {
                                           Copier
                                         </button>
 
-                                        {/* NOUVEAU : Partager ce verset */}
+                                        {/* Partager ce verset */}
                                         <button
                                           onClick={() => shareItem(it)}
                                           className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500"
@@ -602,4 +676,3 @@ export default function Notes() {
     </div>
   );
 }
-
