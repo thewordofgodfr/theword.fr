@@ -93,6 +93,80 @@ function p_moveList(fromIdx: number, toIdx: number): VerseList[] {
   return arr;
 }
 
+/* ========================== Partage par code (Principes) ========================== */
+
+type PSharePayload = {
+  v: 1;
+  kind: 'principle';
+  title: string;
+  createdAt: number;
+  updatedAt: number;
+  items: VerseRef[];
+};
+
+function p_exportListAsCode(list: VerseList): string {
+  const payload: PSharePayload = {
+    v: 1,
+    kind: 'principle',
+    title: list.title || 'Étude',
+    createdAt: list.createdAt || Date.now(),
+    updatedAt: list.updatedAt || Date.now(),
+    items: (list.items || []) as VerseRef[],
+  };
+  const json = JSON.stringify(payload);
+  // encodage UTF-8 safe
+  const b64 = btoa(unescape(encodeURIComponent(json)));
+  return `TWOG-P1:${b64}`;
+}
+
+function p_importListFromCode(code: string): VerseList | null {
+  const trimmed = code.trim();
+  if (!trimmed) return null;
+
+  let raw = trimmed;
+  const prefix = 'TWOG-P1:';
+  const idx = trimmed.indexOf(':');
+
+  if (trimmed.startsWith(prefix)) {
+    raw = trimmed.slice(prefix.length);
+  } else if (idx > 0 && trimmed.substring(0, idx).startsWith('TWOG')) {
+    // ex: "TWOG-XXX:xxxx"
+    raw = trimmed.slice(idx + 1);
+  }
+
+  let json: string;
+  try {
+    json = decodeURIComponent(escape(atob(raw)));
+  } catch {
+    return null;
+  }
+
+  let payload: PSharePayload;
+  try {
+    payload = JSON.parse(json);
+  } catch {
+    return null;
+  }
+
+  if (!payload || payload.v !== 1 || payload.kind !== 'principle' || !Array.isArray(payload.items)) {
+    return null;
+  }
+
+  const now = Date.now();
+  const list: VerseList = {
+    id: p_makeId(),
+    title: payload.title || 'Étude importée',
+    createdAt: now,
+    updatedAt: now,
+    items: (payload.items || []) as VerseRef[],
+  };
+
+  const all = p_getAllLists();
+  all.unshift(list);
+  p_writeAll(all);
+  return list;
+}
+
 /* ========================== Utils d'affichage texte ========================== */
 
 type AnyItem = VerseRef & {
@@ -180,6 +254,25 @@ export default function Principes() {
       share: state.settings.language === 'fr' ? 'Partager' : 'Share',
       copy: state.settings.language === 'fr' ? 'Copier' : 'Copy',
       deleteList: state.settings.language === 'fr' ? 'Supprimer' : 'Delete',
+      // partage par code
+      shareCode: state.settings.language === 'fr' ? 'Code' : 'Code',
+      importCode: state.settings.language === 'fr' ? 'Importer un code' : 'Import code',
+      importPrompt:
+        state.settings.language === 'fr'
+          ? 'Collez ici le code de partage de l’étude :'
+          : 'Paste the study share code here:',
+      importError:
+        state.settings.language === 'fr'
+          ? 'Code invalide ou étude introuvable.'
+          : 'Invalid code or study not found.',
+      importSuccess:
+        state.settings.language === 'fr'
+          ? 'Étude importée avec succès ✅'
+          : 'Study imported successfully ✅',
+      shareCodeCopied:
+        state.settings.language === 'fr'
+          ? 'Code copié dans le presse-papiers ✅'
+          : 'Code copied to clipboard ✅',
     }),
     [state.settings.language]
   );
@@ -267,6 +360,35 @@ export default function Principes() {
     } catch {}
   };
 
+  // --- Partage / import PAR CODE (Principes) ---
+
+  const doShareCode = async (id: string) => {
+    const list = p_getListById(id);
+    if (!list) return;
+    const code = p_exportListAsCode(list);
+    try {
+      await navigator.clipboard.writeText(code);
+      alert(label.shareCodeCopied);
+    } catch {
+      // fallback : on affiche le code dans un prompt pour copie manuelle
+      prompt(label.shareCode, code);
+    }
+  };
+
+  const doImportFromCode = () => {
+    const code = prompt(label.importPrompt) ?? '';
+    const trimmed = code.trim();
+    if (!trimmed) return;
+    const imported = p_importListFromCode(trimmed);
+    if (!imported) {
+      alert(label.importError);
+      return;
+    }
+    alert(label.importSuccess);
+    refresh();
+    setExpandedId(imported.id);
+  };
+
   // ---------- opérations sur items ----------
   const updateItems = (listId: string, updater: (items: AnyItem[]) => AnyItem[]) => {
     const list = p_getListById(listId);
@@ -331,7 +453,7 @@ export default function Principes() {
     });
   };
 
-  // --- NOUVEAU : opérations de copie/partage pour UN élément (verset) ---
+  // --- opérations de copie/partage pour UN élément ---
   const copyItemText = async (it: AnyItem) => {
     const txt = buildItemPlainText(it);
     if (!txt) return;
@@ -357,7 +479,6 @@ export default function Principes() {
       }
     } catch {}
   };
-  // ---------------------------------------------------------------
 
   // quand une liste est ouverte, n'afficher qu'elle
   const shownLists = expandedId ? lists.filter((l) => l.id === expandedId) : lists;
@@ -380,13 +501,26 @@ export default function Principes() {
           </h1>
 
           {!expandedId && (
-            <button
-              onClick={doCreate}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-500"
-            >
-              <Plus size={18} />
-              {label.create}
-            </button>
+            <div className="flex items-center gap-2">
+              {/* Importer une étude par code */}
+              <button
+                onClick={doImportFromCode}
+                className={`inline-flex items-center gap-2 px-3 py-2 rounded-md border text-sm ${
+                  isDark ? 'border-gray-500 text-gray-100' : 'border-gray-300 text-gray-800'
+                }`}
+              >
+                <Copy size={16} />
+                {label.importCode}
+              </button>
+
+              <button
+                onClick={doCreate}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-500"
+              >
+                <Plus size={18} />
+                {label.create}
+              </button>
+            </div>
           )}
         </div>
 
@@ -449,7 +583,7 @@ export default function Principes() {
                     </div>
                   </div>
 
-                  {/* --- NOUVEAU: boutons Monter/Descendre (vue fermée) --- */}
+                  {/* --- Boutons Monter/Descendre (vue fermée) --- */}
                   {!isOpen && hoverIdx === realIndex && (
                     <div className="absolute right-3 top-3 flex gap-1">
                       <button
@@ -459,7 +593,9 @@ export default function Principes() {
                           setLists(next);
                         }}
                         disabled={realIndex === 0}
-                        className={`inline-flex items-center justify-center w-8 h-8 rounded ${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} disabled:opacity-50`}
+                        className={`inline-flex items-center justify-center w-8 h-8 rounded ${
+                          isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
+                        } disabled:opacity-50`}
                         title={label.moveUp}
                       >
                         <ArrowUp size={16} />
@@ -471,7 +607,9 @@ export default function Principes() {
                           setLists(next);
                         }}
                         disabled={realIndex === lists.length - 1}
-                        className={`inline-flex items-center justify-center w-8 h-8 rounded ${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} disabled:opacity-50`}
+                        className={`inline-flex items-center justify-center w-8 h-8 rounded ${
+                          isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
+                        } disabled:opacity-50`}
                         title={label.moveDown}
                       >
                         <ArrowDown size={16} />
@@ -507,6 +645,16 @@ export default function Principes() {
                       >
                         <Copy size={16} />
                         {label.copy}
+                      </button>
+
+                      {/* Code pour cette étude */}
+                      <button
+                        onClick={() => doShareCode(list.id)}
+                        className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
+                        title={label.shareCode}
+                      >
+                        <Copy size={16} />
+                        {label.shareCode}
                       </button>
 
                       <button
