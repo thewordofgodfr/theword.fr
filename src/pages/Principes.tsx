@@ -604,7 +604,7 @@ export default function Principes() {
                       <button
                         onClick={() => copyListText(list.id)}
                         className={`${
-                          isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
+                          isDark ? 'bg-gray-700 text:white' : 'bg-gray-100 text-gray-800'
                         } px-3 py-2 rounded inline-flex items-center gap-2`}
                         title={label.copy}
                       >
@@ -690,7 +690,7 @@ export default function Principes() {
                                   {/* En-tête : pour un verset on montre la réf, pour un bloc texte on n'affiche pas de titre */}
                                   {!isText ? (
                                     <div className="font-semibold">
-                                      {(it.bookName ?? it.bookId) || ' '}
+                                      {(it.bookName ?? it.bookId) || ''}{' '}
                                       {it.chapter}:{it.verse}
                                     </div>
                                   ) : null}
@@ -847,4 +847,5 @@ export default function Principes() {
     </div>
   );
 }
+
 
