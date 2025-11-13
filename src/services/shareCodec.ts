@@ -26,7 +26,7 @@ export function encodeSharedList(kind: SharedListKind, list: VerseList): string 
   const payload: SharedListPayload = {
     kind,
     title: (list.title || '').trim(),
-    // On clone les items pour éviter toute surprise
+    // On clone les items pour éviter toute surprise, y compris les blocs texte (__TEXT__)
     items: Array.isArray(list.items) ? list.items.map(it => ({ ...it })) : [],
   };
 
@@ -45,6 +45,7 @@ export function isTheWordShareCode(raw: string): boolean {
 
 /**
  * Décode un "code partage" en payload exploitable (ou null si invalide).
+ * On ne filtre PAS les blocs texte : tout ce qui ressemble à un VerseRef est conservé.
  */
 export function decodeSharedList(raw: string): SharedListPayload | null {
   if (!raw) return null;
@@ -58,29 +59,24 @@ export function decodeSharedList(raw: string): SharedListPayload | null {
 
     if (!data || typeof data !== 'object') return null;
     const kind = (data as any).kind;
-    const title = ((data as any).title || '').toString();
-    const items = (data as any).items;
+    const title = ((data as any).title ?? '').toString();
+    const itemsRaw = (data as any).items;
 
-    if ((kind !== 'note' && kind !== 'principle') || !title || !Array.isArray(items)) {
-      return null;
-    }
+    if (kind !== 'note' && kind !== 'principle') return null;
+    if (!Array.isArray(itemsRaw)) return null;
 
-    // On filtre / normalise un peu les items pour rester dans le type VerseRef
-    const safeItems: VerseRef[] = items.map((it: any) => ({
+    const items: VerseRef[] = itemsRaw.map((it: any) => ({
       bookId: String(it.bookId ?? ''),
-      bookName: it.bookName ? String(it.bookName) : undefined,
+      bookName: it.bookName != null ? String(it.bookName) : undefined,
       chapter: Number(it.chapter ?? 0),
       verse: Number(it.verse ?? 0),
       text: it.text != null ? String(it.text) : undefined,
-      translation: it.translation ? String(it.translation) : undefined,
-    })).filter((it: VerseRef) => it.bookId && it.chapter > 0 && it.verse > 0);
+      translation: it.translation != null ? String(it.translation) : undefined,
+    }));
 
-    return {
-      kind,
-      title,
-      items: safeItems,
-    };
+    return { kind, title, items };
   } catch {
     return null;
   }
 }
+
