@@ -11,7 +11,76 @@ import {
 } from 'lucide-react';
 import { readSlot as readQuickSlot, saveSlot as saveQuickSlot, type QuickSlot } from '../services/readingSlots';
 import { getAllLists, createList, addVersesToList } from '../services/collectionsService';
-import type { VerseRef } from '../types/collections';
+import type { VerseRef, VerseList } from '../types/collections';
+
+/* ========= Helpers de stockage pour PRINCIPES (même format que Principes.tsx) ========= */
+
+const PRINCIPLES_LS_KEY = 'twog:principles:v1';
+
+function pSafeParse<T>(raw: string | null, fallback: T): T {
+  if (!raw) return fallback;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function readAllPrinciples(): VerseList[] {
+  try {
+    return pSafeParse<VerseList[]>(localStorage.getItem(PRINCIPLES_LS_KEY), []);
+  } catch {
+    return [];
+  }
+}
+
+function writeAllPrinciples(all: VerseList[]) {
+  try {
+    localStorage.setItem(PRINCIPLES_LS_KEY, JSON.stringify(all));
+  } catch {}
+}
+
+function makePrincipleId() {
+  return 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+}
+
+function getAllPrinciplesLists(): VerseList[] {
+  return readAllPrinciples();
+}
+
+function createPrincipleList(title: string): VerseList {
+  const now = Date.now();
+  const list: VerseList = {
+    id: makePrincipleId(),
+    title: title?.trim() || 'Nouvelle étude',
+    createdAt: now,
+    updatedAt: now,
+    items: [],
+  };
+  const all = readAllPrinciples();
+  all.unshift(list); // en tête
+  writeAllPrinciples(all);
+  return list;
+}
+
+function addVersesToPrincipleList(listId: string, verses: VerseRef[]): void {
+  const all = readAllPrinciples();
+  const idx = all.findIndex(l => l.id === listId);
+  if (idx < 0) return;
+
+  const existing = all[idx];
+  const mergedItems = [...(existing.items || []), ...verses];
+
+  all[idx] = {
+    ...existing,
+    items: mergedItems,
+    updatedAt: Date.now(),
+  };
+
+  writeAllPrinciples(all);
+}
+
+/* ================================== Page =================================== */
 
 export default function Reading() {
   const { state, dispatch, saveReadingPosition } = useApp();
@@ -412,36 +481,38 @@ export default function Reading() {
     } catch (e) { console.error('share error', e); }
   };
 
-  // ---- Ajout à une liste (modal simple) ----
-  const [showAddToList, setShowAddToList] = useState(false);
-  const [listsForModal, setListsForModal] = useState(getAllLists());
-  const [selectedListId, setSelectedListId] = useState<string>('');
-  const [newListTitle, setNewListTitle] = useState<string>('');
-  const newListInputRef = useRef<HTMLInputElement>(null);
-
-  const sortListsByTitle = (arr: ReturnType<typeof getAllLists>) =>
+  // ---- Ajout à une liste Notes / Principes ----
+  const sortListsByTitle = (arr: VerseList[]) =>
     [...arr].sort((a, b) => (a.title || '').localeCompare(b.title || '', undefined, { sensitivity: 'base' }));
 
-  const openAddToList = () => {
+  // NOTES (collectionsService)
+  const [showAddToNotes, setShowAddToNotes] = useState(false);
+  const [notesListsForModal, setNotesListsForModal] = useState<VerseList[]>([]);
+  const [selectedNotesListId, setSelectedNotesListId] = useState<string>('');
+  const [newNotesListTitle, setNewNotesListTitle] = useState<string>('');
+
+  const openAddToNotes = () => {
     const all = sortListsByTitle(getAllLists());
-    setListsForModal(all);
-    setSelectedListId(all.length > 0 ? all[0].id : '');
-    setNewListTitle('');
-    setShowAddToList(true);
+    setNotesListsForModal(all);
+    setSelectedNotesListId(all.length > 0 ? all[0].id : '');
+    setNewNotesListTitle('');
+    setShowAddToNotes(true);
   };
 
-  const confirmAddToList = (e?: React.FormEvent) => {
+  const confirmAddToNotes = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!selectedBook || !chapter || selectedVerses.length === 0) return;
 
-    const typed = newListTitle.trim();
+    const typed = newNotesListTitle.trim();
     let targetId = '';
 
     if (typed) {
-      const existing = getAllLists().find(l => l.title.trim().toLowerCase() === typed.toLowerCase());
+      const existing = getAllLists().find(
+        (l) => (l.title || '').trim().toLowerCase() === typed.toLowerCase()
+      );
       targetId = existing ? existing.id : createList(typed).id;
     } else {
-      targetId = selectedListId || '';
+      targetId = selectedNotesListId || '';
     }
     if (!targetId) return;
 
@@ -457,12 +528,64 @@ export default function Reading() {
         translation: state.settings.language,
       }));
 
-    setShowAddToList(false);
+    try { addVersesToList(targetId, chosen); } catch (err) { console.error('addVerses error', err); }
+
+    setShowAddToNotes(false);
     setSelectedVerses([]);
     setCopiedKey('added-to-list');
     setTimeout(() => setCopiedKey(''), 1600);
+  };
 
-    try { addVersesToList(targetId, chosen); } catch (err) { console.error('addVerses error', err); }
+  // PRINCIPES (localStorage twog:principles:v1)
+  const [showAddToPrinciples, setShowAddToPrinciples] = useState(false);
+  const [principlesListsForModal, setPrinciplesListsForModal] = useState<VerseList[]>([]);
+  const [selectedPrincipleListId, setSelectedPrincipleListId] = useState<string>('');
+  const [newPrincipleListTitle, setNewPrincipleListTitle] = useState<string>('');
+
+  const openAddToPrinciples = () => {
+    const all = sortListsByTitle(getAllPrinciplesLists());
+    setPrinciplesListsForModal(all);
+    setSelectedPrincipleListId(all.length > 0 ? all[0].id : '');
+    setNewPrincipleListTitle('');
+    setShowAddToPrinciples(true);
+  };
+
+  const confirmAddToPrinciples = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!selectedBook || !chapter || selectedVerses.length === 0) return;
+
+    const typed = newPrincipleListTitle.trim();
+    let targetId = '';
+
+    const all = getAllPrinciplesLists();
+    if (typed) {
+      const existing = all.find(
+        (l) => (l.title || '').trim().toLowerCase() === typed.toLowerCase()
+      );
+      targetId = existing ? existing.id : createPrincipleList(typed).id;
+    } else {
+      targetId = selectedPrincipleListId || '';
+    }
+    if (!targetId) return;
+
+    const chosen = chapter.verses
+      .filter(v => selectedVerses.includes(v.verse))
+      .sort((a, b) => a.verse - b.verse)
+      .map<VerseRef>(v => ({
+        bookId: selectedBook.name,
+        bookName: getBookName(selectedBook),
+        chapter: v.chapter,
+        verse: v.verse,
+        text: v.text,
+        translation: state.settings.language,
+      }));
+
+    try { addVersesToPrincipleList(targetId, chosen); } catch (err) { console.error('addVerses principles error', err); }
+
+    setShowAddToPrinciples(false);
+    setSelectedVerses([]);
+    setCopiedKey('added-to-list');
+    setTimeout(() => setCopiedKey(''), 1600);
   };
 
   const swipeStart = useRef<{ x: number; y: number; time: number } | null>(null);
@@ -736,9 +859,19 @@ export default function Reading() {
                     : `${selectedVerses.length} verse${selectedVerses.length > 1 ? 's' : ''} selected`}
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={openAddToList} className="inline-flex items-center px-3 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-500">
+                  <button
+                    onClick={openAddToNotes}
+                    className="inline-flex items-center px-3 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-500"
+                  >
                     <ListPlusIcon size={16} className="mr-2" />
-                    {state.settings.language === 'fr' ? 'Ajouter à une liste' : 'Add to list'}
+                    {state.settings.language === 'fr' ? 'Vers Notes' : 'To Notes'}
+                  </button>
+                  <button
+                    onClick={openAddToPrinciples}
+                    className="inline-flex items-center px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-500"
+                  >
+                    <ListPlusIcon size={16} className="mr-2" />
+                    {state.settings.language === 'fr' ? 'Vers Principes' : 'To Principles'}
                   </button>
                   <button onClick={copySelection} className="inline-flex items-center px-3 py-2 rounded bg-blue-600 text-white hover:bg-blue-500">
                     <CopyIcon size={16} className="mr-2" />
@@ -879,9 +1012,13 @@ export default function Reading() {
           {selectedVerses.length > 0 && (
             <div className="sm:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
               <div className="bg-white/5 text-white shadow-lg rounded-full px-3 py-2 flex items-center space-x-2">
-                <button onClick={openAddToList} className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-600 text-white">
+                <button onClick={openAddToNotes} className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-600 text-white">
                   <ListPlusIcon size={16} className="mr-1" />
-                  {state.settings.language === 'fr' ? 'Liste' : 'List'}
+                  {state.settings.language === 'fr' ? 'Notes' : 'Notes'}
+                </button>
+                <button onClick={openAddToPrinciples} className="inline-flex items-center px-3 py-1.5 rounded-full bg-indigo-600 text-white">
+                  <ListPlusIcon size={16} className="mr-1" />
+                  {state.settings.language === 'fr' ? 'Principes' : 'Principles'}
                 </button>
                 <button onClick={copySelection} className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-600 text-white">
                   <CopyIcon size={16} className="mr-1" />
@@ -894,6 +1031,156 @@ export default function Reading() {
                 <button onClick={() => setSelectedVerses([])} className="bg-gray-700 text-white px-3 py-1.5 rounded-full">
                   {state.settings.language === 'fr' ? 'Annuler' : 'Clear'}
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* MODAL : ajout vers NOTES */}
+          {showAddToNotes && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div
+                className="absolute inset-0 bg-black/60"
+                onClick={() => setShowAddToNotes(false)}
+                aria-hidden="true"
+              />
+              <div className="relative bg-gray-900 text-white rounded-xl shadow-lg p-4 w-full max-w-md mx-4">
+                <h3 className="text-lg font-semibold mb-2">
+                  {state.settings.language === 'fr' ? 'Ajouter à une liste (Notes)' : 'Add to a list (Notes)'}
+                </h3>
+                <form onSubmit={confirmAddToNotes}>
+                  <div className="max-h-64 overflow-y-auto mt-2 space-y-1">
+                    {notesListsForModal.length === 0 ? (
+                      <p className="text-sm text-white/70">
+                        {state.settings.language === 'fr'
+                          ? 'Aucune liste pour l’instant. Créez-en une ci-dessous.'
+                          : 'No list yet. Create one below.'}
+                      </p>
+                    ) : (
+                      notesListsForModal.map((l) => (
+                        <label
+                          key={l.id}
+                          className="flex items-center gap-2 px-2 py-1 rounded hover:bg-white/5 cursor-pointer"
+                        >
+                          <input
+                            type="radio"
+                            name="notesList"
+                            className="accent-emerald-500"
+                            value={l.id}
+                            checked={selectedNotesListId === l.id}
+                            onChange={() => setSelectedNotesListId(l.id)}
+                          />
+                          <span className="text-sm truncate">{l.title || '(sans titre)'}</span>
+                        </label>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="mt-3">
+                    <label className="block text-sm mb-1">
+                      {state.settings.language === 'fr'
+                        ? 'Nouvelle liste (optionnel)'
+                        : 'New list (optional)'}
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full rounded-md bg-gray-800 border border-gray-600 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      value={newNotesListTitle}
+                      onChange={(e) => setNewNotesListTitle(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="mt-4 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddToNotes(false)}
+                      className="px-3 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm"
+                    >
+                      {state.settings.language === 'fr' ? 'Annuler' : 'Cancel'}
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-sm"
+                    >
+                      OK
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* MODAL : ajout vers PRINCIPES */}
+          {showAddToPrinciples && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div
+                className="absolute inset-0 bg-black/60"
+                onClick={() => setShowAddToPrinciples(false)}
+                aria-hidden="true"
+              />
+              <div className="relative bg-gray-900 text-white rounded-xl shadow-lg p-4 w-full max-w-md mx-4">
+                <h3 className="text-lg font-semibold mb-2">
+                  {state.settings.language === 'fr'
+                    ? 'Ajouter à une étude (Principes)'
+                    : 'Add to a study (Principles)'}
+                </h3>
+                <form onSubmit={confirmAddToPrinciples}>
+                  <div className="max-h-64 overflow-y-auto mt-2 space-y-1">
+                    {principlesListsForModal.length === 0 ? (
+                      <p className="text-sm text-white/70">
+                        {state.settings.language === 'fr'
+                          ? 'Aucune étude pour l’instant. Créez-en une ci-dessous.'
+                          : 'No study yet. Create one below.'}
+                      </p>
+                    ) : (
+                      principlesListsForModal.map((l) => (
+                        <label
+                          key={l.id}
+                          className="flex items-center gap-2 px-2 py-1 rounded hover:bg-white/5 cursor-pointer"
+                        >
+                          <input
+                            type="radio"
+                            name="principleList"
+                            className="accent-indigo-400"
+                            value={l.id}
+                            checked={selectedPrincipleListId === l.id}
+                            onChange={() => setSelectedPrincipleListId(l.id)}
+                          />
+                          <span className="text-sm truncate">{l.title || '(sans titre)'}</span>
+                        </label>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="mt-3">
+                    <label className="block text-sm mb-1">
+                      {state.settings.language === 'fr'
+                        ? 'Nouvelle étude (optionnel)'
+                        : 'New study (optional)'}
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full rounded-md bg-gray-800 border border-gray-600 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      value={newPrincipleListTitle}
+                      onChange={(e) => setNewPrincipleListTitle(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="mt-4 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddToPrinciples(false)}
+                      className="px-3 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm"
+                    >
+                      {state.settings.language === 'fr' ? 'Annuler' : 'Cancel'}
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-sm"
+                    >
+                      OK
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           )}
@@ -937,3 +1224,4 @@ export default function Reading() {
     </div>
   );
 }
+
