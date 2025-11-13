@@ -9,8 +9,6 @@ import {
   deleteList,
   getListById,
   setListItems,
-  exportListAsCode,
-  importListFromCode,
 } from '../services/collectionsService';
 import type { VerseList, VerseRef } from '../types/collections';
 import {
@@ -25,6 +23,10 @@ import {
   Type as TextIcon,
   Edit2 as EditTextIcon, // <- icône crayon pour modifier un bloc texte
 } from 'lucide-react';
+import {
+  encodeSharedList,
+  decodeSharedList,
+} from '../services/shareCodec';
 
 /** Sentinelle pour distinguer un bloc de texte libre d'un verset */
 const TEXT_SENTINEL = '__TEXT__';
@@ -115,8 +117,8 @@ export default function Notes() {
           : 'Paste the TheWord share code here:',
       importError:
         state.settings.language === 'fr'
-          ? 'Code invalide ou liste introuvable.'
-          : 'Invalid code or list not found.',
+          ? 'Code invalide.'
+          : 'Invalid code.',
       importSuccess:
         state.settings.language === 'fr'
           ? 'Liste importée avec succès ✅'
@@ -217,7 +219,7 @@ export default function Notes() {
   const doShareCode = async (id: string) => {
     const list = getListById(id);
     if (!list) return;
-    const code = exportListAsCode(list);
+    const code = encodeSharedList('note', list); // <- type "note"
     try {
       await navigator.clipboard.writeText(code);
       alert(label.shareCodeCopied);
@@ -231,17 +233,27 @@ export default function Notes() {
     const code = prompt(label.importPrompt) ?? '';
     const trimmed = code.trim();
     if (!trimmed) return;
-    const imported = importListFromCode(trimmed);
-    if (!imported) {
+
+    const payload = decodeSharedList(trimmed);
+    if (!payload) {
       alert(label.importError);
       return;
     }
-    alert(label.importSuccess);
+
+    const title =
+      payload.title?.trim() ||
+      (state.settings.language === 'fr' ? 'Import TheWord' : 'TheWord import');
+
+    // On crée une nouvelle liste avec ce titre,
+    // puis on injecte les items importés (y compris blocs texte).
+    const created = createList(title);
+    setListItems(created.id, (payload.items || []) as VerseRef[]);
     refresh();
-    setExpandedId(imported.id);
+    setExpandedId(created.id);
+    alert(label.importSuccess);
   };
 
-  // --- NOUVEAU : opérations de copie/partage pour UN élément (verset) ---
+  // --- opérations de copie/partage pour UN élément (verset ou bloc texte) ---
   const copyItemText = async (it: AnyItem) => {
     const txt = buildItemPlainText(it);
     if (!txt) return;
@@ -355,6 +367,7 @@ export default function Notes() {
 
           {!expandedId && (
             <div className="flex items-center gap-2">
+              {/* Importer depuis un CODE TheWord */}
               <button
                 onClick={doImportFromCode}
                 className={`inline-flex items-center gap-2 px-3 py-2 rounded-md border text-sm ${
@@ -676,3 +689,4 @@ export default function Notes() {
     </div>
   );
 }
+
