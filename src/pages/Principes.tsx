@@ -319,8 +319,8 @@ export default function Principes() {
     // IMPORTANT : on enlève tous les espaces / retours à la ligne
     const normalized = code.replace(/\s+/g, '').trim();
     if (!normalized) return;
-    
-    const payload = decodeSharedList(trimmed);
+
+    const payload = decodeSharedList(normalized);
     if (!payload) {
       alert(label.importError);
       return;
@@ -690,7 +690,7 @@ export default function Principes() {
                                   {/* En-tête : pour un verset on montre la réf, pour un bloc texte on n'affiche pas de titre */}
                                   {!isText ? (
                                     <div className="font-semibold">
-                                      {(it.bookName ?? it.bookId) || ''}{' '}
+                                      {(it.bookName ?? it.bookId) || ' '}
                                       {it.chapter}:{it.verse}
                                     </div>
                                   ) : null}
