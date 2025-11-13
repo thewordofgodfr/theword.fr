@@ -314,9 +314,12 @@ export default function Principes() {
 
   const doImportFromCode = () => {
     const code = prompt(label.importPrompt) ?? '';
-    const trimmed = code.trim();
-    if (!trimmed) return;
+    if (!code) return;
 
+    // IMPORTANT : on enlève tous les espaces / retours à la ligne
+    const normalized = code.replace(/\s+/g, '').trim();
+    if (!normalized) return;
+    
     const payload = decodeSharedList(trimmed);
     if (!payload) {
       alert(label.importError);
