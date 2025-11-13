@@ -15,6 +15,7 @@ import {
   Type as TextIcon,
   Edit2 as EditTextIcon, // icône crayon pour modifier un bloc texte
 } from 'lucide-react';
+import { encodeSharedList, decodeSharedList } from '../services/shareCodec';
 
 /** Sentinelle pour distinguer un bloc de texte libre d'un verset */
 const TEXT_SENTINEL = '__TEXT__';
@@ -25,13 +26,23 @@ const P_LS_KEY = 'twog:principles:v1';
 
 function p_safeParse<T>(raw: string | null, fallback: T): T {
   if (!raw) return fallback;
-  try { return JSON.parse(raw) as T; } catch { return fallback; }
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
 }
 function p_readAll(): VerseList[] {
-  try { return p_safeParse<VerseList[]>(localStorage.getItem(P_LS_KEY), []); } catch { return []; }
+  try {
+    return p_safeParse<VerseList[]>(localStorage.getItem(P_LS_KEY), []);
+  } catch {
+    return [];
+  }
 }
 function p_writeAll(all: VerseList[]) {
-  try { localStorage.setItem(P_LS_KEY, JSON.stringify(all)); } catch {}
+  try {
+    localStorage.setItem(P_LS_KEY, JSON.stringify(all));
+  } catch {}
 }
 function p_makeId() {
   return 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
@@ -42,7 +53,7 @@ function p_getAllLists(): VerseList[] {
   return p_readAll(); // conserver l'ordre tel qu'enregistré (utile pour le réordonnancement manuel)
 }
 function p_getListById(id: string): VerseList | null {
-  return p_readAll().find(l => l.id === id) ?? null;
+  return p_readAll().find((l) => l.id === id) ?? null;
 }
 function p_createList(title: string): VerseList {
   const now = Date.now();
@@ -60,7 +71,7 @@ function p_createList(title: string): VerseList {
 }
 function p_renameList(id: string, newTitle: string): VerseList | null {
   const all = p_readAll();
-  const i = all.findIndex(l => l.id === id);
+  const i = all.findIndex((l) => l.id === id);
   if (i < 0) return null;
   all[i] = { ...all[i], title: newTitle?.trim() || all[i].title, updatedAt: Date.now() };
   p_writeAll(all);
@@ -68,13 +79,13 @@ function p_renameList(id: string, newTitle: string): VerseList | null {
 }
 function p_deleteList(id: string): boolean {
   const all = p_readAll();
-  const next = all.filter(l => l.id !== id);
+  const next = all.filter((l) => l.id !== id);
   p_writeAll(next);
   return next.length !== all.length;
 }
 function p_setListItems(id: string, items: VerseRef[]): VerseList | null {
   const all = p_readAll();
-  const i = all.findIndex(l => l.id === id);
+  const i = all.findIndex((l) => l.id === id);
   if (i < 0) return null;
   all[i] = { ...all[i], items: Array.isArray(items) ? items : [], updatedAt: Date.now() };
   p_writeAll(all);
@@ -91,80 +102,6 @@ function p_moveList(fromIdx: number, toIdx: number): VerseList[] {
   arr.splice(dst, 0, moved);
   p_writeAll(arr);
   return arr;
-}
-
-/* ========================== Partage par code (Principes) ========================== */
-
-type PSharePayload = {
-  v: 1;
-  kind: 'principle';
-  title: string;
-  createdAt: number;
-  updatedAt: number;
-  items: VerseRef[];
-};
-
-function p_exportListAsCode(list: VerseList): string {
-  const payload: PSharePayload = {
-    v: 1,
-    kind: 'principle',
-    title: list.title || 'Étude',
-    createdAt: list.createdAt || Date.now(),
-    updatedAt: list.updatedAt || Date.now(),
-    items: (list.items || []) as VerseRef[],
-  };
-  const json = JSON.stringify(payload);
-  // encodage UTF-8 safe
-  const b64 = btoa(unescape(encodeURIComponent(json)));
-  return `TWOG-P1:${b64}`;
-}
-
-function p_importListFromCode(code: string): VerseList | null {
-  const trimmed = code.trim();
-  if (!trimmed) return null;
-
-  let raw = trimmed;
-  const prefix = 'TWOG-P1:';
-  const idx = trimmed.indexOf(':');
-
-  if (trimmed.startsWith(prefix)) {
-    raw = trimmed.slice(prefix.length);
-  } else if (idx > 0 && trimmed.substring(0, idx).startsWith('TWOG')) {
-    // ex: "TWOG-XXX:xxxx"
-    raw = trimmed.slice(idx + 1);
-  }
-
-  let json: string;
-  try {
-    json = decodeURIComponent(escape(atob(raw)));
-  } catch {
-    return null;
-  }
-
-  let payload: PSharePayload;
-  try {
-    payload = JSON.parse(json);
-  } catch {
-    return null;
-  }
-
-  if (!payload || payload.v !== 1 || payload.kind !== 'principle' || !Array.isArray(payload.items)) {
-    return null;
-  }
-
-  const now = Date.now();
-  const list: VerseList = {
-    id: p_makeId(),
-    title: payload.title || 'Étude importée',
-    createdAt: now,
-    updatedAt: now,
-    items: (payload.items || []) as VerseRef[],
-  };
-
-  const all = p_getAllLists();
-  all.unshift(list);
-  p_writeAll(all);
-  return list;
 }
 
 /* ========================== Utils d'affichage texte ========================== */
@@ -237,7 +174,8 @@ export default function Principes() {
       openReading: state.settings.language === 'fr' ? 'Ouvrir la lecture' : 'Open Reading',
       copied: state.settings.language === 'fr' ? 'Copié' : 'Copied',
       backAll: state.settings.language === 'fr' ? '← Toutes les études' : '← All studies',
-      addTextBlock: state.settings.language === 'fr' ? 'Ajouter un bloc de texte' : 'Add text block',
+      addTextBlock:
+        state.settings.language === 'fr' ? 'Ajouter un bloc de texte' : 'Add text block',
       editTextBlock: state.settings.language === 'fr' ? 'Modifier le bloc' : 'Edit block',
       deleteItem: state.settings.language === 'fr' ? 'Supprimer' : 'Delete',
       moveUp: state.settings.language === 'fr' ? 'Monter' : 'Move up',
@@ -245,9 +183,7 @@ export default function Principes() {
       open: state.settings.language === 'fr' ? 'Ouvrir' : 'Open',
       cancel: state.settings.language === 'fr' ? 'Annuler' : 'Cancel',
       confirmDeleteItem:
-        state.settings.language === 'fr'
-          ? 'Supprimer cet élément ?'
-          : 'Delete this item?',
+        state.settings.language === 'fr' ? 'Supprimer cet élément ?' : 'Delete this item?',
       newTextPlaceholder:
         state.settings.language === 'fr' ? 'Votre texte…' : 'Your text…',
       rename: state.settings.language === 'fr' ? 'Renommer' : 'Rename',
@@ -259,12 +195,12 @@ export default function Principes() {
       importCode: state.settings.language === 'fr' ? 'Importer un code' : 'Import code',
       importPrompt:
         state.settings.language === 'fr'
-          ? 'Collez ici le code de partage de l’étude :'
-          : 'Paste the study share code here:',
+          ? 'Collez ici le code de partage TheWord (note ou étude) :'
+          : 'Paste the TheWord share code (note or study) here:',
       importError:
         state.settings.language === 'fr'
-          ? 'Code invalide ou étude introuvable.'
-          : 'Invalid code or study not found.',
+          ? 'Code invalide.'
+          : 'Invalid code.',
       importSuccess:
         state.settings.language === 'fr'
           ? 'Étude importée avec succès ✅'
@@ -360,17 +296,18 @@ export default function Principes() {
     } catch {}
   };
 
-  // --- Partage / import PAR CODE (Principes) ---
+  // --- Partage / import PAR CODE (compatible Notes & Principes) ---
 
   const doShareCode = async (id: string) => {
     const list = p_getListById(id);
     if (!list) return;
-    const code = p_exportListAsCode(list);
+    // On encode comme "principle", mais Notes pourra quand même l'importer
+    const code = encodeSharedList('principle', list);
     try {
       await navigator.clipboard.writeText(code);
       alert(label.shareCodeCopied);
     } catch {
-      // fallback : on affiche le code dans un prompt pour copie manuelle
+      // fallback : afficher le code dans un prompt pour copie manuelle
       prompt(label.shareCode, code);
     }
   };
@@ -379,14 +316,23 @@ export default function Principes() {
     const code = prompt(label.importPrompt) ?? '';
     const trimmed = code.trim();
     if (!trimmed) return;
-    const imported = p_importListFromCode(trimmed);
-    if (!imported) {
+
+    const payload = decodeSharedList(trimmed);
+    if (!payload) {
       alert(label.importError);
       return;
     }
-    alert(label.importSuccess);
+
+    const title =
+      payload.title?.trim() ||
+      (state.settings.language === 'fr' ? 'Import TheWord' : 'TheWord import');
+
+    // On crée une NOUVELLE étude, même si le code vient d'une note
+    const created = p_createList(title);
+    p_setListItems(created.id, (payload.items || []) as VerseRef[]);
     refresh();
-    setExpandedId(imported.id);
+    setExpandedId(created.id);
+    alert(label.importSuccess);
   };
 
   // ---------- opérations sur items ----------
@@ -485,7 +431,11 @@ export default function Principes() {
 
   // format date sans heure — affichage simple type 31/12/2025
   const formatDate = (d: string | number | Date) =>
-    new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' });
+    new Date(d).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
 
   return (
     <div className={`min-h-[100svh] ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -502,7 +452,7 @@ export default function Principes() {
 
           {!expandedId && (
             <div className="flex items-center gap-2">
-              {/* Importer une étude par code */}
+              {/* Importer une étude ou une note par code */}
               <button
                 onClick={doImportFromCode}
                 className={`inline-flex items-center gap-2 px-3 py-2 rounded-md border text-sm ${
@@ -528,7 +478,9 @@ export default function Principes() {
           <div className="mb-4 flex items-center gap-2">
             <button
               onClick={() => setExpandedId(null)}
-              className={`${isDark ? 'text-white bg-gray-700' : 'text-gray-700 bg-gray-200'} px-3 py-1.5 rounded`}
+              className={`${
+                isDark ? 'text-white bg-gray-700' : 'text-gray-700 bg-gray-200'
+              } px-3 py-1.5 rounded`}
             >
               {label.backAll}
             </button>
@@ -553,7 +505,7 @@ export default function Principes() {
             {shownLists.map((list, idxInShown) => {
               const isOpen = expandedId === list.id;
               // index réel dans l'ensemble (utile pour move up/down quand tout est affiché)
-              const realIndex = expandedId ? lists.findIndex(l => l.id === list.id) : idxInShown;
+              const realIndex = expandedId ? lists.findIndex((l) => l.id === list.id) : idxInShown;
 
               return (
                 <div
@@ -568,7 +520,9 @@ export default function Principes() {
                         }
                       : undefined
                   }
-                  className={`${isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} rounded-xl shadow p-4 ${!isOpen ? 'cursor-pointer' : ''}`}
+                  className={`${
+                    isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
+                  } rounded-xl shadow p-4 ${!isOpen ? 'cursor-pointer' : ''}`}
                   role={!isOpen ? 'button' : undefined}
                   aria-expanded={isOpen}
                   style={{ WebkitTapHighlightColor: 'transparent', position: 'relative' }}
@@ -578,7 +532,11 @@ export default function Principes() {
                     <div className="text-lg md:text-xl font-semibold leading-snug whitespace-normal break-words">
                       {list.title}
                     </div>
-                    <div className={`mt-1 text-xs ${isDark ? 'text-white/60' : 'text-gray-500'}`}>
+                    <div
+                      className={`mt-1 text-xs ${
+                        isDark ? 'text-white/60' : 'text-gray-500'
+                      }`}
+                    >
                       {list.items.length} {label.verses} • {formatDate(list.updatedAt)}
                     </div>
                   </div>
@@ -622,7 +580,9 @@ export default function Principes() {
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       <button
                         onClick={() => doRename(list.id, list.title)}
-                        className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
+                        className={`${
+                          isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
+                        } px-3 py-2 rounded inline-flex items-center gap-2`}
                         title={label.rename}
                       >
                         <Edit3 size={16} />
@@ -640,7 +600,9 @@ export default function Principes() {
 
                       <button
                         onClick={() => copyListText(list.id)}
-                        className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
+                        className={`${
+                          isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
+                        } px-3 py-2 rounded inline-flex items-center gap-2`}
                         title={label.copy}
                       >
                         <Copy size={16} />
@@ -650,7 +612,9 @@ export default function Principes() {
                       {/* Code pour cette étude */}
                       <button
                         onClick={() => doShareCode(list.id)}
-                        className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
+                        className={`${
+                          isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
+                        } px-3 py-2 rounded inline-flex items-center gap-2`}
                         title={label.shareCode}
                       >
                         <Copy size={16} />
@@ -670,17 +634,28 @@ export default function Principes() {
 
                   {/* Contenu de la liste ouverte */}
                   {isOpen && (
-                    <div className={`mt-4 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-50'} p-3`}>
+                    <div
+                      className={`mt-4 rounded-lg ${
+                        isDark ? 'bg-gray-700' : 'bg-gray-50'
+                      } p-3`}
+                    >
                       {list.items.length === 0 ? (
-                        <div className={`${isDark ? 'text-white/70' : 'text-gray-600'} text-sm`}>
-                          {state.settings.language === 'fr' ? 'Liste vide.' : 'Empty list.'}
+                        <div
+                          className={`${
+                            isDark ? 'text-white/70' : 'text-gray-600'
+                          } text-sm`}
+                        >
+                          {state.settings.language === 'fr'
+                            ? 'Liste vide.'
+                            : 'Empty list.'}
                         </div>
                       ) : (
                         <ul className="space-y-3">
                           {(list.items as AnyItem[]).map((it, idx) => {
                             const isText = it.bookId === TEXT_SENTINEL;
                             const menuOpen =
-                              openItemMenu?.listId === list.id && openItemMenu?.idx === idx;
+                              openItemMenu?.listId === list.id &&
+                              openItemMenu?.idx === idx;
 
                             const openInReading = () => {
                               if (isText) return; // pas d'ouverture pour bloc texte
@@ -712,7 +687,8 @@ export default function Principes() {
                                   {/* En-tête : pour un verset on montre la réf, pour un bloc texte on n'affiche pas de titre */}
                                   {!isText ? (
                                     <div className="font-semibold">
-                                      {(it.bookName ?? it.bookId) || ''} {it.chapter}:{it.verse}
+                                      {(it.bookName ?? it.bookId) || ''}{' '}
+                                      {it.chapter}:{it.verse}
                                     </div>
                                   ) : null}
 
@@ -722,7 +698,11 @@ export default function Principes() {
                                         fontSize: `${state.settings.fontSize}px`,
                                         lineHeight: '1.55',
                                       }}
-                                      className={isDark ? 'text-white mt-1' : 'text-gray-800 mt-1'}
+                                      className={
+                                        isDark
+                                          ? 'text-white mt-1'
+                                          : 'text-gray-800 mt-1'
+                                      }
                                     >
                                       {it.text}
                                     </div>
@@ -749,7 +729,9 @@ export default function Principes() {
                                         <button
                                           onClick={() => copyItemText(it)}
                                           className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                            isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
+                                            isDark
+                                              ? 'bg-gray-700 text-white'
+                                              : 'bg-white text-gray-800'
                                           }`}
                                           title={label.copy}
                                         >
@@ -772,7 +754,13 @@ export default function Principes() {
                                     {/* Modifier (uniquement pour bloc de texte) */}
                                     {isText && (
                                       <button
-                                        onClick={() => editTextBlock(list.id, idx, String(it.text || ''))}
+                                        onClick={() =>
+                                          editTextBlock(
+                                            list.id,
+                                            idx,
+                                            String(it.text || '')
+                                          )
+                                        }
                                         className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500"
                                         title={label.editTextBlock}
                                       >
