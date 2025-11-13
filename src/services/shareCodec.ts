@@ -1,82 +1,112 @@
 // src/services/shareCodec.ts
-// Encodage / décodage de listes TheWord (Notes / Principes) en "code partage"
-// pour échange via WhatsApp / SMS / mail, etc.
-
-import type { VerseRef, VerseList } from '../types/collections';
+import type { VerseList, VerseRef } from '../types/collections';
 
 export type SharedListKind = 'note' | 'principle';
 
-export interface SharedListPayload {
+export interface SharedListPayloadV1 {
+  v: 1;
   kind: SharedListKind;
   title: string;
+  createdAt: number;
+  updatedAt: number;
   items: VerseRef[];
 }
 
-/**
- * Préfixe pour reconnaître un "code TheWord".
- * Exemple : TWOG1:%7B%22kind%22%3A%22note%22%2C...%7D
- */
-export const SHARE_PREFIX = 'TWOG1:';
+// Helpers UTF-8 <-> base64 (équivalent de unescape/encodeURIComponent en JS)
+function encodeBase64Utf8(str: string): string {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+function decodeBase64Utf8(b64: string): string {
+  return decodeURIComponent(escape(atob(b64)));
+}
 
 /**
- * Encode une liste (note ou principe) en "code partage" texte,
- * prêt à être collé dans WhatsApp / SMS / mail / Notes, etc.
+ * Encodage commun Notes / Principes
+ * kind = 'note' ou 'principle'
  */
 export function encodeSharedList(kind: SharedListKind, list: VerseList): string {
-  const payload: SharedListPayload = {
+  const payload: SharedListPayloadV1 = {
+    v: 1,
     kind,
-    title: (list.title || '').trim(),
-    // On clone les items pour éviter toute surprise, y compris les blocs texte (__TEXT__)
-    items: Array.isArray(list.items) ? list.items.map(it => ({ ...it })) : [],
+    title: (list.title || '').trim() || (kind === 'note' ? 'Liste' : 'Étude'),
+    createdAt: list.createdAt || Date.now(),
+    updatedAt: list.updatedAt || Date.now(),
+    items: (list.items || []) as VerseRef[],
   };
 
   const json = JSON.stringify(payload);
-  const encoded = encodeURIComponent(json);
-  return SHARE_PREFIX + encoded;
+  const b64 = encodeBase64Utf8(json);
+
+  // Préfixe générique v1 (Notes & Principes)
+  return `TWOG-1:${b64}`;
 }
 
 /**
- * Test simple : est-ce que la chaîne ressemble à un code TheWord ?
+ * Décodage :
+ * - accepte "TWOG-1:xxxx" (nouveau format)
+ * - accepte aussi "TWOG-P1:xxxx" (ancien format généré par la page HTML / Principes)
+ * - ignore les espaces et retours à la ligne autour / au milieu du code
  */
-export function isTheWordShareCode(raw: string): boolean {
-  if (!raw) return false;
-  return raw.trim().startsWith(SHARE_PREFIX);
-}
+export function decodeSharedList(code: string): SharedListPayloadV1 | null {
+  if (!code) return null;
 
-/**
- * Décode un "code partage" en payload exploitable (ou null si invalide).
- * On ne filtre PAS les blocs texte : tout ce qui ressemble à un VerseRef est conservé.
- */
-export function decodeSharedList(raw: string): SharedListPayload | null {
+  // On supprime tous les espaces et retours à la ligne
+  let raw = code.replace(/\s+/g, '').trim();
   if (!raw) return null;
-  const trimmed = raw.trim();
-  if (!trimmed.startsWith(SHARE_PREFIX)) return null;
 
-  const body = trimmed.slice(SHARE_PREFIX.length);
+  // Si le code commence par "TWOG..." on ne garde que ce qu'il y a après le premier ":"
+  const idx = raw.indexOf(':');
+  if (idx > 0 && raw.startsWith('TWOG')) {
+    raw = raw.slice(idx + 1);
+  }
+
+  if (!raw) return null;
+
+  let json: string;
   try {
-    const json = decodeURIComponent(body);
-    const data = JSON.parse(json);
-
-    if (!data || typeof data !== 'object') return null;
-    const kind = (data as any).kind;
-    const title = ((data as any).title ?? '').toString();
-    const itemsRaw = (data as any).items;
-
-    if (kind !== 'note' && kind !== 'principle') return null;
-    if (!Array.isArray(itemsRaw)) return null;
-
-    const items: VerseRef[] = itemsRaw.map((it: any) => ({
-      bookId: String(it.bookId ?? ''),
-      bookName: it.bookName != null ? String(it.bookName) : undefined,
-      chapter: Number(it.chapter ?? 0),
-      verse: Number(it.verse ?? 0),
-      text: it.text != null ? String(it.text) : undefined,
-      translation: it.translation != null ? String(it.translation) : undefined,
-    }));
-
-    return { kind, title, items };
+    json = decodeBase64Utf8(raw);
   } catch {
     return null;
   }
-}
 
+  let payload: any;
+  try {
+    payload = JSON.parse(json);
+  } catch {
+    return null;
+  }
+
+  if (!payload || payload.v !== 1 || !Array.isArray(payload.items)) {
+    return null;
+  }
+
+  const kind: SharedListKind =
+    payload.kind === 'principle' || payload.kind === 'note'
+      ? payload.kind
+      : 'note';
+
+  const title: string =
+    typeof payload.title === 'string'
+      ? payload.title
+      : kind === 'note'
+      ? 'Liste importée'
+      : 'Étude importée';
+
+  const createdAt: number =
+    typeof payload.createdAt === 'number' ? payload.createdAt : Date.now();
+
+  const updatedAt: number =
+    typeof payload.updatedAt === 'number' ? payload.updatedAt : createdAt;
+
+  const items = (payload.items || []) as VerseRef[];
+
+  return {
+    v: 1,
+    kind,
+    title,
+    createdAt,
+    updatedAt,
+    items,
+  };
+}
