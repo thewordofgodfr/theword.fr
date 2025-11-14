@@ -460,10 +460,10 @@ export default function Notes() {
 
           {!expandedId && (
             <div className="mt-4 space-y-2">
-              {/* Gros bouton primaire : + Créer une liste (plein écran mobile) */}
+              {/* Gros bouton primaire : + Créer une liste (ORANGE) */}
               <button
                 onClick={doCreate}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600 text-white font-semibold text-sm shadow hover:bg-blue-500 active:scale-[0.98]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-orange-500 text-white font-semibold text-sm shadow hover:bg-orange-400 active:scale-[0.98]"
               >
                 <Plus size={18} />
                 {label.create}
@@ -471,7 +471,7 @@ export default function Notes() {
 
               {/* Ligne de boutons secondaires alignés à droite */}
               <div className="flex flex-wrap items-center justify-end gap-2">
-                {/* Importer depuis un TEXTE (Texte → Liste) */}
+                {/* Importer depuis un TEXTE (Texte → Liste) avec liseret harmonisé */}
                 <button
                   onClick={openImportFromText}
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
@@ -484,7 +484,7 @@ export default function Notes() {
                   {label.importTextButton}
                 </button>
 
-                {/* Importer depuis un CODE TheWord */}
+                {/* Importer depuis un CODE TheWord (même liseret) */}
                 <button
                   onClick={doImportFromCode}
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
@@ -502,18 +502,19 @@ export default function Notes() {
         </div>
 
         {expandedId && (
-          <div className="mb-4 flex items-center gap-2">
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            {/* Bouton retour : plus grand, ORANGE, cohérent avec Principes */}
             <button
               onClick={() => setExpandedId(null)}
-              className={`${isDark ? 'text-white bg-gray-700' : 'text-gray-700 bg-gray-200'} px-3 py-1.5 rounded`}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 text-white font-semibold text-sm hover:bg-orange-400"
             >
               {label.backAll}
             </button>
 
-            {/* Ajouter un bloc de texte quand la liste est ouverte */}
+            {/* Ajouter un bloc de texte quand la liste est ouverte (BLEU comme Principes) */}
             <button
               onClick={() => addTextBlock(expandedId)}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-emerald-600 text-white hover:bg-emerald-500"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500 text-sm"
             >
               <TextIcon size={16} />
               {label.addTextBlock}
