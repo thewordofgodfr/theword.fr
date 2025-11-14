@@ -35,6 +35,14 @@ type AnyItem = VerseRef & {
   kind?: 'text' | 'verse';
 };
 
+/** Découpe un texte en blocs séparés par au moins une ligne vide */
+function splitIntoBlocks(raw: string): string[] {
+  return raw
+    .split(/\n\s*\n+/)
+    .map((b) => b.trim())
+    .filter((b) => b.length > 0);
+}
+
 function buildPlainListText(list: VerseList): string {
   const lines: string[] = [];
   const title = (list.title || '').trim();
@@ -85,6 +93,12 @@ export default function Notes() {
   // item sélectionné pour afficher ses actions
   const [openItemMenu, setOpenItemMenu] = useState<{ listId: string; idx: number } | null>(null);
 
+  // --- Mini outil "Importer depuis un texte" ---
+  const [showImportFromText, setShowImportFromText] = useState(false);
+  const [importTextTitle, setImportTextTitle] = useState('');
+  const [importTextBody, setImportTextBody] = useState('');
+  const [importSplitBlocks, setImportSplitBlocks] = useState(true);
+
   const label = useMemo(
     () => ({
       title: state.settings.language === 'fr' ? 'Notes' : 'Notes',
@@ -127,6 +141,41 @@ export default function Notes() {
         state.settings.language === 'fr'
           ? 'Code copié dans le presse-papiers ✅'
           : 'Code copied to clipboard ✅',
+      // Libellés mini-import texte
+      importTextButton:
+        state.settings.language === 'fr' ? 'Texte → Liste' : 'Text → List',
+      importTextTitlePlaceholder:
+        state.settings.language === 'fr'
+          ? 'Titre de la nouvelle liste'
+          : 'New list title',
+      importTextDefaultTitle:
+        state.settings.language === 'fr'
+          ? 'Import texte'
+          : 'Text import',
+      importTextBodyPlaceholder:
+        state.settings.language === 'fr'
+          ? 'Colle ici ton texte…'
+          : 'Paste your text here…',
+      importTextNoBody:
+        state.settings.language === 'fr'
+          ? 'Merci de coller un texte à importer.'
+          : 'Please paste some text to import.',
+      importTextNoBlock:
+        state.settings.language === 'fr'
+          ? 'Aucun bloc détecté (pense à laisser des lignes vides si tu découpes en blocs).'
+          : 'No block detected (add blank lines if you split into blocks).',
+      importTextSplitLabel:
+        state.settings.language === 'fr'
+          ? 'Découper en blocs (séparés par au moins une ligne vide)'
+          : 'Split into blocks (separated by at least one empty line)',
+      importTextInfo:
+        state.settings.language === 'fr'
+          ? 'Chaque bloc deviendra un élément dans la liste.'
+          : 'Each block will become an item in the list.',
+      importTextCreate:
+        state.settings.language === 'fr'
+          ? 'Créer la liste'
+          : 'Create list',
     }),
     [state.settings.language]
   );
@@ -253,6 +302,47 @@ export default function Notes() {
     alert(label.importSuccess);
   };
 
+  // --- Import direct depuis un TEXTE (mini outil interne) ---
+  const openImportFromText = () => {
+    setImportTextTitle('');
+    setImportTextBody('');
+    setImportSplitBlocks(true);
+    setShowImportFromText(true);
+  };
+
+  const handleCreateFromText = () => {
+    const title =
+      (importTextTitle || '').trim() || label.importTextDefaultTitle;
+    const raw = (importTextBody || '').trim();
+
+    if (!raw) {
+      alert(label.importTextNoBody);
+      return;
+    }
+
+    const blocks = importSplitBlocks ? splitIntoBlocks(raw) : [raw];
+    if (blocks.length === 0) {
+      alert(label.importTextNoBlock);
+      return;
+    }
+
+    const items: AnyItem[] = blocks.map((text) => ({
+      bookId: TEXT_SENTINEL,
+      bookName: '',
+      chapter: 0,
+      verse: 0,
+      text,
+      translation: state.settings.language,
+      kind: 'text',
+    }));
+
+    const created = createList(title);
+    setListItems(created.id, items as VerseRef[]);
+    refresh();
+    setExpandedId(created.id);
+    setShowImportFromText(false);
+  };
+
   // --- opérations de copie/partage pour UN élément (verset ou bloc texte) ---
   const copyItemText = async (it: AnyItem) => {
     const txt = buildItemPlainText(it);
@@ -366,7 +456,20 @@ export default function Notes() {
           </h1>
 
           {!expandedId && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap justify-end">
+              {/* Nouveau : Importer depuis un TEXTE (mini outil interne) */}
+              <button
+                onClick={openImportFromText}
+                className={`inline-flex items-center gap-2 px-3 py-2 rounded-md border text-sm ${
+                  isDark
+                    ? 'border-indigo-500 text-indigo-100'
+                    : 'border-indigo-500 text-indigo-700'
+                }`}
+              >
+                <Type as={undefined} size={16} />
+                {label.importTextButton}
+              </button>
+
               {/* Importer depuis un CODE TheWord */}
               <button
                 onClick={doImportFromCode}
@@ -686,6 +789,94 @@ export default function Notes() {
           </div>
         )}
       </div>
+
+      {/* MODALE : importer depuis un TEXTE */}
+      {showImportFromText && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setShowImportFromText(false)}
+            aria-hidden="true"
+          />
+          <div
+            className={`relative w-full max-w-lg mx-4 rounded-2xl p-4 ${
+              isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
+            }`}
+          >
+            <h2 className="text-lg font-semibold mb-2">
+              {state.settings.language === 'fr'
+                ? 'Importer depuis un texte'
+                : 'Import from text'}
+            </h2>
+
+            <div className="mb-3">
+              <label className="block text-sm mb-1">
+                {label.importTextTitlePlaceholder}
+              </label>
+              <input
+                type="text"
+                className={`w-full rounded-md px-2 py-1.5 text-sm border ${
+                  isDark
+                    ? 'bg-gray-800 border-gray-600 text-white'
+                    : 'bg-gray-50 border-gray-300 text-gray-900'
+                }`}
+                value={importTextTitle}
+                onChange={(e) => setImportTextTitle(e.target.value)}
+                placeholder={label.importTextTitlePlaceholder}
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="block text-sm mb-1">
+                {state.settings.language === 'fr'
+                  ? 'Contenu du document'
+                  : 'Document content'}
+              </label>
+              <textarea
+                className={`w-full rounded-md px-2 py-1.5 text-sm min-h-[160px] border resize-vertical ${
+                  isDark
+                    ? 'bg-gray-800 border-gray-600 text-white'
+                    : 'bg-gray-50 border-gray-300 text-gray-900'
+                }`}
+                value={importTextBody}
+                onChange={(e) => setImportTextBody(e.target.value)}
+                placeholder={label.importTextBodyPlaceholder}
+              />
+              <div className="mt-1 text-xs opacity-75">
+                {label.importTextInfo}
+              </div>
+            </div>
+
+            <label className="flex items-center gap-2 text-sm mb-4">
+              <input
+                type="checkbox"
+                checked={importSplitBlocks}
+                onChange={(e) => setImportSplitBlocks(e.target.checked)}
+              />
+              <span>{label.importTextSplitLabel}</span>
+            </label>
+
+            <div className="flex justify-end gap-2 mt-2">
+              <button
+                onClick={() => setShowImportFromText(false)}
+                className={`px-3 py-1.5 rounded text-sm ${
+                  isDark
+                    ? 'bg-gray-700 text-white'
+                    : 'bg-gray-200 text-gray-800'
+                }`}
+              >
+                {label.cancel}
+              </button>
+              <button
+                onClick={handleCreateFromText}
+                className="px-3 py-1.5 rounded text-sm bg-blue-600 text-white hover:bg-blue-500"
+              >
+                {label.importTextCreate}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
