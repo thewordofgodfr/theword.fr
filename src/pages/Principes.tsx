@@ -110,6 +110,14 @@ type AnyItem = VerseRef & {
   kind?: 'text' | 'verse';
 };
 
+/** Découpe un texte en blocs séparés par au moins une ligne vide */
+function splitIntoBlocks(raw: string): string[] {
+  return raw
+    .split(/\n\s*\n+/)
+    .map((b) => b.trim())
+    .filter((b) => b.length > 0);
+}
+
 function buildPlainListText(list: VerseList): string {
   const lines: string[] = [];
   const title = (list.title || '').trim();
@@ -164,6 +172,12 @@ export default function Principes() {
   // item sélectionné pour afficher ses actions
   const [openItemMenu, setOpenItemMenu] = useState<{ listId: string; idx: number } | null>(null);
 
+  // --- Mini outil "Importer depuis un texte" ---
+  const [showImportFromText, setShowImportFromText] = useState(false);
+  const [importTextTitle, setImportTextTitle] = useState('');
+  const [importTextBody, setImportTextBody] = useState('');
+  const [importSplitBlocks, setImportSplitBlocks] = useState(true);
+
   const label = useMemo(
     () => ({
       title: state.settings.language === 'fr' ? 'Principes' : 'Studies',
@@ -209,6 +223,41 @@ export default function Principes() {
         state.settings.language === 'fr'
           ? 'Code copié dans le presse-papiers ✅'
           : 'Code copied to clipboard ✅',
+      // Libellés mini-import texte
+      importTextButton:
+        state.settings.language === 'fr' ? 'Texte → Étude' : 'Text → Study',
+      importTextTitlePlaceholder:
+        state.settings.language === 'fr'
+          ? 'Titre de la nouvelle étude'
+          : 'New study title',
+      importTextDefaultTitle:
+        state.settings.language === 'fr'
+          ? 'Import texte'
+          : 'Text import',
+      importTextBodyPlaceholder:
+        state.settings.language === 'fr'
+          ? 'Colle ici ton texte…'
+          : 'Paste your text here…',
+      importTextNoBody:
+        state.settings.language === 'fr'
+          ? 'Merci de coller un texte à importer.'
+          : 'Please paste some text to import.',
+      importTextNoBlock:
+        state.settings.language === 'fr'
+          ? 'Aucun bloc détecté (pense à laisser des lignes vides si tu découpes en blocs).'
+          : 'No block detected (add blank lines if you split into blocks).',
+      importTextSplitLabel:
+        state.settings.language === 'fr'
+          ? 'Découper en blocs (séparés par au moins une ligne vide)'
+          : 'Split into blocks (separated by at least one empty line)',
+      importTextInfo:
+        state.settings.language === 'fr'
+          ? 'Chaque bloc deviendra un élément dans l’étude.'
+          : 'Each block will become an item in the study.',
+      importTextCreate:
+        state.settings.language === 'fr'
+          ? 'Créer l’étude'
+          : 'Create study',
     }),
     [state.settings.language]
   );
@@ -338,6 +387,47 @@ export default function Principes() {
     alert(label.importSuccess);
   };
 
+  // --- Import direct depuis un TEXTE (mini outil interne) ---
+  const openImportFromText = () => {
+    setImportTextTitle('');
+    setImportTextBody('');
+    setImportSplitBlocks(true);
+    setShowImportFromText(true);
+  };
+
+  const handleCreateFromText = () => {
+    const title =
+      (importTextTitle || '').trim() || label.importTextDefaultTitle;
+    const raw = (importTextBody || '').trim();
+
+    if (!raw) {
+      alert(label.importTextNoBody);
+      return;
+    }
+
+    const blocks = importSplitBlocks ? splitIntoBlocks(raw) : [raw];
+    if (blocks.length === 0) {
+      alert(label.importTextNoBlock);
+      return;
+    }
+
+    const items: AnyItem[] = blocks.map((text) => ({
+      bookId: TEXT_SENTINEL,
+      bookName: '',
+      chapter: 0,
+      verse: 0,
+      text,
+      translation: state.settings.language,
+      kind: 'text',
+    }));
+
+    const created = p_createList(title);
+    p_setListItems(created.id, items as VerseRef[]);
+    refresh();
+    setExpandedId(created.id);
+    setShowImportFromText(false);
+  };
+
   // ---------- opérations sur items ----------
   const updateItems = (listId: string, updater: (items: AnyItem[]) => AnyItem[]) => {
     const list = p_getListById(listId);
@@ -443,55 +533,78 @@ export default function Principes() {
   return (
     <div className={`min-h-[100svh] ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="flex items-center justify-between mb-6">
-          <h1
-            className={`text-2xl md:text-3xl font-bold ${
-              isDark ? 'text-white' : 'text-gray-800'
-            } flex items-center gap-2`}
-          >
-            <ListIcon className="w-6 h-6" />
-            {label.title}
-          </h1>
+        {/* HEADER */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between">
+            <h1
+              className={`text-2xl md:text-3xl font-bold ${
+                isDark ? 'text-white' : 'text-gray-800'
+              } flex items-center gap-2`}
+            >
+              <ListIcon className="w-6 h-6" />
+              {label.title}
+            </h1>
+          </div>
 
+          {/* Actions uniquement quand aucune étude n'est ouverte */}
           {!expandedId && (
-            <div className="flex items-center gap-2">
-              {/* Importer une étude ou une note par code */}
-              <button
-                onClick={doImportFromCode}
-                className={`inline-flex items-center gap-2 px-3 py-2 rounded-md border text-sm ${
-                  isDark ? 'border-gray-500 text-gray-100' : 'border-gray-300 text-gray-800'
-                }`}
-              >
-                <Copy size={16} />
-                {label.importCode}
-              </button>
-
+            <div className="mt-4 space-y-2">
+              {/* Gros bouton primaire : + Créer une étude (plein écran mobile) */}
               <button
                 onClick={doCreate}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-500"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600 text-white font-semibold text-sm shadow hover:bg-blue-500 active:scale-[0.98]"
               >
                 <Plus size={18} />
                 {label.create}
               </button>
+
+              {/* Ligne de boutons secondaires alignés à droite */}
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                {/* Importer depuis un TEXTE */}
+                <button
+                  onClick={openImportFromText}
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
+                    isDark
+                      ? 'border-indigo-400 text-indigo-100 bg-gray-900'
+                      : 'border-indigo-500 text-indigo-700 bg-indigo-50'
+                  }`}
+                >
+                  <TextIcon size={14} />
+                  {label.importTextButton}
+                </button>
+
+                {/* Importer depuis un CODE TheWord */}
+                <button
+                  onClick={doImportFromCode}
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
+                    isDark
+                      ? 'border-gray-500 text-gray-100 bg-gray-900'
+                      : 'border-gray-300 text-gray-800 bg-white'
+                  }`}
+                >
+                  <Copy size={14} />
+                  {label.importCode}
+                </button>
+              </div>
             </div>
           )}
         </div>
 
         {expandedId && (
-          <div className="mb-4 flex items-center gap-2">
+          <div className="mb-4 flex flex-wrap items-center gap-2">
             <button
               onClick={() => setExpandedId(null)}
               className={`${
                 isDark ? 'text-white bg-gray-700' : 'text-gray-700 bg-gray-200'
-              } px-3 py-1.5 rounded`}
+              } px-3 py-1.5 rounded text-sm`}
             >
               {label.backAll}
             </button>
 
-            {/* Ajouter un bloc de texte quand la liste est ouverte */}
+            {/* Ajouter un bloc de texte quand l’étude est ouverte */}
             <button
               onClick={() => addTextBlock(expandedId)}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-emerald-600 text-white hover:bg-emerald-500"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-emerald-600 text-white hover:bg-emerald-500 text-sm"
             >
               <TextIcon size={16} />
               {label.addTextBlock}
@@ -585,7 +698,7 @@ export default function Principes() {
                         onClick={() => doRename(list.id, list.title)}
                         className={`${
                           isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-                        } px-3 py-2 rounded inline-flex items-center gap-2`}
+                        } px-3 py-2 rounded inline-flex items-center gap-2 text-sm`}
                         title={label.rename}
                       >
                         <Edit3 size={16} />
@@ -594,7 +707,7 @@ export default function Principes() {
 
                       <button
                         onClick={() => doShare(list.id)}
-                        className="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-500 inline-flex items-center gap-2"
+                        className="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-500 inline-flex items-center gap-2 text-sm"
                         title={label.share}
                       >
                         <Share2 size={16} />
@@ -604,8 +717,8 @@ export default function Principes() {
                       <button
                         onClick={() => copyListText(list.id)}
                         className={`${
-                          isDark ? 'bg-gray-700 text:white' : 'bg-gray-100 text-gray-800'
-                        } px-3 py-2 rounded inline-flex items-center gap-2`}
+                          isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
+                        } px-3 py-2 rounded inline-flex items-center gap-2 text-sm`}
                         title={label.copy}
                       >
                         <Copy size={16} />
@@ -617,7 +730,7 @@ export default function Principes() {
                         onClick={() => doShareCode(list.id)}
                         className={`${
                           isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-                        } px-3 py-2 rounded inline-flex items-center gap-2`}
+                        } px-3 py-2 rounded inline-flex items-center gap-2 text-sm`}
                         title={label.shareCode}
                       >
                         <Copy size={16} />
@@ -626,7 +739,7 @@ export default function Principes() {
 
                       <button
                         onClick={() => doDelete(list.id)}
-                        className="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-500 inline-flex items-center gap-2"
+                        className="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-500 inline-flex items-center gap-2 text-sm"
                         title={label.deleteList}
                       >
                         <Trash2 size={16} />
@@ -690,7 +803,8 @@ export default function Principes() {
                                   {/* En-tête : pour un verset on montre la réf, pour un bloc texte on n'affiche pas de titre */}
                                   {!isText ? (
                                     <div className="font-semibold">
-                                      {(it.bookName ?? it.bookId) || ''}{' '}
+                                      {(it.bookName ?? it.bookId) || ' '}
+                                      {' '}
                                       {it.chapter}:{it.verse}
                                     </div>
                                   ) : null}
@@ -723,7 +837,7 @@ export default function Principes() {
                                       <>
                                         <button
                                           onClick={openInReading}
-                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-500"
+                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-500 text-xs"
                                         >
                                           {label.open}
                                         </button>
@@ -731,24 +845,24 @@ export default function Principes() {
                                         {/* Copier ce verset */}
                                         <button
                                           onClick={() => copyItemText(it)}
-                                          className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
+                                          className={`inline-flex items-center gap-1 px-2 py-1.5 rounded text-xs ${
                                             isDark
                                               ? 'bg-gray-700 text-white'
                                               : 'bg-white text-gray-800'
                                           }`}
                                           title={label.copy}
                                         >
-                                          <Copy size={16} />
+                                          <Copy size={14} />
                                           {label.copy}
                                         </button>
 
                                         {/* Partager ce verset */}
                                         <button
                                           onClick={() => shareItem(it)}
-                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500"
+                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500 text-xs"
                                           title={label.share}
                                         >
-                                          <Share2 size={16} />
+                                          <Share2 size={14} />
                                           {label.share}
                                         </button>
                                       </>
@@ -764,17 +878,17 @@ export default function Principes() {
                                             String(it.text || '')
                                           )
                                         }
-                                        className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500"
+                                        className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500 text-xs"
                                         title={label.editTextBlock}
                                       >
-                                        <EditTextIcon size={16} />
+                                        <EditTextIcon size={14} />
                                         {label.editTextBlock}
                                       </button>
                                     )}
 
                                     <button
                                       onClick={() => moveItem(list.id, idx, -1)}
-                                      className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
+                                      className={`inline-flex items-center gap-1 px-2 py-1.5 rounded text-xs ${
                                         isDark
                                           ? 'bg-gray-700 text-white'
                                           : 'bg-white text-gray-800'
@@ -782,13 +896,13 @@ export default function Principes() {
                                       disabled={idx === 0}
                                       title={label.moveUp}
                                     >
-                                      <ArrowUp size={16} />
+                                      <ArrowUp size={14} />
                                       {label.moveUp}
                                     </button>
 
                                     <button
                                       onClick={() => moveItem(list.id, idx, 1)}
-                                      className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
+                                      className={`inline-flex items-center gap-1 px-2 py-1.5 rounded text-xs ${
                                         isDark
                                           ? 'bg-gray-700 text-white'
                                           : 'bg-white text-gray-800'
@@ -796,24 +910,24 @@ export default function Principes() {
                                       disabled={idx === list.items.length - 1}
                                       title={label.moveDown}
                                     >
-                                      <ArrowDown size={16} />
+                                      <ArrowDown size={14} />
                                       {label.moveDown}
                                     </button>
 
                                     {/* Corbeille pour supprimer l'élément sélectionné */}
                                     <button
                                       onClick={() => removeItem(list.id, idx)}
-                                      className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-red-600 text-white hover:bg-red-500"
+                                      className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-red-600 text-white hover:bg-red-500 text-xs"
                                       title={label.deleteItem}
                                     >
-                                      <Trash2 size={16} />
+                                      <Trash2 size={14} />
                                       {label.deleteItem}
                                     </button>
 
                                     {/* Annuler (fermer le menu) */}
                                     <button
                                       onClick={() => setOpenItemMenu(null)}
-                                      className={`px-2 py-1.5 rounded ${
+                                      className={`px-2 py-1.5 rounded text-xs ${
                                         isDark
                                           ? 'bg-gray-700 text-white'
                                           : 'bg-white text-gray-800'
@@ -825,7 +939,7 @@ export default function Principes() {
                                     {/* OK visible à droite */}
                                     <button
                                       onClick={() => setOpenItemMenu(null)}
-                                      className="ml-auto px-2 py-1.5 rounded bg-green-600 text-white hover:bg-green-500"
+                                      className="ml-auto px-2 py-1.5 rounded bg-green-600 text-white hover:bg-green-500 text-xs"
                                     >
                                       OK
                                     </button>
@@ -844,8 +958,95 @@ export default function Principes() {
           </div>
         )}
       </div>
+
+      {/* MODALE : importer depuis un TEXTE */}
+      {showImportFromText && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setShowImportFromText(false)}
+            aria-hidden="true"
+          />
+          <div
+            className={`relative w-full max-w-lg mx-4 rounded-2xl p-4 ${
+              isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
+            }`}
+          >
+            <h2 className="text-lg font-semibold mb-2">
+              {state.settings.language === 'fr'
+                ? 'Importer depuis un texte'
+                : 'Import from text'}
+            </h2>
+
+            <div className="mb-3">
+              <label className="block text-sm mb-1">
+                {label.importTextTitlePlaceholder}
+              </label>
+              <input
+                type="text"
+                className={`w-full rounded-md px-2 py-1.5 text-sm border ${
+                  isDark
+                    ? 'bg-gray-800 border-gray-600 text-white'
+                    : 'bg-gray-50 border-gray-300 text-gray-900'
+                }`}
+                value={importTextTitle}
+                onChange={(e) => setImportTextTitle(e.target.value)}
+                placeholder={label.importTextTitlePlaceholder}
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="block text-sm mb-1">
+                {state.settings.language === 'fr'
+                  ? 'Contenu du document'
+                  : 'Document content'}
+              </label>
+              <textarea
+                className={`w-full rounded-md px-2 py-1.5 text-sm min-h-[160px] border resize-vertical ${
+                  isDark
+                    ? 'bg-gray-800 border-gray-600 text-white'
+                    : 'bg-gray-50 border-gray-300 text-gray-900'
+                }`}
+                value={importTextBody}
+                onChange={(e) => setImportTextBody(e.target.value)}
+                placeholder={label.importTextBodyPlaceholder}
+              />
+              <div className="mt-1 text-xs opacity-75">
+                {label.importTextInfo}
+              </div>
+            </div>
+
+            <label className="flex items-center gap-2 text-sm mb-4">
+              <input
+                type="checkbox"
+                checked={importSplitBlocks}
+                onChange={(e) => setImportSplitBlocks(e.target.checked)}
+              />
+              <span>{label.importTextSplitLabel}</span>
+            </label>
+
+            <div className="flex justify-end gap-2 mt-2">
+              <button
+                onClick={() => setShowImportFromText(false)}
+                className={`px-3 py-1.5 rounded text-sm ${
+                  isDark
+                    ? 'bg-gray-700 text-white'
+                    : 'bg-gray-200 text-gray-800'
+                }`}
+              >
+                {label.cancel}
+              </button>
+              <button
+                onClick={handleCreateFromText}
+                className="px-3 py-1.5 rounded text-sm bg-blue-600 text-white hover:bg-blue-500"
+              >
+                {label.importTextCreate}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
 
