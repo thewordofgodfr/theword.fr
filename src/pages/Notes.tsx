@@ -466,7 +466,8 @@ export default function Notes() {
                     : 'border-indigo-500 text-indigo-700'
                 }`}
               >
-                <Type as={undefined} size={16} />
+                {/* CORRECTION : on utilise TextIcon (alias de Type) */}
+                <TextIcon size={16} />
                 {label.importTextButton}
               </button>
 
