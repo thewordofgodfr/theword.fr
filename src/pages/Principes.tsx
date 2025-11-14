@@ -549,10 +549,10 @@ export default function Principes() {
           {/* Actions uniquement quand aucune étude n'est ouverte */}
           {!expandedId && (
             <div className="mt-4 space-y-2">
-              {/* Gros bouton primaire : + Créer une étude (plein écran mobile) */}
+              {/* Gros bouton primaire : + Créer une étude (VERT) */}
               <button
                 onClick={doCreate}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600 text-white font-semibold text-sm shadow hover:bg-blue-500 active:scale-[0.98]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-emerald-600 text-white font-semibold text-sm shadow hover:bg-emerald-500 active:scale-[0.98]"
               >
                 <Plus size={18} />
                 {label.create}
@@ -560,20 +560,20 @@ export default function Principes() {
 
               {/* Ligne de boutons secondaires alignés à droite */}
               <div className="flex flex-wrap items-center justify-end gap-2">
-                {/* Importer depuis un TEXTE */}
+                {/* Importer depuis un TEXTE (même liseret que Notes) */}
                 <button
                   onClick={openImportFromText}
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
                     isDark
-                      ? 'border-indigo-400 text-indigo-100 bg-gray-900'
-                      : 'border-indigo-500 text-indigo-700 bg-indigo-50'
+                      ? 'border-gray-500 text-gray-100 bg-gray-900'
+                      : 'border-gray-300 text-gray-800 bg-white'
                   }`}
                 >
                   <TextIcon size={14} />
                   {label.importTextButton}
                 </button>
 
-                {/* Importer depuis un CODE TheWord */}
+                {/* Importer depuis un CODE TheWord (même liseret que Notes) */}
                 <button
                   onClick={doImportFromCode}
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
@@ -592,19 +592,18 @@ export default function Principes() {
 
         {expandedId && (
           <div className="mb-4 flex flex-wrap items-center gap-2">
+            {/* Bouton retour : plus grand, vert, même couleur que "Créer une étude" */}
             <button
               onClick={() => setExpandedId(null)}
-              className={`${
-                isDark ? 'text-white bg-gray-700' : 'text-gray-700 bg-gray-200'
-              } px-3 py-1.5 rounded text-sm`}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-500"
             >
               {label.backAll}
             </button>
 
-            {/* Ajouter un bloc de texte quand l’étude est ouverte */}
+            {/* Ajouter un bloc de texte quand l’étude est ouverte (BLEU pour éviter 2 verts) */}
             <button
               onClick={() => addTextBlock(expandedId)}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-emerald-600 text-white hover:bg-emerald-500 text-sm"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500 text-sm"
             >
               <TextIcon size={16} />
               {label.addTextBlock}
@@ -803,8 +802,7 @@ export default function Principes() {
                                   {/* En-tête : pour un verset on montre la réf, pour un bloc texte on n'affiche pas de titre */}
                                   {!isText ? (
                                     <div className="font-semibold">
-                                      {(it.bookName ?? it.bookId) || ' '}
-                                      {' '}
+                                      {(it.bookName ?? it.bookId) || ''}{' '}
                                       {it.chapter}:{it.verse}
                                     </div>
                                   ) : null}
