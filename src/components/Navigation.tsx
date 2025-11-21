@@ -8,7 +8,7 @@ import {
   Settings as SettingsIcon,
   Info,
   List as ListIcon,
-  BookMarked
+  BookMarked,
 } from 'lucide-react';
 
 export default function Navigation() {
@@ -16,22 +16,22 @@ export default function Navigation() {
   const { t } = useTranslation();
   const isDark = state.settings.theme === 'dark';
 
-  const labelNotes = state.settings.language === 'fr' ? 'Notes' : 'Notes';
-  const labelPrincipes = state.settings.language === 'fr' ? 'Principes' : 'Studies';
-
   const navItems = [
-    { id: 'home',       icon: Home,        label: t('home') },
-    { id: 'search',     icon: SearchIcon,  label: t('search') },
-    { id: 'reading',    icon: BookOpen,    label: t('reading') },
-    { id: 'notes',      icon: ListIcon,    label: labelNotes },
-    { id: 'principes',  icon: BookMarked,  label: labelPrincipes },
-    { id: 'settings',   icon: SettingsIcon,label: t('settings') },
-    { id: 'about',      icon: Info,        label: t('about') },
+    { id: 'home',      icon: Home,        label: t('home') },
+    { id: 'search',    icon: SearchIcon,  label: t('search') },
+    { id: 'reading',   icon: BookOpen,    label: t('reading') },
+    { id: 'notes',     icon: ListIcon,    label: t('notes') },
+    { id: 'principes', icon: BookMarked,  label: t('principles') },
+    { id: 'settings',  icon: SettingsIcon,label: t('settings') },
+    { id: 'about',     icon: Info,        label: t('about') },
   ] as const;
 
-  const baseBtn  = 'transition-all duration-200 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500';
-  const activeBtn= isDark ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-700';
-  const idleBtn  = isDark ? 'text-white/90 hover:bg-gray-700 hover:text-white' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900';
+  const baseBtn   =
+    'transition-all duration-200 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500';
+  const activeBtn = isDark ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-700';
+  const idleBtn   = isDark
+    ? 'text-white/90 hover:bg-gray-700 hover:text-white'
+    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900';
 
   return (
     <nav
@@ -59,14 +59,11 @@ export default function Navigation() {
                   title={label}
                   className={[
                     baseBtn,
-                    // légèrement moins large qu’avant (px-2 au lieu de px-3)
                     'px-2 py-2 flex flex-col sm:flex-row items-center sm:gap-2',
-                    // largeur minimale un peu réduite pour tout faire rentrer
                     'flex-shrink-0 min-w-[48px] sm:min-w-0',
                     active ? activeBtn : idleBtn,
                   ].join(' ')}
                 >
-                  {/* taille d’icône d’origine rétablie */}
                   <Icon size={20} className="shrink-0" />
                   <span className="hidden sm:inline text-sm leading-none">{label}</span>
                 </button>
@@ -78,4 +75,3 @@ export default function Navigation() {
     </nav>
   );
 }
-
