@@ -22,6 +22,9 @@ const frTranslations = {
   copyVerse: 'Copier le Verset',
   verseCopied: 'Verset copié !',
   godSpeaks: 'Dieu vous parle',
+  openJeremiah: 'Ouvrir Jérémie 23:29',
+  jeremiah23Quote:
+    '« Ma parole n’est-elle pas comme un feu, dit l’Éternel, et comme un marteau qui brise le roc ? » Jérémie 23:29',
 
   // Reading page
   selectBook: 'Sélectionner un livre',
@@ -72,6 +75,9 @@ const enTranslations = {
   copyVerse: 'Copy Verse',
   verseCopied: 'Verse copied!',
   godSpeaks: 'God speaks to you',
+  openJeremiah: 'Open Jeremiah 23:29',
+  jeremiah23Quote:
+    '“Is not my word like as a fire? saith the LORD; and like a hammer that breaketh the rock in pieces?” Jeremiah 23:29',
 
   // Reading page
   selectBook: 'Select a book',
