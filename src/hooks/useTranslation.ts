@@ -4,8 +4,7 @@ import type { Language } from '../types/bible';
 
 /**
  * Dictionnaires de base FR / EN.
- * On gardera EXACTEMENT les mêmes clés qu'actuellement
- * pour ne rien casser dans les pages.
+ * On garde les mêmes clés qu'actuellement pour ne rien casser.
  */
 const frTranslations = {
   // Navigation
@@ -14,6 +13,8 @@ const frTranslations = {
   search: 'Recherche',
   settings: 'Paramètres',
   about: 'À propos',
+  notes: 'Notes',
+  principles: 'Principes',
 
   // Home page
   randomVerse: 'Verset Aléatoire',
@@ -62,6 +63,8 @@ const enTranslations = {
   search: 'Search',
   settings: 'Settings',
   about: 'About',
+  notes: 'Notes',
+  principles: 'Studies',
 
   // Home page
   randomVerse: 'Random Verse',
@@ -109,7 +112,7 @@ const enTranslations = {
  * IMPORTANT :
  * - fr / en ont des vraies traductions.
  * - les autres langues sont pour l'instant vides ({}).
- * - la fonction `t()` fera automatiquement un fallback sur l'anglais
+ * - la fonction `t()` fait automatiquement un fallback sur l'anglais
  *   si la clé n'est pas trouvée dans la langue courante.
  */
 const translations: Record<Language, any> = {
@@ -146,11 +149,12 @@ export function useTranslation() {
       return typeof value === 'string' ? value : undefined;
     };
 
-    // 1) essaie dans la langue courante
-    // 2) sinon en anglais
-    // 3) sinon retourne la clé brute
+    // 1) langue courante
+    // 2) anglais
+    // 3) clé brute
     return resolve(lang) ?? resolve(FALLBACK_LANGUAGE) ?? key;
   };
 
   return { t, language: lang };
 }
+
