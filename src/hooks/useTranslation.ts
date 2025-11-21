@@ -63,6 +63,55 @@ const frTranslations = {
   emptySlotSuffix: '(vide)',
   untitledList: '(sans titre)',
 
+  // Petit libellé court pour “Copié”
+  copiedShort: 'Copié',
+
+  // Bloc Notes (page Notes)
+  notesPage: {
+    create: 'Créer une liste',
+    placeholder: 'Titre de la liste…',
+    empty: 'Aucune liste pour l’instant.',
+    items: 'éléments',
+    backAll: '← Toutes les listes',
+    addTextBlock: 'Ajouter un bloc de texte',
+    editTextBlock: 'Modifier le bloc',
+    deleteItem: 'Supprimer',
+    moveUp: 'Monter',
+    moveDown: 'Descendre',
+    open: 'Ouvrir',
+    confirmDeleteItem: 'Supprimer cet élément ?',
+    newTextPlaceholder: 'Votre texte…',
+
+    // Partage / import via code
+    shareCode: 'Code',
+    importCode: 'Importer un code',
+    importPrompt: 'Collez ici le code de partage TheWord :',
+    importError: 'Code invalide.',
+    importSuccess: 'Liste importée avec succès ✅',
+    shareCodeCopied: 'Code copié dans le presse-papiers ✅',
+
+    // Import direct depuis un texte
+    importTextButton: 'Texte → Liste',
+    importTextTitlePlaceholder: 'Titre de la nouvelle liste',
+    importTextDefaultTitle: 'Import texte',
+    importTextBodyPlaceholder: 'Colle ici ton texte…',
+    importTextNoBody: 'Merci de coller un texte à importer.',
+    importTextNoBlock:
+      'Aucun bloc détecté (pense à laisser des lignes vides si tu découpes en blocs).',
+    importTextSplitLabel:
+      'Découper en blocs (séparés par au moins une ligne vide)',
+    importTextInfo: 'Chaque bloc deviendra un élément dans la liste.',
+    importTextCreate: 'Créer la liste',
+
+    duplicateTitle: 'Un titre identique existe déjà.',
+    confirmDeleteList: 'Supprimer cette liste ?',
+    emptyList: 'Liste vide.',
+
+    importFromTextTitle: 'Importer depuis un texte',
+    documentContent: 'Contenu du document',
+    renameList: 'Renommer',
+  },
+
   // Settings page
   appearance: 'Apparence',
   lightMode: 'Mode Clair',
@@ -168,6 +217,55 @@ const enTranslations = {
   memorySlotLabel: 'Slot',
   emptySlotSuffix: '(empty)',
   untitledList: '(untitled)',
+
+  // Short label “Copied”
+  copiedShort: 'Copied',
+
+  // Notes page block
+  notesPage: {
+    create: 'Create list',
+    placeholder: 'List title…',
+    empty: 'No lists yet.',
+    items: 'items',
+    backAll: '← All lists',
+    addTextBlock: 'Add text block',
+    editTextBlock: 'Edit block',
+    deleteItem: 'Delete',
+    moveUp: 'Move up',
+    moveDown: 'Move down',
+    open: 'Open',
+    confirmDeleteItem: 'Delete this item?',
+    newTextPlaceholder: 'Your text…',
+
+    // Share / import via code
+    shareCode: 'Code',
+    importCode: 'Import code',
+    importPrompt: 'Paste the TheWord share code here:',
+    importError: 'Invalid code.',
+    importSuccess: 'List imported successfully ✅',
+    shareCodeCopied: 'Code copied to clipboard ✅',
+
+    // Direct import from text
+    importTextButton: 'Text → List',
+    importTextTitlePlaceholder: 'New list title',
+    importTextDefaultTitle: 'Text import',
+    importTextBodyPlaceholder: 'Paste your text here…',
+    importTextNoBody: 'Please paste some text to import.',
+    importTextNoBlock:
+      'No block detected (add blank lines if you want to split into blocks).',
+    importTextSplitLabel:
+      'Split into blocks (separated by at least one empty line)',
+    importTextInfo: 'Each block will become an item in the list.',
+    importTextCreate: 'Create list',
+
+    duplicateTitle: 'A list with the same title already exists.',
+    confirmDeleteList: 'Delete this list?',
+    emptyList: 'Empty list.',
+
+    importFromTextTitle: 'Import from text',
+    documentContent: 'Document content',
+    renameList: 'Rename',
+  },
 
   // Settings page
   appearance: 'Appearance',
