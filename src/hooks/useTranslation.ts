@@ -33,6 +33,36 @@ const frTranslations = {
   oldTestament: 'Ancien Testament',
   newTestament: 'Nouveau Testament',
 
+  // Reading – compléments
+  chooseBook: 'Choisir un livre',
+  chooseChapter: 'Choisir un chapitre',
+  prevChapter: 'Chapitre précédent',
+  nextChapter: 'Chapitre suivant',
+  verseWord: 'verset',
+  versesSelectedSuffix: 'verset(s) sélectionné(s)',
+  toNotes: 'Vers Notes',
+  toPrinciples: 'Vers Principes',
+  copyLabel: 'Copier',
+  shareLabel: 'Partager',
+  cancel: 'Annuler',
+  close: 'Fermer',
+  notesModalTitle: 'Ajouter à une liste (Notes)',
+  notesNoList: 'Aucune liste pour l’instant. Créez-en une ci-dessous.',
+  notesNewListOptional: 'Nouvelle liste (optionnel)',
+  principlesModalTitle: 'Ajouter à une étude (Principes)',
+  principlesNoList: 'Aucune étude pour l’instant. Créez-en une ci-dessous.',
+  principlesNewListOptional: 'Nouvelle étude (optionnel)',
+  selectionCopied: 'Sélection copiée',
+  textReadyToShare: 'Texte prêt à partager (copié)',
+  addedToList: 'Ajouté à la liste',
+  newRandom: 'Nouveau aléatoire',
+  swipeLabel: 'Glissez',
+  searchSlotLabel: 'Recherche',
+  searchSlotEmpty: 'Recherche (vide)',
+  memorySlotLabel: 'Mémoire',
+  emptySlotSuffix: '(vide)',
+  untitledList: '(sans titre)',
+
   // Settings page
   appearance: 'Apparence',
   lightMode: 'Mode Clair',
@@ -68,7 +98,7 @@ const frTranslations = {
   versionsFootnote:
     'Toutes les versions bibliques utilisées sont dans le domaine public. Certaines ont été partiellement modernisées (vocabulaire, grammaire) tout en restant strictement fidèles aux manuscrits originaux.',
 
-  // Quick slots / raccourcis lecture (About)
+  // Quick slots / raccourcis lecture (About + Reading)
   quickSlotsIntro:
     'Ces 4 boutons, alignés à droite du sélecteur Livre/Chapitre, permettent de revenir instantanément sur vos lectures fréquentes pour lire plusieurs livres en parallèle : utilisez 1/2/3 pour 3 emplacements distincts, et la loupe pour reprendre le dernier passage (verset aléatoire ou recherche).',
   quickSlotsIllustrationLabel: 'Illustration des raccourcis',
@@ -109,6 +139,36 @@ const enTranslations = {
   oldTestament: 'Old Testament',
   newTestament: 'New Testament',
 
+  // Reading – extras
+  chooseBook: 'Choose a book',
+  chooseChapter: 'Choose a chapter',
+  prevChapter: 'Previous chapter',
+  nextChapter: 'Next chapter',
+  verseWord: 'verse',
+  versesSelectedSuffix: 'verse(s) selected',
+  toNotes: 'To Notes',
+  toPrinciples: 'To Principles',
+  copyLabel: 'Copy',
+  shareLabel: 'Share',
+  cancel: 'Cancel',
+  close: 'Close',
+  notesModalTitle: 'Add to a list (Notes)',
+  notesNoList: 'No list yet. Create one below.',
+  notesNewListOptional: 'New list (optional)',
+  principlesModalTitle: 'Add to a study (Principles)',
+  principlesNoList: 'No study yet. Create one below.',
+  principlesNewListOptional: 'New study (optional)',
+  selectionCopied: 'Selection copied',
+  textReadyToShare: 'Text ready to share (copied)',
+  addedToList: 'Added to list',
+  newRandom: 'New random',
+  swipeLabel: 'Swipe',
+  searchSlotLabel: 'Search',
+  searchSlotEmpty: 'Search (empty)',
+  memorySlotLabel: 'Slot',
+  emptySlotSuffix: '(empty)',
+  untitledList: '(untitled)',
+
   // Settings page
   appearance: 'Appearance',
   lightMode: 'Light Mode',
@@ -144,7 +204,7 @@ const enTranslations = {
   versionsFootnote:
     'All Bible versions used are in the public domain. Some have been partially modernized (vocabulary, grammar) while remaining strictly faithful to the original manuscripts.',
 
-  // Quick slots / reading shortcuts (About)
+  // Quick slots / reading shortcuts (About + Reading)
   quickSlotsIntro:
     'These 4 buttons, aligned to the right of the Book/Chapter selector, let you jump back to frequent readings to follow several books in parallel: use 1/2/3 for three locations, and the magnifier to resume the last passage (random verse or search).',
   quickSlotsIllustrationLabel: 'Shortcuts illustration',
