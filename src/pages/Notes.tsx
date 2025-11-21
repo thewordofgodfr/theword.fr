@@ -213,7 +213,6 @@ export default function Notes() {
   };
 
   // --- Partage / import PAR CODE ---
-
   const doShareCode = async (id: string) => {
     const list = getListById(id);
     if (!list) return;
@@ -238,8 +237,7 @@ export default function Notes() {
       return;
     }
 
-    const title =
-      payload.title?.trim() || label.importTextDefaultTitle;
+    const title = payload.title?.trim() || label.importTextDefaultTitle;
 
     const created = createList(title);
     setListItems(created.id, (payload.items || []) as VerseRef[]);
@@ -508,7 +506,9 @@ export default function Notes() {
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       <button
                         onClick={() => doRename(list.id, list.title)}
-                        className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
+                        className={`${
+                          isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
+                        } px-3 py-2 rounded inline-flex items-center gap-2`}
                         title={t('notesPage.renameList')}
                       >
                         <Edit3 size={16} />
@@ -526,7 +526,9 @@ export default function Notes() {
 
                       <button
                         onClick={() => copyListText(list.id)}
-                        className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
+                        className={`${
+                          isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
+                        } px-3 py-2 rounded inline-flex items-center gap-2`}
                         title={t('copyLabel')}
                       >
                         <Copy size={16} />
@@ -536,7 +538,9 @@ export default function Notes() {
                       {/* Nouveau : bouton "Code" pour cette liste */}
                       <button
                         onClick={() => doShareCode(list.id)}
-                        className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
+                        className={`${
+                          isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
+                        } px-3 py-2 rounded inline-flex items-center gap-2`}
                         title={label.shareCode}
                       >
                         <Copy size={16} />
@@ -826,4 +830,5 @@ export default function Notes() {
     </div>
   );
 }
+
 
