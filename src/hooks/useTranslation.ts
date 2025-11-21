@@ -112,6 +112,60 @@ const frTranslations = {
     renameList: 'Renommer',
   },
 
+  // Bloc Principes (page Principes)
+  principlesPage: {
+    create: 'Créer une étude',
+    placeholder: 'Titre de l’étude…',
+    empty: 'Aucune étude pour l’instant.',
+    items: 'éléments',
+    backAll: '← Toutes les études',
+    addTextBlock: 'Ajouter un bloc de texte',
+    editTextBlock: 'Modifier le bloc',
+    deleteItem: 'Supprimer',
+    moveUp: 'Monter',
+    moveDown: 'Descendre',
+    open: 'Ouvrir',
+    openReading: 'Ouvrir la lecture',
+    confirmDeleteItem: 'Supprimer cet élément ?',
+    newTextPlaceholder: 'Votre texte…',
+
+    // Partage / import via code
+    shareCode: 'Code',
+    importCode: 'Importer un code',
+    importPrompt: 'Collez ici le code de partage TheWord (note ou étude) :',
+    importError: 'Code invalide.',
+    importSuccess: 'Étude importée avec succès ✅',
+    shareCodeCopied: 'Code copié dans le presse-papiers ✅',
+
+    // Import direct depuis un texte
+    importTextButton: 'Texte → Étude',
+    importTextTitlePlaceholder: 'Titre de la nouvelle étude',
+    importTextDefaultTitle: 'Import texte',
+    importTextBodyPlaceholder: 'Colle ici ton texte…',
+    importTextNoBody: 'Merci de coller un texte à importer.',
+    importTextNoBlock:
+      'Aucun bloc détecté (pense à laisser des lignes vides si tu découpes en blocs).',
+    importTextSplitLabel:
+      'Découper en blocs (séparés par au moins une ligne vide)',
+    importTextInfo: 'Chaque bloc deviendra un élément dans l’étude.',
+    importTextCreate: 'Créer l’étude',
+
+    duplicateTitle: 'Une étude avec le même titre existe déjà.',
+    confirmDeleteList: 'Supprimer cette étude ?',
+    emptyList: 'Liste vide.',
+
+    importFromTextTitle: 'Importer depuis un texte',
+    documentContent: 'Contenu du document',
+    renameList: 'Renommer',
+    share: 'Partager',
+    copy: 'Copier',
+    deleteList: 'Supprimer',
+
+    // Titres pour le partage natif
+    shareStudyTitle: 'Étude',
+    shareItemTitle: 'Verset',
+  },
+
   // Settings page
   appearance: 'Apparence',
   lightMode: 'Mode Clair',
@@ -265,6 +319,60 @@ const enTranslations = {
     importFromTextTitle: 'Import from text',
     documentContent: 'Document content',
     renameList: 'Rename',
+  },
+
+  // Principles block (Principes page)
+  principlesPage: {
+    create: 'Create study',
+    placeholder: 'Study title…',
+    empty: 'No studies yet.',
+    items: 'items',
+    backAll: '← All studies',
+    addTextBlock: 'Add text block',
+    editTextBlock: 'Edit block',
+    deleteItem: 'Delete',
+    moveUp: 'Move up',
+    moveDown: 'Move down',
+    open: 'Open',
+    openReading: 'Open Reading',
+    confirmDeleteItem: 'Delete this item?',
+    newTextPlaceholder: 'Your text…',
+
+    // Share / import via code
+    shareCode: 'Code',
+    importCode: 'Import code',
+    importPrompt: 'Paste the TheWord share code (note or study) here:',
+    importError: 'Invalid code.',
+    importSuccess: 'Study imported successfully ✅',
+    shareCodeCopied: 'Code copied to clipboard ✅',
+
+    // Direct import from text
+    importTextButton: 'Text → Study',
+    importTextTitlePlaceholder: 'New study title',
+    importTextDefaultTitle: 'Text import',
+    importTextBodyPlaceholder: 'Paste your text here…',
+    importTextNoBody: 'Please paste some text to import.',
+    importTextNoBlock:
+      'No block detected (add blank lines if you split into blocks).',
+    importTextSplitLabel:
+      'Split into blocks (separated by at least one empty line)',
+    importTextInfo: 'Each block will become an item in the study.',
+    importTextCreate: 'Create study',
+
+    duplicateTitle: 'A study with the same title already exists.',
+    confirmDeleteList: 'Delete this study?',
+    emptyList: 'Empty list.',
+
+    importFromTextTitle: 'Import from text',
+    documentContent: 'Document content',
+    renameList: 'Rename',
+    share: 'Share',
+    copy: 'Copy',
+    deleteList: 'Delete',
+
+    // Titles for native share
+    shareStudyTitle: 'Study',
+    shareItemTitle: 'Verse',
   },
 
   // Settings page
