@@ -180,86 +180,48 @@ export default function Principes() {
 
   const label = useMemo(
     () => ({
-      title: state.settings.language === 'fr' ? 'Principes' : 'Studies',
-      create: state.settings.language === 'fr' ? 'Créer une étude' : 'Create study',
-      placeholder: state.settings.language === 'fr' ? 'Titre de l’étude…' : 'Study title…',
-      empty: state.settings.language === 'fr' ? 'Aucune étude pour l’instant.' : 'No studies yet.',
-      verses: state.settings.language === 'fr' ? 'éléments' : 'items',
-      openReading: state.settings.language === 'fr' ? 'Ouvrir la lecture' : 'Open Reading',
-      copied: state.settings.language === 'fr' ? 'Copié' : 'Copied',
-      backAll: state.settings.language === 'fr' ? '← Toutes les études' : '← All studies',
-      addTextBlock:
-        state.settings.language === 'fr' ? 'Ajouter un bloc de texte' : 'Add text block',
-      editTextBlock: state.settings.language === 'fr' ? 'Modifier le bloc' : 'Edit block',
-      deleteItem: state.settings.language === 'fr' ? 'Supprimer' : 'Delete',
-      moveUp: state.settings.language === 'fr' ? 'Monter' : 'Move up',
-      moveDown: state.settings.language === 'fr' ? 'Descendre' : 'Move down',
-      open: state.settings.language === 'fr' ? 'Ouvrir' : 'Open',
-      cancel: state.settings.language === 'fr' ? 'Annuler' : 'Cancel',
-      confirmDeleteItem:
-        state.settings.language === 'fr' ? 'Supprimer cet élément ?' : 'Delete this item?',
-      newTextPlaceholder:
-        state.settings.language === 'fr' ? 'Votre texte…' : 'Your text…',
-      rename: state.settings.language === 'fr' ? 'Renommer' : 'Rename',
-      share: state.settings.language === 'fr' ? 'Partager' : 'Share',
-      copy: state.settings.language === 'fr' ? 'Copier' : 'Copy',
-      deleteList: state.settings.language === 'fr' ? 'Supprimer' : 'Delete',
+      title: t('principles'),
+      create: t('principlesPage.create'),
+      placeholder: t('principlesPage.placeholder'),
+      empty: t('principlesPage.empty'),
+      verses: t('principlesPage.items'),
+      openReading: t('principlesPage.openReading'),
+      copied: t('copiedShort'),
+      backAll: t('principlesPage.backAll'),
+      addTextBlock: t('principlesPage.addTextBlock'),
+      editTextBlock: t('principlesPage.editTextBlock'),
+      deleteItem: t('principlesPage.deleteItem'),
+      moveUp: t('principlesPage.moveUp'),
+      moveDown: t('principlesPage.moveDown'),
+      open: t('principlesPage.open'),
+      cancel: t('cancel'),
+      confirmDeleteItem: t('principlesPage.confirmDeleteItem'),
+      newTextPlaceholder: t('principlesPage.newTextPlaceholder'),
+      rename: t('principlesPage.renameList'),
+      share: t('principlesPage.share'),
+      copy: t('principlesPage.copy'),
+      deleteList: t('principlesPage.deleteList'),
+
       // partage par code
-      shareCode: state.settings.language === 'fr' ? 'Code' : 'Code',
-      importCode: state.settings.language === 'fr' ? 'Importer un code' : 'Import code',
-      importPrompt:
-        state.settings.language === 'fr'
-          ? 'Collez ici le code de partage TheWord (note ou étude) :'
-          : 'Paste the TheWord share code (note or study) here:',
-      importError:
-        state.settings.language === 'fr'
-          ? 'Code invalide.'
-          : 'Invalid code.',
-      importSuccess:
-        state.settings.language === 'fr'
-          ? 'Étude importée avec succès ✅'
-          : 'Study imported successfully ✅',
-      shareCodeCopied:
-        state.settings.language === 'fr'
-          ? 'Code copié dans le presse-papiers ✅'
-          : 'Code copied to clipboard ✅',
+      shareCode: t('principlesPage.shareCode'),
+      importCode: t('principlesPage.importCode'),
+      importPrompt: t('principlesPage.importPrompt'),
+      importError: t('principlesPage.importError'),
+      importSuccess: t('principlesPage.importSuccess'),
+      shareCodeCopied: t('principlesPage.shareCodeCopied'),
+
       // Libellés mini-import texte
-      importTextButton:
-        state.settings.language === 'fr' ? 'Texte → Étude' : 'Text → Study',
-      importTextTitlePlaceholder:
-        state.settings.language === 'fr'
-          ? 'Titre de la nouvelle étude'
-          : 'New study title',
-      importTextDefaultTitle:
-        state.settings.language === 'fr'
-          ? 'Import texte'
-          : 'Text import',
-      importTextBodyPlaceholder:
-        state.settings.language === 'fr'
-          ? 'Colle ici ton texte…'
-          : 'Paste your text here…',
-      importTextNoBody:
-        state.settings.language === 'fr'
-          ? 'Merci de coller un texte à importer.'
-          : 'Please paste some text to import.',
-      importTextNoBlock:
-        state.settings.language === 'fr'
-          ? 'Aucun bloc détecté (pense à laisser des lignes vides si tu découpes en blocs).'
-          : 'No block detected (add blank lines if you split into blocks).',
-      importTextSplitLabel:
-        state.settings.language === 'fr'
-          ? 'Découper en blocs (séparés par au moins une ligne vide)'
-          : 'Split into blocks (separated by at least one empty line)',
-      importTextInfo:
-        state.settings.language === 'fr'
-          ? 'Chaque bloc deviendra un élément dans l’étude.'
-          : 'Each block will become an item in the study.',
-      importTextCreate:
-        state.settings.language === 'fr'
-          ? 'Créer l’étude'
-          : 'Create study',
+      importTextButton: t('principlesPage.importTextButton'),
+      importTextTitlePlaceholder: t('principlesPage.importTextTitlePlaceholder'),
+      importTextDefaultTitle: t('principlesPage.importTextDefaultTitle'),
+      importTextBodyPlaceholder: t('principlesPage.importTextBodyPlaceholder'),
+      importTextNoBody: t('principlesPage.importTextNoBody'),
+      importTextNoBlock: t('principlesPage.importTextNoBlock'),
+      importTextSplitLabel: t('principlesPage.importTextSplitLabel'),
+      importTextInfo: t('principlesPage.importTextInfo'),
+      importTextCreate: t('principlesPage.importTextCreate'),
     }),
-    [state.settings.language]
+    [t, state.settings.language]
   );
 
   const refresh = () => setLists(p_getAllLists());
@@ -276,6 +238,7 @@ export default function Principes() {
       (l) => (l.title || '').trim().toLowerCase() === trimmed.toLowerCase()
     );
     if (exists) {
+      alert(t('principlesPage.duplicateTitle'));
       setExpandedId(exists.id);
       return;
     }
@@ -292,11 +255,7 @@ export default function Principes() {
       (l) => l.id !== id && (l.title || '').trim().toLowerCase() === trimmed.toLowerCase()
     );
     if (exists) {
-      alert(
-        state.settings.language === 'fr'
-          ? 'Un titre identique existe déjà.'
-          : 'A study with the same title already exists.'
-      );
+      alert(t('principlesPage.duplicateTitle'));
       return;
     }
     p_renameList(id, trimmed);
@@ -304,12 +263,7 @@ export default function Principes() {
   };
 
   const doDelete = (id: string) => {
-    if (
-      !confirm(
-        state.settings.language === 'fr' ? 'Supprimer cette étude ?' : 'Delete this study?'
-      )
-    )
-      return;
+    if (!confirm(t('principlesPage.confirmDeleteList'))) return;
     p_deleteList(id);
     refresh();
     if (expandedId === id) setExpandedId(null);
@@ -323,14 +277,10 @@ export default function Principes() {
     try {
       const nav: any = navigator;
       if (nav?.share) {
-        await nav.share({ title: list.title || 'Étude', text: payload });
+        await nav.share({ title: t('principlesPage.shareStudyTitle'), text: payload });
       } else {
         await navigator.clipboard.writeText(payload);
-        alert(
-          (state.settings.language === 'fr'
-            ? 'Texte prêt à partager (copié)'
-            : 'Text ready to share (copied)') + ' ✅'
-        );
+        alert(t('textReadyToShare') + ' ✅');
       }
     } catch {}
   };
@@ -507,14 +457,10 @@ export default function Principes() {
     try {
       const nav: any = navigator;
       if (nav?.share) {
-        await nav.share({ title: 'Verset', text: payload });
+        await nav.share({ title: t('principlesPage.shareItemTitle'), text: payload });
       } else {
         await navigator.clipboard.writeText(payload);
-        alert(
-          (state.settings.language === 'fr'
-            ? 'Texte prêt à partager (copié)'
-            : 'Text ready to share (copied)') + ' ✅'
-        );
+        alert(t('textReadyToShare') + ' ✅');
       }
     } catch {}
   };
@@ -760,9 +706,7 @@ export default function Principes() {
                             isDark ? 'text-white/70' : 'text-gray-600'
                           } text-sm`}
                         >
-                          {state.settings.language === 'fr'
-                            ? 'Liste vide.'
-                            : 'Empty list.'}
+                          {t('principlesPage.emptyList')}
                         </div>
                       ) : (
                         <ul className="space-y-3">
@@ -802,7 +746,7 @@ export default function Principes() {
                                   {/* En-tête : pour un verset on montre la réf, pour un bloc texte on n'affiche pas de titre */}
                                   {!isText ? (
                                     <div className="font-semibold">
-                                      {(it.bookName ?? it.bookId) || ''}{' '}
+                                      {(it.bookName ?? it.bookId) || ' '}{' '}
                                       {it.chapter}:{it.verse}
                                     </div>
                                   ) : null}
@@ -971,9 +915,7 @@ export default function Principes() {
             }`}
           >
             <h2 className="text-lg font-semibold mb-2">
-              {state.settings.language === 'fr'
-                ? 'Importer depuis un texte'
-                : 'Import from text'}
+              {t('principlesPage.importFromTextTitle')}
             </h2>
 
             <div className="mb-3">
@@ -995,9 +937,7 @@ export default function Principes() {
 
             <div className="mb-3">
               <label className="block text-sm mb-1">
-                {state.settings.language === 'fr'
-                  ? 'Contenu du document'
-                  : 'Document content'}
+                {t('principlesPage.documentContent')}
               </label>
               <textarea
                 className={`w-full rounded-md px-2 py-1.5 text-sm min-h-[160px] border resize-vertical ${
