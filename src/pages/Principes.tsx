@@ -161,7 +161,7 @@ function buildItemPlainText(it: AnyItem): string {
 
 export default function Principes() {
   const { state, setPage } = useApp();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const isDark = state.settings.theme === 'dark';
 
   const [lists, setLists] = useState<VerseList[]>([]);
@@ -202,6 +202,15 @@ export default function Principes() {
       copy: t('principlesPage.copy'),
       deleteList: t('principlesPage.deleteList'),
 
+      // Gestion des doublons / suppression liste
+      duplicateTitle: t('principlesPage.duplicateTitle'),
+      confirmDeleteList: t('principlesPage.confirmDeleteList'),
+      emptyList: t('principlesPage.emptyList'),
+
+      // Titres pour le partage
+      shareStudyTitle: t('principlesPage.shareStudyTitle'),
+      shareItemTitle: t('principlesPage.shareItemTitle'),
+
       // partage par code
       shareCode: t('principlesPage.shareCode'),
       importCode: t('principlesPage.importCode'),
@@ -220,8 +229,12 @@ export default function Principes() {
       importTextSplitLabel: t('principlesPage.importTextSplitLabel'),
       importTextInfo: t('principlesPage.importTextInfo'),
       importTextCreate: t('principlesPage.importTextCreate'),
+
+      // Titre & label pour la modale d'import texte
+      importFromTextTitle: t('principlesPage.importFromTextTitle'),
+      documentContent: t('principlesPage.documentContent'),
     }),
-    [t, state.settings.language]
+    [t, language]
   );
 
   const refresh = () => setLists(p_getAllLists());
@@ -238,7 +251,7 @@ export default function Principes() {
       (l) => (l.title || '').trim().toLowerCase() === trimmed.toLowerCase()
     );
     if (exists) {
-      alert(t('principlesPage.duplicateTitle'));
+      alert(label.duplicateTitle);
       setExpandedId(exists.id);
       return;
     }
@@ -255,7 +268,7 @@ export default function Principes() {
       (l) => l.id !== id && (l.title || '').trim().toLowerCase() === trimmed.toLowerCase()
     );
     if (exists) {
-      alert(t('principlesPage.duplicateTitle'));
+      alert(label.duplicateTitle);
       return;
     }
     p_renameList(id, trimmed);
@@ -263,7 +276,7 @@ export default function Principes() {
   };
 
   const doDelete = (id: string) => {
-    if (!confirm(t('principlesPage.confirmDeleteList'))) return;
+    if (!confirm(label.confirmDeleteList)) return;
     p_deleteList(id);
     refresh();
     if (expandedId === id) setExpandedId(null);
@@ -277,7 +290,7 @@ export default function Principes() {
     try {
       const nav: any = navigator;
       if (nav?.share) {
-        await nav.share({ title: t('principlesPage.shareStudyTitle'), text: payload });
+        await nav.share({ title: label.shareStudyTitle, text: payload });
       } else {
         await navigator.clipboard.writeText(payload);
         alert(t('textReadyToShare') + ' ✅');
@@ -325,9 +338,7 @@ export default function Principes() {
       return;
     }
 
-    const title =
-      payload.title?.trim() ||
-      (state.settings.language === 'fr' ? 'Import TheWord' : 'TheWord import');
+    const title = payload.title?.trim() || label.importTextDefaultTitle;
 
     // On crée une NOUVELLE étude, même si le code vient d'une note
     const created = p_createList(title);
@@ -457,7 +468,7 @@ export default function Principes() {
     try {
       const nav: any = navigator;
       if (nav?.share) {
-        await nav.share({ title: t('principlesPage.shareItemTitle'), text: payload });
+        await nav.share({ title: label.shareItemTitle, text: payload });
       } else {
         await navigator.clipboard.writeText(payload);
         alert(t('textReadyToShare') + ' ✅');
@@ -706,7 +717,7 @@ export default function Principes() {
                             isDark ? 'text-white/70' : 'text-gray-600'
                           } text-sm`}
                         >
-                          {t('principlesPage.emptyList')}
+                          {label.emptyList}
                         </div>
                       ) : (
                         <ul className="space-y-3">
@@ -915,7 +926,7 @@ export default function Principes() {
             }`}
           >
             <h2 className="text-lg font-semibold mb-2">
-              {t('principlesPage.importFromTextTitle')}
+              {label.importFromTextTitle}
             </h2>
 
             <div className="mb-3">
@@ -937,7 +948,7 @@ export default function Principes() {
 
             <div className="mb-3">
               <label className="block text-sm mb-1">
-                {t('principlesPage.documentContent')}
+                {label.documentContent}
               </label>
               <textarea
                 className={`w-full rounded-md px-2 py-1.5 text-sm min-h-[160px] border resize-vertical ${
@@ -987,4 +998,5 @@ export default function Principes() {
     </div>
   );
 }
+
 
