@@ -4,17 +4,23 @@ import React, { useEffect, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { Globe, Palette, RefreshCcw } from 'lucide-react';
+import { SUPPORTED_LANGUAGES, type Language } from '../types/bible';
+
+/** Codes de drapeaux supportés */
+type FlagCode = 'fr' | 'us' | 'de' | 'it' | 'es' | 'pt' | 'ru' | 'hi' | 'zh' | 'ar' | 'id' | 'sw';
 
 /** Petit composant Flag inline SVG pour compatibilité desktop/mobile */
-const FlagIcon: React.FC<{ code: 'fr' | 'us'; size?: number; className?: string }> = ({
+const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> = ({
   code,
   size = 24,
   className = '',
 }) => {
+  const style: React.CSSProperties = { width: size * (4 / 3), height: size };
+
   if (code === 'fr') {
     // Drapeau France (bleu/blanc/rouge)
     return (
-      <span className={`inline-block ${className}`} style={{ width: size * (4 / 3), height: size }}>
+      <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="France" role="img">
           <rect width="1" height="2" x="0" fill="#0055A4" />
           <rect width="1" height="2" x="1" fill="#FFFFFF" />
@@ -23,28 +29,235 @@ const FlagIcon: React.FC<{ code: 'fr' | 'us'; size?: number; className?: string 
       </span>
     );
   }
-  // Drapeau USA (stripes + canton simplifié)
+
+  if (code === 'us') {
+    // Drapeau USA (stripes + canton simplifié)
+    return (
+      <span className={`inline-block ${className}`} style={style}>
+        <svg viewBox="0 0 19 10" width="100%" height="100%" aria-label="United States" role="img">
+          {/* Stripes */}
+          {Array.from({ length: 13 }).map((_, i) => (
+            <rect
+              key={i}
+              x="0"
+              y={(i * 10) / 13}
+              width="19"
+              height={10 / 13}
+              fill={i % 2 === 0 ? '#B22234' : '#FFFFFF'}
+            />
+          ))}
+          {/* Canton */}
+          <rect x="0" y="0" width="7.6" height={(7 / 13) * 10} fill="#3C3B6E" />
+          {/* Étoiles simplifiées (points) */}
+          {Array.from({ length: 9 }).map((_, row) =>
+            Array.from({ length: row % 2 === 0 ? 6 : 5 }).map((__, col) => {
+              const cols = row % 2 === 0 ? 6 : 5;
+              const cx = 0.6 + (col + 1) * (7.6 / (cols + 1));
+              const cy = 0.5 + (row + 1) * ((7 / 13) * 10 / 10);
+              return <circle key={`${row}-${col}`} cx={cx} cy={cy} r="0.15" fill="#FFFFFF" />;
+            })
+          )}
+        </svg>
+      </span>
+    );
+  }
+
+  if (code === 'de') {
+    // Allemagne : noir / rouge / or
+    return (
+      <span className={`inline-block ${className}`} style={style}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Germany" role="img">
+          <rect width="3" height="2" y="0" fill="#000000" />
+          <rect width="3" height="4/3" y="2/3" fill="#DD0000" />
+          <rect width="3" height="2/3" y="4/3" fill="#FFCE00" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (code === 'it') {
+    // Italie : vert / blanc / rouge
+    return (
+      <span className={`inline-block ${className}`} style={style}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Italy" role="img">
+          <rect width="1" height="2" x="0" fill="#009246" />
+          <rect width="1" height="2" x="1" fill="#FFFFFF" />
+          <rect width="1" height="2" x="2" fill="#CE2B37" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (code === 'es') {
+    // Espagne : rouge / jaune / rouge
+    return (
+      <span className={`inline-block ${className}`} style={style}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Spain" role="img">
+          <rect width="3" height="2" fill="#AA151B" />
+          <rect width="3" height="1" y="0.5" fill="#F1BF00" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (code === 'pt') {
+    // Portugal approximatif : vert / rouge
+    return (
+      <span className={`inline-block ${className}`} style={style}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Portugal" role="img">
+          <rect width="1.2" height="2" x="0" fill="#006600" />
+          <rect width="1.8" height="2" x="1.2" fill="#FF0000" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (code === 'ru') {
+    // Russie : blanc / bleu / rouge
+    return (
+      <span className={`inline-block ${className}`} style={style}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Russia" role="img">
+          <rect width="3" height="2/3" y="0" fill="#FFFFFF" />
+          <rect width="3" height="2/3" y="2/3" fill="#0039A6" />
+          <rect width="3" height="2/3" y="4/3" fill="#D52B1E" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (code === 'hi') {
+    // Inde simplifiée : safran / blanc / vert + disque bleu
+    return (
+      <span className={`inline-block ${className}`} style={style}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="India" role="img">
+          <rect width="3" height="2/3" y="0" fill="#FF9933" />
+          <rect width="3" height="2/3" y="2/3" fill="#FFFFFF" />
+          <rect width="3" height="2/3" y="4/3" fill="#138808" />
+          <circle cx="1.5" cy="1" r="0.3" fill="#000080" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (code === 'zh') {
+    // Chine simplifiée : fond rouge + étoile
+    return (
+      <span className={`inline-block ${className}`} style={style}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="China" role="img">
+          <rect width="3" height="2" fill="#DE2910" />
+          <circle cx="0.7" cy="0.7" r="0.3" fill="#FFDE00" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (code === 'ar') {
+    // Arabe générique : fond vert
+    return (
+      <span className={`inline-block ${className}`} style={style}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Arabic" role="img">
+          <rect width="3" height="2" fill="#007A3D" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (code === 'id') {
+    // Indonésie : rouge / blanc
+    return (
+      <span className={`inline-block ${className}`} style={style}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Indonesia" role="img">
+          <rect width="3" height="1" y="0" fill="#CE1126" />
+          <rect width="3" height="1" y="1" fill="#FFFFFF" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (code === 'sw') {
+    // Swahili (style générique vert/jaune)
+    return (
+      <span className={`inline-block ${className}`} style={style}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Swahili" role="img">
+          <rect width="3" height="2" fill="#1EB53A" />
+          <rect width="3" height="0.4" y="0.8" fill="#FCD116" />
+        </svg>
+      </span>
+    );
+  }
+
+  // Fallback gris (ne devrait pas arriver)
   return (
-    <span className={`inline-block ${className}`} style={{ width: size * (4 / 3), height: size }}>
-      <svg viewBox="0 0 19 10" width="100%" height="100%" aria-label="United States" role="img">
-        {/* Stripes */}
-        {Array.from({ length: 13 }).map((_, i) => (
-          <rect key={i} x="0" y={(i * 10) / 13} width="19" height={10 / 13} fill={i % 2 === 0 ? '#B22234' : '#FFFFFF'} />
-        ))}
-        {/* Canton */}
-        <rect x="0" y="0" width="7.6" height={(7 / 13) * 10} fill="#3C3B6E" />
-        {/* Étoiles simplifiées (points) */}
-        {Array.from({ length: 9 }).map((_, row) =>
-          Array.from({ length: row % 2 === 0 ? 6 : 5 }).map((__, col) => {
-            const cols = row % 2 === 0 ? 6 : 5;
-            const cx = 0.6 + (col + 1) * (7.6 / (cols + 1));
-            const cy = 0.5 + (row + 1) * ((7 / 13) * 10 / 10);
-            return <circle key={`${row}-${col}`} cx={cx} cy={cy} r="0.15" fill="#FFFFFF" />;
-          })
-        )}
+    <span className={`inline-block ${className}`} style={style}>
+      <svg viewBox="0 0 3 2" width="100%" height="100%">
+        <rect width="3" height="2" fill="#999999" />
       </svg>
     </span>
   );
+};
+
+/** Config d'affichage par langue (titre + sous-titre + drapeau) */
+const LANGUAGE_CONFIG: Record<Language, { flag: FlagCode; label: string; subtitle: string }> = {
+  fr: {
+    flag: 'fr',
+    label: 'Français',
+    subtitle: 'Louis Segond 1910 révision 2025',
+  },
+  en: {
+    flag: 'us',
+    label: 'English',
+    subtitle: 'King James Version',
+  },
+  de: {
+    flag: 'de',
+    label: 'Deutsch',
+    subtitle: 'Interface en anglais pour le moment (Bible à venir)',
+  },
+  it: {
+    flag: 'it',
+    label: 'Italiano',
+    subtitle: 'Interfaccia in inglese per ora (Bibbia in arrivo)',
+  },
+  es: {
+    flag: 'es',
+    label: 'Español',
+    subtitle: 'Interfaz en inglés por ahora (Biblia próximamente)',
+  },
+  pt: {
+    flag: 'pt',
+    label: 'Português',
+    subtitle: 'Interface em inglês por enquanto (Bíblia futuramente)',
+  },
+  ru: {
+    flag: 'ru',
+    label: 'Русский',
+    subtitle: 'Интерфейс пока на английском (Библия в разработке)',
+  },
+  hi: {
+    flag: 'hi',
+    label: 'हिन्दी',
+    subtitle: 'अभी के लिए अंग्रेज़ी इंटरफ़ेस (बाइबल बाद में आएगी)',
+  },
+  zh: {
+    flag: 'zh',
+    label: '中文',
+    subtitle: '目前界面为英文（圣经版本稍后提供）',
+  },
+  ar: {
+    flag: 'ar',
+    label: 'العربية',
+    subtitle: 'الواجهة بالإنجليزية حاليا (نسخة الكتاب المقدس لاحقاً)',
+  },
+  id: {
+    flag: 'id',
+    label: 'Bahasa Indonesia',
+    subtitle: 'Antarmuka berbahasa Inggris untuk saat ini (Alkitab menyusul)',
+  },
+  sw: {
+    flag: 'sw',
+    label: 'Kiswahili',
+    subtitle: 'Kiolesura kiko kwa Kiingereza kwa sasa (Biblia itafuata)',
+  },
 };
 
 export default function Settings() {
@@ -93,11 +306,17 @@ export default function Settings() {
   }, []);
 
   const handleCheckUpdates = async () => {
-    if (!('serviceWorker' in navigator)) { setUpdateStatus('unavailable'); return; }
+    if (!('serviceWorker' in navigator)) {
+      setUpdateStatus('unavailable');
+      return;
+    }
     try {
       setUpdateStatus('checking');
       const reg = await navigator.serviceWorker.getRegistration();
-      if (!reg) { setUpdateStatus('unavailable'); return; }
+      if (!reg) {
+        setUpdateStatus('unavailable');
+        return;
+      }
       const previousWaiting = reg.waiting || null;
       await reg.update();
       setTimeout(() => {
@@ -134,12 +353,20 @@ export default function Settings() {
         const res = await fetch('/version.json', { cache: 'no-store' });
         if (!res.ok) throw new Error('version.json not ok');
         const data = (await res.json()) as VersionInfo;
-        if (!canceled) { setVersionInfo(data); setVersionError(false); }
+        if (!canceled) {
+          setVersionInfo(data);
+          setVersionError(false);
+        }
       } catch {
-        if (!canceled) { setVersionInfo(null); setVersionError(true); }
+        if (!canceled) {
+          setVersionInfo(null);
+          setVersionError(true);
+        }
       }
     })();
-    return () => { canceled = true; };
+    return () => {
+      canceled = true;
+    };
   }, [updateStatus]);
 
   // --- Bouton langue réutilisable ---
@@ -153,19 +380,21 @@ export default function Settings() {
     <button
       onClick={onClick}
       className={`w-full flex items-center justify-between px-6 py-4 rounded-xl border-2 transition-all duration-200
-        ${active
-          ? 'bg-blue-600 border-blue-600 text-white'
-          : (isDark
-              ? 'bg-gray-700 border-gray-600 text-white hover:border-gray-500'
-              : 'bg-white border-gray-300 text-gray-800 hover:border-gray-400')}`}
+        ${
+          active
+            ? 'bg-blue-600 border-blue-600 text-white'
+            : isDark
+            ? 'bg-gray-700 border-gray-600 text-white hover:border-gray-500'
+            : 'bg-white border-gray-300 text-gray-800 hover:border-gray-400'
+        }`}
     >
       <div className="flex items-center space-x-3">
         <span className="shrink-0">{flag}</span>
         <div className="text-left">
-          <div className={`font-semibold ${active ? 'text-white' : (isDark ? 'text-white' : 'text-gray-800')}`}>
+          <div className={`font-semibold ${active ? 'text-white' : isDark ? 'text-white' : 'text-gray-800'}`}>
             {title}
           </div>
-          <div className={`text-sm ${active ? 'text-white/90' : (isDark ? 'text-white/80' : 'text-gray-600')}`}>
+          <div className={`text-sm ${active ? 'text-white/90' : isDark ? 'text-white/80' : 'text-gray-600'}`}>
             {subtitle}
           </div>
         </div>
@@ -193,23 +422,22 @@ export default function Settings() {
             </h2>
 
             <div className="space-y-4">
-              <LangButton
-                active={state.settings.language === 'fr'}
-                flag={<FlagIcon code="fr" />}
-                title="Français"
-                subtitle="Louis Segond 1910 révision 2025"
-                onClick={() => updateSettings({ language: 'fr' })}
-              />
-              <LangButton
-                active={state.settings.language === 'en'}
-                flag={<FlagIcon code="us" />}
-                title="English"
-                subtitle="King James Version"
-                onClick={() => updateSettings({ language: 'en' })}
-              />
+              {SUPPORTED_LANGUAGES.map((lang) => {
+                const cfg = LANGUAGE_CONFIG[lang];
+                return (
+                  <LangButton
+                    key={lang}
+                    active={state.settings.language === lang}
+                    flag={<FlagIcon code={cfg.flag} />}
+                    title={cfg.label}
+                    subtitle={cfg.subtitle}
+                    onClick={() => updateSettings({ language: lang })}
+                  />
+                );
+              })}
             </div>
 
-            {/* Explications des versions (déplacées depuis About) */}
+            {/* Explications des versions (FR / EN pour l'instant) */}
             <div className="mt-6">
               <h3 className={`text-lg font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-800'}`}>
                 {state.settings.language === 'fr' ? 'Versions de la Bible' : 'Bible Versions'}
@@ -222,9 +450,7 @@ export default function Settings() {
                     <FlagIcon code="fr" />
                     <div>
                       <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>Français</h4>
-                      <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-700'} mt-1`}>
-                        {t('frenchVersion')}
-                      </p>
+                      <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-700'} mt-1`}>{t('frenchVersion')}</p>
                       <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-600'} mt-2`}>
                         {state.settings.language === 'fr'
                           ? 'Version de référence pour la Bible en français, traduite par Louis Segond en 1910 et révisée en 2025 (modernisation du vocabulaire/grammaire, fidélité aux manuscrits).'
@@ -240,9 +466,7 @@ export default function Settings() {
                     <FlagIcon code="us" />
                     <div>
                       <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>English</h4>
-                      <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-700'} mt-1`}>
-                        {t('englishVersion')}
-                      </p>
+                      <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-700'} mt-1`}>{t('englishVersion')}</p>
                       <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-600'} mt-2`}>
                         {state.settings.language === 'fr'
                           ? 'Version classique en anglais (KJV), publiée en 1611, révisée en 1769 et modernisation limitée en 2025.'
@@ -253,11 +477,11 @@ export default function Settings() {
                 </div>
               </div>
 
-              {/* Ouverture à d’autres langues */}
+              {/* Note sur les autres langues */}
               <p className={`mt-3 text-xs ${isDark ? 'text-white/80' : 'text-gray-600'}`}>
                 {state.settings.language === 'fr'
-                  ? ''
-                  : ''}
+                  ? "D'autres langues (Allemand, Espagnol, Portugais, etc.) sont en préparation. En attendant, l'interface utilise l'anglais si la traduction n'est pas encore disponible."
+                  : 'More languages (German, Spanish, Portuguese, etc.) are in preparation. Until then, the interface falls back to English when a translation is not yet available.'}
               </p>
             </div>
           </div>
@@ -318,7 +542,10 @@ export default function Settings() {
               </div>
 
               <div className={`mt-4 p-4 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg`}>
-                <p className={`${isDark ? 'text-white' : 'text-gray-700'}`} style={{ fontSize: `${state.settings.fontSize}px` }}>
+                <p
+                  className={`${isDark ? 'text-white' : 'text-gray-700'}`}
+                  style={{ fontSize: `${state.settings.fontSize}px` }}
+                >
                   {state.settings.language === 'fr'
                     ? 'Aperçu de la taille de police sélectionnée.'
                     : 'Preview of the selected font size.'}
@@ -407,7 +634,7 @@ export default function Settings() {
           <div className="mt-8 text-center text-xs">
             {versionInfo ? (
               <p className={isDark ? 'text-white/70' : 'text-gray-600'}>
-                {state.settings.language === 'fr' ? 'Version' : 'Version'} {versionInfo?.version ?? '0.0.0'}
+                Version {versionInfo?.version ?? '0.0.0'}
               </p>
             ) : (
               <p className={isDark ? 'text-white/50' : 'text-gray-500'}>
