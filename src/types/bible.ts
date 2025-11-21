@@ -20,7 +20,28 @@ export interface BibleChapter {
   verses: BibleVerse[];
 }
 
-export type Language = 'fr' | 'en';
+/**
+ * Langues supportées dans l'application.
+ * On utilise un tableau + "as const" pour obtenir automatiquement
+ * le type union à partir de cette liste.
+ */
+export const SUPPORTED_LANGUAGES = [
+  'fr', // Français
+  'en', // Anglais
+  'de', // Allemand
+  'it', // Italien
+  'es', // Espagnol
+  'pt', // Portugais
+  'ru', // Russe
+  'hi', // Hindi
+  'zh', // Chinois (simplifié)
+  'ar', // Arabe
+  'id', // Indonésien
+  'sw', // Swahili
+] as const;
+
+export type Language = (typeof SUPPORTED_LANGUAGES)[number];
+
 export type Theme = 'light' | 'dark';
 
 export interface AppSettings {
