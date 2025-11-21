@@ -78,24 +78,42 @@ export default function Home() {
 
   // Clic sur la citation fixe -> ouvrir Jérémie 23:29 en surbrillance bleue
   const openJeremiah23 = () => {
-    try { saveQuickSlot(0, { book: 'Jeremiah', chapter: 23, verse: 29 }); } catch {}
+    try {
+      saveQuickSlot(0, { book: 'Jeremiah', chapter: 23, verse: 29 });
+    } catch {}
     navigateToVerse('Jeremiah', 23, 29);
   };
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-indigo-100'} transition-colors duration-200`}>
+    <div
+      className={`min-h-screen ${
+        isDark ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+      } transition-colors duration-200`}
+    >
       <div className="container mx-auto px-4 py-8 md:py-10">
         <div className="max-w-4xl mx-auto">
           {/* Titre */}
-          <h1 className={`text-center font-extrabold tracking-tight mb-6 ${isDark ? 'text-white' : 'text-gray-900'} text-3xl md:text-4xl`}>
+          <h1
+            className={`text-center font-extrabold tracking-tight mb-6 ${
+              isDark ? 'text-white' : 'text-gray-900'
+            } text-3xl md:text-4xl`}
+          >
             The Word
           </h1>
 
           {/* Carte du verset */}
-          <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl shadow-2xl border p-6 md:p-10 transition-all duration-300 hover:shadow-3xl`}>
+          <div
+            className={`${
+              isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+            } rounded-2xl shadow-2xl border p-6 md:p-10 transition-all duration-300 hover:shadow-3xl`}
+          >
             {loading ? (
               <div className="flex items-center justify-center py-16">
-                <div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${isDark ? 'border-blue-400' : 'border-blue-600'}`} />
+                <div
+                  className={`animate-spin rounded-full h-12 w-12 border-b-2 ${
+                    isDark ? 'border-blue-400' : 'border-blue-600'
+                  }`}
+                />
                 <span className={`ml-4 text-lg ${isDark ? 'text-white' : 'text-gray-600'}`}>
                   {t('loading')}
                 </span>
@@ -104,14 +122,18 @@ export default function Home() {
               <div className="text-center">
                 <blockquote
                   onClick={handleVerseClick}
-                  className={`text-lg md:text-xl leading-relaxed mb-8 italic cursor-pointer transition-all duration-200 hover:scale-105 ${isDark ? 'text-white hover:text-blue-300' : 'text-gray-700 hover:text-blue-600'}`}
+                  className={`text-lg md:text-xl leading-relaxed mb-8 italic cursor-pointer transition-all duration-200 hover:scale-105 ${
+                    isDark ? 'text-white hover:text-blue-300' : 'text-gray-700 hover:text-blue-600'
+                  }`}
                   style={{ fontSize: `${state.settings.fontSize}px`, lineHeight: '1.8' }}
                 >
                   “{verse.text}”
                 </blockquote>
                 <cite
                   onClick={handleVerseClick}
-                  className={`text-base font-medium cursor-pointer transition-all duration-200 hover:underline ${isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`}
+                  className={`text-base font-medium cursor-pointer transition-all duration-200 hover:underline ${
+                    isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'
+                  }`}
                 >
                   {verse.reference}
                 </cite>
@@ -144,13 +166,15 @@ export default function Home() {
             <button
               onClick={openJeremiah23}
               className="mx-auto block focus:outline-none"
-              aria-label={lang === 'fr' ? 'Ouvrir Jérémie 23:29' : 'Open Jeremiah 23:29'}
-              title={lang === 'fr' ? 'Ouvrir Jérémie 23:29' : 'Open Jeremiah 23:29'}
+              aria-label={t('openJeremiah')}
+              title={t('openJeremiah')}
             >
-              <p className={`italic hover:underline ${isDark ? 'text-white' : 'text-gray-700'} text-base md:text-lg`}>
-                {lang === 'fr'
-                  ? '« Ma parole n’est-elle pas comme un feu, dit l’Éternel, et comme un marteau qui brise le roc ? » Jérémie 23:29'
-                  : '“Is not my word like as a fire? saith the LORD; and like a hammer that breaketh the rock in pieces?” Jeremiah 23:29'}
+              <p
+                className={`italic hover:underline ${
+                  isDark ? 'text-white' : 'text-gray-700'
+                } text-base md:text-lg`}
+              >
+                {t('jeremiah23Quote')}
               </p>
             </button>
           </div>
