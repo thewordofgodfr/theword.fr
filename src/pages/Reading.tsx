@@ -433,8 +433,8 @@ export default function Reading() {
         } else { window.scrollTo({ top: 0, behavior: 'auto' }); }
       } catch {}
     };
-    const t = setTimeout(doScroll, 50);
-    return () => clearTimeout(t);
+    const tmo = setTimeout(doScroll, 50);
+    return () => clearTimeout(tmo);
   }, [chapter, highlightedVerse, scrollTargetVerse, state.settings.language, selectedBook?.name, selectedChapter]);
 
   const toggleSelectVerse = (num: number) => {
@@ -590,10 +590,10 @@ export default function Reading() {
 
   const swipeStart = useRef<{ x: number; y: number; time: number } | null>(null);
   const swipeHandled = useRef(false);
-  const onTouchStart = (e: React.TouchEvent) => { const t = e.touches[0]; swipeStart.current = { x: t.clientX, y: t.clientY, time: Date.now() }; swipeHandled.current = false; };
+  const onTouchStart = (e: React.TouchEvent) => { const tTouch = e.touches[0]; swipeStart.current = { x: tTouch.clientX, y: tTouch.clientY, time: Date.now() }; swipeHandled.current = false; };
   const onTouchMove = (e: React.TouchEvent) => {
     if (!swipeStart.current || swipeHandled.current || loading || !selectedBook) return;
-    const t = e.touches[0]; const dx = t.clientX - swipeStart.current.x; const dy = t.clientY - swipeStart.current.y;
+    const tTouch = e.touches[0]; const dx = tTouch.clientX - swipeStart.current.x; const dy = tTouch.clientY - swipeStart.current.y;
     const absDx = Math.abs(dx); const absDy = Math.abs(dy);
     if (absDx > 60 && absDx > absDy * 1.4) { swipeHandled.current = true; if (dx < 0) handleNextUnit(); else handlePrevUnit(); }
   };
@@ -667,7 +667,7 @@ export default function Reading() {
                           aria-expanded={showBookPicker}
                           className={`min-w-0 inline-flex items-center justify-between gap-1 rounded-md px-2 py-1 text-sm leading-none font-semibold shadow active:scale-95 focus:outline-none focus:ring-2 ${activeTheme ? `${activeTheme.mobileBtn} ${activeTheme.mobileBtnHover}` : 'bg-blue-600 text-white hover:bg-blue-500'} focus:ring-blue-400 flex-1`}
                           title={getBookName(selectedBook)}
-                          aria-label={state.settings.language === 'fr' ? 'Choisir un livre' : 'Choose a book'}
+                          aria-label={t('chooseBook')}
                         >
                           <span className="truncate w-[13ch]">{shortBookName(selectedBook)}</span>
                           <ChevronDown className="w-3.5 h-3.5 opacity-90" />
@@ -679,10 +679,13 @@ export default function Reading() {
                           onClick={() => setShowChapterPicker(true)}
                           aria-expanded={showChapterPicker}
                           className={`min-w-0 inline-flex items-center justify-between gap-1 rounded-md px-2 py-1 text-sm leading-none font-semibold shadow active:scale-95 focus:outline-none focus:ring-2 ${activeTheme ? `${activeTheme.mobileBtn} ${activeTheme.mobileBtnHover}` : 'bg-blue-600 text-white hover:bg-blue-500'} focus:ring-blue-400 flex-none shrink-0 whitespace-nowrap`}
-                          title={state.settings.language === 'fr' ? 'Choisir un chapitre' : 'Choose a chapter'}
-                          aria-label={state.settings.language === 'fr' ? 'Choisir un chapitre' : 'Choose a chapter'}
+                          title={t('chooseChapter')}
+                          aria-label={t('chooseChapter')}
                         >
-                          <span className="truncate"><span className="md:hidden">Ch.</span><span className="hidden md:inline">{t('chapter')}</span> {selectedChapter}</span>
+                          <span className="truncate">
+                            <span className="md:hidden">Ch.</span>
+                            <span className="hidden md:inline">{t('chapter')}</span> {selectedChapter}
+                          </span>
                           <ChevronDown className="w-3.5 h-3.5 opacity-90" />
                         </button>
 
@@ -710,10 +713,15 @@ export default function Reading() {
                             // Cercle bleu au périmètre (1/2/3) — conservé
                             const activePerimeter = isNumeric && activeSlot === i ? 'border-2 border-blue-400' : '';
 
-                            const title =
-                              i === 0
-                                ? (s ? `Recherche : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : 'Recherche (vide)')
-                                : (s ? `Mémoire ${i} : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : `Mémoire ${i} (vide)`);
+                            const refText = s ? `${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : '';
+                            let title: string;
+                            if (i === 0) {
+                              title = s ? `${t('searchSlotLabel')}: ${refText}` : t('searchSlotEmpty');
+                            } else {
+                              title = s
+                                ? `${t('memorySlotLabel')} ${i}: ${refText}`
+                                : `${t('memorySlotLabel')} ${i} ${t('emptySlotSuffix')}`;
+                            }
                             const isPressed = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
 
                             // GLOW plus visible (sans changer tailles/couleurs)
@@ -777,10 +785,15 @@ export default function Reading() {
                         // Cercle bleu au périmètre (1/2/3) — conservé
                         const activePerimeter = isNumeric && activeSlot === i ? 'border-2 border-blue-400' : '';
 
-                        const title =
-                          i === 0
-                            ? (s ? `Recherche : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : 'Recherche (vide)')
-                            : (s ? `Mémoire ${i} : ${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : `Mémoire ${i} (vide)`);
+                        const refText = s ? `${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : '';
+                        let title: string;
+                        if (i === 0) {
+                          title = s ? `${t('searchSlotLabel')}: ${refText}` : t('searchSlotEmpty');
+                        } else {
+                          title = s
+                            ? `${t('memorySlotLabel')} ${i}: ${refText}`
+                            : `${t('memorySlotLabel')} ${i} ${t('emptySlotSuffix')}`;
+                        }
                         const isPressed = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
 
                         // GLOW plus visible (sans changer tailles/couleurs)
@@ -813,9 +826,9 @@ export default function Reading() {
                       className={`px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm
                         ${activeTheme ? activeTheme.solid : 'bg-blue-600 text-white'}
                         ${activeTheme ? activeTheme.solidHover : 'hover:bg-blue-500'}`}
-                      title={state.settings.language === 'fr' ? 'Choisir un livre' : 'Choose a book'}
+                      title={t('chooseBook')}
                     >
-                      {state.settings.language === 'fr' ? 'Livres' : 'Books'}
+                      {t('booksLabel')}
                     </button>
 
                     <button
@@ -823,7 +836,7 @@ export default function Reading() {
                       className={`px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm inline-flex items-center gap-1
                         ${activeTheme ? activeTheme.solid : 'bg-blue-600 text-white'}
                         ${activeTheme ? activeTheme.solidHover : 'hover:bg-blue-500'}`}
-                      title={state.settings.language === 'fr' ? 'Choisir un chapitre' : 'Choose a chapter'}
+                      title={t('chooseChapter')}
                     >
                       {t('chapter')} {selectedChapter}
                       <ChevronDown className="w-3.5 h-3.5 opacity-90" />
@@ -834,13 +847,13 @@ export default function Reading() {
                       <button
                         onClick={() => handlePrevUnit()}
                         className="p-1.5 rounded-md transition-all bg-gray-700 text-white hover:bg-gray-600"
-                        title={state.settings.language === 'fr' ? 'Chapitre précédent' : 'Previous chapter'}
+                        title={t('prevChapter')}
                       ><ChevronLeft className="w-4 h-4" /></button>
 
                       <button
                         onClick={() => handleNextUnit()}
                         className="p-1.5 rounded-md transition-all bg-gray-700 text-white hover:bg-gray-600"
-                        title={state.settings.language === 'fr' ? 'Chapitre suivant' : 'Next chapter'}
+                        title={t('nextChapter')}
                       ><ChevronRight className="w-4 h-4" /></button>
                     </div>
                   </div>
@@ -854,9 +867,7 @@ export default function Reading() {
             <div className="hidden md:block sticky z-40 mb-3" style={{ top: `${NAV_H + cmdH + 8}px` }}>
               <div className="bg-white/5 text-white border border-gray-700 rounded-lg shadow px-4 py-3 flex items-center justify-between">
                 <div className="text-sm">
-                  {state.settings.language === 'fr'
-                    ? `${selectedVerses.length} verset${selectedVerses.length > 1 ? 's' : ''} sélectionné${selectedVerses.length > 1 ? 's' : ''}`
-                    : `${selectedVerses.length} verse${selectedVerses.length > 1 ? 's' : ''} selected`}
+                  {selectedVerses.length} {t('versesSelectedSuffix')}
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -864,25 +875,34 @@ export default function Reading() {
                     className="inline-flex items-center px-3 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-500"
                   >
                     <ListPlusIcon size={16} className="mr-2" />
-                    {state.settings.language === 'fr' ? 'Vers Notes' : 'To Notes'}
+                    {t('toNotes')}
                   </button>
                   <button
                     onClick={openAddToPrinciples}
                     className="inline-flex items-center px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-500"
                   >
                     <ListPlusIcon size={16} className="mr-2" />
-                    {state.settings.language === 'fr' ? 'Vers Principes' : 'To Principles'}
+                    {t('toPrinciples')}
                   </button>
-                  <button onClick={copySelection} className="inline-flex items-center px-3 py-2 rounded bg-blue-600 text-white hover:bg-blue-500">
+                  <button
+                    onClick={copySelection}
+                    className="inline-flex items-center px-3 py-2 rounded bg-blue-600 text-white hover:bg-blue-500"
+                  >
                     <CopyIcon size={16} className="mr-2" />
-                    {state.settings.language === 'fr' ? 'Copier' : 'Copy'}
+                    {t('copyLabel')}
                   </button>
-                  <button onClick={shareSelection} className="inline-flex items-center px-3 py-2 rounded bg-gray-700 text-white hover:opacity-90">
+                  <button
+                    onClick={shareSelection}
+                    className="inline-flex items-center px-3 py-2 rounded bg-gray-700 text-white hover:opacity-90"
+                  >
                     <ShareIcon size={16} className="mr-2" />
-                    {state.settings.language === 'fr' ? 'Partager' : 'Share'}
+                    {t('shareLabel')}
                   </button>
-                  <button onClick={() => setSelectedVerses([])} className="bg-gray-700 text-white px-3 py-2 rounded hover:opacity-90">
-                    {state.settings.language === 'fr' ? 'Annuler' : 'Clear'}
+                  <button
+                    onClick={() => setSelectedVerses([])}
+                    className="bg-gray-700 text-white px-3 py-2 rounded hover:opacity-90"
+                  >
+                    {t('cancel')}
                   </button>
                 </div>
               </div>
@@ -916,7 +936,7 @@ export default function Reading() {
                           className={`relative cursor-pointer px-1 sm:px-2 py-2 sm:py-2.5 rounded-md transition-colors ${selectedBg} ${highlightCls}`}
                         >
                           <span className="absolute right-2 top-0.5 sm:top-1 text-[11px] sm:text-xs select-none pointer-events-none text-white/80">
-                            {state.settings.language === 'fr' ? 'verset' : 'verse'} {v.verse}
+                            {t('verseWord')} {v.verse}
                             {isSelected && <Check size={14} className="inline ml-1 text-blue-300" />}
                           </span>
                           <div className="text-white" style={{ fontSize: `${state.settings.fontSize}px`, lineHeight: '1.55' }}>
@@ -949,9 +969,9 @@ export default function Reading() {
               <div className="absolute inset-0 bg-black/60" onClick={() => setShowBookPicker(false)} aria-hidden="true" />
               <div className="absolute inset-0 bg-gray-900 p-4 overflow-y-auto">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-white"></h3>
+                  <h3 className="text-xl font-semibold text-white">{t('selectBook')}</h3>
                   <button onClick={() => setShowBookPicker(false)} className="text-white bg-gray-700 px-3 py-1 rounded">
-                    {state.settings.language === 'fr' ? 'Fermer' : 'Close'}
+                    {t('close')}
                   </button>
                 </div>
 
@@ -962,7 +982,7 @@ export default function Reading() {
                       className={`w-full inline-block mb-2 break-inside-avoid px-3 py-2 rounded-lg text-lg ${
                         selectedBook?.name === book.name ? 'bg-blue-600 text-white' : 'bg-gray-800 text-white hover:bg-gray-700'
                       }`}>
-                      {state.settings.language === 'fr' ? book.nameFr : book.nameEn}
+                      {getBookName(book)}
                     </button>
                   ))}
                 </div>
@@ -974,7 +994,7 @@ export default function Reading() {
                       className={`w-full inline-block mb-2 break-inside-avoid px-3 py-2 rounded-lg text-lg ${
                         selectedBook?.name === book.name ? 'bg-blue-600 text-white' : 'bg-gray-800 text-white hover:bg-gray-700'
                       }`}>
-                      {state.settings.language === 'fr' ? book.nameFr : book.nameEn}
+                      {getBookName(book)}
                     </button>
                   ))}
                 </div>
@@ -987,9 +1007,9 @@ export default function Reading() {
               <div className="absolute inset-0 bg-black/60" onClick={() => setShowChapterPicker(false)} aria-hidden="true" />
               <div className="absolute inset-0 bg-gray-900 p-4 overflow-y-auto">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-white">{state.settings.language === 'fr' ? 'Choisir un chapitre' : 'Choose a chapter'}</h3>
+                  <h3 className="text-xl font-semibold text-white">{t('chooseChapter')}</h3>
                   <button onClick={() => setShowChapterPicker(false)} className="text-white bg-gray-700 px-3 py-1 rounded">
-                    {state.settings.language === 'fr' ? 'Fermer' : 'Close'}
+                    {t('close')}
                   </button>
                 </div>
 
@@ -1019,14 +1039,14 @@ export default function Reading() {
                     className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-600 text-white text-sm"
                   >
                     <ListPlusIcon size={16} className="mr-1" />
-                    {state.settings.language === 'fr' ? 'Notes' : 'Notes'}
+                    {t('notes')}
                   </button>
                   <button
                     onClick={openAddToPrinciples}
                     className="inline-flex items-center px-3 py-1.5 rounded-full bg-indigo-600 text-white text-sm"
                   >
                     <ListPlusIcon size={16} className="mr-1" />
-                    {state.settings.language === 'fr' ? 'Principes' : 'Principles'}
+                    {t('principles')}
                   </button>
                 </div>
 
@@ -1037,20 +1057,20 @@ export default function Reading() {
                     className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-600 text-white text-sm"
                   >
                     <CopyIcon size={16} className="mr-1" />
-                    {state.settings.language === 'fr' ? 'Copier' : 'Copy'}
+                    {t('copyLabel')}
                   </button>
                   <button
                     onClick={shareSelection}
                     className="bg-gray-700 text-white px-3 py-1.5 rounded-full inline-flex items-center text-sm"
                   >
                     <ShareIcon size={16} className="mr-1" />
-                    {state.settings.language === 'fr' ? 'Partager' : 'Share'}
+                    {t('shareLabel')}
                   </button>
                   <button
                     onClick={() => setSelectedVerses([])}
                     className="bg-gray-700 text-white px-3 py-1.5 rounded-full text-sm"
                   >
-                    {state.settings.language === 'fr' ? 'Annuler' : 'Clear'}
+                    {t('cancel')}
                   </button>
                 </div>
               </div>
@@ -1067,15 +1087,13 @@ export default function Reading() {
               />
               <div className="relative bg-gray-900 text-white rounded-xl shadow-lg p-4 w-full max-w-md mx-4">
                 <h3 className="text-lg font-semibold mb-2">
-                  {state.settings.language === 'fr' ? 'Ajouter à une liste (Notes)' : 'Add to a list (Notes)'}
+                  {t('notesModalTitle')}
                 </h3>
                 <form onSubmit={confirmAddToNotes}>
                   <div className="max-h-64 overflow-y-auto mt-2 space-y-1">
                     {notesListsForModal.length === 0 ? (
                       <p className="text-sm text-white/70">
-                        {state.settings.language === 'fr'
-                          ? 'Aucune liste pour l’instant. Créez-en une ci-dessous.'
-                          : 'No list yet. Create one below.'}
+                        {t('notesNoList')}
                       </p>
                     ) : (
                       notesListsForModal.map((l) => (
@@ -1091,7 +1109,7 @@ export default function Reading() {
                             checked={selectedNotesListId === l.id}
                             onChange={() => setSelectedNotesListId(l.id)}
                           />
-                          <span className="text-sm truncate">{l.title || '(sans titre)'}</span>
+                          <span className="text-sm truncate">{l.title || t('untitledList')}</span>
                         </label>
                       ))
                     )}
@@ -1099,9 +1117,7 @@ export default function Reading() {
 
                   <div className="mt-3">
                     <label className="block text-sm mb-1">
-                      {state.settings.language === 'fr'
-                        ? 'Nouvelle liste (optionnel)'
-                        : 'New list (optional)'}
+                      {t('notesNewListOptional')}
                     </label>
                     <input
                       type="text"
@@ -1117,7 +1133,7 @@ export default function Reading() {
                       onClick={() => setShowAddToNotes(false)}
                       className="px-3 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm"
                     >
-                      {state.settings.language === 'fr' ? 'Annuler' : 'Cancel'}
+                      {t('cancel')}
                     </button>
                     <button
                       type="submit"
@@ -1141,17 +1157,13 @@ export default function Reading() {
               />
               <div className="relative bg-gray-900 text-white rounded-xl shadow-lg p-4 w-full max-w-md mx-4">
                 <h3 className="text-lg font-semibold mb-2">
-                  {state.settings.language === 'fr'
-                    ? 'Ajouter à une étude (Principes)'
-                    : 'Add to a study (Principles)'}
+                  {t('principlesModalTitle')}
                 </h3>
                 <form onSubmit={confirmAddToPrinciples}>
                   <div className="max-h-64 overflow-y-auto mt-2 space-y-1">
                     {principlesListsForModal.length === 0 ? (
                       <p className="text-sm text-white/70">
-                        {state.settings.language === 'fr'
-                          ? 'Aucune étude pour l’instant. Créez-en une ci-dessous.'
-                          : 'No study yet. Create one below.'}
+                        {t('principlesNoList')}
                       </p>
                     ) : (
                       principlesListsForModal.map((l) => (
@@ -1167,7 +1179,7 @@ export default function Reading() {
                             checked={selectedPrincipleListId === l.id}
                             onChange={() => setSelectedPrincipleListId(l.id)}
                           />
-                          <span className="text-sm truncate">{l.title || '(sans titre)'}</span>
+                          <span className="text-sm truncate">{l.title || t('untitledList')}</span>
                         </label>
                       ))
                     )}
@@ -1175,9 +1187,7 @@ export default function Reading() {
 
                   <div className="mt-3">
                     <label className="block text-sm mb-1">
-                      {state.settings.language === 'fr'
-                        ? 'Nouvelle étude (optionnel)'
-                        : 'New study (optional)'}
+                      {t('principlesNewListOptional')}
                     </label>
                     <input
                       type="text"
@@ -1193,7 +1203,7 @@ export default function Reading() {
                       onClick={() => setShowAddToPrinciples(false)}
                       className="px-3 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm"
                     >
-                      {state.settings.language === 'fr' ? 'Annuler' : 'Cancel'}
+                      {t('cancel')}
                     </button>
                     <button
                       type="submit"
@@ -1210,24 +1220,24 @@ export default function Reading() {
           {/* TOASTS */}
           {copiedKey === 'selection' && (
             <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-green-600 text-white z-50">
-              {state.settings.language === 'fr' ? 'Sélection copiée' : 'Selection copied'}
+              {t('selectionCopied')}
             </div>
           )}
           {copiedKey === 'shared-fallback' && (
             <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-blue-600 text-white z-50">
-            {state.settings.language === 'fr' ? 'Texte prêt à partager (copié)' : 'Text ready to share (copied)'}
+              {t('textReadyToShare')}
             </div>
           )}
           {copiedKey === 'added-to-list' && (
             <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-emerald-600 text-white z-50">
-              {state.settings.language === 'fr' ? 'Ajouté à la liste' : 'Added to list'}
+              {t('addedToList')}
             </div>
           )}
 
           {false && showBottomRandom && (
             <div className="fixed bottom-4 right-4 z-40 sm:right-6 sm:bottom-6">
               <button onClick={pickNewRandom} className="px-3 py-2 rounded-full shadow-lg bg-indigo-600 text-white text-sm active:scale-95">
-                {state.settings.language === 'fr' ? 'Nouveau aléatoire' : 'New random'}
+                {t('newRandom')}
               </button>
             </div>
           )}
@@ -1236,7 +1246,7 @@ export default function Reading() {
             <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
               <div className="w-1/2 max-w-xs text-center px-4 py-3 rounded-2xl text-base font-bold shadow-2xl ring-2 ring-blue-200 bg-blue-600/95 text-white flex items-center justify-center">
                 <span className="opacity-90 mr-2">◀</span>
-                {state.settings.language === 'fr' ? 'Glissez' : 'Swipe'}
+                {t('swipeLabel')}
                 <span className="opacity-90 ml-2">▶</span>
               </div>
             </div>
@@ -1246,4 +1256,3 @@ export default function Reading() {
     </div>
   );
 }
-
