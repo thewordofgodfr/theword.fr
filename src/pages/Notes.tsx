@@ -84,7 +84,7 @@ function buildItemPlainText(it: AnyItem): string {
 
 export default function Notes() {
   const { state, setPage } = useApp();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const isDark = state.settings.theme === 'dark';
 
   const [lists, setLists] = useState<VerseList[]>([]);
@@ -101,83 +101,44 @@ export default function Notes() {
 
   const label = useMemo(
     () => ({
-      title: state.settings.language === 'fr' ? 'Notes' : 'Notes',
-      create: state.settings.language === 'fr' ? 'Créer une liste' : 'Create list',
-      placeholder: state.settings.language === 'fr' ? 'Titre de la liste…' : 'List title…',
-      empty: state.settings.language === 'fr' ? 'Aucune liste pour l’instant.' : 'No lists yet.',
-      verses: state.settings.language === 'fr' ? 'éléments' : 'items',
-      openReading: state.settings.language === 'fr' ? 'Ouvrir la lecture' : 'Open Reading',
-      copied: state.settings.language === 'fr' ? 'Copié' : 'Copied',
-      backAll: state.settings.language === 'fr' ? '← Toutes les listes' : '← All lists',
-      addTextBlock: state.settings.language === 'fr' ? 'Ajouter un bloc de texte' : 'Add text block',
-      editTextBlock: state.settings.language === 'fr' ? 'Modifier le bloc' : 'Edit block',
-      deleteItem: state.settings.language === 'fr' ? 'Supprimer' : 'Delete',
-      moveUp: state.settings.language === 'fr' ? 'Monter' : 'Move up',
-      moveDown: state.settings.language === 'fr' ? 'Descendre' : 'Move down',
-      open: state.settings.language === 'fr' ? 'Ouvrir' : 'Open',
-      cancel: state.settings.language === 'fr' ? 'Annuler' : 'Cancel',
-      confirmDeleteItem:
-        state.settings.language === 'fr'
-          ? 'Supprimer cet élément ?'
-          : 'Delete this item?',
-      newTextPlaceholder:
-        state.settings.language === 'fr' ? 'Votre texte…' : 'Your text…',
-      // Nouveau : partage / import par code
-      shareCode: state.settings.language === 'fr' ? 'Code' : 'Code',
-      importCode: state.settings.language === 'fr' ? 'Importer un code' : 'Import code',
-      importPrompt:
-        state.settings.language === 'fr'
-          ? 'Collez ici le code de partage TheWord :'
-          : 'Paste the TheWord share code here:',
-      importError:
-        state.settings.language === 'fr'
-          ? 'Code invalide.'
-          : 'Invalid code.',
-      importSuccess:
-        state.settings.language === 'fr'
-          ? 'Liste importée avec succès ✅'
-          : 'List imported successfully ✅',
-      shareCodeCopied:
-        state.settings.language === 'fr'
-          ? 'Code copié dans le presse-papiers ✅'
-          : 'Code copied to clipboard ✅',
-      // Libellés mini-import texte
-      importTextButton:
-        state.settings.language === 'fr' ? 'Texte → Liste' : 'Text → List',
-      importTextTitlePlaceholder:
-        state.settings.language === 'fr'
-          ? 'Titre de la nouvelle liste'
-          : 'New list title',
-      importTextDefaultTitle:
-        state.settings.language === 'fr'
-          ? 'Import texte'
-          : 'Text import',
-      importTextBodyPlaceholder:
-        state.settings.language === 'fr'
-          ? 'Colle ici ton texte…'
-          : 'Paste your text here…',
-      importTextNoBody:
-        state.settings.language === 'fr'
-          ? 'Merci de coller un texte à importer.'
-          : 'Please paste some text to import.',
-      importTextNoBlock:
-        state.settings.language === 'fr'
-          ? 'Aucun bloc détecté (pense à laisser des lignes vides si tu découpes en blocs).'
-          : 'No block detected (add blank lines if you split into blocks).',
-      importTextSplitLabel:
-        state.settings.language === 'fr'
-          ? 'Découper en blocs (séparés par au moins une ligne vide)'
-          : 'Split into blocks (separated by at least one empty line)',
-      importTextInfo:
-        state.settings.language === 'fr'
-          ? 'Chaque bloc deviendra un élément dans la liste.'
-          : 'Each block will become an item in the list.',
-      importTextCreate:
-        state.settings.language === 'fr'
-          ? 'Créer la liste'
-          : 'Create list',
+      title: t('notes'), // libellé général "Notes"
+      create: t('notesPage.create'),
+      placeholder: t('notesPage.placeholder'),
+      empty: t('notesPage.empty'),
+      verses: t('notesPage.items'),
+      copied: t('copiedShort'),
+      backAll: t('notesPage.backAll'),
+      addTextBlock: t('notesPage.addTextBlock'),
+      editTextBlock: t('notesPage.editTextBlock'),
+      deleteItem: t('notesPage.deleteItem'),
+      moveUp: t('notesPage.moveUp'),
+      moveDown: t('notesPage.moveDown'),
+      open: t('notesPage.open'),
+      cancel: t('cancel'),
+      confirmDeleteItem: t('notesPage.confirmDeleteItem'),
+      newTextPlaceholder: t('notesPage.newTextPlaceholder'),
+      shareCode: t('notesPage.shareCode'),
+      importCode: t('notesPage.importCode'),
+      importPrompt: t('notesPage.importPrompt'),
+      importError: t('notesPage.importError'),
+      importSuccess: t('notesPage.importSuccess'),
+      shareCodeCopied: t('notesPage.shareCodeCopied'),
+      importTextButton: t('notesPage.importTextButton'),
+      importTextTitlePlaceholder: t('notesPage.importTextTitlePlaceholder'),
+      importTextDefaultTitle: t('notesPage.importTextDefaultTitle'),
+      importTextBodyPlaceholder: t('notesPage.importTextBodyPlaceholder'),
+      importTextNoBody: t('notesPage.importTextNoBody'),
+      importTextNoBlock: t('notesPage.importTextNoBlock'),
+      importTextSplitLabel: t('notesPage.importTextSplitLabel'),
+      importTextInfo: t('notesPage.importTextInfo'),
+      importTextCreate: t('notesPage.importTextCreate'),
+      duplicateTitle: t('notesPage.duplicateTitle'),
+      confirmDeleteList: t('notesPage.confirmDeleteList'),
+      emptyList: t('notesPage.emptyList'),
+      importFromTextTitle: t('notesPage.importFromTextTitle'),
+      documentContent: t('notesPage.documentContent'),
     }),
-    [state.settings.language]
+    [t, language]
   );
 
   const refresh = () => setLists(getAllLists());
@@ -194,6 +155,7 @@ export default function Notes() {
       (l) => (l.title || '').trim().toLowerCase() === trimmed.toLowerCase()
     );
     if (exists) {
+      alert(label.duplicateTitle);
       setExpandedId(exists.id);
       return;
     }
@@ -210,11 +172,7 @@ export default function Notes() {
       (l) => l.id !== id && (l.title || '').trim().toLowerCase() === trimmed.toLowerCase()
     );
     if (exists) {
-      alert(
-        state.settings.language === 'fr'
-          ? 'Un titre identique existe déjà.'
-          : 'A list with the same title already exists.'
-      );
+      alert(label.duplicateTitle);
       return;
     }
     renameList(id, trimmed);
@@ -222,12 +180,7 @@ export default function Notes() {
   };
 
   const doDelete = (id: string) => {
-    if (
-      !confirm(
-        state.settings.language === 'fr' ? 'Supprimer cette liste ?' : 'Delete this list?'
-      )
-    )
-      return;
+    if (!confirm(label.confirmDeleteList)) return;
     deleteList(id);
     refresh();
     if (expandedId === id) setExpandedId(null);
@@ -241,14 +194,10 @@ export default function Notes() {
     try {
       const nav: any = navigator;
       if (nav?.share) {
-        await nav.share({ title: list.title || 'Notes', text: payload });
+        await nav.share({ title: list.title || label.title, text: payload });
       } else {
         await navigator.clipboard.writeText(payload);
-        alert(
-          (state.settings.language === 'fr'
-            ? 'Texte prêt à partager (copié)'
-            : 'Text ready to share (copied)') + ' ✅'
-        );
+        alert(t('textReadyToShare') + ' ✅');
       }
     } catch {}
   };
@@ -290,11 +239,8 @@ export default function Notes() {
     }
 
     const title =
-      payload.title?.trim() ||
-      (state.settings.language === 'fr' ? 'Import TheWord' : 'TheWord import');
+      payload.title?.trim() || label.importTextDefaultTitle;
 
-    // On crée une nouvelle liste avec ce titre,
-    // puis on injecte les items importés (y compris blocs texte).
     const created = createList(title);
     setListItems(created.id, (payload.items || []) as VerseRef[]);
     refresh();
@@ -358,14 +304,10 @@ export default function Notes() {
     try {
       const nav: any = navigator;
       if (nav?.share) {
-        await nav.share({ title: 'Verset', text: payload });
+        await nav.share({ title: t('verseWord'), text: payload });
       } else {
         await navigator.clipboard.writeText(payload);
-        alert(
-          (state.settings.language === 'fr'
-            ? 'Texte prêt à partager (copié)'
-            : 'Text ready to share (copied)') + ' ✅'
-        );
+        alert(t('textReadyToShare') + ' ✅');
       }
     } catch {}
   };
@@ -567,28 +509,28 @@ export default function Notes() {
                       <button
                         onClick={() => doRename(list.id, list.title)}
                         className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
-                        title="Renommer"
+                        title={t('notesPage.renameList')}
                       >
                         <Edit3 size={16} />
-                        Renommer
+                        {t('notesPage.renameList')}
                       </button>
 
                       <button
                         onClick={() => doShare(list.id)}
                         className="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-500 inline-flex items-center gap-2"
-                        title="Partager"
+                        title={t('shareLabel')}
                       >
                         <Share2 size={16} />
-                        Partager
+                        {t('shareLabel')}
                       </button>
 
                       <button
                         onClick={() => copyListText(list.id)}
                         className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
-                        title="Copier"
+                        title={t('copyLabel')}
                       >
                         <Copy size={16} />
-                        Copier
+                        {t('copyLabel')}
                       </button>
 
                       {/* Nouveau : bouton "Code" pour cette liste */}
@@ -604,10 +546,10 @@ export default function Notes() {
                       <button
                         onClick={() => doDelete(list.id)}
                         className="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-500 inline-flex items-center gap-2"
-                        title="Supprimer"
+                        title={label.deleteItem}
                       >
                         <Trash2 size={16} />
-                        Supprimer
+                        {label.deleteItem}
                       </button>
                     </div>
                   )}
@@ -617,7 +559,7 @@ export default function Notes() {
                     <div className={`mt-4 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-50'} p-3`}>
                       {list.items.length === 0 ? (
                         <div className={`${isDark ? 'text-white/70' : 'text-gray-600'} text-sm`}>
-                          {state.settings.language === 'fr' ? 'Liste vide.' : 'Empty list.'}
+                          {label.emptyList}
                         </div>
                       ) : (
                         <ul className="space-y-3">
@@ -695,20 +637,20 @@ export default function Notes() {
                                           className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
                                             isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
                                           }`}
-                                          title="Copier"
+                                          title={t('copyLabel')}
                                         >
                                           <Copy size={16} />
-                                          Copier
+                                          {t('copyLabel')}
                                         </button>
 
                                         {/* Partager ce verset */}
                                         <button
                                           onClick={() => shareItem(it)}
                                           className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500"
-                                          title="Partager"
+                                          title={t('shareLabel')}
                                         >
                                           <Share2 size={16} />
-                                          Partager
+                                          {t('shareLabel')}
                                         </button>
                                       </>
                                     )}
@@ -812,9 +754,7 @@ export default function Notes() {
             }`}
           >
             <h2 className="text-lg font-semibold mb-2">
-              {state.settings.language === 'fr'
-                ? 'Importer depuis un texte'
-                : 'Import from text'}
+              {label.importFromTextTitle}
             </h2>
 
             <div className="mb-3">
@@ -836,9 +776,7 @@ export default function Notes() {
 
             <div className="mb-3">
               <label className="block text-sm mb-1">
-                {state.settings.language === 'fr'
-                  ? 'Contenu du document'
-                  : 'Document content'}
+                {label.documentContent}
               </label>
               <textarea
                 className={`w-full rounded-md px-2 py-1.5 text-sm min-h-[160px] border resize-vertical ${
@@ -888,3 +826,4 @@ export default function Notes() {
     </div>
   );
 }
+
