@@ -38,6 +38,10 @@ export const SUPPORTED_LANGUAGES = [
   'ar', // Arabe
   'id', // Indonésien
   'sw', // Swahili
+  'tr', // Turc
+  'ja', // Japonais
+  'ko', // Coréen
+  'yo', // Yoruba
 ] as const;
 
 export type Language = (typeof SUPPORTED_LANGUAGES)[number];
