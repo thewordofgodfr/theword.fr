@@ -66,6 +66,18 @@ const frTranslations = {
   // Petit libellé court pour “Copié”
   copiedShort: 'Copié',
 
+  // *** Search page ***
+  searchTitle: 'Recherche biblique',
+  searchPlaceholder: 'Tapez votre recherche',
+  searchMinChars: 'Saisissez au moins 2 caractères',
+  searchSearching: 'Recherche en cours…',
+  searchResults: 'Résultats',
+  searchExpandAll: 'Tout ouvrir',
+  searchCollapseAll: 'Tout fermer',
+  searchNoResults: 'Aucun verset trouvé.',
+  searchClear: 'Effacer',
+  searchOpenInReading: 'Ouvrir dans Lecture',
+
   // Bloc Notes (page Notes)
   notesPage: {
     create: 'Créer une liste',
@@ -274,6 +286,18 @@ const enTranslations = {
 
   // Short label “Copied”
   copiedShort: 'Copied',
+
+  // *** Search page ***
+  searchTitle: 'Bible search',
+  searchPlaceholder: 'Type your search',
+  searchMinChars: 'Type at least 2 characters to search.',
+  searchSearching: 'Searching…',
+  searchResults: 'Results',
+  searchExpandAll: 'Expand all',
+  searchCollapseAll: 'Collapse all',
+  searchNoResults: 'No verses found.',
+  searchClear: 'Clear',
+  searchOpenInReading: 'Open in Reading',
 
   // Notes page block
   notesPage: {
@@ -484,6 +508,18 @@ const ruTranslations = {
 
   // Petit libellé court pour “Copié”
   copiedShort: 'Скопировано',
+
+  // *** Search page ***
+  searchTitle: 'Библейский поиск',
+  searchPlaceholder: 'Введите запрос',
+  searchMinChars: 'Введите как минимум 2 символа.',
+  searchSearching: 'Поиск…',
+  searchResults: 'Результаты',
+  searchExpandAll: 'Открыть всё',
+  searchCollapseAll: 'Свернуть всё',
+  searchNoResults: 'Стихи не найдены.',
+  searchClear: 'Очистить',
+  searchOpenInReading: 'Открыть в Чтении',
 
   // Bloc Notes (page Notes)
   notesPage: {
