@@ -182,20 +182,41 @@ const frTranslations = {
   appearance: 'Apparence',
   lightMode: 'Mode Clair',
   darkMode: 'Mode Sombre',
-  fontSize: 'Taille de Police',
+  fontSize: 'Taille de police',
   language: 'Langue',
   french: 'Français',
   english: 'Anglais',
+  fontSizeXLLabel: 'Mode Malvoyant (XL)',
+  fontSizePreview: 'Aperçu de la taille de police sélectionnée.',
+  updates: 'Mises à jour',
+  updatesDescription:
+    "Vérifie s'il existe une nouvelle version de l'application et applique-la.",
+  applyUpdate: 'Appliquer la mise à jour',
+  checkUpdatesButton: 'Vérifier les mises à jour',
+  updatesChecking: 'Vérification en cours…',
+  updatesUpToDate: "Votre application est à jour.",
+  updatesReady:
+    'Nouvelle version prête. Cliquez sur « Appliquer la mise à jour ».',
+  updatesUnavailable:
+    'Mise à jour automatique indisponible (Service Worker non détecté).',
+  updatesError: 'Erreur lors de la vérification. Réessayez.',
 
-  // About page
+  // About / versions
   aboutTitle: '',
   aboutDescription:
     'The Word vous permet de découvrir la parole de Dieu à travers des versets aléatoires et une lecture complète de la Bible.',
   aboutIntro:
     'TheWord : Lecture de la Bible hors-ligne, recherche instantanée, notes thématiques, partage en un geste. Retrouvez aussi TheWord sur le web : www.theword.fr',
   bibleVersions: 'Versions de la Bible',
-  frenchVersion: 'Français : Louis Segond 1910 (LSG)- Révision 2025 - Libre de droit',
+  frenchVersion:
+    'Français : Louis Segond 1910 (LSG)- Révision 2025 - Libre de droit',
   englishVersion: 'Anglais : King James Version (KJV) - Libre de droit',
+  frenchVersionDetails:
+    'Version de référence pour la Bible en français, traduite par Louis Segond en 1910 et révisée en 2025 (modernisation du vocabulaire/grammaire, fidélité aux manuscrits).',
+  englishVersionDetails:
+    'Version classique en anglais (KJV), publiée en 1611, révisée en 1769 et modernisation limitée en 2025.',
+  otherLanguagesNote:
+    "D'autres langues (Allemand, Espagnol, Portugais, etc.) sont en préparation. En attendant, l'interface utilise l'anglais si la traduction n'est pas encore disponible.",
   randomFeature: 'Fonctionnalité Aléatoire',
   randomFeatureDesc:
     'Notre générateur de versets aléatoires sélectionne parmi plus de 31,000 versets bibliques pour vous offrir une inspiration quotidienne.',
@@ -407,6 +428,17 @@ const enTranslations = {
   language: 'Language',
   french: 'French',
   english: 'English',
+  fontSizeXLLabel: 'Low-vision mode (XL)',
+  fontSizePreview: 'Preview of the selected font size.',
+  updates: 'Updates',
+  updatesDescription: 'Check if a new version is available and apply it.',
+  applyUpdate: 'Apply update',
+  checkUpdatesButton: 'Check for updates',
+  updatesChecking: 'Checking…',
+  updatesUpToDate: 'Your app is up to date.',
+  updatesReady: 'New version ready. Click “Apply update”.',
+  updatesUnavailable: 'Automatic update unavailable (No Service Worker).',
+  updatesError: 'Error while checking. Please try again.',
 
   // About page
   aboutTitle: '',
@@ -417,6 +449,12 @@ const enTranslations = {
   bibleVersions: 'Bible Versions',
   frenchVersion: 'French: Louis Segond 1910 (LSG) - Public Domain',
   englishVersion: 'English: King James Version (KJV) - Public Domain',
+  frenchVersionDetails:
+    'Reference French Bible, translated by Louis Segond in 1910 and refreshed in 2025 (modernized wording/grammar, faithful to the manuscripts).',
+  englishVersionDetails:
+    'Classic English version (KJV), published in 1611, revised in 1769, with a limited 2025 refresh.',
+  otherLanguagesNote:
+    'More languages (German, Spanish, Portuguese, etc.) are in preparation. Until then, the interface falls back to English when a translation is not yet available.',
   randomFeature: 'Random Feature',
   randomFeatureDesc:
     'Our random verse generator selects from over 31,000 biblical verses to provide you with daily inspiration.',
@@ -587,7 +625,8 @@ const ruTranslations = {
     // Partage / import via code
     shareCode: 'Код',
     importCode: 'Импортировать код',
-    importPrompt: 'Вставьте сюда код общего доступа TheWord (заметка или исследование):',
+    importPrompt:
+      'Вставьте сюда код общего доступа TheWord (заметка или исследование):',
     importError: 'Недействительный код.',
     importSuccess: 'Исследование успешно импортировано ✅',
     shareCodeCopied: 'Код скопирован в буфер обмена ✅',
@@ -629,6 +668,19 @@ const ruTranslations = {
   language: 'Язык',
   french: 'Французский',
   english: 'Английский',
+  fontSizeXLLabel: 'Режим для слабовидящих (XL)',
+  fontSizePreview: 'Пример выбранного размера шрифта.',
+  updates: 'Обновления',
+  updatesDescription:
+    'Проверяет, доступна ли новая версия приложения, и применяет её.',
+  applyUpdate: 'Применить обновление',
+  checkUpdatesButton: 'Проверить обновления',
+  updatesChecking: 'Проверка…',
+  updatesUpToDate: 'Приложение обновлено.',
+  updatesReady: 'Новая версия готова. Нажмите «Применить обновление».',
+  updatesUnavailable:
+    'Автоматическое обновление недоступно (Service Worker не найден).',
+  updatesError: 'Ошибка при проверке. Повторите попытку.',
 
   // About page
   aboutTitle: '',
@@ -639,8 +691,13 @@ const ruTranslations = {
   bibleVersions: 'Переводы Библии',
   frenchVersion:
     'Французский: Louis Segond 1910 (LSG) – редакция 2025 – общественное достояние',
-  englishVersion:
-    'Английский: King James Version (KJV) – общественное достояние',
+  englishVersion: 'Английский: King James Version (KJV) – общественное достояние',
+  frenchVersionDetails:
+    'Версия Библии на французском языке, переведённая Луи Сегоном в 1910 году и обновлённая в 2025 году (обновлённая лексика и грамматика, верность рукописям).',
+  englishVersionDetails:
+    'Классический английский перевод (KJV), опубликованный в 1611 году, пересмотренный в 1769 году и слегка обновлённый в 2025 году.',
+  otherLanguagesNote:
+    'Другие языки (немецкий, испанский, португальский и др.) находятся в разработке. Пока нет перевода, интерфейс отображается на английском.',
   randomFeature: 'Функция «Случайный стих»',
   randomFeatureDesc:
     'Наш генератор случайных стихов выбирает из более чем 31 000 библейских стихов, чтобы ежедневно вдохновлять вас.',
