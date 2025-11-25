@@ -1,3 +1,4 @@
+// src/pages/Search.tsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { getBibleBooks, searchInBible } from '../services/bibleService';
@@ -10,6 +11,7 @@ import {
   X,
 } from 'lucide-react';
 import { saveSlot as saveQuickSlot } from '../services/readingSlots';
+import { useTranslation } from '../hooks/useTranslation';
 
 /* -------- Types -------- */
 
@@ -28,12 +30,18 @@ function normalizeLigatures(s: string) {
   return s.replace(/œ/g, 'oe').replace(/Œ/g, 'oe').replace(/æ/g, 'ae').replace(/Æ/g, 'ae');
 }
 
+/**
+ * Normalisation compatible Unicode :
+ * - enlève les accents
+ * - conserve toutes les lettres/chiffres (toutes écritures) via \p{L}\p{N}
+ * - remplace le reste par des espaces
+ */
 function normalizeForSearch(s: string) {
   const noLig = normalizeLigatures(s);
   const deAccented = noLig.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   return deAccented
     .toLowerCase()
-    .replace(/[^a-z0-9]+/gi, ' ')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
     .trim()
     .replace(/\s+/g, ' ');
 }
@@ -50,7 +58,7 @@ function buildNormalizedWithMap(input: string) {
     let emitted = false;
     for (let k = 0; k < base.length; k++) {
       const c = base[k];
-      if (/[A-Za-z0-9]/.test(c)) {
+      if (/[\p{L}\p{N}]/u.test(c)) {
         normChars.push(c.toLowerCase());
         idxMap.push(i);
         emitted = true;
@@ -185,6 +193,7 @@ function highlightFlexible(text: string, query: string) {
 
 export default function Search() {
   const { state, navigateToVerse } = useApp();
+  const { t, language } = useTranslation();
   const isDark = state.settings.theme === 'dark';
 
   const queryKey = `twog:search:lastQuery:${state.settings.language}`;
@@ -211,6 +220,7 @@ export default function Search() {
   const getBookName = (id: string) => {
     const b = books.find(x => x.name === id);
     if (!b) return id;
+    // Pour l’instant : FR → nameFr, sinon → nameEn (y compris RU)
     return state.settings.language === 'fr' ? b.nameFr : b.nameEn;
   };
   const bibleOrder = (id: string) => {
@@ -218,10 +228,11 @@ export default function Search() {
     return idx === -1 ? 9999 : idx;
   };
 
-  // Titre de page
+  // Titre de page (onglet navigateur)
   useEffect(() => {
-    document.title = state.settings.language === 'fr' ? 'Recherche biblique' : 'Bible Search';
-  }, [state.settings.language]);
+    document.title = t('searchTitle');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [language]);
 
   // Lancer la recherche (debounce)
   useEffect(() => {
@@ -340,7 +351,9 @@ export default function Search() {
   };
 
   const openInReading = (v: ResultItem) => {
-    try { saveQuickSlot(0, { book: v.book, chapter: v.chapter, verse: v.verse }); } catch {}
+    try {
+      saveQuickSlot(0, { book: v.book, chapter: v.chapter, verse: v.verse });
+    } catch {}
     sessionStorage.setItem(scrollKey(query), String(window.scrollY || 0));
     navigateToVerse(v.book, v.chapter, v.verse);
   };
@@ -355,7 +368,7 @@ export default function Search() {
       <div className="max-w-4xl mx-auto px-4 py-5">
         {/* En-tête / titre */}
         <h1 className={`text-xl font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-          {state.settings.language === 'fr' ? '' : ''}
+          {t('searchTitle')}
         </h1>
 
         {/* Petit masque collant */}
@@ -379,11 +392,7 @@ export default function Search() {
               value={query}
               onChange={e => setQuery(e.target.value)}
               type="text"
-              placeholder={
-                state.settings.language === 'fr'
-                  ? 'Tapez votre recherche'
-                  : 'Type your search'
-              }
+              placeholder={t('searchPlaceholder')}
               className={`w-full pl-10 pr-20 py-3 rounded-lg border-2 focus:outline-none transition ${
                 isDark
                   ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-400 focus:border-blue-500'
@@ -400,7 +409,7 @@ export default function Search() {
                       ? 'text-white/80 hover:text-white hover:bg-gray-700'
                       : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                   }`}
-                  aria-label={state.settings.language === 'fr' ? 'Effacer' : 'Clear'}
+                  aria-label={t('searchClear')}
                 >
                   <X size={18} />
                 </button>
@@ -414,16 +423,14 @@ export default function Search() {
               {loading ? (
                 <>
                   <Loader2 className="inline mr-2 animate-spin" size={16} />
-                  {state.settings.language === 'fr' ? 'Recherche en cours…' : 'Searching…'}
+                  {t('searchSearching')}
                 </>
               ) : query.trim().length >= 2 ? (
                 <>
-                  {state.settings.language === 'fr' ? 'Résultats' : 'Results'} "{query}" ({totalOccurrences})
+                  {t('searchResults')} "{query}" ({totalOccurrences})
                 </>
               ) : (
-                state.settings.language === 'fr'
-                  ? 'Saisissez au moins 2 caractères'
-                  : 'Type at least 2 characters to search.'
+                t('searchMinChars')
               )}
             </div>
 
@@ -433,7 +440,7 @@ export default function Search() {
                   onClick={expandAll}
                   className="text-xs px-2 py-1 rounded border border-transparent bg-blue-600 text-white hover:bg-blue-500"
                 >
-                  {state.settings.language === 'fr' ? 'Tout ouvrir' : 'Expand all'}
+                  {t('searchExpandAll')}
                 </button>
                 <button
                   onClick={collapseAll}
@@ -443,7 +450,7 @@ export default function Search() {
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                   }`}
                 >
-                  {state.settings.language === 'fr' ? 'Tout fermer' : 'Collapse all'}
+                  {t('searchCollapseAll')}
                 </button>
               </div>
             )}
@@ -454,7 +461,7 @@ export default function Search() {
         <div className="mt-4">
           {totalOccurrences === 0 && !loading && query.trim().length >= 2 && (
             <div className={`${isDark ? 'text-white' : 'text-gray-600'} text-center py-10`}>
-              {state.settings.language === 'fr' ? 'Aucun verset trouvé.' : 'No verses found.'}
+              {t('searchNoResults')}
             </div>
           )}
 
@@ -494,7 +501,7 @@ export default function Search() {
                           onClick={() => openInReading(v)}
                           onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && openInReading(v)}
                           className={`${isDark ? 'bg-gray-700/50 hover:bg-gray-700' : 'bg-gray-50 hover:bg-gray-100'} cursor-pointer rounded-md p-3 border ${isDark ? 'border-gray-700' : 'border-gray-200'} transition`}
-                          title={state.settings.language === 'fr' ? 'Ouvrir dans Lecture' : 'Open in Reading'}
+                          title={t('searchOpenInReading')}
                         >
                           <div className={`${isDark ? 'text-blue-300' : 'text-blue-700'} font-medium mb-1 flex items-center gap-2`}>
                             <span>{getBookName(v.book)} {v.chapter}:{v.verse}</span>
