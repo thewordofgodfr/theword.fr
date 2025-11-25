@@ -4,5 +4,8 @@
   ],
   "en": [
     "/data/bible/en/verses.jsonl"
+  ],
+  "ru": [
+    "/data/bible/ru/verses.jsonl"
   ]
 }
