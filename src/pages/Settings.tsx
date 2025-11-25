@@ -19,7 +19,11 @@ type FlagCode =
   | 'zh'
   | 'ar'
   | 'id'
-  | 'sw';
+  | 'sw'
+  | 'tr'
+  | 'ja'
+  | 'ko'
+  | 'yo';
 
 /** Petit composant Flag inline SVG pour compatibilité desktop/mobile */
 const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> = ({
@@ -204,6 +208,61 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
     );
   }
 
+  if (code === 'tr') {
+    // Turquie : rouge + croissant/étoile simplifiés
+    return (
+      <span className={`inline-block ${className}`} style={style}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Turkey" role="img">
+          <rect width="3" height="2" fill="#E30A17" />
+          <circle cx="1.1" cy="1" r="0.45" fill="#FFFFFF" />
+          <circle cx="1.2" cy="1" r="0.35" fill="#E30A17" />
+          <polygon
+            points="1.6,1 1.8,0.85 1.75,1.1 1.9,1.25 1.7,1.25 1.6,1.45 1.5,1.25 1.3,1.25 1.45,1.1 1.4,0.85"
+            fill="#FFFFFF"
+          />
+        </svg>
+      </span>
+    );
+  }
+
+  if (code === 'ja') {
+    // Japon : fond blanc + disque rouge
+    return (
+      <span className={`inline-block ${className}`} style={style}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Japan" role="img">
+          <rect width="3" height="2" fill="#FFFFFF" />
+          <circle cx="1.5" cy="1" r="0.5" fill="#BC002D" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (code === 'ko') {
+    // Corée du Sud simplifiée
+    return (
+      <span className={`inline-block ${className}`} style={style}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Korea" role="img">
+          <rect width="3" height="2" fill="#FFFFFF" />
+          <circle cx="1.5" cy="1" r="0.45" fill="#003478" />
+          <path d="M1.05 0.9a0.45 0.45 0 0 1 0.9 0" fill="#C60C30" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (code === 'yo') {
+    // Yoruba -> drapeau type Nigéria (vert / blanc / vert)
+    return (
+      <span className={`inline-block ${className}`} style={style}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Yoruba" role="img">
+          <rect width="1" height="2" x="0" fill="#008753" />
+          <rect width="1" height="2" x="1" fill="#FFFFFF" />
+          <rect width="1" height="2" x="2" fill="#008753" />
+        </svg>
+      </span>
+    );
+  }
+
   // Fallback gris (ne devrait pas arriver)
   return (
     <span className={`inline-block ${className}`} style={style}>
@@ -222,67 +281,104 @@ const LANGUAGE_CONFIG: Record<
   fr: {
     flag: 'fr',
     label: 'Français',
-    subtitle: 'Louis Segond 1910 révision 2025',
+    subtitle: 'Louis Segond 1910 (rév. 2025)',
   },
   en: {
     flag: 'us',
     label: 'English',
-    subtitle: 'King James Version',
+    subtitle: 'King James Version (KJV)',
   },
   de: {
     flag: 'de',
     label: 'Deutsch',
-    subtitle: 'Interface en anglais pour le moment (Bible à venir)',
+    subtitle: 'Lutherbibel 1912',
   },
   it: {
     flag: 'it',
     label: 'Italiano',
-    subtitle: 'Interfaccia in inglese per ora (Bibbia in arrivo)',
+    subtitle: 'Riveduta Bibbia 1927',
   },
   es: {
     flag: 'es',
     label: 'Español',
-    subtitle: 'Biblia y aplicación en español (versión en desarrollo)',
+    subtitle: 'Biblia en español',
   },
   pt: {
     flag: 'pt',
     label: 'Português',
-    subtitle: 'Interface em inglês por enquanto (Bíblia futuramente)',
+    subtitle: 'Bíblia Portuguesa Mundial',
   },
   ru: {
     flag: 'ru',
     label: 'Русский',
-    subtitle: 'Библия и интерфейс на русском (version en développement)',
+    subtitle: 'Библия на русском',
   },
   hi: {
     flag: 'hi',
     label: 'हिन्दी',
-    subtitle: 'अभी के लिए अंग्रेज़ी इंटरफ़ेस (बाइबल बाद में आएगी)',
+    subtitle: 'Indian Revised Version (IRV)',
   },
   zh: {
     flag: 'zh',
     label: '中文',
-    subtitle: '目前界面为英文（圣经版本稍后提供）',
+    subtitle: 'Biblica 圣经当代译本',
   },
   ar: {
     flag: 'ar',
     label: 'العربية',
-    subtitle: 'الواجهة بالإنجليزية حاليا (نسخة الكتاب المقدس لاحقاً)',
+    subtitle: 'Ketab El Hayat (Book of Life)',
   },
   id: {
     flag: 'id',
     label: 'Bahasa Indonesia',
-    subtitle: 'Antarmuka berbahasa Inggris untuk saat ini (Alkitab menyusul)',
+    subtitle: 'Alkitab TSI (Edisi ketiga)',
   },
   sw: {
     flag: 'sw',
     label: 'Kiswahili',
-    subtitle: 'Kiolesura kiko kwa Kiingereza kwa sasa (Biblia itafuata)',
+    subtitle: 'Biblica Toleo Wazi Neno',
+  },
+  tr: {
+    flag: 'tr',
+    label: 'Türkçe',
+    subtitle: 'Yorumsuz Türkçe Çeviri (YTC)',
+  },
+  ja: {
+    flag: 'ja',
+    label: '日本語',
+    subtitle: '新改訳新約聖書 (1965)',
+  },
+  ko: {
+    flag: 'ko',
+    label: '한국어',
+    subtitle: '한국어 성경 1910',
+  },
+  yo: {
+    flag: 'yo',
+    label: 'Yorùbá',
+    subtitle: 'Biblica Yoruba Bible',
   },
 };
 
 /** Langues réellement disponibles (Bible + interface) */
-const AVAILABLE_LANGUAGES: Language[] = ['fr', 'en', 'es', 'ru'];
+const AVAILABLE_LANGUAGES: Language[] = [
+  'fr',
+  'en',
+  'de',
+  'it',
+  'es',
+  'pt',
+  'ru',
+  'hi',
+  'zh',
+  'ar',
+  'id',
+  'sw',
+  'tr',
+  'ja',
+  'ko',
+  'yo',
+];
 
 export default function Settings() {
   const { state, updateSettings } = useApp();
@@ -327,7 +423,8 @@ export default function Settings() {
     if (!('serviceWorker' in navigator)) return;
     const onControllerChange = () => window.location.reload();
     navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
-    return () => navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
+    return () =>
+      navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
   }, []);
 
   const handleCheckUpdates = async () => {
@@ -432,7 +529,7 @@ export default function Settings() {
           </div>
         </div>
       </div>
-      {active && <div className="w-3 h-3 rounded-full bg-white" />}
+      {active && <div className="w-3 h-3 rounded-full bg-white shrink-0" />}
     </button>
   );
 
@@ -480,88 +577,6 @@ export default function Settings() {
                   />
                 );
               })}
-            </div>
-
-            {/* Explications des versions */}
-            <div className="mt-6">
-              <h3
-                className={`text-lg font-semibold mb-4 ${
-                  isDark ? 'text-white' : 'text-gray-800'
-                }`}
-              >
-                {t('bibleVersions')}
-              </h3>
-
-              <div className="space-y-4">
-                {/* FR */}
-                <div className={`p-4 ${isDark ? 'bg-gray-700' : 'bg-blue-50'} rounded-lg`}>
-                  <div className="flex items-start space-x-3">
-                    <FlagIcon code="fr" />
-                    <div>
-                      <h4
-                        className={`font-semibold ${
-                          isDark ? 'text-white' : 'text-gray-800'
-                        }`}
-                      >
-                        {t('french')}
-                      </h4>
-                      <p
-                        className={`text-sm ${
-                          isDark ? 'text-white' : 'text-gray-700'
-                        } mt-1`}
-                      >
-                        {t('frenchVersion')}
-                      </p>
-                      <p
-                        className={`text-sm ${
-                          isDark ? 'text-white' : 'text-gray-600'
-                        } mt-2`}
-                      >
-                        {t('frenchVersionDetails')}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* EN */}
-                <div className={`p-4 ${isDark ? 'bg-gray-700' : 'bg-green-50'} rounded-lg`}>
-                  <div className="flex items-start space-x-3">
-                    <FlagIcon code="us" />
-                    <div>
-                      <h4
-                        className={`font-semibold ${
-                          isDark ? 'text-white' : 'text-gray-800'
-                        }`}
-                      >
-                        {t('english')}
-                      </h4>
-                      <p
-                        className={`text-sm ${
-                          isDark ? 'text-white' : 'text-gray-700'
-                        } mt-1`}
-                      >
-                        {t('englishVersion')}
-                      </p>
-                      <p
-                        className={`text-sm ${
-                          isDark ? 'text-white' : 'text-gray-600'
-                        } mt-2`}
-                      >
-                        {t('englishVersionDetails')}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Note sur les autres langues */}
-              <p
-                className={`mt-3 text-xs ${
-                  isDark ? 'text-white/80' : 'text-gray-600'
-                }`}
-              >
-                {t('otherLanguagesNote')}
-              </p>
             </div>
           </div>
 
