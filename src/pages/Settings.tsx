@@ -4,15 +4,27 @@ import React, { useEffect, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { Globe, Palette, RefreshCcw } from 'lucide-react';
-import { SUPPORTED_LANGUAGES, type Language } from '../types/bible';
+import type { Language } from '../types/bible';
 
 /** Codes de drapeaux supportés */
-type FlagCode = 'fr' | 'us' | 'de' | 'it' | 'es' | 'pt' | 'ru' | 'hi' | 'zh' | 'ar' | 'id' | 'sw';
+type FlagCode =
+  | 'fr'
+  | 'us'
+  | 'de'
+  | 'it'
+  | 'es'
+  | 'pt'
+  | 'ru'
+  | 'hi'
+  | 'zh'
+  | 'ar'
+  | 'id'
+  | 'sw';
 
 /** Petit composant Flag inline SVG pour compatibilité desktop/mobile */
 const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> = ({
   code,
-  size = 24,
+  size = 26,
   className = '',
 }) => {
   const style: React.CSSProperties = { width: size * (4 / 3), height: size };
@@ -34,7 +46,13 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
     // Drapeau USA (stripes + canton simplifié)
     return (
       <span className={`inline-block ${className}`} style={style}>
-        <svg viewBox="0 0 19 10" width="100%" height="100%" aria-label="United States" role="img">
+        <svg
+          viewBox="0 0 19 10"
+          width="100%"
+          height="100%"
+          aria-label="United States"
+          role="img"
+        >
           {/* Stripes */}
           {Array.from({ length: 13 }).map((_, i) => (
             <rect
@@ -67,9 +85,9 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Germany" role="img">
-          <rect width="3" height="2" y="0" fill="#000000" />
-          <rect width="3" height="4/3" y="2/3" fill="#DD0000" />
-          <rect width="3" height="2/3" y="4/3" fill="#FFCE00" />
+          <rect width="3" height="0.6667" y="0" fill="#000000" />
+          <rect width="3" height="0.6667" y="0.6667" fill="#DD0000" />
+          <rect width="3" height="0.6667" y="1.3333" fill="#FFCE00" />
         </svg>
       </span>
     );
@@ -117,9 +135,9 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Russia" role="img">
-          <rect width="3" height="2/3" y="0" fill="#FFFFFF" />
-          <rect width="3" height="2/3" y="2/3" fill="#0039A6" />
-          <rect width="3" height="2/3" y="4/3" fill="#D52B1E" />
+          <rect width="3" height="0.6667" y="0" fill="#FFFFFF" />
+          <rect width="3" height="0.6667" y="0.6667" fill="#0039A6" />
+          <rect width="3" height="0.6667" y="1.3333" fill="#D52B1E" />
         </svg>
       </span>
     );
@@ -130,9 +148,9 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="India" role="img">
-          <rect width="3" height="2/3" y="0" fill="#FF9933" />
-          <rect width="3" height="2/3" y="2/3" fill="#FFFFFF" />
-          <rect width="3" height="2/3" y="4/3" fill="#138808" />
+          <rect width="3" height="0.6667" y="0" fill="#FF9933" />
+          <rect width="3" height="0.6667" y="0.6667" fill="#FFFFFF" />
+          <rect width="3" height="0.6667" y="1.3333" fill="#138808" />
           <circle cx="1.5" cy="1" r="0.3" fill="#000080" />
         </svg>
       </span>
@@ -197,7 +215,10 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
 };
 
 /** Config d'affichage par langue (titre + sous-titre + drapeau) */
-const LANGUAGE_CONFIG: Record<Language, { flag: FlagCode; label: string; subtitle: string }> = {
+const LANGUAGE_CONFIG: Record<
+  Language,
+  { flag: FlagCode; label: string; subtitle: string }
+> = {
   fr: {
     flag: 'fr',
     label: 'Français',
@@ -231,7 +252,7 @@ const LANGUAGE_CONFIG: Record<Language, { flag: FlagCode; label: string; subtitl
   ru: {
     flag: 'ru',
     label: 'Русский',
-    subtitle: 'Интерфейс пока на английском (Библия в разработке)',
+    subtitle: 'Библия и интерфейс на русском (version en développement)',
   },
   hi: {
     flag: 'hi',
@@ -259,6 +280,9 @@ const LANGUAGE_CONFIG: Record<Language, { flag: FlagCode; label: string; subtitl
     subtitle: 'Kiolesura kiko kwa Kiingereza kwa sasa (Biblia itafuata)',
   },
 };
+
+/** Langues réellement disponibles (Bible + interface) */
+const AVAILABLE_LANGUAGES: Language[] = ['fr', 'en', 'ru'];
 
 export default function Settings() {
   const { state, updateSettings } = useApp();
@@ -294,8 +318,9 @@ export default function Settings() {
   const fontSizes = [21, 23, 25, 27];
   const XL_FONT = 42;
 
-  const [updateStatus, setUpdateStatus] =
-    useState<'idle' | 'checking' | 'ready' | 'upToDate' | 'unavailable' | 'error'>('idle');
+  const [updateStatus, setUpdateStatus] = useState<
+    'idle' | 'checking' | 'ready' | 'upToDate' | 'unavailable' | 'error'
+  >('idle');
   const [waitingSW, setWaitingSW] = useState<ServiceWorker | null>(null);
 
   useEffect(() => {
@@ -391,10 +416,18 @@ export default function Settings() {
       <div className="flex items-center space-x-3">
         <span className="shrink-0">{flag}</span>
         <div className="text-left">
-          <div className={`font-semibold ${active ? 'text-white' : isDark ? 'text-white' : 'text-gray-800'}`}>
+          <div
+            className={`font-semibold ${
+              active ? 'text-white' : isDark ? 'text-white' : 'text-gray-800'
+            }`}
+          >
             {title}
           </div>
-          <div className={`text-sm ${active ? 'text-white/90' : isDark ? 'text-white/80' : 'text-gray-600'}`}>
+          <div
+            className={`text-sm ${
+              active ? 'text-white/90' : isDark ? 'text-white/80' : 'text-gray-600'
+            }`}
+          >
             {subtitle}
           </div>
         </div>
@@ -404,25 +437,37 @@ export default function Settings() {
   );
 
   return (
-    <div className={`min-h-[100svh] ${isDark ? 'bg-gray-900' : 'bg-gray-50'} transition-colors duration-200`}>
+    <div
+      className={`min-h-[100svh] ${
+        isDark ? 'bg-gray-900' : 'bg-gray-50'
+      } transition-colors duration-200`}
+    >
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className={`text-3xl md:text-4xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+            <h1
+              className={`text-3xl md:text-4xl font-bold mb-2 ${
+                isDark ? 'text-white' : 'text-gray-800'
+              }`}
+            >
               {t('settings')}
             </h1>
           </div>
 
           {/* 1) Langue */}
           <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 mb-6`}>
-            <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-white' : 'text-gray-800'} flex items-center`}>
+            <h2
+              className={`text-xl font-semibold mb-6 ${
+                isDark ? 'text-white' : 'text-gray-800'
+              } flex items-center`}
+            >
               <Globe size={24} className="mr-3" />
               {t('language')}
             </h2>
 
             <div className="space-y-4">
-              {SUPPORTED_LANGUAGES.map((lang) => {
+              {AVAILABLE_LANGUAGES.map(lang => {
                 const cfg = LANGUAGE_CONFIG[lang];
                 return (
                   <LangButton
@@ -437,10 +482,14 @@ export default function Settings() {
               })}
             </div>
 
-            {/* Explications des versions (FR / EN pour l'instant) */}
+            {/* Explications des versions */}
             <div className="mt-6">
-              <h3 className={`text-lg font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-800'}`}>
-                {state.settings.language === 'fr' ? 'Versions de la Bible' : 'Bible Versions'}
+              <h3
+                className={`text-lg font-semibold mb-4 ${
+                  isDark ? 'text-white' : 'text-gray-800'
+                }`}
+              >
+                {t('bibleVersions')}
               </h3>
 
               <div className="space-y-4">
@@ -449,12 +498,26 @@ export default function Settings() {
                   <div className="flex items-start space-x-3">
                     <FlagIcon code="fr" />
                     <div>
-                      <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>Français</h4>
-                      <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-700'} mt-1`}>{t('frenchVersion')}</p>
-                      <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-600'} mt-2`}>
-                        {state.settings.language === 'fr'
-                          ? 'Version de référence pour la Bible en français, traduite par Louis Segond en 1910 et révisée en 2025 (modernisation du vocabulaire/grammaire, fidélité aux manuscrits).'
-                          : 'Reference French Bible, translated by Louis Segond in 1910 and refreshed in 2025 (modernized wording/grammar, faithful to the manuscripts).'}
+                      <h4
+                        className={`font-semibold ${
+                          isDark ? 'text-white' : 'text-gray-800'
+                        }`}
+                      >
+                        {t('french')}
+                      </h4>
+                      <p
+                        className={`text-sm ${
+                          isDark ? 'text-white' : 'text-gray-700'
+                        } mt-1`}
+                      >
+                        {t('frenchVersion')}
+                      </p>
+                      <p
+                        className={`text-sm ${
+                          isDark ? 'text-white' : 'text-gray-600'
+                        } mt-2`}
+                      >
+                        {t('frenchVersionDetails')}
                       </p>
                     </div>
                   </div>
@@ -465,12 +528,26 @@ export default function Settings() {
                   <div className="flex items-start space-x-3">
                     <FlagIcon code="us" />
                     <div>
-                      <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-800'}`}>English</h4>
-                      <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-700'} mt-1`}>{t('englishVersion')}</p>
-                      <p className={`text-sm ${isDark ? 'text-white' : 'text-gray-600'} mt-2`}>
-                        {state.settings.language === 'fr'
-                          ? 'Version classique en anglais (KJV), publiée en 1611, révisée en 1769 et modernisation limitée en 2025.'
-                          : 'Classic English version (KJV), published in 1611, revised in 1769, with a limited 2025 refresh.'}
+                      <h4
+                        className={`font-semibold ${
+                          isDark ? 'text-white' : 'text-gray-800'
+                        }`}
+                      >
+                        {t('english')}
+                      </h4>
+                      <p
+                        className={`text-sm ${
+                          isDark ? 'text-white' : 'text-gray-700'
+                        } mt-1`}
+                      >
+                        {t('englishVersion')}
+                      </p>
+                      <p
+                        className={`text-sm ${
+                          isDark ? 'text-white' : 'text-gray-600'
+                        } mt-2`}
+                      >
+                        {t('englishVersionDetails')}
                       </p>
                     </div>
                   </div>
@@ -478,33 +555,47 @@ export default function Settings() {
               </div>
 
               {/* Note sur les autres langues */}
-              <p className={`mt-3 text-xs ${isDark ? 'text-white/80' : 'text-gray-600'}`}>
-                {state.settings.language === 'fr'
-                  ? "D'autres langues (Allemand, Espagnol, Portugais, etc.) sont en préparation. En attendant, l'interface utilise l'anglais si la traduction n'est pas encore disponible."
-                  : 'More languages (German, Spanish, Portuguese, etc.) are in preparation. Until then, the interface falls back to English when a translation is not yet available.'}
+              <p
+                className={`mt-3 text-xs ${
+                  isDark ? 'text-white/80' : 'text-gray-600'
+                }`}
+              >
+                {t('otherLanguagesNote')}
               </p>
             </div>
           </div>
 
           {/* 2) Apparence + Taille de police */}
           <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 mb-6`}>
-            <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-white' : 'text-gray-800'} flex items-center`}>
+            <h2
+              className={`text-xl font-semibold mb-6 ${
+                isDark ? 'text-white' : 'text-gray-800'
+              } flex items-center`}
+            >
               <Palette size={24} className="mr-3" />
               {t('appearance')}
             </h2>
 
             <div>
-              <div className={`block text-sm font-medium mb-4 ${isDark ? 'text-white' : 'text-gray-700'}`}>
-                {state.settings.language === 'fr' ? 'Taille de police' : 'Font size'}
+              <div
+                className={`block text-sm font-medium mb-4 ${
+                  isDark ? 'text-white' : 'text-gray-700'
+                }`}
+              >
+                {t('fontSize')}
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                {fontSizes.map((value) => {
+                {fontSizes.map(value => {
                   const isSelected = state.settings.fontSize === value;
                   return (
                     <button
                       key={value}
-                      onClick={() => updateSettings({ fontSize: Math.max(18, Math.min(value, 42)) })}
+                      onClick={() =>
+                        updateSettings({
+                          fontSize: Math.max(18, Math.min(value, 42)),
+                        })
+                      }
                       aria-pressed={isSelected}
                       className={`px-4 py-3 rounded-lg border-2 font-medium transition-all duration-200 ${
                         isSelected
@@ -525,7 +616,11 @@ export default function Settings() {
                   const isXL = state.settings.fontSize === XL_FONT;
                   return (
                     <button
-                      onClick={() => updateSettings({ fontSize: Math.max(18, Math.min(XL_FONT, 42)) })}
+                      onClick={() =>
+                        updateSettings({
+                          fontSize: Math.max(18, Math.min(XL_FONT, 42)),
+                        })
+                      }
                       aria-pressed={isXL}
                       className={`w-full px-4 py-4 rounded-lg border-2 font-semibold tracking-wide transition-all duration-200 ${
                         isXL
@@ -535,20 +630,22 @@ export default function Settings() {
                           : 'border-gray-300 bg-gray-50 text-gray-700 hover:border-gray-400'
                       }`}
                     >
-                      {state.settings.language === 'fr' ? 'Mode Malvoyant (XL)' : 'Low-vision mode (XL)'}
+                      {t('fontSizeXLLabel')}
                     </button>
                   );
                 })()}
               </div>
 
-              <div className={`mt-4 p-4 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg`}>
+              <div
+                className={`mt-4 p-4 ${
+                  isDark ? 'bg-gray-700' : 'bg-gray-100'
+                } rounded-lg`}
+              >
                 <p
-                  className={`${isDark ? 'text-white' : 'text-gray-700'}`}
+                  className={isDark ? 'text-white' : 'text-gray-700'}
                   style={{ fontSize: `${state.settings.fontSize}px` }}
                 >
-                  {state.settings.language === 'fr'
-                    ? 'Aperçu de la taille de police sélectionnée.'
-                    : 'Preview of the selected font size.'}
+                  {t('fontSizePreview')}
                 </p>
               </div>
             </div>
@@ -556,16 +653,20 @@ export default function Settings() {
 
           {/* 3) Mises à jour */}
           <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6`}>
-            <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-white' : 'text-gray-800'} flex items-center`}>
+            <h2
+              className={`text-xl font-semibold mb-6 ${
+                isDark ? 'text-white' : 'text-gray-800'
+              } flex items-center`}
+            >
               <RefreshCcw size={22} className="mr-3" />
-              {state.settings.language === 'fr' ? 'Mises à jour' : 'Updates'}
+              {t('updates')}
             </h2>
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className={`${isDark ? 'text-white/80' : 'text-gray-700'} text-sm`}>
-                {state.settings.language === 'fr'
-                  ? "Vérifie s'il existe une nouvelle version de l'application et applique-la."
-                  : 'Check if a new version is available and apply it.'}
+              <div
+                className={`${isDark ? 'text-white/80' : 'text-gray-700'} text-sm`}
+              >
+                {t('updatesDescription')}
               </div>
 
               <div className="flex gap-3">
@@ -574,7 +675,7 @@ export default function Settings() {
                     onClick={applyUpdate}
                     className="px-4 py-2 rounded-lg border-2 font-medium transition-all duration-200 border-green-500 bg-green-50 text-green-700"
                   >
-                    {state.settings.language === 'fr' ? 'Appliquer la mise à jour' : 'Apply update'}
+                    {t('applyUpdate')}
                   </button>
                 ) : (
                   <button
@@ -588,7 +689,7 @@ export default function Settings() {
                         : 'border-gray-300 bg-gray-50 text-gray-700 hover:border-gray-400'
                     }`}
                   >
-                    {state.settings.language === 'fr' ? 'Vérifier les mises à jour' : 'Check for updates'}
+                    {t('checkUpdatesButton')}
                   </button>
                 )}
               </div>
@@ -598,34 +699,20 @@ export default function Settings() {
             <div className="mt-4 text-sm">
               {updateStatus === 'checking' && (
                 <p className={isDark ? 'text-white/80' : 'text-gray-700'}>
-                  {state.settings.language === 'fr' ? 'Vérification en cours…' : 'Checking…'}
+                  {t('updatesChecking')}
                 </p>
               )}
               {updateStatus === 'upToDate' && (
-                <p className="text-green-500">
-                  {state.settings.language === 'fr' ? "Votre application est à jour." : 'Your app is up to date.'}
-                </p>
+                <p className="text-green-500">{t('updatesUpToDate')}</p>
               )}
               {updateStatus === 'ready' && (
-                <p className="text-yellow-400">
-                  {state.settings.language === 'fr'
-                    ? 'Nouvelle version prête. Cliquez sur « Appliquer la mise à jour ».'
-                    : 'New version ready. Click “Apply update”.'}
-                </p>
+                <p className="text-yellow-400">{t('updatesReady')}</p>
               )}
               {updateStatus === 'unavailable' && (
-                <p className="text-red-400">
-                  {state.settings.language === 'fr'
-                    ? 'Mise à jour automatique indisponible (Service Worker non détecté).'
-                    : 'Automatic update unavailable (No Service Worker).'}
-                </p>
+                <p className="text-red-400">{t('updatesUnavailable')}</p>
               )}
               {updateStatus === 'error' && (
-                <p className="text-red-400">
-                  {state.settings.language === 'fr'
-                    ? 'Erreur lors de la vérification. Réessayez.'
-                    : 'Error while checking. Please try again.'}
-                </p>
+                <p className="text-red-400">{t('updatesError')}</p>
               )}
             </div>
           </div>
@@ -647,4 +734,3 @@ export default function Settings() {
     </div>
   );
 }
-
