@@ -242,7 +242,7 @@ const LANGUAGE_CONFIG: Record<
   es: {
     flag: 'es',
     label: 'Español',
-    subtitle: 'Interfaz en inglés por ahora (Biblia próximamente)',
+    subtitle: 'Biblia y aplicación en español (versión en desarrollo)',
   },
   pt: {
     flag: 'pt',
@@ -282,7 +282,7 @@ const LANGUAGE_CONFIG: Record<
 };
 
 /** Langues réellement disponibles (Bible + interface) */
-const AVAILABLE_LANGUAGES: Language[] = ['fr', 'en', 'ru'];
+const AVAILABLE_LANGUAGES: Language[] = ['fr', 'en', 'es', 'ru'];
 
 export default function Settings() {
   const { state, updateSettings } = useApp();
@@ -734,3 +734,4 @@ export default function Settings() {
     </div>
   );
 }
+
