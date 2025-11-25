@@ -1,11 +1,6 @@
 {
-  "fr": [
-    "/data/bible/fr/verses.jsonl"
-  ],
-  "en": [
-    "/data/bible/en/verses.jsonl"
-  ],
-  "ru": [
-    "/data/bible/ru/verses.jsonl"
-  ]
+  "fr": ["/data/bible/fr/verses.jsonl"],
+  "en": ["/data/bible/en/verses.jsonl"],
+  "ru": ["/data/bible/ru/verses.jsonl"],
+  "es": ["/data/bible/es/verses.jsonl"]
 }
