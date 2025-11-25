@@ -2,5 +2,17 @@
   "fr": ["/data/bible/fr/verses.jsonl"],
   "en": ["/data/bible/en/verses.jsonl"],
   "ru": ["/data/bible/ru/verses.jsonl"],
-  "es": ["/data/bible/es/verses.jsonl"]
+  "es": ["/data/bible/es/verses.jsonl"],
+  "pt": ["/data/bible/pt/verses.jsonl"],
+  "de": ["/data/bible/de/verses.jsonl"],
+  "hi": ["/data/bible/hi/verses.jsonl"],
+  "zh": ["/data/bible/zh/verses.jsonl"],
+  "ar": ["/data/bible/ar/verses.jsonl"],
+  "sw": ["/data/bible/sw/verses.jsonl"],
+  "it": ["/data/bible/it/verses.jsonl"],
+  "id": ["/data/bible/id/verses.jsonl"],
+  "tr": ["/data/bible/tr/verses.jsonl"],
+  "ja": ["/data/bible/ja/verses.jsonl"],
+  "ko": ["/data/bible/ko/verses.jsonl"],
+  "yo": ["/data/bible/yo/verses.jsonl"]
 }
