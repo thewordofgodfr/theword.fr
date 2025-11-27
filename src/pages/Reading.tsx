@@ -649,7 +649,7 @@ export default function Reading() {
   };
 
   return (
-    <div className="min-h-[100svh] bg-gray-900 transition-colors duration-200">
+    <div className="min-h-[100svh] bg-gray-950 transition-colors duration-200">
       <div className="container mx-auto px-4 pb-6">
         <div className="max-w-6xl mx-auto">
           {selectedBook && (
@@ -724,10 +724,11 @@ export default function Reading() {
                             }
                             const isPressed = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
 
-                            // GLOW plus visible (sans changer tailles/couleurs)
-                            const loupeGlow = (i === 0 && isPressed)
-                              ? 'shadow-[0_0_0_2px_rgba(37,99,235,0.95),0_0_10px_rgba(37,99,235,0.55)]'
+                            // Liseré blanc autour de la loupe quand elle est active
+                            const loupeRing = (i === 0 && isPressed)
+                              ? 'border-2 border-white'
                               : '';
+
                             const numGlow = (isNumeric && activeSlot === i)
                               ? 'shadow-[0_0_0_2px_rgba(37,99,235,0.9),0_0_10px_rgba(37,99,235,0.6)]'
                               : '';
@@ -735,7 +736,7 @@ export default function Reading() {
                             return (
                               <button
                                 key={`qs-m-${i}`}
-                                className={`${base} ${cls} ${activePerimeter} ${loupeGlow} ${numGlow}`}
+                                className={`${base} ${cls} ${activePerimeter} ${loupeRing} ${numGlow}`}
                                 onClick={() => jumpToSlot(i)}
                                 aria-label={title}
                                 title={title}
@@ -796,10 +797,11 @@ export default function Reading() {
                         }
                         const isPressed = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
 
-                        // GLOW plus visible (sans changer tailles/couleurs)
-                        const loupeGlow = (i === 0 && isPressed)
-                          ? 'shadow-[0_0_0_2px_rgba(37,99,235,0.95),0_0_10px_rgba(37,99,235,0.55)]'
+                        // Liseré blanc autour de la loupe quand elle est active
+                        const loupeRing = (i === 0 && isPressed)
+                          ? 'border-2 border-white'
                           : '';
+
                         const numGlow = (isNumeric && activeSlot === i)
                           ? 'shadow-[0_0_0_2px_rgba(37,99,235,0.9),0_0_10px_rgba(37,99,235,0.6)]'
                           : '';
@@ -807,7 +809,7 @@ export default function Reading() {
                         return (
                           <button
                             key={`qs-d-${i}`}
-                            className={`${base} ${cls} ${activePerimeter} ${loupeGlow} ${numGlow}`}
+                            className={`${base} ${cls} ${activePerimeter} ${loupeRing} ${numGlow}`}
                             onClick={() => jumpToSlot(i)}
                             aria-label={title}
                             title={title}
@@ -828,7 +830,7 @@ export default function Reading() {
                         ${activeTheme ? activeTheme.solidHover : 'hover:bg-blue-500'}`}
                       title={t('chooseBook')}
                     >
-                      {t('booksLabel')}
+                      {shortBookName(selectedBook)}
                     </button>
 
                     <button
@@ -838,7 +840,7 @@ export default function Reading() {
                         ${activeTheme ? activeTheme.solidHover : 'hover:bg-blue-500'}`}
                       title={t('chooseChapter')}
                     >
-                      {t('chapter')} {selectedChapter}
+                      Ch. {selectedChapter}
                       <ChevronDown className="w-3.5 h-3.5 opacity-90" />
                     </button>
 
@@ -872,14 +874,14 @@ export default function Reading() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={openAddToNotes}
-                    className="inline-flex items-center px-3 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-500"
+                    className="inline-flex items-center px-3 py-2 rounded bg-orange-500 text-white hover:bg-orange-400"
                   >
                     <ListPlusIcon size={16} className="mr-2" />
                     {t('toNotes')}
                   </button>
                   <button
                     onClick={openAddToPrinciples}
-                    className="inline-flex items-center px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-500"
+                    className="inline-flex items-center px-3 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-500"
                   >
                     <ListPlusIcon size={16} className="mr-2" />
                     {t('toPrinciples')}
@@ -893,14 +895,14 @@ export default function Reading() {
                   </button>
                   <button
                     onClick={shareSelection}
-                    className="inline-flex items-center px-3 py-2 rounded bg-gray-700 text-white hover:opacity-90"
+                    className="inline-flex items-center px-3 py-2 rounded bg-indigo-500 text-white hover:bg-indigo-400"
                   >
                     <ShareIcon size={16} className="mr-2" />
                     {t('shareLabel')}
                   </button>
                   <button
                     onClick={() => setSelectedVerses([])}
-                    className="bg-gray-700 text-white px-3 py-2 rounded hover:opacity-90"
+                    className="bg-slate-500 text-white px-3 py-2 rounded hover:bg-slate-400"
                   >
                     {t('cancel')}
                   </button>
@@ -935,7 +937,7 @@ export default function Reading() {
                           style={{ scrollMarginTop: NAV_H + cmdH + 12 }}
                           className={`relative cursor-pointer px-1 sm:px-2 py-2 sm:py-2.5 rounded-md transition-colors ${selectedBg} ${highlightCls}`}
                         >
-                          <span className="absolute right-2 top-0.5 sm:top-1 text-[11px] sm:text-xs select-none pointer-events-none text-white/80">
+                          <span className="absolute right-2 top-0.5 sm:top-1 text-[11px] sm:text-xs select-none pointer-events-none text-white">
                             {t('verseWord')} {v.verse}
                             {isSelected && <Check size={14} className="inline ml-1 text-blue-300" />}
                           </span>
@@ -1036,14 +1038,14 @@ export default function Reading() {
                 <div className="flex items-center justify-center gap-2">
                   <button
                     onClick={openAddToNotes}
-                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-600 text-white text-sm"
+                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-orange-500 text-white text-sm"
                   >
                     <ListPlusIcon size={16} className="mr-1" />
                     {t('notes')}
                   </button>
                   <button
                     onClick={openAddToPrinciples}
-                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-indigo-600 text-white text-sm"
+                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-600 text-white text-sm"
                   >
                     <ListPlusIcon size={16} className="mr-1" />
                     {t('principles')}
@@ -1061,14 +1063,14 @@ export default function Reading() {
                   </button>
                   <button
                     onClick={shareSelection}
-                    className="bg-gray-700 text-white px-3 py-1.5 rounded-full inline-flex items-center text-sm"
+                    className="bg-indigo-500 hover:bg-indigo-400 text-white px-3 py-1.5 rounded-full inline-flex items-center text-sm"
                   >
                     <ShareIcon size={16} className="mr-1" />
                     {t('shareLabel')}
                   </button>
                   <button
                     onClick={() => setSelectedVerses([])}
-                    className="bg-gray-700 text-white px-3 py-1.5 rounded-full text-sm"
+                    className="bg-slate-500 hover:bg-slate-400 text-white px-3 py-1.5 rounded-full text-sm"
                   >
                     {t('cancel')}
                   </button>
@@ -1256,3 +1258,4 @@ export default function Reading() {
     </div>
   );
 }
+
