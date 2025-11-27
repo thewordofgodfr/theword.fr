@@ -3191,6 +3191,1090 @@ const swTranslations = {
     "Hitilafu imetokea wakati wa kupakia",
 };
 
+// Korean translations
+const koTranslations = {
+  // Navigation
+  home: "홈",
+  reading: "성경 읽기",
+  search: "검색",
+  settings: "설정",
+  about: "정보",
+  notes: "노트",
+  principles: "연구",
+
+  // Home page
+  randomVerse: "무작위 구절",
+  newVerse: "새 구절",
+  copyVerse: "구절 복사",
+  verseCopied: "구절이 복사되었습니다!",
+  godSpeaks: "하나님이 당신에게 말씀하십니다",
+  openJeremiah: "예레미야 23:29 열기",
+  jeremiah23Quote:
+    "“여호와의 말씀이니라, 내 말이 불 같지 아니하냐, 바위를 쳐서 부수는 망치 같지 아니하냐?” (예레미야 23:29)",
+
+  // Reading page
+  selectBook: "책 선택",
+  selectChapter: "장 선택",
+  chapter: "장",
+  oldTestament: "구약",
+  newTestament: "신약",
+
+  // Reading – extras
+  chooseBook: "책을 선택하세요",
+  chooseChapter: "장을 선택하세요",
+  prevChapter: "이전 장",
+  nextChapter: "다음 장",
+  verseWord: "절",
+  versesSelectedSuffix: "개 절 선택됨",
+  toNotes: "노트로 보내기",
+  toPrinciples: "연구로 보내기",
+  copyLabel: "복사",
+  shareLabel: "공유",
+  cancel: "취소",
+  close: "닫기",
+  notesModalTitle: "목록에 추가 (노트)",
+  notesNoList: "아직 목록이 없습니다. 아래에서 새로 만드세요.",
+  notesNewListOptional: "새 목록 (선택 사항)",
+  principlesModalTitle: "연구에 추가 (연구)",
+  principlesNoList: "아직 연구가 없습니다. 아래에서 새로 만드세요.",
+  principlesNewListOptional: "새 연구 (선택 사항)",
+  selectionCopied: "선택한 내용이 복사되었습니다",
+  textReadyToShare: "공유할 텍스트가 준비되었습니다 (복사 완료)",
+  addedToList: "목록에 추가되었습니다",
+  newRandom: "새 무작위",
+  swipeLabel: "옆으로 밀기",
+  searchSlotLabel: "검색",
+  searchSlotEmpty: "검색 (비어 있음)",
+  memorySlotLabel: "슬롯",
+  emptySlotSuffix: "(비어 있음)",
+  untitledList: "(제목 없음)",
+
+  // Short label “Copied”
+  copiedShort: "복사됨",
+
+  // Search page
+  searchTitle: "성경 검색",
+  searchPlaceholder: "검색어를 입력하세요",
+  searchMinChars: "검색하려면 최소 두 글자를 입력하세요.",
+  searchSearching: "검색 중…",
+  searchResults: "결과",
+  searchExpandAll: "모두 펼치기",
+  searchCollapseAll: "모두 접기",
+  searchNoResults: "구절을 찾을 수 없습니다.",
+  searchClear: "지우기",
+  searchOpenInReading: "읽기에서 열기",
+
+  // Notes page
+  notesPage: {
+    create: "목록 만들기",
+    placeholder: "목록 제목…",
+    empty: "아직 목록이 없습니다.",
+    items: "개 항목",
+    backAll: "← 모든 목록",
+    addTextBlock: "텍스트 블록 추가",
+    editTextBlock: "블록 편집",
+    deleteItem: "삭제",
+    moveUp: "위로 이동",
+    moveDown: "아래로 이동",
+    open: "열기",
+    confirmDeleteItem: "이 항목을 삭제하시겠습니까?",
+    newTextPlaceholder: "텍스트를 입력하세요…",
+
+    // Share / import via code
+    shareCode: "코드",
+    importCode: "코드 가져오기",
+    importPrompt: "여기에 TheWord 공유 코드를 붙여넣으세요:",
+    importError: "잘못된 코드입니다.",
+    importSuccess: "목록을 성공적으로 가져왔습니다 ✅",
+    shareCodeCopied: "코드를 클립보드에 복사했습니다 ✅",
+
+    // Direct import from text
+    importTextButton: "텍스트 → 목록",
+    importTextTitlePlaceholder: "새 목록 제목",
+    importTextDefaultTitle: "텍스트 가져오기",
+    importTextBodyPlaceholder: "여기에 텍스트를 붙여넣으세요…",
+    importTextNoBody: "가져올 텍스트를 붙여넣어 주세요.",
+    importTextNoBlock:
+      "블록이 감지되지 않았습니다 (블록으로 나누려면 빈 줄을 남겨 두세요).",
+    importTextSplitLabel:
+      "블록으로 나누기 (최소 한 줄의 빈 줄로 구분)",
+    importTextInfo: "각 블록은 목록의 한 항목이 됩니다.",
+    importTextCreate: "목록 만들기",
+
+    duplicateTitle: "같은 제목의 목록이 이미 존재합니다.",
+    confirmDeleteList: "이 목록을 삭제하시겠습니까?",
+    emptyList: "비어 있는 목록입니다.",
+
+    importFromTextTitle: "텍스트에서 가져오기",
+    documentContent: "문서 내용",
+    renameList: "이름 바꾸기"
+  },
+
+  // Principles page
+  principlesPage: {
+    create: "연구 만들기",
+    placeholder: "연구 제목…",
+    empty: "아직 연구가 없습니다.",
+    items: "개 항목",
+    backAll: "← 모든 연구",
+    addTextBlock: "텍스트 블록 추가",
+    editTextBlock: "블록 편집",
+    deleteItem: "삭제",
+    moveUp: "위로 이동",
+    moveDown: "아래로 이동",
+    open: "열기",
+    openReading: "읽기 열기",
+    confirmDeleteItem: "이 항목을 삭제하시겠습니까?",
+    newTextPlaceholder: "텍스트를 입력하세요…",
+
+    shareCode: "코드",
+    importCode: "코드 가져오기",
+    importPrompt: "여기에 TheWord 공유 코드(노트 또는 연구)를 붙여넣으세요:",
+    importError: "잘못된 코드입니다.",
+    importSuccess: "연구를 성공적으로 가져왔습니다 ✅",
+    shareCodeCopied: "코드를 클립보드에 복사했습니다 ✅",
+
+    importTextButton: "텍스트 → 연구",
+    importTextTitlePlaceholder: "새 연구 제목",
+    importTextDefaultTitle: "텍스트 가져오기",
+    importTextBodyPlaceholder: "여기에 텍스트를 붙여넣으세요…",
+    importTextNoBody: "가져올 텍스트를 붙여넣어 주세요.",
+    importTextNoBlock:
+      "블록이 감지되지 않았습니다 (블록으로 나누려면 빈 줄을 남겨 두세요).",
+    importTextSplitLabel:
+      "블록으로 나누기 (최소 한 줄의 빈 줄로 구분)",
+    importTextInfo: "각 블록은 연구의 한 항목이 됩니다.",
+    importTextCreate: "연구 만들기",
+
+    duplicateTitle: "같은 제목의 연구가 이미 존재합니다.",
+    confirmDeleteList: "이 연구를 삭제하시겠습니까?",
+    emptyList: "비어 있는 연구입니다.",
+
+    importFromTextTitle: "텍스트에서 가져오기",
+    documentContent: "문서 내용",
+    renameList: "이름 바꾸기",
+    share: "공유",
+    copy: "복사",
+    deleteList: "삭제",
+
+    shareStudyTitle: "연구",
+    shareItemTitle: "구절"
+  },
+
+  // Settings page
+  appearance: "모양",
+  lightMode: "라이트 모드",
+  darkMode: "다크 모드",
+  fontSize: "글자 크기",
+  language: "언어",
+  french: "프랑스어",
+  english: "영어",
+  fontSizeXLLabel: "저시력 모드 (XL)",
+  fontSizePreview: "선택한 글자 크기의 미리 보기입니다.",
+  updates: "업데이트",
+  updatesDescription:
+    "새 버전이 있는지 확인하고 적용합니다.",
+  applyUpdate: "업데이트 적용",
+  checkUpdatesButton: "업데이트 확인",
+  updatesChecking: "확인 중…",
+  updatesUpToDate: "앱이 최신 버전입니다.",
+  updatesReady:
+    "새 버전이 준비되었습니다. \"업데이트 적용\"을 눌러 주세요.",
+  updatesUnavailable:
+    "자동 업데이트를 사용할 수 없습니다 (Service Worker를 찾을 수 없음).",
+  updatesError: "확인 중 오류가 발생했습니다. 다시 시도해 주세요.",
+
+  // About page
+  aboutTitle: "",
+  aboutDescription:
+    "The Word는 무작위 구절과 성경 전체 읽기를 통해 하나님의 말씀을 발견하도록 도와줍니다.",
+  aboutIntro:
+    "TheWord: 오프라인 성경 읽기, 즉시 검색, 주제별 노트, 한 번에 공유. 웹에서도 TheWord를 사용할 수 있습니다: www.theword.fr",
+  bibleVersions: "성경 번역들",
+  frenchVersion:
+    "프랑스어: Louis Segond 1910 (LSG) – 2025 개정 – 퍼블릭 도메인",
+  englishVersion:
+    "영어: King James Version (KJV) – 퍼블릭 도메인",
+  frenchVersionDetails:
+    "프랑스어 성경의 표준 번역으로, 1910년 Louis Segond가 번역했으며 2025년에 어휘와 문법이 현대화되었습니다 (원문 사본에 충실).",
+  englishVersionDetails:
+    "고전적인 영어 번역(KJV)으로 1611년에 출판되고 1769년에 개정되었으며 2025년에 일부 현대화되었습니다.",
+  otherLanguagesNote:
+    "다른 언어(독일어, 포르투갈어 등)가 준비 중입니다. 번역이 아직 준비되지 않은 경우 인터페이스는 영어로 표시됩니다.",
+  randomFeature: "무작위 기능",
+  randomFeatureDesc:
+    "무작위 구절 생성기는 31,000개가 넘는 성경 구절 중에서 선택하여 매일 영감을 드립니다.",
+  musicLink: "창조주의 음악",
+  versesLabel: "구절",
+  booksLabel: "책",
+  readingShortcuts: "읽기 바로가기",
+  notesIntro:
+    "좋아하는 구절과 생각을 주제별 목록으로 정리하세요.",
+  notesPoint1: "구절이나 자유 텍스트 블록을 추가하세요.",
+  notesPoint2:
+    "항목을 탭하면 메뉴가 열립니다 (읽기에서 열기, 위/아래로 이동, 삭제 등).",
+  notesPoint3: "목록 이름을 바꾸고 복사하거나 공유할 수 있습니다.",
+  createdWithLove:
+    "하나님의 말씀을 전하기 위해 사랑으로 만들었습니다",
+  versionsFootnote:
+    "사용되는 모든 성경 번역은 퍼블릭 도메인입니다. 일부는 어휘와 문법이 부분적으로 현대화되었지만, 원본 사본에 엄격히 충실합니다.",
+
+  // Quick slots
+  quickSlotsIntro:
+    "책/장 선택기 오른쪽에 있는 네 개의 버튼은 자주 읽는 본문으로 즉시 돌아가 여러 책을 병행해서 읽을 수 있게 해 줍니다. 1/2/3은 세 개의 위치에, 돋보기는 마지막 본문(무작위 구절 또는 검색 결과)에 사용하세요.",
+  quickSlotsIllustrationLabel: "바로가기 예시",
+  quickSlotLastPassageTooltip: "마지막 본문",
+  quickSlot1ActiveTooltip: "바로가기 1 (활성)",
+  quickSlot2Tooltip: "바로가기 2",
+  quickSlot3Tooltip: "바로가기 3",
+
+  // Common
+  loading: "로딩 중...",
+  error: "로딩 중 오류가 발생했습니다"
+};
+
+// Japanese translations
+const jaTranslations = {
+  // Navigation
+  home: "ホーム",
+  reading: "聖書を読む",
+  search: "検索",
+  settings: "設定",
+  about: "このアプリについて",
+  notes: "ノート",
+  principles: "学び",
+
+  // Home page
+  randomVerse: "ランダムな聖句",
+  newVerse: "新しい聖句",
+  copyVerse: "聖句をコピー",
+  verseCopied: "聖句をコピーしました！",
+  godSpeaks: "神様があなたに語っておられます",
+  openJeremiah: "エレミヤ 23:29 を開く",
+  jeremiah23Quote:
+    "「わたしのことばは火のようではないか──主の御告げ──岩を砕く槌のようではないか。」（エレミヤ 23:29）",
+
+  // Reading page
+  selectBook: "書を選ぶ",
+  selectChapter: "章を選ぶ",
+  chapter: "章",
+  oldTestament: "旧約聖書",
+  newTestament: "新約聖書",
+
+  // Reading – extras
+  chooseBook: "書を選択してください",
+  chooseChapter: "章を選択してください",
+  prevChapter: "前の章",
+  nextChapter: "次の章",
+  verseWord: "節",
+  versesSelectedSuffix: "節が選択されています",
+  toNotes: "ノートへ",
+  toPrinciples: "学びへ",
+  copyLabel: "コピー",
+  shareLabel: "共有",
+  cancel: "キャンセル",
+  close: "閉じる",
+  notesModalTitle: "リストに追加（ノート）",
+  notesNoList: "まだリストがありません。下で作成してください。",
+  notesNewListOptional: "新しいリスト（任意）",
+  principlesModalTitle: "学びに追加（学び）",
+  principlesNoList: "まだ学びがありません。下で作成してください。",
+  principlesNewListOptional: "新しい学び（任意）",
+  selectionCopied: "選択範囲をコピーしました",
+  textReadyToShare:
+    "共有するためのテキストが準備できました（コピー済み）",
+  addedToList: "リストに追加しました",
+  newRandom: "新しいランダム",
+  swipeLabel: "スワイプ",
+  searchSlotLabel: "検索",
+  searchSlotEmpty: "検索（空）",
+  memorySlotLabel: "スロット",
+  emptySlotSuffix: "（空）",
+  untitledList: "（タイトルなし）",
+
+  // Short label “Copied”
+  copiedShort: "コピーしました",
+
+  // Search page
+  searchTitle: "聖書検索",
+  searchPlaceholder: "検索語を入力してください",
+  searchMinChars:
+    "検索するには 2 文字以上入力してください。",
+  searchSearching: "検索中…",
+  searchResults: "結果",
+  searchExpandAll: "すべて展開",
+  searchCollapseAll: "すべて折りたたむ",
+  searchNoResults:
+    "該当する聖句は見つかりませんでした。",
+  searchClear: "クリア",
+  searchOpenInReading: "「読む」で開く",
+
+  // Notes page
+  notesPage: {
+    create: "リストを作成",
+    placeholder: "リストのタイトル…",
+    empty: "まだリストがありません。",
+    items: "件",
+    backAll: "← すべてのリスト",
+    addTextBlock: "テキストブロックを追加",
+    editTextBlock: "ブロックを編集",
+    deleteItem: "削除",
+    moveUp: "上へ移動",
+    moveDown: "下へ移動",
+    open: "開く",
+    confirmDeleteItem:
+      "この項目を削除しますか？",
+    newTextPlaceholder: "テキストを入力してください…",
+
+    shareCode: "コード",
+    importCode: "コードをインポート",
+    importPrompt:
+      "ここに TheWord の共有コードを貼り付けてください:",
+    importError: "無効なコードです。",
+    importSuccess: "リストをインポートしました ✅",
+    shareCodeCopied:
+      "コードをクリップボードにコピーしました ✅",
+
+    importTextButton: "テキスト → リスト",
+    importTextTitlePlaceholder:
+      "新しいリストのタイトル",
+    importTextDefaultTitle: "テキストのインポート",
+    importTextBodyPlaceholder:
+      "ここにテキストを貼り付けてください…",
+    importTextNoBody:
+      "インポートするテキストを貼り付けてください。",
+    importTextNoBlock:
+      "ブロックが検出されませんでした（ブロックに分ける場合は空行を入れてください）。",
+    importTextSplitLabel:
+      "ブロックに分割（1 行以上の空行で区切る）",
+    importTextInfo:
+      "各ブロックがリストの 1 項目になります。",
+    importTextCreate: "リストを作成",
+
+    duplicateTitle:
+      "同じタイトルのリストがすでに存在します。",
+    confirmDeleteList:
+      "このリストを削除しますか？",
+    emptyList: "空のリストです。",
+
+    importFromTextTitle:
+      "テキストからインポート",
+    documentContent: "文書の内容",
+    renameList: "名前を変更"
+  },
+
+  // Principles page
+  principlesPage: {
+    create: "学びを作成",
+    placeholder: "学びのタイトル…",
+    empty: "まだ学びがありません。",
+    items: "件",
+    backAll: "← すべての学び",
+    addTextBlock: "テキストブロックを追加",
+    editTextBlock: "ブロックを編集",
+    deleteItem: "削除",
+    moveUp: "上へ移動",
+    moveDown: "下へ移動",
+    open: "開く",
+    openReading: "読む画面を開く",
+    confirmDeleteItem:
+      "この項目を削除しますか？",
+    newTextPlaceholder: "テキストを入力してください…",
+
+    shareCode: "コード",
+    importCode: "コードをインポート",
+    importPrompt:
+      "ここに TheWord の共有コード（ノートまたは学び）を貼り付けてください:",
+    importError: "無効なコードです。",
+    importSuccess: "学びをインポートしました ✅",
+    shareCodeCopied:
+      "コードをクリップボードにコピーしました ✅",
+
+    importTextButton: "テキスト → 学び",
+    importTextTitlePlaceholder:
+      "新しい学びのタイトル",
+    importTextDefaultTitle: "テキストのインポート",
+    importTextBodyPlaceholder:
+      "ここにテキストを貼り付けてください…",
+    importTextNoBody:
+      "インポートするテキストを貼り付けてください。",
+    importTextNoBlock:
+      "ブロックが検出されませんでした（ブロックに分ける場合は空行を入れてください）。",
+    importTextSplitLabel:
+      "ブロックに分割（1 行以上の空行で区切る）",
+    importTextInfo:
+      "各ブロックが学びの 1 項目になります。",
+    importTextCreate: "学びを作成",
+
+    duplicateTitle:
+      "同じタイトルの学びがすでに存在します。",
+    confirmDeleteList:
+      "この学びを削除しますか？",
+    emptyList: "空の学びです。",
+
+    importFromTextTitle:
+      "テキストからインポート",
+    documentContent: "文書の内容",
+    renameList: "名前を変更",
+    share: "共有",
+    copy: "コピー",
+    deleteList: "削除",
+
+    shareStudyTitle: "学び",
+    shareItemTitle: "聖句"
+  },
+
+  // Settings page
+  appearance: "外観",
+  lightMode: "ライトモード",
+  darkMode: "ダークモード",
+  fontSize: "文字サイズ",
+  language: "言語",
+  french: "フランス語",
+  english: "英語",
+  fontSizeXLLabel: "大きな文字モード (XL)",
+  fontSizePreview:
+    "選択した文字サイズのプレビュー。",
+  updates: "アップデート",
+  updatesDescription:
+    "新しいバージョンがあるか確認して適用します。",
+  applyUpdate: "アップデートを適用",
+  checkUpdatesButton: "アップデートを確認",
+  updatesChecking: "確認中…",
+  updatesUpToDate: "アプリは最新です。",
+  updatesReady:
+    "新しいバージョンの準備ができました。「アップデートを適用」をタップしてください。",
+  updatesUnavailable:
+    "自動アップデートを利用できません（Service Worker が検出されません）。",
+  updatesError:
+    "確認中にエラーが発生しました。もう一度お試しください。",
+
+  // About page
+  aboutTitle: "",
+  aboutDescription:
+    "The Word は、ランダムな聖句と聖書通読を通して、神のことばを発見するのを助けるアプリです。",
+  aboutIntro:
+    "TheWord: オフラインで聖書を読み、すぐに検索し、テーマ別ノートを作り、ワンタップで共有できます。ウェブ版 TheWord もあります: www.theword.fr",
+  bibleVersions: "聖書の翻訳",
+  frenchVersion:
+    "フランス語: Louis Segond 1910 (LSG) – 2025 改訂 – パブリックドメイン",
+  englishVersion:
+    "英語: King James Version (KJV) – パブリックドメイン",
+  frenchVersionDetails:
+    "フランス語聖書の代表的な翻訳で、Louis Segond により 1910 年に翻訳され、2025 年に語彙と文法が現代風に更新されました（原典写本に忠実）。",
+  englishVersionDetails:
+    "古典的な英語訳 (KJV) で、1611 年に刊行され、1769 年に改訂され、2025 年に軽い更新が加えられています。",
+  otherLanguagesNote:
+    "他の言語（ドイツ語、ポルトガル語など）も準備中です。それまでは、翻訳がない部分は英語で表示されます。",
+  randomFeature: "ランダム機能",
+  randomFeatureDesc:
+    "ランダム聖句ジェネレーターが、3万1千節以上の聖句から 1 節を選び、毎日あなたに励ましを与えます。",
+  musicLink: "創造主の音楽",
+  versesLabel: "聖句",
+  booksLabel: "書",
+  readingShortcuts: "読書ショートカット",
+  notesIntro:
+    "お気に入りの聖句や思いを書き留め、テーマ別のリストに整理できます。",
+  notesPoint1:
+    "聖句や自由なテキストブロックを追加します。",
+  notesPoint2:
+    "項目をタップしてメニューを開きます（読む画面で開く／上へ移動／下へ移動／削除など）。",
+  notesPoint3:
+    "リストの名前を変更したり、コピー・共有したりできます。",
+  createdWithLove:
+    "神のことばを広めるために、愛を込めて作られました",
+  versionsFootnote:
+    "使用しているすべての聖書訳はパブリックドメインです。一部は語彙や文法が部分的に現代化されていますが、原典写本に厳密に忠実です。",
+
+  // Quick slots
+  quickSlotsIntro:
+    "書／章セレクターの右側に並ぶ 4 つのボタンで、よく読む箇所にすぐ戻り、複数の書を並行して読むことができます。1/2/3 は 3 つの場所の保存に、虫眼鏡は最後に読んだ箇所（ランダム聖句または検索結果）に戻るために使います。",
+  quickSlotsIllustrationLabel:
+    "ショートカットのイラスト",
+  quickSlotLastPassageTooltip: "最後の箇所",
+  quickSlot1ActiveTooltip:
+    "ショートカット 1（使用中）",
+  quickSlot2Tooltip: "ショートカット 2",
+  quickSlot3Tooltip: "ショートカット 3",
+
+  // Common
+  loading: "読み込み中...",
+  error: "読み込み中にエラーが発生しました"
+};
+
+// Yoruba translations
+const yoTranslations = {
+  // Navigation
+  home: "Ìbẹ̀rẹ̀",
+  reading: "Kà Bíbélì",
+  search: "Ṣàwárí",
+  settings: "Ètò",
+  about: "Nípa",
+  notes: "Àkọsílẹ̀",
+  principles: "Ìkẹ́kọ̀ọ́",
+
+  // Home page
+  randomVerse: "Ẹsẹ àdánidá",
+  newVerse: "Ẹsẹ tuntun",
+  copyVerse: "Ṣe àdákọ ẹsẹ",
+  verseCopied: "A ti ṣe àdákọ ẹsẹ!",
+  godSpeaks: "Ọlọ́run ń bá ọ sọ̀rọ̀",
+  openJeremiah: "Ṣí Jeremíà 23:29",
+  jeremiah23Quote:
+    "«Ọ̀rọ̀ mi kì í ṣe bí iná? ni Oluwa wí, tí ó sì dàbí ìlùùdá tí ń fọ àpáta?» Jeremíà 23:29",
+
+  // Reading page
+  selectBook: "Yan ìwé",
+  selectChapter: "Yan apá",
+  chapter: "Apá",
+  oldTestament: "Májẹ́mú Lailai",
+  newTestament: "Májẹ́mú Titun",
+
+  // Reading – extras
+  chooseBook: "Yan ìwé kan",
+  chooseChapter: "Yan apá kan",
+  prevChapter: "Apá tó kọjá",
+  nextChapter: "Apá tó kàn",
+  verseWord: "ẹsẹ",
+  versesSelectedSuffix: "ẹsẹ yàn",
+  toNotes: "Lọ sí Àkọsílẹ̀",
+  toPrinciples: "Lọ sí Ìkẹ́kọ̀ọ́",
+  copyLabel: "Àdákọ",
+  shareLabel: "Pín",
+  cancel: "Fagilé",
+  close: "Pa",
+  notesModalTitle:
+    "Fi kún àkójọ (Àkọsílẹ̀)",
+  notesNoList:
+    "Àkójọ kankan kò tíì sí. Dá tuntun sí isalẹ.",
+  notesNewListOptional:
+    "Àkójọ tuntun (àṣàyàn)",
+  principlesModalTitle:
+    "Fi kún ìkẹ́kọ̀ọ́ (Ìkẹ́kọ̀ọ́)",
+  principlesNoList:
+    "Ìkẹ́kọ̀ọ́ kankan kò tíì sí. Dá tuntun sí isalẹ.",
+  principlesNewListOptional:
+    "Ìkẹ́kọ̀ọ́ tuntun (àṣàyàn)",
+  selectionCopied:
+    "A ti ṣe àdákọ yíyàn rẹ",
+  textReadyToShare:
+    "Ọ̀rọ̀ ti ṣetán láti pín (a ti ṣe àdákọ)",
+  addedToList: "A fi sí àkójọ",
+  newRandom: "Ẹsẹ àdánidá tuntun",
+  swipeLabel: "Fa",
+  searchSlotLabel: "Ṣàwárí",
+  searchSlotEmpty: "Ṣàwárí (òfo)",
+  memorySlotLabel: "Sílòòtì",
+  emptySlotSuffix: "(òfo)",
+  untitledList: "(láìsí akọlé)",
+
+  // Short label “Copied”
+  copiedShort: "A dá àdákọ",
+
+  // Search page
+  searchTitle: "Ṣàwárí nínú Bíbélì",
+  searchPlaceholder:
+    "Tẹ ohun tí o ń wá",
+  searchMinChars:
+    "Tẹ o kere jù àmì lẹ́tà méjì.",
+  searchSearching: "Ṣàwárí…",
+  searchResults: "Àbájáde",
+  searchExpandAll: "Ṣí gbogbo rẹ",
+  searchCollapseAll: "Pa gbogbo rẹ mọ́",
+  searchNoResults:
+    "Kò sí ẹsẹ tí a rí.",
+  searchClear: "Nu kúrò",
+  searchOpenInReading: "Ṣí nínú Kíkà",
+
+  // Notes page
+  notesPage: {
+    create: "Dá àkójọ sílẹ̀",
+    placeholder: "Akọlé àkójọ…",
+    empty: "Àkójọ kankan kò tíì sí.",
+    items: "nkan",
+    backAll: "← Gbogbo àkójọ",
+    addTextBlock:
+      "Fi àpínrọ ọ̀rọ̀ kun",
+    editTextBlock: "Ṣàtúnṣe àpínrọ",
+    deleteItem: "Pa rẹ́",
+    moveUp: "Gbé s'ókè",
+    moveDown: "Gbé s'ísalẹ̀",
+    open: "Ṣí",
+    confirmDeleteItem:
+      "Ṣe o fẹ́ pa nkan yìí rẹ́?",
+    newTextPlaceholder: "Ọ̀rọ̀ rẹ…",
+
+    shareCode: "Kóòdù",
+    importCode: "Gbe kóòdù wọlé",
+    importPrompt:
+      "Lè kóòdù pínpín TheWord síbí:",
+    importError: "Kóòdù kò tọ́́nà.",
+    importSuccess:
+      "A ti gbe àkójọ wọlé ✅",
+    shareCodeCopied:
+      "A ti dá kóòdù sí àkọsílẹ̀ ✅",
+
+    importTextButton: "Ọ̀rọ̀ → Àkójọ",
+    importTextTitlePlaceholder:
+      "Akọlé àkójọ tuntun",
+    importTextDefaultTitle:
+      "Ìgbéwọlé ọ̀rọ̀",
+    importTextBodyPlaceholder:
+      "Lè ọ̀rọ̀ rẹ síbí…",
+    importTextNoBody:
+      "Jọ̀wọ́, lè díẹ̀ nínú ọ̀rọ̀ tí a óò gbé wọlé.",
+    importTextNoBlock:
+      "A kò rí àpínrọ kankan (fi ìlà òfo sí láàárín bí o bá fẹ́ ya sí àpínrọ).",
+    importTextSplitLabel:
+      "Ya sí àpínrọ (pín pẹ̀lú o kere jù ìlà òfo kan)",
+    importTextInfo:
+      "Gbogbo àpínrọ yóò di nkan kan nínú àkójọ.",
+    importTextCreate: "Dá àkójọ sílẹ̀",
+
+    duplicateTitle:
+      "Àkójọ pẹ̀lú akọlé yìí ti wà tẹ́lẹ̀.",
+    confirmDeleteList:
+      "Ṣe o fẹ́ pa àkójọ yìí rẹ́?",
+    emptyList: "Àkójọ òfo.",
+
+    importFromTextTitle:
+      "Gbé wọlé láti inú ọ̀rọ̀",
+    documentContent:
+      "Àkóónú ìwé àkọsílẹ̀",
+    renameList: "Tun akọlé ṣe"
+  },
+
+  // Principles page
+  principlesPage: {
+    create: "Dá ìkẹ́kọ̀ọ́ sílẹ̀",
+    placeholder: "Akọlé ìkẹ́kọ̀ọ́…",
+    empty: "Ìkẹ́kọ̀ọ́ kankan kò tíì sí.",
+    items: "nkan",
+    backAll: "← Gbogbo ìkẹ́kọ̀ọ́",
+    addTextBlock:
+      "Fi àpínrọ ọ̀rọ̀ kun",
+    editTextBlock: "Ṣàtúnṣe àpínrọ",
+    deleteItem: "Pa rẹ́",
+    moveUp: "Gbé s'ókè",
+    moveDown: "Gbé s'ísalẹ̀",
+    open: "Ṣí",
+    openReading: "Ṣí Kíkà",
+    confirmDeleteItem:
+      "Ṣe o fẹ́ pa nkan yìí rẹ́?",
+    newTextPlaceholder: "Ọ̀rọ̀ rẹ…",
+
+    shareCode: "Kóòdù",
+    importCode: "Gbe kóòdù wọlé",
+    importPrompt:
+      "Lè kóòdù pínpín TheWord (àkọsílẹ̀ tàbí ìkẹ́kọ̀ọ́) síbí:",
+    importError: "Kóòdù kò tọ́́nà.",
+    importSuccess:
+      "A ti gbe ìkẹ́kọ̀ọ́ wọlé ✅",
+    shareCodeCopied:
+      "A ti dá kóòdù sí àkọsílẹ̀ ✅",
+
+    importTextButton: "Ọ̀rọ̀ → Ìkẹ́kọ̀ọ́",
+    importTextTitlePlaceholder:
+      "Akọlé ìkẹ́kọ̀ọ́ tuntun",
+    importTextDefaultTitle:
+      "Ìgbéwọlé ọ̀rọ̀",
+    importTextBodyPlaceholder:
+      "Lè ọ̀rọ̀ rẹ síbí…",
+    importTextNoBody:
+      "Jọ̀wọ́, lè díẹ̀ nínú ọ̀rọ̀ tí a óò gbé wọlé.",
+    importTextNoBlock:
+      "A kò rí àpínrọ kankan (fi ìlà òfo sí láàárín bí o bá fẹ́ ya sí àpínrọ).",
+    importTextSplitLabel:
+      "Ya sí àpínrọ (pín pẹ̀lú o kere jù ìlà òfo kan)",
+    importTextInfo:
+      "Gbogbo àpínrọ yóò di nkan kan nínú ìkẹ́kọ̀ọ́.",
+    importTextCreate: "Dá ìkẹ́kọ̀ọ́ sílẹ̀",
+
+    duplicateTitle:
+      "Ìkẹ́kọ̀ọ́ pẹ̀lú akọlé yìí ti wà tẹ́lẹ̀.",
+    confirmDeleteList:
+      "Ṣe o fẹ́ pa ìkẹ́kọ̀ọ́ yìí rẹ́?",
+    emptyList: "Ìkẹ́kọ̀ọ́ òfo.",
+
+    importFromTextTitle:
+      "Gbé wọlé láti inú ọ̀rọ̀",
+    documentContent:
+      "Àkóónú ìwé àkọsílẹ̀",
+    renameList: "Tun akọlé ṣe",
+    share: "Pín",
+    copy: "Àdákọ",
+    deleteList: "Pa rẹ́",
+
+    shareStudyTitle: "Ìkẹ́kọ̀ọ́",
+    shareItemTitle: "Ẹsẹ"
+  },
+
+  // Settings page
+  appearance: "Àwòrán àfihàn",
+  lightMode: "Ìmọ́lẹ̀ (light mode)",
+  darkMode: "Òru (dark mode)",
+  fontSize: "Ìwọn fọ́ńtì",
+  language: "Èdè",
+  french: "Fáransé",
+  english: "Gẹ̀ẹ́sì",
+  fontSizeXLLabel:
+    "Ìpo ojú-rírì díẹ̀ (XL)",
+  fontSizePreview:
+    "Àpẹrẹ ìwọ̀n fọ́ńtì tí o yàn.",
+  updates: "Ìmúdójúìwò",
+  updatesDescription:
+    "Ṣàyẹ̀wò bóyá àtúnṣe tuntun wà, kí o sì lò ó.",
+  applyUpdate: "Lo àtúnṣe",
+  checkUpdatesButton: "Ṣàyẹ̀wò àtúnṣe",
+  updatesChecking: "Ṣàyẹ̀wò…",
+  updatesUpToDate:
+    "App rẹ wà lórí àtúnṣe tuntun jù lọ.",
+  updatesReady:
+    "Àtúnṣe tuntun ti ṣetán. Tẹ «Lo àtúnṣe».",
+  updatesUnavailable:
+    "A kì í lè ṣe àtúnṣe laifọwọyi (a kò rí Service Worker).",
+  updatesError:
+    "Àsìse nígbà ṣàyẹ̀wò. Jọ̀wọ́, gbìyànjú lẹ́ẹkansi.",
+
+  // About page
+  aboutTitle: "",
+  aboutDescription:
+    "The Word ń ràn ọ́ lọ́wọ́ láti ṣàwárí Ọ̀rọ̀ Ọlọ́run nípasẹ̀ ẹsẹ àdánidá àti kíkà Bíbélì tán.",
+  aboutIntro:
+    "TheWord: kíkà Bíbélì láìsí ìnítànẹ́tì, ṣàwárí kíákíá, àkọsílẹ̀ àkórí, pínpín ní tẹ̀ kan. O tún lè lò TheWord lórí wẹẹ̀bù: www.theword.fr",
+  bibleVersions: "Àwọn ìtumọ̀ Bíbélì",
+  frenchVersion:
+    "Fáransé: Louis Segond 1910 (LSG) – Àtúnṣe 2025 – Gbólóhùn àwùjọ",
+  englishVersion:
+    "Gẹ̀ẹ́sì: King James Version (KJV) – Gbólóhùn àwùjọ",
+  frenchVersionDetails:
+    "Ìtumọ̀ àfihàn Bíbélì ní Fáransé, Louis Segond túmọ̀ rẹ̀ ní 1910, a sì tún un ṣe ní 2025 (àmúlò ọ̀rọ̀ àti gírámà tuntun, ṣùgbọ́n tí ó ṣọ́ra láti má bà a jẹ́ mọ́ ìwé àtijọ́).",
+  englishVersionDetails:
+    "Ìtumọ̀ Bíbélì Gẹ̀ẹ́sì àtijọ́ (KJV), tí wọ́n tẹ̀ jáde lódún 1611, tí a tún ṣe ní 1769, a sì ṣe àtúnṣe díẹ̀ ní 2025.",
+  otherLanguagesNote:
+    "Àwọn èdè míì (Jámánì, Pọtúgí, bẹ́ẹ̀ bẹ́ẹ̀ lọ) wà ní ìmúrasílẹ̀. Títí di àkókò yẹn, ao lo Gẹ̀ẹ́sì níbi tí ìtumọ̀ kò tíì wà.",
+  randomFeature: "Àwọn aṣàyàn àdánidá",
+  randomFeatureDesc:
+    "Ẹrọ ẹsẹ àdánidá wa ń yàn láti inú àwọn ẹsẹ Bíbélì tó ju 31,000 lọ láti fún ọ ní ìmísí lojoojúmọ́.",
+  musicLink: "Orin Olùdá",
+  versesLabel: "Ẹsẹ",
+  booksLabel: "Ìwé",
+  readingShortcuts:
+    "Àkọsílẹ̀ kíkà kíákíá",
+  notesIntro:
+    "Ṣètò àwọn ẹsẹ ayanfẹ rẹ àti àwọn èrò rẹ sínú àkójọ àkórí.",
+  notesPoint1:
+    "Fi ẹsẹ tàbí àpínrọ ọ̀rọ̀ òmìnira kun.",
+  notesPoint2:
+    "Tẹ̀ nkan kan láti ṣí àkójọ aṣayan (Ṣí nínú Kíkà, Gbé s'ókè/s'ísalẹ̀, Pa rẹ́…).",
+  notesPoint3:
+    "Tun orúkọ àkójọ ṣe, ṣe àdákọ, kí o sì pín.",
+  createdWithLove:
+    "A dá a sílẹ̀ pẹ̀lú ìfẹ́ láti tàn Ọ̀rọ̀ Ọlọ́run ka",
+  versionsFootnote:
+    "Gbogbo àwọn ìtumọ̀ Bíbélì tí a lo wà ní gbòlóhùn àwùjọ. Díẹ̀ lára wọn ni a ti ṣe àtúnṣe díẹ̀ (ọ̀rọ̀ àti gírámà) ṣùgbọ́n wọ́n ṣi wà ní ìfarahàn pípé sí àwọn ìwé àtẹ̀jáde.",
+
+  // Quick slots
+  quickSlotsIntro:
+    "Àwọn bọ́tìnì mẹ́rin yìí, tí wọ́n wà ní apa ọ̀tún aṣàyàn Ìwé/Apá, ń jẹ́ kí o padà sí ìkàwé tí o máa ń kà lọ́pọ̀ jù lọ láìpé, kí o lè kà ọ̀pọ̀ ìwé ní àkókò kan: lo 1/2/3 fún ipò mẹ́ta, kí o sì lo lúpà láti padà sí apá tí o kà gbẹ́yìn (ẹsẹ àdánidá tàbí abájáde ìṣàwárí).",
+  quickSlotsIllustrationLabel:
+    "Àpẹẹrẹ àwọn ọ̀nà kíákíá",
+  quickSlotLastPassageTooltip:
+    "Apá tí o gbà gbẹ́yìn",
+  quickSlot1ActiveTooltip:
+    "Ọ̀nà kíákíá 1 (nṣiṣẹ́)",
+  quickSlot2Tooltip: "Ọ̀nà kíákíá 2",
+  quickSlot3Tooltip: "Ọ̀nà kíákíá 3",
+
+  // Common
+  loading: "Ṣíṣí…",
+  error: "Àsìse nígbà títẹ̀jáde"
+};
+
+// Turkish translations
+const trTranslations = {
+  // Navigation
+  home: "Ana sayfa",
+  reading: "Okuma",
+  search: "Arama",
+  settings: "Ayarlar",
+  about: "Hakkında",
+  notes: "Notlar",
+  principles: "Çalışmalar",
+
+  // Home page
+  randomVerse: "Rastgele ayet",
+  newVerse: "Yeni ayet",
+  copyVerse: "Ayeti kopyala",
+  verseCopied: "Ayet kopyalandı!",
+  godSpeaks: "Tanrı sana konuşuyor",
+  openJeremiah: "Yeremya 23:29'u aç",
+  jeremiah23Quote:
+    "«RAB diyor ki: Sözüm ateş gibi değil mi, kayayı parçalayan çekiç gibi değil mi?» Yeremya 23:29",
+
+  // Reading page
+  selectBook: "Kitap seç",
+  selectChapter: "Bölüm seç",
+  chapter: "Bölüm",
+  oldTestament: "Eski Antlaşma",
+  newTestament: "Yeni Antlaşma",
+
+  // Reading – extras
+  chooseBook: "Bir kitap seç",
+  chooseChapter: "Bir bölüm seç",
+  prevChapter: "Önceki bölüm",
+  nextChapter: "Sonraki bölüm",
+  verseWord: "ayet",
+  versesSelectedSuffix: "seçili ayet(ler)",
+  toNotes: "Notlara gönder",
+  toPrinciples: "Çalışmalara gönder",
+  copyLabel: "Kopyala",
+  shareLabel: "Paylaş",
+  cancel: "İptal",
+  close: "Kapat",
+  notesModalTitle:
+    "Listeye ekle (Notlar)",
+  notesNoList:
+    "Henüz liste yok. Aşağıdan bir tane oluştur.",
+  notesNewListOptional:
+    "Yeni liste (isteğe bağlı)",
+  principlesModalTitle:
+    "Çalışmaya ekle (Çalışmalar)",
+  principlesNoList:
+    "Henüz çalışma yok. Aşağıdan bir tane oluştur.",
+  principlesNewListOptional:
+    "Yeni çalışma (isteğe bağlı)",
+  selectionCopied: "Seçim kopyalandı",
+  textReadyToShare:
+    "Metin paylaşmaya hazır (kopyalandı)",
+  addedToList: "Listeye eklendi",
+  newRandom: "Yeni rastgele",
+  swipeLabel: "Kaydır",
+  searchSlotLabel: "Ara",
+  searchSlotEmpty: "Ara (boş)",
+  memorySlotLabel: "Kısayol",
+  emptySlotSuffix: "(boş)",
+  untitledList: "(başlıksız)",
+
+  // Short label “Copied”
+  copiedShort: "Kopyalandı",
+
+  // Search page
+  searchTitle: "Kutsal Kitap arama",
+  searchPlaceholder:
+    "Aramak istediğinizi yazın",
+  searchMinChars:
+    "Arama için en az 2 karakter yazın.",
+  searchSearching: "Aranıyor…",
+  searchResults: "Sonuçlar",
+  searchExpandAll: "Tümünü aç",
+  searchCollapseAll: "Tümünü kapat",
+  searchNoResults:
+    "Hiç ayet bulunamadı.",
+  searchClear: "Temizle",
+  searchOpenInReading: "Okuma bölümünde aç",
+
+  // Notes page
+  notesPage: {
+    create: "Liste oluştur",
+    placeholder: "Liste başlığı…",
+    empty: "Henüz liste yok.",
+    items: "öğe",
+    backAll: "← Tüm listeler",
+    addTextBlock: "Metin bloğu ekle",
+    editTextBlock: "Bloğu düzenle",
+    deleteItem: "Sil",
+    moveUp: "Yukarı taşı",
+    moveDown: "Aşağı taşı",
+    open: "Aç",
+    confirmDeleteItem:
+      "Bu öğe silinsin mi?",
+    newTextPlaceholder: "Metniniz…",
+
+    shareCode: "Kod",
+    importCode: "Kodu içe aktar",
+    importPrompt:
+      "TheWord paylaşım kodunu buraya yapıştırın:",
+    importError: "Geçersiz kod.",
+    importSuccess:
+      "Liste başarıyla içe aktarıldı ✅",
+    shareCodeCopied:
+      "Kod panoya kopyalandı ✅",
+
+    importTextButton: "Metin → Liste",
+    importTextTitlePlaceholder:
+      "Yeni listenin başlığı",
+    importTextDefaultTitle:
+      "Metin içe aktarma",
+    importTextBodyPlaceholder:
+      "Metninizi buraya yapıştırın…",
+    importTextNoBody:
+      "Lütfen içe aktarılacak bir metin yapıştırın.",
+    importTextNoBlock:
+      "Hiç blok algılanmadı (metni bloklara ayırmak için aralara boş satırlar bırakın).",
+    importTextSplitLabel:
+      "Bloklara ayır (en az bir boş satırla ayrılmış)",
+    importTextInfo:
+      "Her blok listede bir öğe olur.",
+    importTextCreate: "Liste oluştur",
+
+    duplicateTitle:
+      "Aynı başlığa sahip bir liste zaten var.",
+    confirmDeleteList:
+      "Bu liste silinsin mi?",
+    emptyList: "Boş liste.",
+
+    importFromTextTitle:
+      "Metinden içe aktar",
+    documentContent: "Belge içeriği",
+    renameList: "Yeniden adlandır"
+  },
+
+  // Principles page
+  principlesPage: {
+    create: "Çalışma oluştur",
+    placeholder: "Çalışmanın başlığı…",
+    empty: "Henüz çalışma yok.",
+    items: "öğe",
+    backAll: "← Tüm çalışmalar",
+    addTextBlock: "Metin bloğu ekle",
+    editTextBlock: "Bloğu düzenle",
+    deleteItem: "Sil",
+    moveUp: "Yukarı taşı",
+    moveDown: "Aşağı taşı",
+    open: "Aç",
+    openReading: "Okumayı aç",
+    confirmDeleteItem:
+      "Bu öğe silinsin mi?",
+    newTextPlaceholder: "Metniniz…",
+
+    shareCode: "Kod",
+    importCode: "Kodu içe aktar",
+    importPrompt:
+      "TheWord paylaşım kodunu (not veya çalışma) buraya yapıştırın:",
+    importError: "Geçersiz kod.",
+    importSuccess:
+      "Çalışma başarıyla içe aktarıldı ✅",
+    shareCodeCopied:
+      "Kod panoya kopyalandı ✅",
+
+    importTextButton: "Metin → Çalışma",
+    importTextTitlePlaceholder:
+      "Yeni çalışmanın başlığı",
+    importTextDefaultTitle:
+      "Metin içe aktarma",
+    importTextBodyPlaceholder:
+      "Metninizi buraya yapıştırın…",
+    importTextNoBody:
+      "Lütfen içe aktarılacak bir metin yapıştırın.",
+    importTextNoBlock:
+      "Hiç blok algılanmadı (metni bloklara ayırmak için aralara boş satırlar bırakın).",
+    importTextSplitLabel:
+      "Bloklara ayır (en az bir boş satırla ayrılmış)",
+    importTextInfo:
+      "Her blok çalışmada bir öğe olur.",
+    importTextCreate: "Çalışma oluştur",
+
+    duplicateTitle:
+      "Aynı başlığa sahip bir çalışma zaten var.",
+    confirmDeleteList:
+      "Bu çalışma silinsin mi?",
+    emptyList: "Boş çalışma.",
+
+    importFromTextTitle:
+      "Metinden içe aktar",
+    documentContent: "Belge içeriği",
+    renameList: "Yeniden adlandır",
+    share: "Paylaş",
+    copy: "Kopyala",
+    deleteList: "Sil",
+
+    shareStudyTitle: "Çalışma",
+    shareItemTitle: "Ayet"
+  },
+
+  // Settings page
+  appearance: "Görünüm",
+  lightMode: "Aydınlık mod",
+  darkMode: "Karanlık mod",
+  fontSize: "Yazı tipi boyutu",
+  language: "Dil",
+  french: "Fransızca",
+  english: "İngilizce",
+  fontSizeXLLabel:
+    "Az gören modu (XL)",
+  fontSizePreview:
+    "Seçilen yazı tipi boyutunun önizlemesi.",
+  updates: "Güncellemeler",
+  updatesDescription:
+    "Yeni bir sürüm olup olmadığını kontrol edin ve uygulayın.",
+  applyUpdate: "Güncellemeyi uygula",
+  checkUpdatesButton:
+    "Güncellemeleri denetle",
+  updatesChecking: "Denetleniyor…",
+  updatesUpToDate:
+    "Uygulamanız güncel.",
+  updatesReady:
+    "Yeni sürüm hazır. \"Güncellemeyi uygula\"ya tıklayın.",
+  updatesUnavailable:
+    "Otomatik güncelleme kullanılamıyor (Service Worker bulunamadı).",
+  updatesError:
+    "Denetlerken bir hata oluştu. Lütfen tekrar deneyin.",
+
+  // About page
+  aboutTitle: "",
+  aboutDescription:
+    "The Word, rastgele ayetler ve bütün Kutsal Kitap okumaları aracılığıyla Tanrı'nın sözünü keşfetmene yardım eder.",
+  aboutIntro:
+    "TheWord: çevrimdışı Kutsal Kitap okuma, anında arama, tematik notlar, tek dokunuşla paylaşma. TheWord'ü web'de de kullanabilirsin: www.theword.fr",
+  bibleVersions: "Kutsal Kitap çevirileri",
+  frenchVersion:
+    "Fransızca: Louis Segond 1910 (LSG) – 2025 gözden geçirilmiş – Kamu malı",
+  englishVersion:
+    "İngilizce: King James Version (KJV) – Kamu malı",
+  frenchVersionDetails:
+    "Fransızca Kutsal Kitap için başvuru çevirisi; 1910'da Louis Segond tarafından çevrildi ve 2025'te söz varlığı ile dilbilgisi modernleştirildi (el yazmalarına sadık kalınarak).",
+  englishVersionDetails:
+    "Klasik İngilizce çeviri (KJV); 1611'de yayımlandı, 1769'da gözden geçirildi ve 2025'te sınırlı bir güncelleme aldı.",
+  otherLanguagesNote:
+    "Diğer diller (Almanca, Portekizce vb.) hazırlanmaktadır. O zamana kadar, çeviri olmayan yerlerde arayüz İngilizceye döner.",
+  randomFeature: "Rastgele özellik",
+  randomFeatureDesc:
+    "Rastgele ayet üretecimiz, her gün ilham vermek için 31.000'den fazla Kutsal Kitap ayetinden seçim yapar.",
+  musicLink: "Yaratıcının Müziği",
+  versesLabel: "Ayetler",
+  booksLabel: "Kitaplar",
+  readingShortcuts: "Okuma kısayolları",
+  notesIntro:
+    "Sevdiğin bölümleri ve düşüncelerini tematik listelere düzenle.",
+  notesPoint1:
+    "Ayetler veya serbest metin blokları ekle.",
+  notesPoint2:
+    "Bir öğeye dokunarak menüyü aç (Okumada aç, yukarı/aşağı taşı, sil vb.).",
+  notesPoint3:
+    "Listeleri yeniden adlandır, kopyala ve paylaş.",
+  createdWithLove:
+    "Tanrı'nın Sözünü yaymak için sevgiyle oluşturuldu",
+  versionsFootnote:
+    "Kullanılan tüm Kutsal Kitap çevirileri kamu malıdır. Bazıları (söz varlığı ve dilbilgisi açısından) kısmen modernleştirilmiştir; ancak özgün el yazmalarına kesinlikle sadıktır.",
+
+  // Quick slots
+  quickSlotsIntro:
+    "Kitap/Bölüm seçicisinin sağındaki bu 4 düğme, sık okunan yerlere anında dönmene ve birden çok kitabı paralel olarak takip etmene yardım eder: üç konum için 1/2/3'ü ve son bölüme (rastgele ayet veya arama sonucu) dönmek için büyüteci kullan.",
+  quickSlotsIllustrationLabel:
+    "Kısayolların görseli",
+  quickSlotLastPassageTooltip:
+    "Son bölüm",
+  quickSlot1ActiveTooltip:
+    "Kısayol 1 (etkin)",
+  quickSlot2Tooltip: "Kısayol 2",
+  quickSlot3Tooltip: "Kısayol 3",
+
+  // Common
+  loading: "Yükleniyor...",
+  error: "Yüklenirken bir hata oluştu"
+};
+
 /**
  * Dictionnaire global par langue.
  *
@@ -3210,6 +4294,10 @@ const translations: Record<Language, any> = {
   ar: arTranslations,
   id: idTranslations,
   sw: swTranslations,
+  ko: koTranslations,
+  ja: jaTranslations,
+  yo: yoTranslations,
+  tr: trTranslations
 };
 
 const FALLBACK_LANGUAGE: Language = 'en';
