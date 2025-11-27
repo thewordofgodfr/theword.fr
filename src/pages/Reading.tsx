@@ -356,11 +356,15 @@ export default function Reading() {
       if (!slot) return;
       const b = resolveBook(slot.book);
       if (!b) return;
+
+      // Quand on revient sur la loupe, on ne ré-applique pas de highlight,
+      // on utilise la loupe comme mémoire de position seulement.
       setSelectedBook(b);
       setSelectedChapter(slot.chapter);
       setSelectedVerses([]);
-      setHighlightedVerse(slot.verse ?? null);
+      setHighlightedVerse(null);
       setScrollTargetVerse(slot.verse ?? null);
+
       try {
         window.scrollTo({ top: 0 });
       } catch {}
@@ -368,6 +372,7 @@ export default function Reading() {
       saveReadingPosition(b.name, slot.chapter);
       return;
     }
+
     // Slots mémoire 1/2/3
     setActiveSlot(i);
     if (!slot) {
