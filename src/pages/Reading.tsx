@@ -351,19 +351,17 @@ export default function Reading() {
     const slot = readQuickSlot(i);
     setTapped(i);
     if (i === 0) {
-      // Loupe = slot 0
+      // Loupe = slot 0 : mémoire de position *sans* highlight.
       setActiveSlot(null);
       if (!slot) return;
       const b = resolveBook(slot.book);
       if (!b) return;
 
-      // Quand on revient sur la loupe, on ne ré-applique pas de highlight,
-      // on utilise la loupe comme mémoire de position seulement.
       setSelectedBook(b);
       setSelectedChapter(slot.chapter);
       setSelectedVerses([]);
-      setHighlightedVerse(null);
-      setScrollTargetVerse(slot.verse ?? null);
+      setHighlightedVerse(null);              // pas de surlignage
+      setScrollTargetVerse(slot.verse ?? null); // on utilise le verset pour le scroll uniquement
 
       try {
         window.scrollTo({ top: 0 });
@@ -386,8 +384,8 @@ export default function Reading() {
     setSelectedBook(book);
     setSelectedChapter(slot.chapter);
     setSelectedVerses([]);
-    setHighlightedVerse(null);
-    setScrollTargetVerse(slot.verse ?? null);
+    setHighlightedVerse(null);                 // pas de surlignage pour 1/2/3
+    setScrollTargetVerse(slot.verse ?? null);  // juste pour le scroll
     try {
       window.scrollTo({ top: 0 });
     } catch {}
@@ -406,19 +404,18 @@ export default function Reading() {
   const [hasLoadedContext, setHasLoadedContext] = useState(false);
 
   useEffect(() => {
-    const applyIfChanged = (book: BibleBook, chapNum: number, verseNum: number | null) => {
-      const alreadyThere =
-        selectedBook?.name === book.name &&
-        selectedChapter === chapNum &&
-        (verseNum === null || highlightedVerse === verseNum);
-
-      if (alreadyThere) return false;
-
+    // scrollVerse = pour la position, highlightVerse = pour le contour
+    const applyIfChanged = (
+      book: BibleBook,
+      chapNum: number,
+      scrollVerse: number | null,
+      highlightVerse: number | null
+    ) => {
       setSelectedBook(book);
       setSelectedChapter(chapNum);
       setSelectedVerses([]);
-      setHighlightedVerse(verseNum);
-      setScrollTargetVerse(verseNum);
+      setHighlightedVerse(highlightVerse);
+      setScrollTargetVerse(scrollVerse);
       setTapped(0);
       setActiveSlot(null);
       try {
@@ -437,20 +434,22 @@ export default function Reading() {
       const verseNum = qv ? parseInt(qv, 10) : NaN;
       if (book && Number.isFinite(chapNum) && chapNum >= 1 && chapNum <= book.chapters) {
         const v = Number.isFinite(verseNum) ? verseNum : null;
-        const changed = applyIfChanged(book, chapNum, v);
+        // Depuis une URL explicite : on surligne ce verset.
+        const changed = applyIfChanged(book, chapNum, v, v);
         if (!hasLoadedContext) setHasLoadedContext(true);
         clearUrlIntent();
         if (changed) return;
       }
     }
 
-    // 2) readingContext (depuis d'autres pages)
+    // 2) readingContext (depuis d'autres pages : recherche, random widget, etc.)
     const ctx = state.readingContext;
     if (ctx && ctx.book && ctx.chapter > 0) {
       const book2 = resolveBook(ctx.book);
       if (book2) {
         const v2 = ctx.verse ?? null;
-        const changed = applyIfChanged(book2, ctx.chapter, v2);
+        // Depuis une autre page avec un verset précis => on surligne une fois.
+        const changed = applyIfChanged(book2, ctx.chapter, v2, v2);
         dispatch({ type: 'SET_READING_CONTEXT', payload: { book: '', chapter: 0 } });
         if (!hasLoadedContext) setHasLoadedContext(true);
         if (changed) return;
@@ -460,7 +459,7 @@ export default function Reading() {
     // 3) si déjà chargé et pas de nouvelle intention
     if (hasLoadedContext) return;
 
-    // 4) fallback : dernier slot tapé (loupe)
+    // 4) fallback : dernier slot tapé (loupe) -> position uniquement, PAS de highlight
     try {
       const rawTapped = localStorage.getItem('twog:qs:lastTapped');
       if (rawTapped === '0') {
@@ -469,7 +468,7 @@ export default function Reading() {
           const b = resolveBook(s0.book);
           if (b) {
             const v = s0.verse ?? null;
-            const changed = applyIfChanged(b, s0.chapter, v);
+            const changed = applyIfChanged(b, s0.chapter, v, null); // pas de highlight ici
             setHasLoadedContext(true);
             if (changed) return;
           }
@@ -477,7 +476,7 @@ export default function Reading() {
       }
     } catch {}
 
-    // 5) fallback : dernier slot mémoire actif
+    // 5) fallback : dernier slot mémoire actif (1/2/3) -> position uniquement, PAS de highlight
     try {
       const rawActive = localStorage.getItem('twog:qs:lastActive');
       const i = rawActive ? parseInt(rawActive, 10) : NaN;
@@ -486,7 +485,7 @@ export default function Reading() {
         if (s) {
           const b = resolveBook(s.book);
           if (b) {
-            const changed = applyIfChanged(b, s.chapter, s.verse ?? null);
+            const changed = applyIfChanged(b, s.chapter, s.verse ?? null, null);
             setActiveSlot(i);
             setLastTappedSlot(i);
             setHasLoadedContext(true);
@@ -496,21 +495,21 @@ export default function Reading() {
       }
     } catch {}
 
-    // 6) fallback : dernière position de lecture
+    // 6) fallback : dernière position de lecture -> position seulement
     const last = (state.settings as any).lastReadingPosition;
     if (last && last.book && last.chapter > 0) {
       const b = resolveBook(last.book);
       if (b) {
-        applyIfChanged(b, last.chapter, last.verse ?? null);
+        applyIfChanged(b, last.chapter, last.verse ?? null, null);
         setHasLoadedContext(true);
         return;
       }
     }
 
-    // 7) fallback par défaut : Jean 1
+    // 7) fallback par défaut : Jean 1 (sans highlight)
     const john = resolveBook('John');
     if (john) {
-      applyIfChanged(john, 1, null);
+      applyIfChanged(john, 1, null, null);
       setHasLoadedContext(true);
     }
   }, [
@@ -521,7 +520,8 @@ export default function Reading() {
     highlightedVerse,
     books,
     dispatch,
-    hasLoadedContext
+    hasLoadedContext,
+    saveReadingPosition
   ]);
 
   const suppressAutoSaveUntil = useRef<number>(0);
@@ -898,6 +898,7 @@ export default function Reading() {
       setSelectedBook(b);
       setSelectedChapter(v.chapter);
       setSelectedVerses([]);
+      // ICI : verset aléatoire = on surligne une fois
       setHighlightedVerse(v.verse);
       setScrollTargetVerse(v.verse);
       setTapped(0);
@@ -1655,4 +1656,5 @@ export default function Reading() {
     </div>
   );
 }
+
 
