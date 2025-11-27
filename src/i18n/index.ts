@@ -17,8 +17,7 @@ import sw from './sw';
 import ko from './ko';
 import ja from './ja';
 import yo from './yo';
-// Ajoute ici "tr" si tu crées src/i18n/tr.ts
-// import tr from './tr';
+import tr from './tr';
 
 export const translations: Partial<Record<Language, TranslationDict>> = {
   fr,
@@ -36,7 +35,7 @@ export const translations: Partial<Record<Language, TranslationDict>> = {
   ko,
   ja,
   yo,
-  // tr,
+  tr,
 };
 
 const FALLBACK_LANG: Language = 'en';
