@@ -2,7 +2,6 @@
 import type { TranslationDict } from './types';
 
 const id: TranslationDict = {
-  const idTranslations = {
   // Navigation
   home: "Beranda",
   reading: "Bacaan",
