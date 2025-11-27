@@ -617,10 +617,19 @@ export default function Reading() {
             const top = el.getBoundingClientRect().top;
             if (top - offset <= 0) bestVerse = v.verse; else break;
           }
-          if (activeSlot && activeSlot !== 0) {
-            saveQuickSlot(activeSlot, { book: selectedBook.name, chapter: selectedChapter, verse: bestVerse });
+
+          // Nouveau : si on est en mode loupe (slot 0 actif), on met à jour le slot 0,
+          // sinon on continue à mettre à jour le slot mémoire actif (1/2/3)
+          const slotToUpdate =
+            activeSlot && activeSlot !== 0
+              ? activeSlot
+              : (lastTappedSlot === 0 ? 0 : null);
+
+          if (slotToUpdate !== null) {
+            saveQuickSlot(slotToUpdate, { book: selectedBook.name, chapter: selectedChapter, verse: bestVerse });
             refreshSlots();
           }
+
           const nearBottom =
             window.innerHeight + (window.scrollY || document.documentElement.scrollTop || 0)
             >= (document.documentElement.scrollHeight || document.body.scrollHeight) - 180;
@@ -701,17 +710,15 @@ export default function Reading() {
                               ? 'relative overflow-visible w-7 h-7 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
                               : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all box-border';
 
+                            const isActive = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
+
                             let cls = '';
                             if (i === 0) {
-                              cls = lastTappedSlot === 0 ? 'bg-blue-600 text-white hover:bg-blue-500' :
-                                'bg-white/5 border border-blue-400/60 text-blue-200';
+                              cls = 'bg-blue-600 text-white hover:bg-blue-500';
                             } else {
                               const theme = SLOT_THEMES[i as SlotKey];
                               cls = filled ? `${theme.solid} ${theme.solidHover}` : 'bg-gray-800 text-white border border-gray-600';
                             }
-
-                            // Cercle bleu au périmètre (1/2/3) — conservé
-                            const activePerimeter = isNumeric && activeSlot === i ? 'border-2 border-blue-400' : '';
 
                             const refText = s ? `${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : '';
                             let title: string;
@@ -722,21 +729,19 @@ export default function Reading() {
                                 ? `${t('memorySlotLabel')} ${i}: ${refText}`
                                 : `${t('memorySlotLabel')} ${i} ${t('emptySlotSuffix')}`;
                             }
-                            const isPressed = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
+                            const isPressed = isActive;
 
-                            // Liseré blanc autour de la loupe quand elle est active
-                            const loupeRing = (i === 0 && isPressed)
-                              ? 'border-2 border-white'
-                              : '';
+                            // Anneau blanc autour du slot actif (loupe ou 1/2/3)
+                            const activeRing = isActive ? 'border-2 border-white' : '';
 
-                            const numGlow = (isNumeric && activeSlot === i)
+                            const numGlow = (isNumeric && isActive)
                               ? 'shadow-[0_0_0_2px_rgba(37,99,235,0.9),0_0_10px_rgba(37,99,235,0.6)]'
                               : '';
 
                             return (
                               <button
                                 key={`qs-m-${i}`}
-                                className={`${base} ${cls} ${activePerimeter} ${loupeRing} ${numGlow}`}
+                                className={`${base} ${cls} ${activeRing} ${numGlow}`}
                                 onClick={() => jumpToSlot(i)}
                                 aria-label={title}
                                 title={title}
@@ -774,17 +779,15 @@ export default function Reading() {
                           ? 'relative overflow-visible w-7 h-7 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
                           : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all box-border';
 
+                        const isActive = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
+
                         let cls = '';
                         if (i === 0) {
-                          cls = lastTappedSlot === 0 ? 'bg-blue-600 text-white hover:bg-blue-500' :
-                            'bg-white/5 border border-blue-400/60 text-blue-200';
+                          cls = 'bg-blue-600 text-white hover:bg-blue-500';
                         } else {
                           const theme = SLOT_THEMES[i as SlotKey];
                           cls = filled ? `${theme.solid} ${theme.solidHover}` : 'bg-gray-800 text-white border border-gray-600';
                         }
-
-                        // Cercle bleu au périmètre (1/2/3) — conservé
-                        const activePerimeter = isNumeric && activeSlot === i ? 'border-2 border-blue-400' : '';
 
                         const refText = s ? `${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : '';
                         let title: string;
@@ -795,21 +798,19 @@ export default function Reading() {
                             ? `${t('memorySlotLabel')} ${i}: ${refText}`
                             : `${t('memorySlotLabel')} ${i} ${t('emptySlotSuffix')}`;
                         }
-                        const isPressed = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
+                        const isPressed = isActive;
 
-                        // Liseré blanc autour de la loupe quand elle est active
-                        const loupeRing = (i === 0 && isPressed)
-                          ? 'border-2 border-white'
-                          : '';
+                        // Anneau blanc autour du slot actif (loupe ou 1/2/3)
+                        const activeRing = isActive ? 'border-2 border-white' : '';
 
-                        const numGlow = (isNumeric && activeSlot === i)
+                        const numGlow = (isNumeric && isActive)
                           ? 'shadow-[0_0_0_2px_rgba(37,99,235,0.9),0_0_10px_rgba(37,99,235,0.6)]'
                           : '';
 
                         return (
                           <button
                             key={`qs-d-${i}`}
-                            className={`${base} ${cls} ${activePerimeter} ${loupeRing} ${numGlow}`}
+                            className={`${base} ${cls} ${activeRing} ${numGlow}`}
                             onClick={() => jumpToSlot(i)}
                             aria-label={title}
                             title={title}
