@@ -41,21 +41,14 @@ const tr: TranslationDict = {
   shareLabel: "Paylaş",
   cancel: "İptal",
   close: "Kapat",
-  notesModalTitle:
-    "Listeye ekle (Notlar)",
-  notesNoList:
-    "Henüz liste yok. Aşağıdan bir tane oluştur.",
-  notesNewListOptional:
-    "Yeni liste (isteğe bağlı)",
-  principlesModalTitle:
-    "Çalışmaya ekle (Çalışmalar)",
-  principlesNoList:
-    "Henüz çalışma yok. Aşağıdan bir tane oluştur.",
-  principlesNewListOptional:
-    "Yeni çalışma (isteğe bağlı)",
+  notesModalTitle: "Listeye ekle (Notlar)",
+  notesNoList: "Henüz liste yok. Aşağıdan bir tane oluştur.",
+  notesNewListOptional: "Yeni liste (isteğe bağlı)",
+  principlesModalTitle: "Çalışmaya ekle (Çalışmalar)",
+  principlesNoList: "Henüz çalışma yok. Aşağıdan bir tane oluştur.",
+  principlesNewListOptional: "Yeni çalışma (isteğe bağlı)",
   selectionCopied: "Seçim kopyalandı",
-  textReadyToShare:
-    "Metin paylaşmaya hazır (kopyalandı)",
+  textReadyToShare: "Metin paylaşmaya hazır (kopyalandı)",
   addedToList: "Listeye eklendi",
   newRandom: "Yeni rastgele",
   swipeLabel: "Kaydır",
@@ -65,25 +58,22 @@ const tr: TranslationDict = {
   emptySlotSuffix: "(boş)",
   untitledList: "(başlıksız)",
 
-  // Short label “Copied”
+  // Petit libellé court pour “Copié”
   copiedShort: "Kopyalandı",
 
-  // Search page
+  // *** Search page ***
   searchTitle: "Kutsal Kitap arama",
-  searchPlaceholder:
-    "Aramak istediğinizi yazın",
-  searchMinChars:
-    "Arama için en az 2 karakter yazın.",
+  searchPlaceholder: "Aramak istediğinizi yazın",
+  searchMinChars: "Arama için en az 2 karakter yazın.",
   searchSearching: "Aranıyor…",
   searchResults: "Sonuçlar",
   searchExpandAll: "Tümünü aç",
   searchCollapseAll: "Tümünü kapat",
-  searchNoResults:
-    "Hiç ayet bulunamadı.",
+  searchNoResults: "Hiç ayet bulunamadı.",
   searchClear: "Temizle",
   searchOpenInReading: "Okuma bölümünde aç",
 
-  // Notes page
+  // Bloc Notes (page Notes)
   notesPage: {
     create: "Liste oluştur",
     placeholder: "Liste başlığı…",
@@ -96,29 +86,23 @@ const tr: TranslationDict = {
     moveUp: "Yukarı taşı",
     moveDown: "Aşağı taşı",
     open: "Aç",
-    confirmDeleteItem:
-      "Bu öğe silinsin mi?",
+    confirmDeleteItem: "Bu öğe silinsin mi?",
     newTextPlaceholder: "Metniniz…",
 
+    // Partage / import via code
     shareCode: "Kod",
     importCode: "Kodu içe aktar",
-    importPrompt:
-      "TheWord paylaşım kodunu buraya yapıştırın:",
+    importPrompt: "TheWord paylaşım kodunu buraya yapıştırın:",
     importError: "Geçersiz kod.",
-    importSuccess:
-      "Liste başarıyla içe aktarıldı ✅",
-    shareCodeCopied:
-      "Kod panoya kopyalandı ✅",
+    importSuccess: "Liste başarıyla içe aktarıldı ✅",
+    shareCodeCopied: "Kod panoya kopyalandı ✅",
 
+    // Import direct depuis un texte
     importTextButton: "Metin → Liste",
-    importTextTitlePlaceholder:
-      "Yeni listenin başlığı",
-    importTextDefaultTitle:
-      "Metin içe aktarma",
-    importTextBodyPlaceholder:
-      "Metninizi buraya yapıştırın…",
-    importTextNoBody:
-      "Lütfen içe aktarılacak bir metin yapıştırın.",
+    importTextTitlePlaceholder: "Yeni listenin başlığı",
+    importTextDefaultTitle: "Metin içe aktarma",
+    importTextBodyPlaceholder: "Metninizi buraya yapıştırın…",
+    importTextNoBody: "Lütfen içe aktarılacak bir metin yapıştırın.",
     importTextNoBlock:
       "Hiç blok algılanmadı (metni bloklara ayırmak için aralara boş satırlar bırakın).",
     importTextSplitLabel:
@@ -127,19 +111,16 @@ const tr: TranslationDict = {
       "Her blok listede bir öğe olur.",
     importTextCreate: "Liste oluştur",
 
-    duplicateTitle:
-      "Aynı başlığa sahip bir liste zaten var.",
-    confirmDeleteList:
-      "Bu liste silinsin mi?",
+    duplicateTitle: "Aynı başlığa sahip bir liste zaten var.",
+    confirmDeleteList: "Bu liste silinsin mi?",
     emptyList: "Boş liste.",
 
-    importFromTextTitle:
-      "Metinden içe aktar",
+    importFromTextTitle: "Metinden içe aktar",
     documentContent: "Belge içeriği",
-    renameList: "Yeniden adlandır"
+    renameList: "Yeniden adlandır",
   },
 
-  // Principles page
+  // Bloc Principes (page Principes)
   principlesPage: {
     create: "Çalışma oluştur",
     placeholder: "Çalışmanın başlığı…",
@@ -153,27 +134,23 @@ const tr: TranslationDict = {
     moveDown: "Aşağı taşı",
     open: "Aç",
     openReading: "Okumayı aç",
-    confirmDeleteItem:
-      "Bu öğe silinsin mi?",
+    confirmDeleteItem: "Bu öğe silinsin mi?",
     newTextPlaceholder: "Metniniz…",
 
+    // Partage / import via code
     shareCode: "Kod",
     importCode: "Kodu içe aktar",
     importPrompt:
       "TheWord paylaşım kodunu (not veya çalışma) buraya yapıştırın:",
     importError: "Geçersiz kod.",
-    importSuccess:
-      "Çalışma başarıyla içe aktarıldı ✅",
-    shareCodeCopied:
-      "Kod panoya kopyalandı ✅",
+    importSuccess: "Çalışma başarıyla içe aktarıldı ✅",
+    shareCodeCopied: "Kod panoya kopyalandı ✅",
 
+    // Import direct depuis un texte
     importTextButton: "Metin → Çalışma",
-    importTextTitlePlaceholder:
-      "Yeni çalışmanın başlığı",
-    importTextDefaultTitle:
-      "Metin içe aktarma",
-    importTextBodyPlaceholder:
-      "Metninizi buraya yapıştırın…",
+    importTextTitlePlaceholder: "Yeni çalışmanın başlığı",
+    importTextDefaultTitle: "Metin içe aktarma",
+    importTextBodyPlaceholder: "Metninizi buraya yapıştırın…",
     importTextNoBody:
       "Lütfen içe aktarılacak bir metin yapıştırın.",
     importTextNoBlock:
@@ -186,20 +163,19 @@ const tr: TranslationDict = {
 
     duplicateTitle:
       "Aynı başlığa sahip bir çalışma zaten var.",
-    confirmDeleteList:
-      "Bu çalışma silinsin mi?",
+    confirmDeleteList: "Bu çalışma silinsin mi?",
     emptyList: "Boş çalışma.",
 
-    importFromTextTitle:
-      "Metinden içe aktar",
+    importFromTextTitle: "Metinden içe aktar",
     documentContent: "Belge içeriği",
     renameList: "Yeniden adlandır",
     share: "Paylaş",
     copy: "Kopyala",
     deleteList: "Sil",
 
+    // Titres pour le partage natif
     shareStudyTitle: "Çalışma",
-    shareItemTitle: "Ayet"
+    shareItemTitle: "Ayet",
   },
 
   // Settings page
@@ -210,19 +186,15 @@ const tr: TranslationDict = {
   language: "Dil",
   french: "Fransızca",
   english: "İngilizce",
-  fontSizeXLLabel:
-    "Az gören modu (XL)",
-  fontSizePreview:
-    "Seçilen yazı tipi boyutunun önizlemesi.",
+  fontSizeXLLabel: "Az gören modu (XL)",
+  fontSizePreview: "Seçilen yazı tipi boyutunun önizlemesi.",
   updates: "Güncellemeler",
   updatesDescription:
     "Yeni bir sürüm olup olmadığını kontrol edin ve uygulayın.",
   applyUpdate: "Güncellemeyi uygula",
-  checkUpdatesButton:
-    "Güncellemeleri denetle",
+  checkUpdatesButton: "Güncellemeleri denetle",
   updatesChecking: "Denetleniyor…",
-  updatesUpToDate:
-    "Uygulamanız güncel.",
+  updatesUpToDate: "Uygulamanız güncel.",
   updatesReady:
     "Yeni sürüm hazır. \"Güncellemeyi uygula\"ya tıklayın.",
   updatesUnavailable:
@@ -230,7 +202,7 @@ const tr: TranslationDict = {
   updatesError:
     "Denetlerken bir hata oluştu. Lütfen tekrar deneyin.",
 
-  // About page
+  // About / versions
   aboutTitle: "",
   aboutDescription:
     "The Word, rastgele ayetler ve bütün Kutsal Kitap okumaları aracılığıyla Tanrı'nın sözünü keşfetmene yardım eder.",
@@ -239,8 +211,7 @@ const tr: TranslationDict = {
   bibleVersions: "Kutsal Kitap çevirileri",
   frenchVersion:
     "Fransızca: Louis Segond 1910 (LSG) – 2025 gözden geçirilmiş – Kamu malı",
-  englishVersion:
-    "İngilizce: King James Version (KJV) – Kamu malı",
+  englishVersion: "İngilizce: King James Version (KJV) – Kamu malı",
   frenchVersionDetails:
     "Fransızca Kutsal Kitap için başvuru çevirisi; 1910'da Louis Segond tarafından çevrildi ve 2025'te söz varlığı ile dilbilgisi modernleştirildi (el yazmalarına sadık kalınarak).",
   englishVersionDetails:
@@ -256,32 +227,28 @@ const tr: TranslationDict = {
   readingShortcuts: "Okuma kısayolları",
   notesIntro:
     "Sevdiğin bölümleri ve düşüncelerini tematik listelere düzenle.",
-  notesPoint1:
-    "Ayetler veya serbest metin blokları ekle.",
+  notesPoint1: "Ayetler veya serbest metin blokları ekle.",
   notesPoint2:
     "Bir öğeye dokunarak menüyü aç (Okumada aç, yukarı/aşağı taşı, sil vb.).",
-  notesPoint3:
-    "Listeleri yeniden adlandır, kopyala ve paylaş.",
+  notesPoint3: "Listeleri yeniden adlandır, kopyala ve paylaş.",
   createdWithLove:
     "Tanrı'nın Sözünü yaymak için sevgiyle oluşturuldu",
   versionsFootnote:
     "Kullanılan tüm Kutsal Kitap çevirileri kamu malıdır. Bazıları (söz varlığı ve dilbilgisi açısından) kısmen modernleştirilmiştir; ancak özgün el yazmalarına kesinlikle sadıktır.",
 
-  // Quick slots
+  // Quick slots / raccourcis lecture
   quickSlotsIntro:
     "Kitap/Bölüm seçicisinin sağındaki bu 4 düğme, sık okunan yerlere anında dönmene ve birden çok kitabı paralel olarak takip etmene yardım eder: üç konum için 1/2/3'ü ve son bölüme (rastgele ayet veya arama sonucu) dönmek için büyüteci kullan.",
-  quickSlotsIllustrationLabel:
-    "Kısayolların görseli",
-  quickSlotLastPassageTooltip:
-    "Son bölüm",
-  quickSlot1ActiveTooltip:
-    "Kısayol 1 (etkin)",
+  quickSlotsIllustrationLabel: "Kısayolların görseli",
+  quickSlotLastPassageTooltip: "Son bölüm",
+  quickSlot1ActiveTooltip: "Kısayol 1 (etkin)",
   quickSlot2Tooltip: "Kısayol 2",
   quickSlot3Tooltip: "Kısayol 3",
 
   // Common
   loading: "Yükleniyor...",
-  error: "Yüklenirken bir hata oluştu"
+  error: "Yüklenirken bir hata oluştu",
 };
 
 export default tr;
+
