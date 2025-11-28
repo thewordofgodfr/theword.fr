@@ -84,9 +84,9 @@ function buildNormalizedWithMap(input: string) {
   return { norm, map };
 }
 
-/** Match “flexible” :
+/** Match “flexible” (non utilisé directement mais gardé au cas où) :
  *  - si la requête se termine par un espace → expression exacte (mots entiers)
- *  - sinon → dernier mot en *préfixe* (ex: "conspi" → "conspiration")
+ *  - sinon → dernier mot en *préfixe*
  *  - insensible aux accents/ligatures/casse
  */
 function matchesFlexible(text: string, query: string) {
@@ -105,13 +105,37 @@ function matchesFlexible(text: string, query: string) {
   return paddedText.includes(` ${normQuery}`);
 }
 
+/* ===== Helpers pour la version "simple" (1 seul mot) ===== */
+
+function isLetterOrDigit(ch: string) {
+  return /[\p{L}\p{N}]/u.test(ch);
+}
+
 /**
- * Nouveau helper : trouve les matches dans la chaîne normalisée `norm`.
- * - `norm` : texte normalisé (sans accents, uniquement lettres/chiffres + espaces)
- * - `normQuery` : requête normalisée
- * - `endsWithSpace` : si la requête originale finit par un espace
- *
- * Retourne des paires { start, end } en indices de `norm`.
+ * Découpe le texte original en "mots" (séquences de lettres/chiffres)
+ * et retourne leurs bornes dans la chaîne originale.
+ */
+function scanWords(text: string): Array<{ start: number; end: number }> {
+  const res: Array<{ start: number; end: number }> = [];
+  const len = text.length;
+  let i = 0;
+
+  while (i < len) {
+    // sauter les séparateurs
+    while (i < len && !isLetterOrDigit(text[i])) i++;
+    if (i >= len) break;
+    const start = i;
+    while (i < len && isLetterOrDigit(text[i])) i++;
+    const end = i;
+    res.push({ start, end });
+  }
+
+  return res;
+}
+
+/**
+ * Helper "complet" pour les requêtes multi-mots sur la chaîne normalisée.
+ * Retourne des paires { start, end } sur la chaîne `norm`.
  */
 function findMatchesInNorm(
   norm: string,
@@ -146,28 +170,49 @@ function findMatchesInNorm(
       }
       matches.push({ start: i, end });
     } else {
-      // préfixe : on étend jusqu'à la fin du mot
+      // préfixe du dernier mot : on étend jusqu'à la fin de ce mot
       let end = i + qlen;
       while (end < nlen && norm[end] !== ' ') end++;
       matches.push({ start: i, end });
     }
 
-    // on avance d'un caractère pour trouver d'autres matches éventuels
     i++;
   }
 
   return matches;
 }
 
-/** Compte le nombre d’occurrences selon la même logique que highlightFlexible */
+/** Compte le nombre d’occurrences selon la même logique que le surlignage */
 function countMatchesFlexible(text: string, query: string): number {
   const normQuery = normalizeForSearch(query);
   if (!normQuery) return 0;
 
+  const endsWithSpace = /\s$/.test(query);
+
+  // 1) CAS SIMPLE : une seule "mot" dans la requête → on travaille mot par mot dans le texte original
+  if (!normQuery.includes(' ')) {
+    const words = scanWords(text);
+    let count = 0;
+
+    for (const w of words) {
+      const word = text.slice(w.start, w.end);
+      const normWord = normalizeForSearch(word);
+      if (!normWord) continue;
+
+      const match = endsWithSpace
+        ? normWord === normQuery
+        : normWord.startsWith(normQuery);
+
+      if (match) count++;
+    }
+
+    return count;
+  }
+
+  // 2) CAS COMPLEXE : requête multi-mots → on retombe sur la version "norm + map"
   const { norm } = buildNormalizedWithMap(text);
   if (!norm) return 0;
 
-  const endsWithSpace = /\s$/.test(query);
   const matches = findMatchesInNorm(norm, normQuery, endsWithSpace);
   return matches.length;
 }
@@ -180,15 +225,58 @@ function escapeHtml(s: string) {
     .replace(/"/g, '&quot;');
 }
 
-/** Surlignage aligné sur countMatchesFlexible / findMatchesInNorm */
+/** Surlignage aligné sur countMatchesFlexible */
 function highlightFlexible(text: string, query: string) {
   const normQuery = normalizeForSearch(query);
   if (!normQuery) return escapeHtml(text);
 
+  const endsWithSpace = /\s$/.test(query);
+
+  // 1) CAS SIMPLE : requête = un seul mot → surlignage direct sur les "mots" du texte original
+  if (!normQuery.includes(' ')) {
+    const words = scanWords(text);
+    const ranges: Array<{ start: number; end: number }> = [];
+
+    for (const w of words) {
+      const word = text.slice(w.start, w.end);
+      const normWord = normalizeForSearch(word);
+      if (!normWord) continue;
+
+      const match = endsWithSpace
+        ? normWord === normQuery
+        : normWord.startsWith(normQuery);
+
+      if (match) {
+        ranges.push({ start: w.start, end: w.end });
+      }
+    }
+
+    if (!ranges.length) return escapeHtml(text);
+
+    // Fusion des recouvrements (au cas où)
+    ranges.sort((a, b) => a.start - b.start);
+    const merged: typeof ranges = [];
+    for (const r of ranges) {
+      const last = merged[merged.length - 1];
+      if (!last || r.start > last.end) merged.push({ ...r });
+      else last.end = Math.max(last.end, r.end);
+    }
+
+    let html = '';
+    let cursor = 0;
+    for (const r of merged) {
+      if (cursor < r.start) html += escapeHtml(text.slice(cursor, r.start));
+      html += `<mark>${escapeHtml(text.slice(r.start, r.end))}</mark>`;
+      cursor = r.end;
+    }
+    if (cursor < text.length) html += escapeHtml(text.slice(cursor));
+    return html;
+  }
+
+  // 2) CAS COMPLEXE : requête multi-mots → on garde la version "norm + map"
   const { norm, map } = buildNormalizedWithMap(text);
   if (!norm) return escapeHtml(text);
 
-  const endsWithSpace = /\s$/.test(query);
   const matchesInNorm = findMatchesInNorm(norm, normQuery, endsWithSpace);
   if (!matchesInNorm.length) return escapeHtml(text);
 
@@ -196,7 +284,8 @@ function highlightFlexible(text: string, query: string) {
   const ranges = matchesInNorm
     .map(({ start, end }) => {
       const origStart = map[Math.max(0, start)];
-      const origEnd = (map[Math.min(map.length - 1, end - 1)] ?? map[map.length - 1]) + 1; // exclu
+      const origEnd =
+        (map[Math.min(map.length - 1, end - 1)] ?? map[map.length - 1]) + 1; // exclu
       return { start: origStart, end: origEnd };
     })
     .sort((a, b) => a.start - b.start);
@@ -561,4 +650,3 @@ export default function Search() {
     </div>
   );
 }
-
