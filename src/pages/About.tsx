@@ -251,7 +251,7 @@ export default function About() {
             </div>
           </section>
 
-          {/* ====== 6) COMMENTAIRE DE FIN SUR LES VERSIONS ====== */}
+          {/* ====== 6) COMMENTAIRE DE FIN SUR LES VERSIONS + LIEN CONFIDENTIALITÉ ====== */}
           <footer className="px-1 pb-2">
             <p
               className={`${
@@ -260,6 +260,38 @@ export default function About() {
               style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.6 }}
             >
               {t('versionsFootnote')}
+            </p>
+
+            {/* Lien vers la politique de confidentialité */}
+            <p
+              className={`${
+                isDark ? 'text-white/70' : 'text-gray-600'
+              } text-center mt-2`}
+              style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.6 }}
+            >
+              {state.settings.language === 'fr' ? (
+                <>
+                  Pour consulter la politique de confidentialité,&nbsp;
+                  <a
+                    href="https://theword.fr/privacy.html"
+                    className="underline"
+                  >
+                    cliquez ici
+                  </a>
+                  .
+                </>
+              ) : (
+                <>
+                  To read the privacy policy,&nbsp;
+                  <a
+                    href="https://theword.fr/privacy.html"
+                    className="underline"
+                  >
+                    click here
+                  </a>
+                  .
+                </>
+              )}
             </p>
           </footer>
         </div>
