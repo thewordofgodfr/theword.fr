@@ -105,7 +105,61 @@ function matchesFlexible(text: string, query: string) {
   return paddedText.includes(` ${normQuery}`);
 }
 
-/** Compte le nombre d’occurrences selon la même logique que matchesFlexible */
+/**
+ * Nouveau helper : trouve les matches dans la chaîne normalisée `norm`.
+ * - `norm` : texte normalisé (sans accents, uniquement lettres/chiffres + espaces)
+ * - `normQuery` : requête normalisée
+ * - `endsWithSpace` : si la requête originale finit par un espace
+ *
+ * Retourne des paires { start, end } en indices de `norm`.
+ */
+function findMatchesInNorm(
+  norm: string,
+  normQuery: string,
+  endsWithSpace: boolean
+): Array<{ start: number; end: number }> {
+  if (!norm || !normQuery) return [];
+
+  const matches: Array<{ start: number; end: number }> = [];
+  const qlen = normQuery.length;
+  const nlen = norm.length;
+
+  let i = 0;
+  while (i <= nlen - qlen) {
+    // on ne considère que les débuts de mots / expressions
+    if (i > 0 && norm[i - 1] !== ' ') {
+      i++;
+      continue;
+    }
+
+    if (norm.slice(i, i + qlen) !== normQuery) {
+      i++;
+      continue;
+    }
+
+    if (endsWithSpace) {
+      // expression exacte : doit se terminer sur une frontière de mot
+      const end = i + qlen;
+      if (end < nlen && norm[end] !== ' ') {
+        i++;
+        continue;
+      }
+      matches.push({ start: i, end });
+    } else {
+      // préfixe : on étend jusqu'à la fin du mot
+      let end = i + qlen;
+      while (end < nlen && norm[end] !== ' ') end++;
+      matches.push({ start: i, end });
+    }
+
+    // on avance d'un caractère pour trouver d'autres matches éventuels
+    i++;
+  }
+
+  return matches;
+}
+
+/** Compte le nombre d’occurrences selon la même logique que highlightFlexible */
 function countMatchesFlexible(text: string, query: string): number {
   const normQuery = normalizeForSearch(query);
   if (!normQuery) return 0;
@@ -114,18 +168,8 @@ function countMatchesFlexible(text: string, query: string): number {
   if (!norm) return 0;
 
   const endsWithSpace = /\s$/.test(query);
-  const haystack = endsWithSpace ? ` ${norm} ` : ` ${norm}`;
-  const needle   = endsWithSpace ? ` ${normQuery} ` : ` ${normQuery}`;
-
-  let from = 0;
-  let count = 0;
-  while (true) {
-    const pos = haystack.indexOf(needle, from);
-    if (pos === -1) break;
-    count++;
-    from = pos + needle.length; // pas de chevauchement attendu (séparateurs = espaces)
-  }
-  return count;
+  const matches = findMatchesInNorm(norm, normQuery, endsWithSpace);
+  return matches.length;
 }
 
 function escapeHtml(s: string) {
@@ -136,7 +180,7 @@ function escapeHtml(s: string) {
     .replace(/"/g, '&quot;');
 }
 
-/** Surlignage aligné sur matchesFlexible */
+/** Surlignage aligné sur countMatchesFlexible / findMatchesInNorm */
 function highlightFlexible(text: string, query: string) {
   const normQuery = normalizeForSearch(query);
   if (!normQuery) return escapeHtml(text);
@@ -145,23 +189,11 @@ function highlightFlexible(text: string, query: string) {
   if (!norm) return escapeHtml(text);
 
   const endsWithSpace = /\s$/.test(query);
-  const padded = ` ${norm}`; // pas d’espace final ici
-  const needle = endsWithSpace ? ` ${normQuery} ` : ` ${normQuery}`;
-
-  const matches: Array<{ start: number; end: number }> = [];
-  let from = 0;
-  while (true) {
-    const pos = padded.indexOf(needle, from);
-    if (pos === -1) break;
-    const startInNorm = pos;
-    const endInNorm = pos + normQuery.length; // exclusif
-    matches.push({ start: startInNorm, end: endInNorm });
-    from = pos + needle.length;
-  }
-  if (!matches.length) return escapeHtml(text);
+  const matchesInNorm = findMatchesInNorm(norm, normQuery, endsWithSpace);
+  if (!matchesInNorm.length) return escapeHtml(text);
 
   // Conversion → indices d’origine
-  const ranges = matches
+  const ranges = matchesInNorm
     .map(({ start, end }) => {
       const origStart = map[Math.max(0, start)];
       const origEnd = (map[Math.min(map.length - 1, end - 1)] ?? map[map.length - 1]) + 1; // exclu
