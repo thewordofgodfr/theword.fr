@@ -64,14 +64,23 @@ function AppContent() {
 
     const root = document.documentElement;
     if (theme === 'dark') root.classList.add('dark'); else root.classList.remove('dark');
-    root.setAttribute('lang', language === 'fr' ? 'fr' : 'en');
+
+    // IMPORTANT : on met directement le code langue (fr, en, es, ru, pt, etc.)
+    root.setAttribute('lang', language);
   }, [state.currentPage, state.settings.language, state.settings.theme]);
 
   useEffect(() => {
-    if ('scrollRestoration' in window.history) { try { window.history.scrollRestoration = 'manual'; } catch {} }
+    if ('scrollRestoration' in window.history) {
+      try {
+        window.history.scrollRestoration = 'manual';
+      } catch {}
+    }
   }, []);
+
   useEffect(() => {
-    const raf = requestAnimationFrame(() => { window.scrollTo({ top: 0, left: 0 }); });
+    const raf = requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0 });
+    });
     return () => cancelAnimationFrame(raf);
   }, [state.currentPage]);
 
@@ -89,7 +98,11 @@ function AppContent() {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-200 ${state.settings.theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+    <div
+      className={`min-h-screen transition-colors duration-200 ${
+        state.settings.theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
+      }`}
+    >
       <Navigation />
       <main>{renderCurrentPage()}</main>
     </div>
@@ -103,4 +116,5 @@ export default function App() {
     </AppProvider>
   );
 }
+
 
