@@ -26,10 +26,10 @@ export default function Navigation() {
     { id: 'about',     icon: Info,        label: t('about') },
   ] as const;
 
-  const baseBtn   =
+  const baseBtn =
     'transition-all duration-200 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500';
   const activeBtn = isDark ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-700';
-  const idleBtn   = isDark
+  const idleBtn = isDark
     ? 'text-white/90 hover:bg-gray-700 hover:text-white'
     : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900';
 
@@ -59,8 +59,11 @@ export default function Navigation() {
                   title={label}
                   className={[
                     baseBtn,
+                    // 🔽 Ajustement important :
+                    // - Sur mobile : chaque bouton prend la même largeur (flex-1) -> tout rentre.
+                    // - Sur sm et + : largeur naturelle (sm:flex-none), comme avant.
                     'px-2 py-2 flex flex-col sm:flex-row items-center sm:gap-2',
-                    'flex-shrink-0 min-w-[48px] sm:min-w-0',
+                    'flex-1 sm:flex-none min-w-0',
                     active ? activeBtn : idleBtn,
                   ].join(' ')}
                 >
@@ -75,3 +78,4 @@ export default function Navigation() {
     </nav>
   );
 }
+
