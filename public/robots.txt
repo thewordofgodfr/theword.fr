@@ -1,4 +1,7 @@
+# Autoriser tous les robots à explorer le site
 User-agent: *
 Allow: /
 
+# Indiquer l'emplacement du sitemap
 Sitemap: https://www.theword.fr/sitemap.xml
+
