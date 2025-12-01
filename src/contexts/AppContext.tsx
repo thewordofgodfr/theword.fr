@@ -53,8 +53,15 @@ const FIRST_RUN_KEY = 'tw_firstRun_v2';
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-/** Détermine la langue par défaut (localStorage → navigateur → 'en') */
+/**
+ * Détermine la langue par défaut
+ * 1. Si localStorage contient déjà une langue → on la réutilise.
+ * 2. Sinon, on regarde navigator.language et on mappe vers les 16 langues supportées :
+ *    fr, en, ru, es, ar, de, hi, id, it, ja, ko, pt, sw, tr, yo, zh
+ * 3. Si aucune correspondance → 'en'
+ */
 const getInitialLanguage = (): Language => {
+  // 1) Langue déjà sauvegardée
   try {
     const savedLanguage =
       (typeof localStorage !== 'undefined'
@@ -65,10 +72,35 @@ const getInitialLanguage = (): Language => {
     /* ignore */
   }
 
+  // 2) Mapper navigator.language -> langue app
   if (typeof navigator !== 'undefined') {
     const browserLang = navigator.language?.toLowerCase() || '';
-    if (browserLang.startsWith('fr')) return 'fr';
+    const base = browserLang.split('-')[0]; // "pt" pour "pt-BR", "fr" pour "fr-FR", etc.
+
+    const browserToAppLangMap: Record<string, Language> = {
+      fr: 'fr',
+      en: 'en',
+      es: 'es',
+      ru: 'ru',
+      ar: 'ar',
+      de: 'de',
+      hi: 'hi',
+      id: 'id',
+      it: 'it',
+      ja: 'ja',
+      ko: 'ko',
+      pt: 'pt',
+      sw: 'sw',
+      tr: 'tr',
+      yo: 'yo',
+      zh: 'zh',
+    };
+
+    const mapped = browserToAppLangMap[base];
+    if (mapped) return mapped;
   }
+
+  // 3) Fallback : anglais
   return 'en';
 };
 
@@ -329,3 +361,4 @@ export function useApp() {
   }
   return context;
 }
+
