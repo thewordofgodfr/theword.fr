@@ -677,13 +677,13 @@ export default function Reading() {
   // NOTES (collectionsService)
   const [showAddToNotes, setShowAddToNotes] = useState(false);
   const [notesListsForModal, setNotesListsForModal] = useState<VerseList[]>([]);
-  const [selectedNotesListId, setSelectedNotesListId] = useState<string>('');
+  const [selectedNotesListIds, setSelectedNotesListIds] = useState<string[]>([]);
   const [newNotesListTitle, setNewNotesListTitle] = useState<string>('');
 
   const openAddToNotes = () => {
     const all = sortListsByTitle(getAllLists());
     setNotesListsForModal(all);
-    setSelectedNotesListId(all.length > 0 ? all[0].id : '');
+    setSelectedNotesListIds(all.length > 0 ? [all[0].id] : []);
     setNewNotesListTitle('');
     setShowAddToNotes(true);
   };
@@ -693,17 +693,20 @@ export default function Reading() {
     if (!selectedBook || !chapter || selectedVerses.length === 0) return;
 
     const typed = newNotesListTitle.trim();
-    let targetId = '';
+    const allLists = getAllLists();
+    let targetIds = [...selectedNotesListIds];
 
     if (typed) {
-      const existing = getAllLists().find(
+      const existing = allLists.find(
         l => (l.title || '').trim().toLowerCase() === typed.toLowerCase()
       );
-      targetId = existing ? existing.id : createList(typed).id;
-    } else {
-      targetId = selectedNotesListId || '';
+      const newId = existing ? existing.id : createList(typed).id;
+      if (!targetIds.includes(newId)) {
+        targetIds.push(newId);
+      }
     }
-    if (!targetId) return;
+
+    if (targetIds.length === 0) return;
 
     const chosen = chapter.verses
       .filter(v => selectedVerses.includes(v.verse))
@@ -718,7 +721,9 @@ export default function Reading() {
       }));
 
     try {
-      addVersesToList(targetId, chosen);
+      targetIds.forEach(id => {
+        addVersesToList(id, chosen);
+      });
     } catch (err) {
       console.error('addVerses error', err);
     }
@@ -733,15 +738,15 @@ export default function Reading() {
   const [showAddToPrinciples, setShowAddToPrinciples] = useState(false);
   const [principlesListsForModal, setPrinciplesListsForModal] =
     useState<VerseList[]>([]);
-  const [selectedPrincipleListId, setSelectedPrincipleListId] =
-    useState<string>('');
+  const [selectedPrincipleListIds, setSelectedPrincipleListIds] =
+    useState<string[]>([]);
   const [newPrincipleListTitle, setNewPrincipleListTitle] =
     useState<string>('');
 
   const openAddToPrinciples = () => {
     const all = sortListsByTitle(getAllPrinciplesLists());
     setPrinciplesListsForModal(all);
-    setSelectedPrincipleListId(all.length > 0 ? all[0].id : '');
+    setSelectedPrincipleListIds(all.length > 0 ? [all[0].id] : []);
     setNewPrincipleListTitle('');
     setShowAddToPrinciples(true);
   };
@@ -751,18 +756,20 @@ export default function Reading() {
     if (!selectedBook || !chapter || selectedVerses.length === 0) return;
 
     const typed = newPrincipleListTitle.trim();
-    let targetId = '';
-
     const all = getAllPrinciplesLists();
+    let targetIds = [...selectedPrincipleListIds];
+
     if (typed) {
       const existing = all.find(
         l => (l.title || '').trim().toLowerCase() === typed.toLowerCase()
       );
-      targetId = existing ? existing.id : createPrincipleList(typed).id;
-    } else {
-      targetId = selectedPrincipleListId || '';
+      const newId = existing ? existing.id : createPrincipleList(typed).id;
+      if (!targetIds.includes(newId)) {
+        targetIds.push(newId);
+      }
     }
-    if (!targetId) return;
+
+    if (targetIds.length === 0) return;
 
     const chosen = chapter.verses
       .filter(v => selectedVerses.includes(v.verse))
@@ -777,7 +784,9 @@ export default function Reading() {
       }));
 
     try {
-      addVersesToPrincipleList(targetId, chosen);
+      targetIds.forEach(id => {
+        addVersesToPrincipleList(id, chosen);
+      });
     } catch (err) {
       console.error('addVerses principles error', err);
     }
@@ -1479,30 +1488,37 @@ export default function Reading() {
                 aria-hidden="true"
               />
               <div className="relative bg-gray-900 text-white rounded-xl shadow-lg p-4 w-full max-w-md mx-4">
-                <h3 className="text-lg font-semibold mb-2">
+                <h3 className="text-xl md:text-2xl font-semibold mb-2">
                   {t('notesModalTitle')}
                 </h3>
                 <form onSubmit={confirmAddToNotes}>
                   <div className="max-h-64 overflow-y-auto mt-2 space-y-1">
                     {notesListsForModal.length === 0 ? (
-                      <p className="text-sm text-white/70">
+                      <p className="text-base text-white/70">
                         {t('notesNoList')}
                       </p>
                     ) : (
                       notesListsForModal.map(l => (
                         <label
                           key={l.id}
-                          className="flex items-center gap-2 px-2 py-1 rounded hover:bg-white/5 cursor-pointer"
+                          className="flex items-center gap-2 px-2 py-2 rounded hover:bg-white/5 cursor-pointer"
                         >
                           <input
-                            type="radio"
+                            type="checkbox"
                             name="notesList"
                             className="accent-emerald-500"
                             value={l.id}
-                            checked={selectedNotesListId === l.id}
-                            onChange={() => setSelectedNotesListId(l.id)}
+                            checked={selectedNotesListIds.includes(l.id)}
+                            onChange={e => {
+                              const checked = e.target.checked;
+                              setSelectedNotesListIds(prev =>
+                                checked
+                                  ? [...prev, l.id]
+                                  : prev.filter(id => id !== l.id)
+                              );
+                            }}
                           />
-                          <span className="text-sm truncate">
+                          <span className="text-lg truncate">
                             {l.title || t('untitledList')}
                           </span>
                         </label>
@@ -1511,12 +1527,12 @@ export default function Reading() {
                   </div>
 
                   <div className="mt-3">
-                    <label className="block text-sm mb-1">
+                    <label className="block text-lg mb-1">
                       {t('notesNewListOptional')}
                     </label>
                     <input
                       type="text"
-                      className="w-full rounded-md bg-gray-800 border border-gray-600 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full rounded-md bg-gray-800 border border-gray-600 px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       value={newNotesListTitle}
                       onChange={e => setNewNotesListTitle(e.target.value)}
                     />
@@ -1551,30 +1567,37 @@ export default function Reading() {
                 aria-hidden="true"
               />
               <div className="relative bg-gray-900 text-white rounded-xl shadow-lg p-4 w-full max-w-md mx-4">
-                <h3 className="text-lg font-semibold mb-2">
+                <h3 className="text-xl md:text-2xl font-semibold mb-2">
                   {t('principlesModalTitle')}
                 </h3>
                 <form onSubmit={confirmAddToPrinciples}>
                   <div className="max-h-64 overflow-y-auto mt-2 space-y-1">
                     {principlesListsForModal.length === 0 ? (
-                      <p className="text-sm text-white/70">
+                      <p className="text-base text-white/70">
                         {t('principlesNoList')}
                       </p>
                     ) : (
                       principlesListsForModal.map(l => (
                         <label
                           key={l.id}
-                          className="flex items-center gap-2 px-2 py-1 rounded hover:bg-white/5 cursor-pointer"
+                          className="flex items-center gap-2 px-2 py-2 rounded hover:bg-white/5 cursor-pointer"
                         >
                           <input
-                            type="radio"
+                            type="checkbox"
                             name="principleList"
                             className="accent-indigo-400"
                             value={l.id}
-                            checked={selectedPrincipleListId === l.id}
-                            onChange={() => setSelectedPrincipleListId(l.id)}
+                            checked={selectedPrincipleListIds.includes(l.id)}
+                            onChange={e => {
+                              const checked = e.target.checked;
+                              setSelectedPrincipleListIds(prev =>
+                                checked
+                                  ? [...prev, l.id]
+                                  : prev.filter(id => id !== l.id)
+                              );
+                            }}
                           />
-                          <span className="text-sm truncate">
+                          <span className="text-lg truncate">
                             {l.title || t('untitledList')}
                           </span>
                         </label>
@@ -1583,12 +1606,12 @@ export default function Reading() {
                   </div>
 
                   <div className="mt-3">
-                    <label className="block text-sm mb-1">
+                    <label className="block text-lg mb-1">
                       {t('principlesNewListOptional')}
                     </label>
                     <input
                       type="text"
-                      className="w-full rounded-md bg-gray-800 border border-gray-600 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full rounded-md bg-gray-800 border border-gray-600 px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       value={newPrincipleListTitle}
                       onChange={e => setNewPrincipleListTitle(e.target.value)}
                     />
