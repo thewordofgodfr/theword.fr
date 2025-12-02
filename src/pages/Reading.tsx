@@ -829,7 +829,7 @@ export default function Reading() {
     swipeHandled.current = false;
   };
 
-  const stickyOffset = NAV_H + cmdH + 12;
+    const stickyOffset = NAV_H + cmdH + 12;
 
   const scrollDebounce = useRef<number | null>(null);
   const [showBottomRandom, setShowBottomRandom] = useState(false);
@@ -1057,22 +1057,33 @@ export default function Reading() {
                         </div>
                       </div>
 
-                      {/* DESKTOP */}
+                      {/* DESKTOP : boutons Livre / Chapitre à gauche */}
                       <div className="hidden md:flex md:items-center md:gap-2">
-                        <span className={`${desktopChipBase} ${desktopChipColors}`}>
-                          <span className="truncate max-w-[28ch]">
-                            {getBookName(selectedBook)}
-                          </span>
-                          <span>•</span>
-                          <span>
-                            {t('chapter')} {selectedChapter}
-                          </span>
-                        </span>
+                        <button
+                          onClick={() => setShowBookPicker(true)}
+                          className={`px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm
+                            ${activeTheme ? activeTheme.solid : 'bg-blue-600 text-white'}
+                            ${activeTheme ? activeTheme.solidHover : 'hover:bg-blue-500'}`}
+                          title={t('chooseBook')}
+                        >
+                          {shortBookName(selectedBook)}
+                        </button>
+
+                        <button
+                          onClick={() => setShowChapterPicker(true)}
+                          className={`px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm inline-flex items-center gap-1
+                            ${activeTheme ? activeTheme.solid : 'bg-blue-600 text-white'}
+                            ${activeTheme ? activeTheme.solidHover : 'hover:bg-blue-500'}`}
+                          title={t('chooseChapter')}
+                        >
+                          Ch. {selectedChapter}
+                          <ChevronDown className="w-3.5 h-3.5 opacity-90" />
+                        </button>
                       </div>
                     </h2>
                   </div>
 
-                  {/* Desktop : actions à droite */}
+                  {/* Desktop : actions à droite (slots + flèches) */}
                   <div className="hidden md:flex items-center gap-2 ml-auto">
                     {/* Loupe + slots (desktop) — mêmes tailles/couleurs que mobile */}
                     <div className="flex items-center gap-2 mr-2">
@@ -1146,28 +1157,6 @@ export default function Reading() {
                       })}
                     </div>
 
-                    {/* PC = mêmes sélecteurs que mobile : Livres / Chapitre avec thème actif */}
-                    <button
-                      onClick={() => setShowBookPicker(true)}
-                      className={`px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm
-                        ${activeTheme ? activeTheme.solid : 'bg-blue-600 text-white'}
-                        ${activeTheme ? activeTheme.solidHover : 'hover:bg-blue-500'}`}
-                      title={t('chooseBook')}
-                    >
-                      {shortBookName(selectedBook)}
-                    </button>
-
-                    <button
-                      onClick={() => setShowChapterPicker(true)}
-                      className={`px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm inline-flex items-center gap-1
-                        ${activeTheme ? activeTheme.solid : 'bg-blue-600 text-white'}
-                        ${activeTheme ? activeTheme.solidHover : 'hover:bg-blue-500'}`}
-                      title={t('chooseChapter')}
-                    >
-                      Ch. {selectedChapter}
-                      <ChevronDown className="w-3.5 h-3.5 opacity-90" />
-                    </button>
-
                     {/* Flèches de navigation */}
                     <div className="flex items-center gap-2">
                       <button
@@ -1192,13 +1181,10 @@ export default function Reading() {
             </div>
           )}
 
-          {/* BARRE SELECTION (desktop) */}
+          {/* BARRE SELECTION (desktop) EN BAS DE L'ÉCRAN */}
           {selectedVerses.length > 0 && (
-            <div
-              className="hidden md:block sticky z-40 mb-3"
-              style={{ top: `${NAV_H + cmdH + 8}px` }}
-            >
-              <div className="bg-white/5 text-white border border-gray-700 rounded-lg shadow px-4 py-3 flex items-center justify-between">
+            <div className="hidden md:flex fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-full max-w-4xl px-4">
+              <div className="bg-white/5 text-white border border-gray-700 rounded-xl shadow px-4 py-3 flex items-center justify-between w-full">
                 <div className="text-sm">
                   {selectedVerses.length} {t('versesSelectedSuffix')}
                 </div>
@@ -1250,6 +1236,7 @@ export default function Reading() {
               onTouchEnd={onTouchEnd}
               style={{ touchAction: 'manipulation' }}
             >
+
               {loading ? (
                 <div className="flex items-center justify-center py-16">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400" />
