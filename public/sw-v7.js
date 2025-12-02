@@ -1,5 +1,5 @@
 // sw-v7.js — prod: https+cache propre+MAJ immédiate + fallback navigation robuste + precache assets index + fix navigate
-const CACHE_VERSION = 'v252';
+const CACHE_VERSION = 'v253';
 const CACHE_NAME = `twog-${CACHE_VERSION}`;
 const APP_SHELL = ['/', '/index.html', '/favicon.ico', '/logo192.png', '/logo512.png', '/site.webmanifest'];
 
