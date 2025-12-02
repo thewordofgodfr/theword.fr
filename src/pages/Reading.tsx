@@ -1185,7 +1185,7 @@ export default function Reading() {
           {selectedVerses.length > 0 && (
             <div className="hidden md:flex fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-full max-w-4xl px-4">
               <div className="bg-white/5 text-white border border-gray-700 rounded-xl shadow px-4 py-3 flex items-center justify-between w-full">
-                <div className="inline-flex items-center px-3 py-1 rounded-full bg-gray-900/80 text-white text-xs sm:text-sm shadow">
+                <div className="inline-flex items-center px-3 py-1 rounded-full bg-black/90 text-white text-xs sm:text-sm shadow">
                   {selectedVerses.length} {t('versesSelectedSuffix')}
                 </div>
                 <div className="flex items-center gap-2">
