@@ -9,7 +9,7 @@ const fr: TranslationDict = {
   settings: 'Paramètres',
   about: 'À propos',
   notes: 'Notes',
-  principles: 'Principes',
+  principles: 'Études',
 
   // Home page
   randomVerse: 'Verset Aléatoire',
@@ -36,7 +36,7 @@ const fr: TranslationDict = {
   verseWord: 'verset',
   versesSelectedSuffix: 'verset(s) sélectionné(s)',
   toNotes: 'Vers Notes',
-  toPrinciples: 'Vers Principes',
+  toPrinciples: 'Vers Études',
   copyLabel: 'Copier',
   shareLabel: 'Partager',
   cancel: 'Annuler',
@@ -44,7 +44,7 @@ const fr: TranslationDict = {
   notesModalTitle: 'Ajouter à une liste (Notes)',
   notesNoList: 'Aucune liste pour l’instant. Créez-en une ci-dessous.',
   notesNewListOptional: 'Nouvelle liste (optionnel)',
-  principlesModalTitle: 'Ajouter à une étude (Principes)',
+  principlesModalTitle: 'Ajouter à une étude (Études)',
   principlesNoList: 'Aucune étude pour l’instant. Créez-en une ci-dessous.',
   principlesNewListOptional: 'Nouvelle étude (optionnel)',
   selectionCopied: 'Sélection copiée',
@@ -119,7 +119,7 @@ const fr: TranslationDict = {
     renameList: 'Renommer',
   },
 
-  // Bloc Principes (page Principes)
+  // Bloc Études (page Études)
   principlesPage: {
     create: 'Créer une étude',
     placeholder: 'Titre de l’étude…',
@@ -241,7 +241,7 @@ const fr: TranslationDict = {
   // Common
   loading: 'Chargement...',
   error: 'Erreur lors du chargement',
-
 };
 
 export default fr;
+
