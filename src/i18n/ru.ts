@@ -9,7 +9,7 @@ const ru: TranslationDict = {
   settings: 'Настройки',
   about: 'О приложении',
   notes: 'Заметки',
-  principles: 'Принципы',
+  principles: 'Исследования',
 
   // Home page
   randomVerse: 'Случайный стих',
@@ -36,7 +36,7 @@ const ru: TranslationDict = {
   verseWord: 'стих',
   versesSelectedSuffix: 'выбранные стихи',
   toNotes: 'К заметкам',
-  toPrinciples: 'К принципам',
+  toPrinciples: 'К исследованиям',
   copyLabel: 'Копировать',
   shareLabel: 'Поделиться',
   cancel: 'Отмена',
