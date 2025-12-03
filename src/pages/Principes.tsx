@@ -548,19 +548,19 @@ export default function Principes() {
         </div>
 
         {expandedId && (
-          <div className="mb-4 flex flex-wrap items-center gap-2">
-            {/* Bouton retour : plus grand, vert, même couleur que "Créer une étude" */}
+          <div className="mb-4 flex flex-col sm:flex-row sm:items-center gap-2">
+            {/* Bouton retour : vert, pleine largeur sur mobile comme Notes */}
             <button
               onClick={() => setExpandedId(null)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-500"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-500"
             >
               {label.backAll}
             </button>
 
-            {/* Ajouter un bloc de texte quand l’étude est ouverte (BLEU pour éviter 2 verts) */}
+            {/* Ajouter un bloc de texte : BLEU, même largeur/hauteur */}
             <button
               onClick={() => addTextBlock(expandedId)}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500 text-sm"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 text-sm"
             >
               <TextIcon size={16} />
               {label.addTextBlock}
@@ -706,11 +706,7 @@ export default function Principes() {
 
                   {/* Contenu de la liste ouverte */}
                   {isOpen && (
-                    <div
-                      className={`mt-4 rounded-lg ${
-                        isDark ? 'bg-gray-700' : 'bg-gray-50'
-                      } p-3`}
-                    >
+                    <div className="mt-4">
                       {list.items.length === 0 ? (
                         <div
                           className={`${
@@ -727,6 +723,15 @@ export default function Principes() {
                               openItemMenu?.listId === list.id &&
                               openItemMenu?.idx === idx;
 
+                            // fond différent verset / bloc texte (comme Notes)
+                            const baseItemBg = isText
+                              ? isDark
+                                ? 'bg-gray-700/70 hover:bg-gray-700/90'
+                                : 'bg-indigo-50 hover:bg-indigo-100'
+                              : isDark
+                              ? 'bg-gray-600/40 hover:bg-gray-600/60'
+                              : 'bg-white hover:bg-gray-100';
+
                             const openInReading = () => {
                               if (isText) return; // pas d'ouverture pour bloc texte
                               const url = new URL(window.location.href);
@@ -740,11 +745,7 @@ export default function Principes() {
                             return (
                               <li
                                 key={idx}
-                                className={`${
-                                  isDark
-                                    ? 'bg-gray-600/40 hover:bg-gray-600/60'
-                                    : 'bg-white hover:bg-gray-100'
-                                } rounded-md p-3 transition`}
+                                className={`${baseItemBg} rounded-md p-3 transition`}
                               >
                                 <button
                                   className="w-full text-left"
@@ -779,7 +780,7 @@ export default function Principes() {
                                   ) : null}
                                 </button>
 
-                                {/* Actions de l'item */}
+                                {/* Actions de l'item — mêmes tailles que Notes */}
                                 {menuOpen && (
                                   <div
                                     className={`mt-3 flex flex-wrap items-center gap-2 rounded-md px-2 py-2 ${
@@ -790,7 +791,7 @@ export default function Principes() {
                                       <>
                                         <button
                                           onClick={openInReading}
-                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-500 text-xs"
+                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-500"
                                         >
                                           {label.open}
                                         </button>
@@ -798,24 +799,24 @@ export default function Principes() {
                                         {/* Copier ce verset */}
                                         <button
                                           onClick={() => copyItemText(it)}
-                                          className={`inline-flex items-center gap-1 px-2 py-1.5 rounded text-xs ${
+                                          className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
                                             isDark
                                               ? 'bg-gray-700 text-white'
                                               : 'bg-white text-gray-800'
                                           }`}
                                           title={label.copy}
                                         >
-                                          <Copy size={14} />
+                                          <Copy size={16} />
                                           {label.copy}
                                         </button>
 
                                         {/* Partager ce verset */}
                                         <button
                                           onClick={() => shareItem(it)}
-                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500 text-xs"
+                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500"
                                           title={label.share}
                                         >
-                                          <Share2 size={14} />
+                                          <Share2 size={16} />
                                           {label.share}
                                         </button>
                                       </>
@@ -831,17 +832,17 @@ export default function Principes() {
                                             String(it.text || '')
                                           )
                                         }
-                                        className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500 text-xs"
+                                        className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500"
                                         title={label.editTextBlock}
                                       >
-                                        <EditTextIcon size={14} />
+                                        <EditTextIcon size={16} />
                                         {label.editTextBlock}
                                       </button>
                                     )}
 
                                     <button
                                       onClick={() => moveItem(list.id, idx, -1)}
-                                      className={`inline-flex items-center gap-1 px-2 py-1.5 rounded text-xs ${
+                                      className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
                                         isDark
                                           ? 'bg-gray-700 text-white'
                                           : 'bg-white text-gray-800'
@@ -849,13 +850,13 @@ export default function Principes() {
                                       disabled={idx === 0}
                                       title={label.moveUp}
                                     >
-                                      <ArrowUp size={14} />
+                                      <ArrowUp size={16} />
                                       {label.moveUp}
                                     </button>
 
                                     <button
                                       onClick={() => moveItem(list.id, idx, 1)}
-                                      className={`inline-flex items-center gap-1 px-2 py-1.5 rounded text-xs ${
+                                      className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
                                         isDark
                                           ? 'bg-gray-700 text-white'
                                           : 'bg-white text-gray-800'
@@ -863,24 +864,24 @@ export default function Principes() {
                                       disabled={idx === list.items.length - 1}
                                       title={label.moveDown}
                                     >
-                                      <ArrowDown size={14} />
+                                      <ArrowDown size={16} />
                                       {label.moveDown}
                                     </button>
 
                                     {/* Corbeille pour supprimer l'élément sélectionné */}
                                     <button
                                       onClick={() => removeItem(list.id, idx)}
-                                      className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-red-600 text-white hover:bg-red-500 text-xs"
+                                      className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-red-600 text-white hover:bg-red-500"
                                       title={label.deleteItem}
                                     >
-                                      <Trash2 size={14} />
+                                      <Trash2 size={16} />
                                       {label.deleteItem}
                                     </button>
 
                                     {/* Annuler (fermer le menu) */}
                                     <button
                                       onClick={() => setOpenItemMenu(null)}
-                                      className={`px-2 py-1.5 rounded text-xs ${
+                                      className={`px-2 py-1.5 rounded ${
                                         isDark
                                           ? 'bg-gray-700 text-white'
                                           : 'bg-white text-gray-800'
@@ -892,7 +893,7 @@ export default function Principes() {
                                     {/* OK visible à droite */}
                                     <button
                                       onClick={() => setOpenItemMenu(null)}
-                                      className="ml-auto px-2 py-1.5 rounded bg-green-600 text-white hover:bg-green-500 text-xs"
+                                      className="ml-auto px-2 py-1.5 rounded bg-green-600 text-white hover:bg-green-500"
                                     >
                                       OK
                                     </button>
