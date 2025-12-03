@@ -36,7 +36,7 @@ const en: TranslationDict = {
   verseWord: 'verse',
   versesSelectedSuffix: 'verse(s) selected',
   toNotes: 'To Notes',
-  toPrinciples: 'To Principles',
+  toPrinciples: 'To Studies',
   copyLabel: 'Copy',
   shareLabel: 'Share',
   cancel: 'Cancel',
@@ -44,7 +44,7 @@ const en: TranslationDict = {
   notesModalTitle: 'Add to a list (Notes)',
   notesNoList: 'No list yet. Create one below.',
   notesNewListOptional: 'New list (optional)',
-  principlesModalTitle: 'Add to a study (Principles)',
+  principlesModalTitle: 'Add to a study (Studies)',
   principlesNoList: 'No study yet. Create one below.',
   principlesNewListOptional: 'New study (optional)',
   selectionCopied: 'Selection copied',
@@ -119,7 +119,7 @@ const en: TranslationDict = {
     renameList: 'Rename',
   },
 
-  // Principles block (Principes page)
+  // Studies block (Principes page)
   principlesPage: {
     create: 'Create study',
     placeholder: 'Study title…',
@@ -240,3 +240,4 @@ const en: TranslationDict = {
 };
 
 export default en;
+
