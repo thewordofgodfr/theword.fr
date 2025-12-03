@@ -683,7 +683,8 @@ export default function Reading() {
   const openAddToNotes = () => {
     const all = sortListsByTitle(getAllLists());
     setNotesListsForModal(all);
-    setSelectedNotesListIds(all.length > 0 ? [all[0].id] : []);
+    // -> plus de liste pré-sélectionnée par défaut
+    setSelectedNotesListIds([]);
     setNewNotesListTitle('');
     setShowAddToNotes(true);
   };
@@ -730,7 +731,8 @@ export default function Reading() {
 
     setShowAddToNotes(false);
     setSelectedVerses([]);
-    setCopiedKey('added-to-list');
+    // Toast spécifique Notes : orange
+    setCopiedKey('added-to-notes');
     setTimeout(() => setCopiedKey(''), 1600);
   };
 
@@ -746,7 +748,8 @@ export default function Reading() {
   const openAddToPrinciples = () => {
     const all = sortListsByTitle(getAllPrinciplesLists());
     setPrinciplesListsForModal(all);
-    setSelectedPrincipleListIds(all.length > 0 ? [all[0].id] : []);
+    // -> plus de liste pré-sélectionnée par défaut
+    setSelectedPrincipleListIds([]);
     setNewPrincipleListTitle('');
     setShowAddToPrinciples(true);
   };
@@ -793,7 +796,8 @@ export default function Reading() {
 
     setShowAddToPrinciples(false);
     setSelectedVerses([]);
-    setCopiedKey('added-to-list');
+    // Toast spécifique Principes : vert (comme avant)
+    setCopiedKey('added-to-principles');
     setTimeout(() => setCopiedKey(''), 1600);
   };
 
@@ -1635,7 +1639,13 @@ export default function Reading() {
               {t('textReadyToShare')}
             </div>
           )}
-          {copiedKey === 'added-to-list' && (
+          {/* Ajouté à la liste — Notes = orange, Principes = vert */}
+          {copiedKey === 'added-to-notes' && (
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-orange-500 text-white z-50">
+              {t('addedToList')}
+            </div>
+          )}
+          {copiedKey === 'added-to-principles' && (
             <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-emerald-600 text-white z-50">
               {t('addedToList')}
             </div>
@@ -1666,5 +1676,4 @@ export default function Reading() {
     </div>
   );
 }
-
 
