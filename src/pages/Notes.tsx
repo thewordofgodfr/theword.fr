@@ -442,19 +442,19 @@ export default function Notes() {
         </div>
 
         {expandedId && (
-          <div className="mb-4 flex flex-wrap items-center gap-2">
-            {/* Bouton retour : plus grand, ORANGE, cohérent avec Principes */}
+          <div className="mb-4 flex flex-col sm:flex-row sm:items-center gap-2">
+            {/* Bouton retour : ORANGE, pleine largeur sur mobile */}
             <button
               onClick={() => setExpandedId(null)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 text-white font-semibold text-sm hover:bg-orange-400"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-orange-500 text-white font-semibold text-sm hover:bg-orange-400"
             >
               {label.backAll}
             </button>
 
-            {/* Ajouter un bloc de texte quand la liste est ouverte (BLEU comme Principes) */}
+            {/* Ajouter un bloc de texte : BLEU, même largeur/hauteur */}
             <button
               onClick={() => addTextBlock(expandedId)}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500 text-sm"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 text-sm"
             >
               <TextIcon size={16} />
               {label.addTextBlock}
@@ -560,7 +560,7 @@ export default function Notes() {
 
                   {/* Contenu de la liste ouverte */}
                   {isOpen && (
-                    <div className={`mt-4 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-50'} p-3`}>
+                    <div className="mt-4">
                       {list.items.length === 0 ? (
                         <div className={`${isDark ? 'text-white/70' : 'text-gray-600'} text-sm`}>
                           {label.emptyList}
@@ -571,6 +571,14 @@ export default function Notes() {
                             const isText = it.bookId === TEXT_SENTINEL;
                             const menuOpen =
                               openItemMenu?.listId === list.id && openItemMenu?.idx === idx;
+
+                            const baseItemBg = isText
+                              ? isDark
+                                ? 'bg-gray-700/70 hover:bg-gray-700/90'
+                                : 'bg-indigo-50 hover:bg-indigo-100'
+                              : isDark
+                              ? 'bg-gray-600/40 hover:bg-gray-600/60'
+                              : 'bg-white hover:bg-gray-100';
 
                             const openInReading = () => {
                               if (isText) return; // pas d'ouverture pour bloc texte
@@ -585,11 +593,7 @@ export default function Notes() {
                             return (
                               <li
                                 key={idx}
-                                className={`${
-                                  isDark
-                                    ? 'bg-gray-600/40 hover:bg-gray-600/60'
-                                    : 'bg-white hover:bg-gray-100'
-                                } rounded-md p-3 transition`}
+                                className={`${baseItemBg} rounded-md p-3 transition`}
                               >
                                 <button
                                   className="w-full text-left"
@@ -639,7 +643,9 @@ export default function Notes() {
                                         <button
                                           onClick={() => copyItemText(it)}
                                           className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                            isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
+                                            isDark
+                                              ? 'bg-gray-700 text-white'
+                                              : 'bg-white text-gray-800'
                                           }`}
                                           title={t('copyLabel')}
                                         >
@@ -830,5 +836,4 @@ export default function Notes() {
     </div>
   );
 }
-
 
