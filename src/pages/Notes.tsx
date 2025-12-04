@@ -164,6 +164,38 @@ export default function Notes() {
     [t, language]
   );
 
+  // Textes d’aide (i18n)
+  const notesHelp = useMemo(
+    () => ({
+      title: t('notesHelp.title'),
+      intro: t('notesHelp.intro'),
+      s1Title: t('notesHelp.s1Title'),
+      s1Body: t('notesHelp.s1Body'),
+      s2Title: t('notesHelp.s2Title'),
+      s2Body: t('notesHelp.s2Body'),
+      s3Title: t('notesHelp.s3Title'),
+      s3Body: t('notesHelp.s3Body'),
+      s4Title: t('notesHelp.s4Title'),
+      s4Body: t('notesHelp.s4Body'),
+      s5Title: t('notesHelp.s5Title'),
+      s5Body: t('notesHelp.s5Body'),
+      s6Title: t('notesHelp.s6Title'),
+      s6Body: t('notesHelp.s6Body'),
+      s7Title: t('notesHelp.s7Title'),
+      s7Body: t('notesHelp.s7Body'),
+      s8Title: t('notesHelp.s8Title'),
+      s8Body: t('notesHelp.s8Body'),
+      s9Title: t('notesHelp.s9Title'),
+      s9Body: t('notesHelp.s9Body'),
+      s10Title: t('notesHelp.s10Title'),
+      s10Body: t('notesHelp.s10Body'),
+      ok: t('notesHelp.ok'),
+      buttonTitle: t('notesHelp.helpButtonTitle'),
+      buttonAria: t('notesHelp.helpButtonAria'),
+    }),
+    [t, language]
+  );
+
   const refresh = () => setLists(getAllLists());
   useEffect(() => {
     refresh();
@@ -522,8 +554,8 @@ export default function Notes() {
             {/* Bouton aide / mode d'emploi */}
             <button
               type="button"
-              aria-label="Aide sur la page Notes"
-              title="Aide / Mode d'emploi"
+              aria-label={notesHelp.buttonAria}
+              title={notesHelp.buttonTitle}
               onClick={() => setShowHelp(true)}
               className={`inline-flex items-center justify-center rounded-full p-2 border text-sm ${
                 isDark
@@ -808,7 +840,7 @@ export default function Notes() {
                                           {/* Partager ce verset */}
                                           <button
                                             onClick={() => shareItem(it)}
-                                            className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500"
+                                            className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text.white hover:bg-indigo-500"
                                             title={t('shareLabel')}
                                           >
                                             <Share2 size={16} />
@@ -918,7 +950,7 @@ export default function Notes() {
 
       {/* MODALE : importer depuis un TEXTE */}
       {showImportFromText && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex.items-center justify-center">
           <div
             className="absolute inset-0 bg-black/60"
             onClick={() => setShowImportFromText(false)}
@@ -951,11 +983,11 @@ export default function Notes() {
             </div>
 
             <div className="mb-3">
-              <label className="block text-sm mb-1">
+              <label.className="block text-sm mb-1">
                 {label.documentContent}
               </label>
               <textarea
-                className={`w-full rounded-md px-2 py-1.5 text-sm min-h-[160px] border resize-vertical ${
+                className={`w-full rounded-md px-2 py-1.5 text-sm min-h-[160px] border.resize-vertical ${
                   isDark
                     ? 'bg-gray-800 border-gray-600 text-white'
                     : 'bg-gray-50 border-gray-300 text-gray-900'
@@ -1002,7 +1034,7 @@ export default function Notes() {
 
       {/* MODALE : édition / création d'un bloc de texte multi-lignes */}
       {editingTextBlock && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex.items-center justify-center">
           <div
             className="absolute inset-0 bg-black/60"
             onClick={() => setEditingTextBlock(null)}
@@ -1017,7 +1049,7 @@ export default function Notes() {
               {editingTextBlock.idx === null ? label.addTextBlock : label.editTextBlock}
             </h2>
             <textarea
-              className={`w-full rounded-md px-3 py-2 text-base min-h-[220px] border resize-vertical ${
+              className={`w-full rounded-md px-3.py-2 text-base min-h-[220px] border.resize-vertical ${
                 isDark
                   ? 'bg-gray-800 border-gray-600 text-white'
                   : 'bg-gray-50 border-gray-300 text-gray-900'
@@ -1054,7 +1086,7 @@ export default function Notes() {
 
       {/* MODALE : Aide / mode d'emploi de la page Notes */}
       {showHelp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex.items-center justify-center">
           <div
             className="absolute inset-0 bg-black/60"
             onClick={() => setShowHelp(false)}
@@ -1065,101 +1097,82 @@ export default function Notes() {
               isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
             }`}
           >
-            <h2 className="text-xl font-semibold mb-3">
-              Notes — mode d&apos;emploi
+            <h2
+              className="font-semibold mb-3"
+              style={{
+                fontSize: `${state.settings.fontSize + 4}px`,
+              }}
+            >
+              {notesHelp.title}
             </h2>
 
-            <div className="space-y-3 text-sm leading-relaxed">
+            <div
+              className="space-y-3 leading-relaxed"
+              style={{
+                fontSize: `${state.settings.fontSize}px`,
+                lineHeight: 1.6,
+              }}
+            >
+              <p>{notesHelp.intro}</p>
+
               <p>
-                La page <strong>Notes</strong> vous permet de garder vos versets, pensées,
-                méditations et prières organisés par listes. Tout est stocké localement sur
-                votre appareil, <strong>100&nbsp;% hors ligne</strong>, sans compte et sans
-                connexion internet.
+                <strong>{notesHelp.s1Title}</strong>
+                <br />
+                {notesHelp.s1Body}
               </p>
 
               <p>
-                <strong>1. Listes de notes</strong><br />
-                Chaque carte représente une liste de notes (par exemple&nbsp;: &laquo;&nbsp;Prédication
-                du dimanche&nbsp;&raquo;, &laquo;&nbsp;Prières pour la famille&nbsp;&raquo;, etc.).
-                Le bouton <em>&laquo;&nbsp;Créer une liste&nbsp;&raquo;</em> (orange) permet
-                d&apos;ajouter une nouvelle liste. La ligne sous le titre indique le nombre
-                d&apos;éléments et la date de dernière modification.
+                <strong>{notesHelp.s2Title}</strong>
+                <br />
+                {notesHelp.s2Body}
               </p>
 
               <p>
-                <strong>2. Ouvrir et revenir aux listes</strong><br />
-                Touchez une carte pour ouvrir une liste. Le bouton
-                <em> &laquo;&nbsp;Toutes les listes&nbsp;&raquo;</em> en haut permet de revenir
-                à la vue globale. Quand vous revenez depuis la page Lecture, l&apos;application
-                réouvre automatiquement la dernière liste utilisée et se place à la fin, pour
-                continuer vos notes facilement.
+                <strong>{notesHelp.s3Title}</strong>
+                <br />
+                {notesHelp.s3Body}
               </p>
 
               <p>
-                <strong>3. Ajouter des versets depuis la Bible</strong><br />
-                Depuis la page <em>Lecture</em> (et la recherche), vous pouvez ajouter des versets
-                à vos notes en utilisant le bouton dédié pour les Notes. Les versets choisis
-                sont enregistrés dans la ou les listes que vous sélectionnez, avec la référence
-                et le texte du verset.
+                <strong>{notesHelp.s4Title}</strong>
+                <br />
+                {notesHelp.s4Body}
               </p>
 
               <p>
-                <strong>4. Blocs de texte libres</strong><br />
-                En plus des versets, vous pouvez ajouter des <em>blocs de texte</em> (compte-rendus,
-                plans, idées, prières, résumés, etc.). Le bouton
-                <em> &laquo;&nbsp;Ajouter un bloc texte&nbsp;&raquo;</em> (en haut et en bas de
-                la liste) ouvre une grande zone d&apos;édition. Le texte est enregistré comme un
-                élément à part entière dans la liste, que vous pouvez ensuite modifier,
-                déplacer ou supprimer.
+                <strong>{notesHelp.s5Title}</strong>
+                <br />
+                {notesHelp.s5Body}
               </p>
 
               <p>
-                <strong>5. Réorganiser les éléments</strong><br />
-                En appuyant sur un élément, vous ouvrez son menu d&apos;actions. Les flèches
-                <em>Monter</em> et <em>Descendre</em> permettent de changer l&apos;ordre
-                des éléments dans la liste pour adapter la structure à votre étude ou à votre
-                prédication.
+                <strong>{notesHelp.s6Title}</strong>
+                <br />
+                {notesHelp.s6Body}
               </p>
 
               <p>
-                <strong>6. Copier et partager une liste entière</strong><br />
-                Dans une liste ouverte, les boutons <em>Partager</em> et <em>Copier</em> permettent
-                de récupérer tout le contenu de la liste&nbsp;: titre, références, textes et blocs
-                de notes. Vous pouvez ensuite coller ce contenu dans un message, un document ou un
-                autre outil, même en restant hors ligne.
+                <strong>{notesHelp.s7Title}</strong>
+                <br />
+                {notesHelp.s7Body}
               </p>
 
               <p>
-                <strong>7. Partage par code TheWord</strong><br />
-                Le bouton <em>&laquo;&nbsp;Code&nbsp;&raquo;</em> génère un code compact que vous
-                pouvez envoyer à quelqu&apos;un. Dans son application The Word, cette personne
-                peut utiliser l&apos;option d&apos;import par code pour recréer exactement la
-                même liste (titre + contenu) sur son appareil.
+                <strong>{notesHelp.s8Title}</strong>
+                <br />
+                {notesHelp.s8Body}
               </p>
 
               <p>
-                <strong>8. Importer à partir d&apos;un texte</strong><br />
-                Le bouton <em>&laquo;&nbsp;Importer depuis un texte&nbsp;&raquo;</em> permet de
-                coller un document complet (notes Word, mail, prédication, etc.). L&apos;application
-                découpe le texte en blocs (séparés par des lignes vides) et crée automatiquement
-                une liste de blocs de texte. Pratique pour transformer rapidement un document
-                existant en notes dans The Word.
+                <strong>{notesHelp.s9Title}</strong>
+                <br />
+                {notesHelp.s9Body}
               </p>
 
               <p>
-                <strong>9. Gestion locale et confidentialité</strong><br />
-                Toutes vos notes sont enregistrées <strong>uniquement sur votre appareil</strong>.
-                The Word ne synchronise rien sur un serveur et ne collecte aucune donnée personnelle.
-                Si vous supprimez l&apos;application ou effacez les données de navigation,
-                les listes de notes seront également effacées.
-              </p>
-
-              <p>
-                <strong>10. Idées d&apos;utilisation</strong><br />
-                Vous pouvez utiliser les Notes pour&nbsp;: préparer des prédications, suivre un
-                plan d&apos;étude, garder une liste de prières, noter ce que Dieu vous rappelle
-                pendant la journée, ou encore conserver des versets pour les apprendre par cœur.
-                À vous d&apos;adapter les listes à votre manière de méditer la Parole.
+                <strong>{notesHelp.s10Title}</strong>
+                <br />
+                {notesHelp.s10Body}
               </p>
             </div>
 
@@ -1172,7 +1185,7 @@ export default function Notes() {
                     : 'bg-gray-200 text-gray-800'
                 }`}
               >
-                OK
+                {notesHelp.ok}
               </button>
             </div>
           </div>
