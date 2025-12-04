@@ -9,7 +9,7 @@ const ko: TranslationDict = {
   settings: "설정",
   about: "정보",
   notes: "노트",
-  principles: "연구",
+  principles: "성경공부",
 
   // Home page
   randomVerse: "무작위 구절",
@@ -36,7 +36,7 @@ const ko: TranslationDict = {
   verseWord: "절",
   versesSelectedSuffix: "개 절 선택됨",
   toNotes: "노트로 보내기",
-  toPrinciples: "연구로 보내기",
+  toPrinciples: "성경공부로",
   copyLabel: "복사",
   shareLabel: "공유",
   cancel: "취소",
