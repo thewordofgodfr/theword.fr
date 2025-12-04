@@ -240,37 +240,37 @@ const fr: TranslationDict = {
   // Aide Notes + Études (mode d'emploi commun)
   notesHelpTitle: 'Notes & Études — mode d’emploi',
   notesHelpIntro:
-    'Les pages Notes et Études vous permettent de garder vos versets, pensées, méditations et plans bibliques bien organisés. Tout est stocké localement sur votre appareil, 100 % hors ligne, sans compte et sans connexion internet. Utilisez plutôt les Notes pour vos listes personnelles (prédications entendues, prières, pensées, thèmes…) et les Études pour construire des études bibliques structurées que vous pourrez ensuite enseigner ou partager.',
-  notesHelp1Title: '1. Listes de Notes et d’Études',
+    'Les pages Notes et Études vous permettent de mémoriser vos versets, de créer des listes par thème et de construire de vraies études en combinant versets et blocs de texte. Tout est stocké localement sur votre appareil, 100 % hors ligne, sans compte et sans connexion internet.',
+  notesHelp1Title: '1. Page d’accueil de Notes et d’Études',
   notesHelp1Body:
-    'Chaque carte représente soit une liste de Notes (par exemple : « Prédication du dimanche », « Prières pour la famille », etc.), soit une Étude (par exemple : « Étude sur la foi », « Parcours biblique jeunesse », etc.). Le bouton « Créer une liste » (orange) sur la page Notes et « Créer une étude » (vert) sur la page Études permettent d’ajouter de nouveaux ensembles. La ligne sous le titre indique le nombre d’éléments et la date de dernière modification.',
-  notesHelp2Title: '2. Ouvrir et revenir aux listes / études',
+    'Chaque carte correspond à une liste de Notes ou à une Étude. Touchez une carte pour ouvrir son contenu. Le bouton « Toutes les listes » ou « Toutes les études » en haut permet de revenir à la vue globale. Quand vous revenez depuis la page Lecture, l’application réouvre automatiquement la dernière liste de Notes ou la dernière Étude utilisée et se place à la fin pour continuer facilement votre travail.',
+  notesHelp2Title: '2. Ajouter des versets depuis la Bible',
   notesHelp2Body:
-    'Touchez une carte pour ouvrir son contenu. Le bouton « Toutes les listes » ou « Toutes les études » en haut permet de revenir à la vue globale. Quand vous revenez depuis la page Lecture, l’application réouvre automatiquement la dernière liste de Notes ou la dernière Étude utilisée et se place à la fin pour continuer facilement votre travail.',
-  notesHelp3Title: '3. Ajouter des versets depuis la Bible',
+    'Depuis la page Lecture (et la Recherche), vous pouvez ajouter des versets soit dans vos Notes, soit dans vos Études, en utilisant les boutons dédiés. Les versets choisis sont enregistrés dans la ou les listes/études que vous sélectionnez, avec la référence et le texte du verset. Vous pouvez mémoriser le même verset dans plusieurs listes différentes.',
+  notesHelp3Title: '3. Blocs de texte libres',
   notesHelp3Body:
-    'Depuis la page Lecture (et la Recherche), vous pouvez ajouter des versets soit dans vos Notes, soit dans vos Études, en utilisant les boutons dédiés. Les versets choisis sont enregistrés dans la ou les listes/études que vous sélectionnez, avec la référence et le texte du verset. Cela permet, par exemple, de préparer un plan d’étude biblique dans Études tout en gardant des applications personnelles dans Notes.',
-  notesHelp4Title: '4. Blocs de texte libres',
+    'En plus des versets, vous pouvez ajouter des blocs de texte libre (commentaires, idées personnelles, questions, points de prédication, etc.). Le bouton « Ajouter un bloc texte » (en haut et en bas d’une liste ou d’une étude ouverte) affiche une grande zone d’édition. Le texte est enregistré comme un élément à part entière que vous pouvez ensuite modifier, déplacer ou supprimer.',
+  notesHelp4Title: '4. Réorganiser les éléments',
   notesHelp4Body:
-    'En plus des versets, vous pouvez ajouter des blocs de texte libre (compte-rendus, plans détaillés, idées, prières, résumés, questions, etc.). Le bouton « Ajouter un bloc texte » (en haut et en bas d’une liste ou d’une étude ouverte) affiche une grande zone d’édition. Le texte est enregistré comme un élément à part entière que vous pouvez ensuite modifier, déplacer ou supprimer.',
-  notesHelp5Title: '5. Réorganiser les éléments',
-  notesHelp5Body:
     'En appuyant sur un élément (verset ou bloc de texte), vous ouvrez son menu d’actions. Les flèches « Monter » et « Descendre » permettent de changer l’ordre des éléments dans la liste ou l’étude, pour adapter la structure à votre étude biblique, votre prédication ou votre temps de méditation.',
-  notesHelp6Title: '6. Copier et partager une liste entière',
+  notesHelp5Title: '5. Copier et partager une liste entière',
+  notesHelp5Body:
+    'Dans une liste de Notes ou une Étude ouverte, les boutons « Partager » et « Copier » permettent de récupérer tout le contenu : titre, références, textes et blocs de notes. Vous pouvez ensuite coller ce contenu dans un message, un document ou un autre outil, même en restant hors ligne, par exemple pour l’envoyer à quelqu’un par SMS ou par WhatsApp.',
+  notesHelp6Title: '6. Partage par code TheWord',
   notesHelp6Body:
-    'Dans une liste de Notes ou une Étude ouverte, les boutons « Partager » et « Copier » permettent de récupérer tout le contenu : titre, références, textes et blocs de notes. Vous pouvez ensuite coller ce contenu dans un message, un document ou un autre outil, même en restant hors ligne, par exemple pour envoyer votre étude à quelqu’un.',
-  notesHelp7Title: '7. Partage par code TheWord',
+    'Le bouton « Code » génère un code compact que vous pouvez envoyer à quelqu’un qui possède aussi l’application The Word. Dans son application, cette personne peut utiliser l’option d’import par code pour recréer exactement la même liste de Notes ou la même Étude (titre + contenu) sur son appareil.',
+  notesHelp7Title: '7. Importer à partir d’un texte',
   notesHelp7Body:
-    'Le bouton « Code » génère un code compact que vous pouvez envoyer à quelqu’un. Dans son application The Word, cette personne peut utiliser l’option d’import par code pour recréer exactement la même liste de Notes ou la même Étude (titre + contenu) sur son appareil.',
-  notesHelp8Title: '8. Importer à partir d’un texte',
+    'Le bouton « Importer depuis un texte » permet de coller un document complet (notes Word, e-mail, prédication, plan d’étude, etc.). L’application découpe le texte en blocs (séparés par des lignes vides) et crée automatiquement une liste ou une étude composée de ces blocs de texte. C’est très pratique pour transformer rapidement un document existant en Notes ou en Étude dans The Word.',
+  notesHelp8Title: '8. Gestion locale et confidentialité',
   notesHelp8Body:
-    'Le bouton « Importer depuis un texte » permet de coller un document complet (notes Word, mail, prédication, plan d’étude, etc.). L’application découpe le texte en blocs (séparés par des lignes vides) et crée automatiquement une liste ou une étude composée de blocs de texte. Pratique pour transformer rapidement un document existant en Notes ou en Étude dans The Word.',
-  notesHelp9Title: '9. Gestion locale et confidentialité',
-  notesHelp9Body:
     'Toutes vos Notes et Études sont enregistrées uniquement sur votre appareil. The Word ne synchronise rien sur un serveur et ne collecte aucune donnée personnelle. Si vous supprimez l’application ou effacez les données de navigation, les listes de Notes et les Études seront également effacées.',
-  notesHelp10Title: '10. Idées d’utilisation',
+  notesHelp9Title: '9. Idées d’utilisation',
+  notesHelp9Body:
+    'Vous pouvez utiliser les Notes pour préparer des prédications, suivre un plan d’étude personnel, garder une liste de prières, noter ce que Dieu vous rappelle pendant la journée ou conserver des versets à apprendre par cœur. Utilisez les Études pour construire des parcours bibliques complets (par thèmes, par livres, pour un groupe de maison, un groupe de jeunes, une série de messages, etc.) que vous pourrez ensuite enseigner ou partager facilement.',
+  notesHelp10Title: '10. Notes & Études ensemble',
   notesHelp10Body:
-    'Vous pouvez utiliser les Notes pour : préparer des prédications, suivre un plan d’étude personnel, garder une liste de prières, noter ce que Dieu vous rappelle pendant la journée, ou encore conserver des versets pour les apprendre par cœur. Utilisez les Études pour construire des parcours bibliques complets (par thèmes, par livres, pour un groupe de maison, un groupe de jeunes, une série de messages, etc.) que vous pourrez ensuite enseigner ou partager facilement.',
+    'N’hésitez pas à combiner Notes et Études : par exemple, gardez vos pensées quotidiennes et vos prières dans Notes, et réservez les Études pour les plans que vous souhaitez retravailler, imprimer, enseigner ou partager avec un groupe.',
 
   // Common
   loading: 'Chargement...',
