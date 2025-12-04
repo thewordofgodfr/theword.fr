@@ -120,7 +120,11 @@ export default function About() {
               Pour faire partie des premiers testeurs de l’application Android The Word,
               demandez le lien d’installation à&nbsp;
               <a
-                href="mailto:contact@theword.fr"
+                href={`mailto:contact@theword.fr?subject=${encodeURIComponent(
+                  "Demande pour tester l'application Android The Word"
+                )}&body=${encodeURIComponent(
+                  "Bonjour,\n\nJe souhaite faire partie des premiers testeurs de l'application Android The Word.\n\nMerci d'avance,\n"
+                )}`}
                 className="underline"
               >
                 contact@theword.fr
