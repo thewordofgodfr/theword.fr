@@ -712,7 +712,7 @@ export default function Notes() {
                   {/* Titre + infos + (optionnel) boutons de réorganisation de liste */}
                   <div className="min-w-0 flex items-start justify-between gap-3">
                     <div>
-                      <div className="text-lg md:text-xl font-semibold leading-snug whitespace-normal break-words">
+                      <div className="text-xl md:text-2xl font-semibold leading-snug whitespace-normal break-words">
                         {list.title}
                       </div>
                       <div
