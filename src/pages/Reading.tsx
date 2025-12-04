@@ -646,7 +646,7 @@ export default function Reading() {
     const ref =
       getBookName(selectedBook) + ' ' + chapter.chapter + ':' + ranges;
     const body = chosen.map(v => String(v.text)).join('\n');
-    const shareUrl = 'https://www.theword.fr';
+    const shareUrl = 'https://www.theword.fr/#about';
     const shareText = ref + '\n' + body + '\n\n' + shareUrl;
     try {
       const nav = navigator as any;
