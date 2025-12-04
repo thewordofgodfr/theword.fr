@@ -1,5 +1,5 @@
 // src/pages/Principes.tsx
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import type { VerseList, VerseRef } from '../types/collections';
@@ -23,6 +23,8 @@ const TEXT_SENTINEL = '__TEXT__';
 /* ===================== Stockage local dédié à Principes ===================== */
 
 const P_LS_KEY = 'twog:principles:v1';
+// mémorise la dernière étude ouverte (utilisé pour le retour depuis Lecture)
+const P_LAST_OPEN_KEY = 'twog:lastPrincipleId';
 
 function p_safeParse<T>(raw: string | null, fallback: T): T {
   if (!raw) return fallback;
@@ -172,6 +174,13 @@ export default function Principes() {
   // item sélectionné pour afficher ses actions
   const [openItemMenu, setOpenItemMenu] = useState<{ listId: string; idx: number } | null>(null);
 
+  // brouillons de blocs texte par étude (éditeur en bas de page)
+  const [textDrafts, setTextDrafts] = useState<Record<string, string>>({});
+  const newTextRef = useRef<HTMLTextAreaElement | null>(null);
+
+  // notice Notes / Études
+  const [showHelp, setShowHelp] = useState(false);
+
   // --- Mini outil "Importer depuis un texte" ---
   const [showImportFromText, setShowImportFromText] = useState(false);
   const [importTextTitle, setImportTextTitle] = useState('');
@@ -237,10 +246,38 @@ export default function Principes() {
     [t, language]
   );
 
-  const refresh = () => setLists(p_getAllLists());
+  const refresh = () => {
+    const all = p_getAllLists();
+    setLists(all);
+    return all;
+  };
+
+  // Chargement initial + réouverture de la dernière étude utilisée
   useEffect(() => {
-    refresh();
+    const all = refresh();
+
+    try {
+      const lastId = localStorage.getItem(P_LAST_OPEN_KEY);
+      if (lastId && all.some((l) => l.id === lastId)) {
+        setExpandedId(lastId);
+        setTimeout(() => {
+          window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
+        }, 0);
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Quand une étude est ouverte, la mémoriser + se placer vers la fin
+  useEffect(() => {
+    if (!expandedId) return;
+    try {
+      localStorage.setItem(P_LAST_OPEN_KEY, expandedId);
+    } catch {}
+    setTimeout(() => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }, 0);
+  }, [expandedId]);
 
   const doCreate = () => {
     const title = prompt(label.placeholder) ?? '';
@@ -357,8 +394,7 @@ export default function Principes() {
   };
 
   const handleCreateFromText = () => {
-    const title =
-      (importTextTitle || '').trim() || label.importTextDefaultTitle;
+    const title = (importTextTitle || '').trim() || label.importTextDefaultTitle;
     const raw = (importTextBody || '').trim();
 
     if (!raw) {
@@ -426,9 +462,9 @@ export default function Principes() {
     );
   };
 
-  const addTextBlock = (listId: string) => {
-    const txt = prompt(label.newTextPlaceholder) ?? '';
-    const trimmed = txt.trim();
+  // Ajout d'un bloc texte (utilisé par l'éditeur en bas de page)
+  const addTextBlock = (listId: string, text: string) => {
+    const trimmed = text.trim();
     if (!trimmed) return;
     const newItem: AnyItem = {
       bookId: TEXT_SENTINEL,
@@ -492,7 +528,7 @@ export default function Principes() {
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* HEADER */}
         <div className="mb-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <h1
               className={`text-2xl md:text-3xl font-bold ${
                 isDark ? 'text-white' : 'text-gray-800'
@@ -501,6 +537,23 @@ export default function Principes() {
               <ListIcon className="w-6 h-6" />
               {label.title}
             </h1>
+
+            {/* Bouton Notice (commun Notes / Études) */}
+            <button
+              type="button"
+              onClick={() => setShowHelp(true)}
+              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
+                isDark
+                  ? 'border-gray-500 text-gray-100 bg-gray-900'
+                  : 'border-gray-300 text-gray-800 bg-white'
+              }`}
+            >
+              <span className="inline-flex items-center justify-center w-4 h-4 rounded-full border text-[10px]">
+                ?
+              </span>
+              <span className="hidden sm:inline">{t('notesHelpTitle')}</span>
+              <span className="sm:hidden">Notice</span>
+            </button>
           </div>
 
           {/* Actions uniquement quand aucune étude n'est ouverte */}
@@ -517,7 +570,7 @@ export default function Principes() {
 
               {/* Ligne de boutons secondaires alignés à droite */}
               <div className="flex flex-wrap items-center justify-end gap-2">
-                {/* Importer depuis un TEXTE (même liseret que Notes) */}
+                {/* Importer depuis un TEXTE */}
                 <button
                   onClick={openImportFromText}
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
@@ -530,7 +583,7 @@ export default function Principes() {
                   {label.importTextButton}
                 </button>
 
-                {/* Importer depuis un CODE TheWord (même liseret que Notes) */}
+                {/* Importer depuis un CODE TheWord */}
                 <button
                   onClick={doImportFromCode}
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
@@ -557,9 +610,14 @@ export default function Principes() {
               {label.backAll}
             </button>
 
-            {/* Ajouter un bloc de texte : BLEU, même largeur/hauteur */}
+            {/* Ajouter un bloc de texte : BLEU, même largeur/hauteur, fait défiler vers l’éditeur */}
             <button
-              onClick={() => addTextBlock(expandedId)}
+              onClick={() => {
+                if (newTextRef.current) {
+                  newTextRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  newTextRef.current.focus();
+                }
+              }}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 text-sm"
             >
               <TextIcon size={16} />
@@ -904,6 +962,56 @@ export default function Principes() {
                           })}
                         </ul>
                       )}
+
+                      {/* Éditeur de bloc texte en bas de l’étude (comme Notes) */}
+                      <div
+                        className={`mt-4 rounded-lg p-3 ${
+                          isDark
+                            ? 'bg-gray-800'
+                            : 'bg-indigo-50 border border-indigo-100'
+                        }`}
+                      >
+                        <label className="block text-sm font-semibold mb-2">
+                          {label.addTextBlock}
+                        </label>
+                        <textarea
+                          ref={newTextRef}
+                          className={`w-full rounded-md px-2 py-1.5 text-sm min-h-[120px] border resize-vertical ${
+                            isDark
+                              ? 'bg-gray-900 border-gray-600 text-white'
+                              : 'bg-white border-gray-300 text-gray-900'
+                          }`}
+                          style={{
+                            fontSize: `${state.settings.fontSize}px`,
+                            lineHeight: '1.55',
+                          }}
+                          value={textDrafts[list.id] ?? ''}
+                          onChange={(e) =>
+                            setTextDrafts((prev) => ({
+                              ...prev,
+                              [list.id]: e.target.value,
+                            }))
+                          }
+                          placeholder={label.newTextPlaceholder}
+                        />
+                        <div className="mt-2 flex justify-end">
+                          <button
+                            onClick={() => {
+                              const draft = (textDrafts[list.id] ?? '').trim();
+                              if (!draft) return;
+                              addTextBlock(list.id, draft);
+                              setTextDrafts((prev) => ({
+                                ...prev,
+                                [list.id]: '',
+                              }));
+                            }}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-500"
+                          >
+                            <TextIcon size={16} />
+                            {label.addTextBlock}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -996,8 +1104,57 @@ export default function Principes() {
           </div>
         </div>
       )}
+
+      {/* MODALE : notice Notes & Études (commune avec Notes) */}
+      {showHelp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setShowHelp(false)}
+            aria-hidden="true"
+          />
+          <div
+            className={`relative w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto rounded-2xl p-4 ${
+              isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
+            }`}
+          >
+            <h2 className="text-xl font-semibold mb-3">
+              {t('notesHelpTitle')}
+            </h2>
+            <p className="text-sm mb-3">{t('notesHelpIntro')}</p>
+
+            <div className="space-y-3 text-sm">
+              {Array.from({ length: 10 }).map((_, idx) => {
+                const n = idx + 1;
+                const titleKey = `notesHelp${n}Title`;
+                const bodyKey = `notesHelp${n}Body`;
+                return (
+                  <div key={n}>
+                    <h3 className="font-semibold mb-0.5">
+                      {t(titleKey as any)}
+                    </h3>
+                    <p className="opacity-90">{t(bodyKey as any)}</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="mt-4 text-right">
+              <button
+                onClick={() => setShowHelp(false)}
+                className={`px-3 py-1.5 rounded text-sm ${
+                  isDark
+                    ? 'bg-gray-700 text-white'
+                    : 'bg-gray-200 text-gray-800'
+                }`}
+              >
+                {label.cancel}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
 
