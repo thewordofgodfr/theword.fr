@@ -119,7 +119,12 @@ export default function About() {
             >
               Pour faire partie des premiers testeurs de l’application Android The Word,
               demandez le lien d’installation à&nbsp;
-              <span className="underline">contact@theword.fr</span>.
+              <a
+                href="mailto:contact@theword.fr"
+                className="underline"
+              >
+                contact@theword.fr
+              </a>
             </div>
           )}
 
