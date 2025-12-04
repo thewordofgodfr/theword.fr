@@ -470,27 +470,31 @@ https://www.theword.fr/#about`;
   };
 
   // --- opérations de copie/partage pour UN élément ---
-  const copyItemText = async (it: AnyItem) => {
-    const txt = buildItemPlainText(it);
-    if (!txt) return;
-    try {
-      await navigator.clipboard.writeText(txt);
-      alert(label.copied + ' ✅');
-    } catch {}
-  };
+const copyItemText = async (it: AnyItem) => {
+  const txt = buildItemPlainText(it);
+  if (!txt) return;
+  try {
+    await navigator.clipboard.writeText(txt);
+    alert(label.copied + ' ✅');
+  } catch {}
+};
 
-  const shareItem = async (it: AnyItem) => {
-    const payload = buildItemPlainText(it) + '\n\nhttps://www.theword.fr\n';
-    try {
-      const nav: any = navigator;
-      if (nav?.share) {
-        await nav.share({ title: t('verseWord'), text: payload });
-      } else {
-        await navigator.clipboard.writeText(payload);
-        alert(t('textReadyToShare') + ' ✅');
-      }
-    } catch {}
-  };
+const shareItem = async (it: AnyItem) => {
+  const payload = `${buildItemPlainText(it)}
+
+Découvrir l’application The Word :
+https://www.theword.fr/#about`;
+
+  try {
+    const nav: any = navigator;
+    if (nav?.share) {
+      await nav.share({ title: t('verseWord'), text: payload });
+    } else {
+      await navigator.clipboard.writeText(payload);
+      alert(t('textReadyToShare') + ' ✅');
+    }
+  } catch {}
+};
 
   // ---------- opérations sur items ----------
   const updateItems = (listId: string, updater: (items: AnyItem[]) => AnyItem[]) => {
