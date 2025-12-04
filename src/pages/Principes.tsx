@@ -1,5 +1,5 @@
 // src/pages/Principes.tsx
-import React, { useEffect, useMemo, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import type { VerseList, VerseRef } from '../types/collections';
@@ -13,7 +13,8 @@ import {
   ArrowUp,
   ArrowDown,
   Type as TextIcon,
-  Edit2 as EditTextIcon, // icône crayon pour modifier un bloc texte
+  Edit2 as EditTextIcon,
+  HelpCircle,
 } from 'lucide-react';
 import { encodeSharedList, decodeSharedList } from '../services/shareCodec';
 
@@ -22,9 +23,12 @@ const TEXT_SENTINEL = '__TEXT__';
 
 /* ===================== Stockage local dédié à Principes ===================== */
 
+// même clé que l’implémentation précédente pour ne PAS perdre les études existantes
 const P_LS_KEY = 'twog:principles:v1';
-// mémorise la dernière étude ouverte (utilisé pour le retour depuis Lecture)
-const P_LAST_OPEN_KEY = 'twog:lastPrincipleId';
+// mémorise la dernière étude ouverte (utilisé aussi par Lecture)
+const LAST_LIST_STORAGE_KEY = 'twog:lastPrincipleId';
+// ordre manuel des listes (comme pour Notes, mais séparé)
+const LIST_ORDER_STORAGE_KEY = 'theword:principlesListOrder';
 
 function p_safeParse<T>(raw: string | null, fallback: T): T {
   if (!raw) return fallback;
@@ -34,6 +38,7 @@ function p_safeParse<T>(raw: string | null, fallback: T): T {
     return fallback;
   }
 }
+
 function p_readAll(): VerseList[] {
   try {
     return p_safeParse<VerseList[]>(localStorage.getItem(P_LS_KEY), []);
@@ -41,22 +46,26 @@ function p_readAll(): VerseList[] {
     return [];
   }
 }
+
 function p_writeAll(all: VerseList[]) {
   try {
     localStorage.setItem(P_LS_KEY, JSON.stringify(all));
   } catch {}
 }
+
 function p_makeId() {
   return 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
 }
 
-// === API similaire à collectionsService, mais indépendante et sans tri auto ===
+// === API similaire à collectionsService, mais indépendante (Études) ===
 function p_getAllLists(): VerseList[] {
-  return p_readAll(); // conserver l'ordre tel qu'enregistré (utile pour le réordonnancement manuel)
+  return p_readAll();
 }
+
 function p_getListById(id: string): VerseList | null {
   return p_readAll().find((l) => l.id === id) ?? null;
 }
+
 function p_createList(title: string): VerseList {
   const now = Date.now();
   const list: VerseList = {
@@ -67,10 +76,11 @@ function p_createList(title: string): VerseList {
     items: [],
   };
   const all = p_readAll();
-  all.unshift(list); // nouvelle en tête
+  all.push(list);
   p_writeAll(all);
   return list;
 }
+
 function p_renameList(id: string, newTitle: string): VerseList | null {
   const all = p_readAll();
   const i = all.findIndex((l) => l.id === id);
@@ -79,12 +89,14 @@ function p_renameList(id: string, newTitle: string): VerseList | null {
   p_writeAll(all);
   return all[i];
 }
+
 function p_deleteList(id: string): boolean {
   const all = p_readAll();
   const next = all.filter((l) => l.id !== id);
   p_writeAll(next);
   return next.length !== all.length;
 }
+
 function p_setListItems(id: string, items: VerseRef[]): VerseList | null {
   const all = p_readAll();
   const i = all.findIndex((l) => l.id === id);
@@ -92,18 +104,6 @@ function p_setListItems(id: string, items: VerseRef[]): VerseList | null {
   all[i] = { ...all[i], items: Array.isArray(items) ? items : [], updatedAt: Date.now() };
   p_writeAll(all);
   return all[i];
-}
-// Réordonner les listes (monter/descendre)
-function p_moveList(fromIdx: number, toIdx: number): VerseList[] {
-  const all = p_readAll();
-  const src = Math.max(0, Math.min(all.length - 1, fromIdx));
-  const dst = Math.max(0, Math.min(all.length - 1, toIdx));
-  if (src === dst) return all;
-  const arr = [...all];
-  const [moved] = arr.splice(src, 1);
-  arr.splice(dst, 0, moved);
-  p_writeAll(arr);
-  return arr;
 }
 
 /* ========================== Utils d'affichage texte ========================== */
@@ -167,25 +167,37 @@ export default function Principes() {
   const isDark = state.settings.theme === 'dark';
 
   const [lists, setLists] = useState<VerseList[]>([]);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  // pour réordonner les listes : connaître l'index courant dans "vue fermée"
-  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      return window.localStorage.getItem(LAST_LIST_STORAGE_KEY) || null;
+    } catch {
+      return null;
+    }
+  });
 
   // item sélectionné pour afficher ses actions
   const [openItemMenu, setOpenItemMenu] = useState<{ listId: string; idx: number } | null>(null);
-
-  // brouillons de blocs texte par étude (éditeur en bas de page)
-  const [textDrafts, setTextDrafts] = useState<Record<string, string>>({});
-  const newTextRef = useRef<HTMLTextAreaElement | null>(null);
-
-  // notice Notes / Études
-  const [showHelp, setShowHelp] = useState(false);
 
   // --- Mini outil "Importer depuis un texte" ---
   const [showImportFromText, setShowImportFromText] = useState(false);
   const [importTextTitle, setImportTextTitle] = useState('');
   const [importTextBody, setImportTextBody] = useState('');
   const [importSplitBlocks, setImportSplitBlocks] = useState(true);
+
+  // --- Édition multi-lignes d'un bloc texte (création + édition) ---
+  const [editingTextBlock, setEditingTextBlock] = useState<{
+    listId: string;
+    idx: number | null; // null = nouveau bloc
+    initialValue: string;
+  } | null>(null);
+  const [editingTextValue, setEditingTextValue] = useState('');
+
+  // Flag pour savoir si on doit scroller automatiquement vers le dernier élément
+  const [shouldScrollToLast, setShouldScrollToLast] = useState(false);
+
+  // Aide / mode d'emploi
+  const [showHelp, setShowHelp] = useState(false);
 
   const label = useMemo(
     () => ({
@@ -194,7 +206,6 @@ export default function Principes() {
       placeholder: t('principlesPage.placeholder'),
       empty: t('principlesPage.empty'),
       verses: t('principlesPage.items'),
-      openReading: t('principlesPage.openReading'),
       copied: t('copiedShort'),
       backAll: t('principlesPage.backAll'),
       addTextBlock: t('principlesPage.addTextBlock'),
@@ -206,29 +217,12 @@ export default function Principes() {
       cancel: t('cancel'),
       confirmDeleteItem: t('principlesPage.confirmDeleteItem'),
       newTextPlaceholder: t('principlesPage.newTextPlaceholder'),
-      rename: t('principlesPage.renameList'),
-      share: t('principlesPage.share'),
-      copy: t('principlesPage.copy'),
-      deleteList: t('principlesPage.deleteList'),
-
-      // Gestion des doublons / suppression liste
-      duplicateTitle: t('principlesPage.duplicateTitle'),
-      confirmDeleteList: t('principlesPage.confirmDeleteList'),
-      emptyList: t('principlesPage.emptyList'),
-
-      // Titres pour le partage
-      shareStudyTitle: t('principlesPage.shareStudyTitle'),
-      shareItemTitle: t('principlesPage.shareItemTitle'),
-
-      // partage par code
       shareCode: t('principlesPage.shareCode'),
       importCode: t('principlesPage.importCode'),
       importPrompt: t('principlesPage.importPrompt'),
       importError: t('principlesPage.importError'),
       importSuccess: t('principlesPage.importSuccess'),
       shareCodeCopied: t('principlesPage.shareCodeCopied'),
-
-      // Libellés mini-import texte
       importTextButton: t('principlesPage.importTextButton'),
       importTextTitlePlaceholder: t('principlesPage.importTextTitlePlaceholder'),
       importTextDefaultTitle: t('principlesPage.importTextDefaultTitle'),
@@ -238,52 +232,140 @@ export default function Principes() {
       importTextSplitLabel: t('principlesPage.importTextSplitLabel'),
       importTextInfo: t('principlesPage.importTextInfo'),
       importTextCreate: t('principlesPage.importTextCreate'),
-
-      // Titre & label pour la modale d'import texte
+      duplicateTitle: t('principlesPage.duplicateTitle'),
+      confirmDeleteList: t('principlesPage.confirmDeleteList'),
+      emptyList: t('principlesPage.emptyList'),
       importFromTextTitle: t('principlesPage.importFromTextTitle'),
       documentContent: t('principlesPage.documentContent'),
+
+      // Aide / mode d'emploi (mutualisée avec Notes)
+      helpTitle: t('notesHelpTitle'),
+      helpIntro: t('notesHelpIntro'),
+      help1Title: t('notesHelp1Title'),
+      help1Body: t('notesHelp1Body'),
+      help2Title: t('notesHelp2Title'),
+      help2Body: t('notesHelp2Body'),
+      help3Title: t('notesHelp3Title'),
+      help3Body: t('notesHelp3Body'),
+      help4Title: t('notesHelp4Title'),
+      help4Body: t('notesHelp4Body'),
+      help5Title: t('notesHelp5Title'),
+      help5Body: t('notesHelp5Body'),
+      help6Title: t('notesHelp6Title'),
+      help6Body: t('notesHelp6Body'),
+      help7Title: t('notesHelp7Title'),
+      help7Body: t('notesHelp7Body'),
+      help8Title: t('notesHelp8Title'),
+      help8Body: t('notesHelp8Body'),
+      help9Title: t('notesHelp9Title'),
+      help9Body: t('notesHelp9Body'),
+      help10Title: t('notesHelp10Title'),
+      help10Body: t('notesHelp10Body'),
     }),
     [t, language]
   );
 
   const refresh = () => {
     const all = p_getAllLists();
-    setLists(all);
-    return all;
-  };
 
-  // Chargement initial + réouverture de la dernière étude utilisée
-  useEffect(() => {
-    const all = refresh();
+    if (typeof window === 'undefined') {
+      setLists(all);
+      return;
+    }
+
+    let storedOrder: string[] = [];
+    try {
+      const raw = window.localStorage.getItem(LIST_ORDER_STORAGE_KEY);
+      if (raw) {
+        storedOrder = JSON.parse(raw);
+      }
+    } catch {
+      storedOrder = [];
+    }
+
+    const validStored = storedOrder.filter((id) => all.some((l) => l.id === id));
+    const missingIds = all
+      .filter((l) => !validStored.includes(l.id))
+      .map((l) => l.id);
+    const finalOrder = [...validStored, ...missingIds];
+
+    const sorted = [...all].sort(
+      (a, b) => finalOrder.indexOf(a.id) - finalOrder.indexOf(b.id)
+    );
+
+    setLists(sorted);
 
     try {
-      const lastId = localStorage.getItem(P_LAST_OPEN_KEY);
-      if (lastId && all.some((l) => l.id === lastId)) {
-        setExpandedId(lastId);
-        setTimeout(() => {
-          window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
-        }, 0);
-      }
-    } catch {}
+      window.localStorage.setItem(LIST_ORDER_STORAGE_KEY, JSON.stringify(finalOrder));
+    } catch {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    refresh();
+  }, []);
+
+  useEffect(() => {
+    if (expandedId) {
+      setShouldScrollToLast(true);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Quand une étude est ouverte, la mémoriser + se placer vers la fin
+  // mémoriser / nettoyer la dernière étude ouverte (Lecture ↔ Études)
+  useEffect(() => {
+    try {
+      if (expandedId) {
+        window.localStorage.setItem(LAST_LIST_STORAGE_KEY, expandedId);
+      } else {
+        window.localStorage.removeItem(LAST_LIST_STORAGE_KEY);
+      }
+    } catch {
+      // ignore
+    }
+  }, [expandedId]);
+
+  // si la liste mémorisée n'existe plus (supprimée), on nettoie l'état
   useEffect(() => {
     if (!expandedId) return;
-    try {
-      localStorage.setItem(P_LAST_OPEN_KEY, expandedId);
-    } catch {}
-    setTimeout(() => {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    }, 0);
-  }, [expandedId]);
+    if (!lists.length) return;
+    if (!lists.some((l) => l.id === expandedId)) {
+      setExpandedId(null);
+    }
+  }, [lists, expandedId]);
+
+  // quand une liste restaurée est ouverte, descendre automatiquement sur le dernier élément
+  useEffect(() => {
+    if (!expandedId || !shouldScrollToLast) return;
+    const list = lists.find((l) => l.id === expandedId);
+    if (!list || !list.items.length) {
+      setShouldScrollToLast(false);
+      return;
+    }
+
+    const lastIdx = list.items.length - 1;
+    const el = document.getElementById(`principle-item-${expandedId}-${lastIdx}`);
+    if (el && 'scrollIntoView' in el) {
+      (el as HTMLElement).scrollIntoView({ block: 'center', behavior: 'auto' });
+    }
+    setShouldScrollToLast(false);
+  }, [lists, expandedId, shouldScrollToLast]);
+
+  // synchroniser la valeur de la modale d'édition avec le bloc courant
+  useEffect(() => {
+    if (editingTextBlock) {
+      setEditingTextValue(editingTextBlock.initialValue ?? '');
+    } else {
+      setEditingTextValue('');
+    }
+  }, [editingTextBlock]);
 
   const doCreate = () => {
     const title = prompt(label.placeholder) ?? '';
     const trimmed = title.trim();
     if (!trimmed) return;
-    // éviter doublons de titre (insensible à la casse)
+
     const exists = p_getAllLists().find(
       (l) => (l.title || '').trim().toLowerCase() === trimmed.toLowerCase()
     );
@@ -295,6 +377,9 @@ export default function Principes() {
     const created = p_createList(trimmed);
     refresh();
     setExpandedId(created.id);
+    try {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    } catch {}
   };
 
   const doRename = (id: string, current: string) => {
@@ -319,6 +404,32 @@ export default function Principes() {
     if (expandedId === id) setExpandedId(null);
   };
 
+  // Réordonner les Études (monter / descendre)
+  const moveList = (id: string, dir: -1 | 1) => {
+    setLists((current) => {
+      const arr = [...current];
+      const index = arr.findIndex((l) => l.id === id);
+      if (index === -1) return current;
+
+      const target = index + dir;
+      if (target < 0 || target >= arr.length) return current;
+
+      const [moved] = arr.splice(index, 1);
+      arr.splice(target, 0, moved);
+
+      try {
+        if (typeof window !== 'undefined') {
+          const order = arr.map((l) => l.id);
+          window.localStorage.setItem(LIST_ORDER_STORAGE_KEY, JSON.stringify(order));
+        }
+      } catch {
+        // ignore
+      }
+
+      return arr;
+    });
+  };
+
   // Partage au même format que "Copier", avec lien en plus
   const doShare = async (id: string) => {
     const list = p_getListById(id);
@@ -327,7 +438,7 @@ export default function Principes() {
     try {
       const nav: any = navigator;
       if (nav?.share) {
-        await nav.share({ title: label.shareStudyTitle, text: payload });
+        await nav.share({ title: list.title || label.title, text: payload });
       } else {
         await navigator.clipboard.writeText(payload);
         alert(t('textReadyToShare') + ' ✅');
@@ -345,31 +456,25 @@ export default function Principes() {
     } catch {}
   };
 
-  // --- Partage / import PAR CODE (compatible Notes & Principes) ---
-
+  // --- Partage / import PAR CODE (type "principle") ---
   const doShareCode = async (id: string) => {
     const list = p_getListById(id);
     if (!list) return;
-    // On encode comme "principle", mais Notes pourra quand même l'importer
     const code = encodeSharedList('principle', list);
     try {
       await navigator.clipboard.writeText(code);
       alert(label.shareCodeCopied);
     } catch {
-      // fallback : afficher le code dans un prompt pour copie manuelle
       prompt(label.shareCode, code);
     }
   };
 
   const doImportFromCode = () => {
     const code = prompt(label.importPrompt) ?? '';
-    if (!code) return;
+    const trimmed = code.trim();
+    if (!trimmed) return;
 
-    // IMPORTANT : on enlève tous les espaces / retours à la ligne
-    const normalized = code.replace(/\s+/g, '').trim();
-    if (!normalized) return;
-
-    const payload = decodeSharedList(normalized);
+    const payload = decodeSharedList(trimmed.replace(/\s+/g, ''));
     if (!payload) {
       alert(label.importError);
       return;
@@ -377,15 +482,17 @@ export default function Principes() {
 
     const title = payload.title?.trim() || label.importTextDefaultTitle;
 
-    // On crée une NOUVELLE étude, même si le code vient d'une note
     const created = p_createList(title);
     p_setListItems(created.id, (payload.items || []) as VerseRef[]);
     refresh();
     setExpandedId(created.id);
     alert(label.importSuccess);
+    try {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    } catch {}
   };
 
-  // --- Import direct depuis un TEXTE (mini outil interne) ---
+  // --- Import direct depuis un TEXTE ---
   const openImportFromText = () => {
     setImportTextTitle('');
     setImportTextBody('');
@@ -394,7 +501,8 @@ export default function Principes() {
   };
 
   const handleCreateFromText = () => {
-    const title = (importTextTitle || '').trim() || label.importTextDefaultTitle;
+    const title =
+      (importTextTitle || '').trim() || label.importTextDefaultTitle;
     const raw = (importTextBody || '').trim();
 
     if (!raw) {
@@ -423,6 +531,32 @@ export default function Principes() {
     refresh();
     setExpandedId(created.id);
     setShowImportFromText(false);
+    try {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    } catch {}
+  };
+
+  // --- opérations de copie/partage pour UN élément ---
+  const copyItemText = async (it: AnyItem) => {
+    const txt = buildItemPlainText(it);
+    if (!txt) return;
+    try {
+      await navigator.clipboard.writeText(txt);
+      alert(label.copied + ' ✅');
+    } catch {}
+  };
+
+  const shareItem = async (it: AnyItem) => {
+    const payload = buildItemPlainText(it) + '\n\nhttps://www.theword.fr\n';
+    try {
+      const nav: any = navigator;
+      if (nav?.share) {
+        await nav.share({ title: t('verseWord'), text: payload });
+      } else {
+        await navigator.clipboard.writeText(payload);
+        alert(t('textReadyToShare') + ' ✅');
+      }
+    } catch {}
   };
 
   // ---------- opérations sur items ----------
@@ -462,60 +596,65 @@ export default function Principes() {
     );
   };
 
-  // Ajout d'un bloc texte (utilisé par l'éditeur en bas de page)
-  const addTextBlock = (listId: string, text: string) => {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    const newItem: AnyItem = {
-      bookId: TEXT_SENTINEL,
-      bookName: '',
-      chapter: 0,
-      verse: 0,
-      text: trimmed,
-      translation: state.settings.language,
-      kind: 'text',
-    };
-    updateItems(listId, (items) => [...items, newItem]);
-  };
-
-  const editTextBlock = (listId: string, idx: number, currentText: string) => {
-    const txt = prompt(label.newTextPlaceholder, currentText) ?? '';
-    updateItems(listId, (items) => {
-      const arr = [...items];
-      if (idx < 0 || idx >= arr.length) return arr;
-      const prev = (arr[idx] || {}) as AnyItem;
-      arr[idx] = { ...(prev as any), text: txt } as AnyItem;
-      return arr;
+  // Ouverture d'un nouveau bloc texte
+  const addTextBlock = (listId: string) => {
+    setEditingTextBlock({
+      listId,
+      idx: null,
+      initialValue: '',
     });
   };
 
-  // --- opérations de copie/partage pour UN élément ---
-  const copyItemText = async (it: AnyItem) => {
-    const txt = buildItemPlainText(it);
-    if (!txt) return;
-    try {
-      await navigator.clipboard.writeText(txt);
-      alert(label.copied + ' ✅');
-    } catch {}
+  // Édition d'un bloc texte existant
+  const editTextBlock = (listId: string, idx: number, currentText: string) => {
+    setEditingTextBlock({
+      listId,
+      idx,
+      initialValue: currentText || '',
+    });
   };
 
-  const shareItem = async (it: AnyItem) => {
-    const payload = buildItemPlainText(it) + '\n\nhttps://www.theword.fr\n';
-    try {
-      const nav: any = navigator;
-      if (nav?.share) {
-        await nav.share({ title: label.shareItemTitle, text: payload });
-      } else {
-        await navigator.clipboard.writeText(payload);
-        alert(t('textReadyToShare') + ' ✅');
-      }
-    } catch {}
+  const handleSaveTextBlock = () => {
+    if (!editingTextBlock) return;
+    const raw = editingTextValue;
+    if (!raw.trim()) {
+      setEditingTextBlock(null);
+      return;
+    }
+
+    if (editingTextBlock.idx === null) {
+      updateItems(editingTextBlock.listId, (items) => {
+        const arr = [...items];
+        const newItem: AnyItem = {
+          bookId: TEXT_SENTINEL,
+          bookName: '',
+          chapter: 0,
+          verse: 0,
+          text: raw,
+          translation: state.settings.language,
+          kind: 'text',
+        };
+        arr.push(newItem);
+        return arr;
+      });
+    } else {
+      const idx = editingTextBlock.idx;
+      updateItems(editingTextBlock.listId, (items) => {
+        const arr = [...items];
+        if (idx < 0 || idx >= arr.length) return arr;
+        const prev = (arr[idx] || {}) as AnyItem;
+        arr[idx] = { ...prev, text: raw } as AnyItem;
+        return arr;
+      });
+    }
+
+    setEditingTextBlock(null);
   };
 
   // quand une liste est ouverte, n'afficher qu'elle
   const shownLists = expandedId ? lists.filter((l) => l.id === expandedId) : lists;
 
-  // format date sans heure — affichage simple type 31/12/2025
+  // format date simple
   const formatDate = (d: string | number | Date) =>
     new Date(d).toLocaleDateString(undefined, {
       year: 'numeric',
@@ -528,7 +667,7 @@ export default function Principes() {
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* HEADER */}
         <div className="mb-6">
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-3">
             <h1
               className={`text-2xl md:text-3xl font-bold ${
                 isDark ? 'text-white' : 'text-gray-800'
@@ -538,39 +677,35 @@ export default function Principes() {
               {label.title}
             </h1>
 
-            {/* Bouton Notice (commun Notes / Études) */}
+            {/* Bouton aide / mode d'emploi Études */}
             <button
               type="button"
+              aria-label="Aide sur la page Études"
+              title="Aide / Mode d'emploi"
               onClick={() => setShowHelp(true)}
-              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
+              className={`inline-flex items-center justify-center rounded-full p-2 border text-sm ${
                 isDark
-                  ? 'border-gray-500 text-gray-100 bg-gray-900'
-                  : 'border-gray-300 text-gray-800 bg-white'
+                  ? 'border-gray-600 text-gray-200 hover:border-indigo-400 hover:text-white'
+                  : 'border-gray-300 text-gray-600 hover:border-indigo-500 hover:text-gray-900'
               }`}
             >
-              <span className="inline-flex items-center justify-center w-4 h-4 rounded-full border text-[10px]">
-                ?
-              </span>
-              <span className="hidden sm:inline">{t('notesHelpTitle')}</span>
-              <span className="sm:hidden">Notice</span>
+              <HelpCircle className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Actions uniquement quand aucune étude n'est ouverte */}
           {!expandedId && (
             <div className="mt-4 space-y-2">
-              {/* Gros bouton primaire : + Créer une étude (VERT) */}
+              {/* Gros bouton : créer une étude (VERT) */}
               <button
                 onClick={doCreate}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-emerald-600 text-white font-semibold text-sm shadow hover:bg-emerald-500 active:scale-[0.98]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-semibold text-sm shadow hover:bg-emerald-500 active:scale-[0.98]"
               >
                 <Plus size={18} />
                 {label.create}
               </button>
 
-              {/* Ligne de boutons secondaires alignés à droite */}
+              {/* Boutons secondaires à droite */}
               <div className="flex flex-wrap items-center justify-end gap-2">
-                {/* Importer depuis un TEXTE */}
                 <button
                   onClick={openImportFromText}
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
@@ -583,7 +718,6 @@ export default function Principes() {
                   {label.importTextButton}
                 </button>
 
-                {/* Importer depuis un CODE TheWord */}
                 <button
                   onClick={doImportFromCode}
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
@@ -602,7 +736,7 @@ export default function Principes() {
 
         {expandedId && (
           <div className="mb-4 flex flex-col sm:flex-row sm:items-center gap-2">
-            {/* Bouton retour : vert, pleine largeur sur mobile comme Notes */}
+            {/* Bouton retour : vert */}
             <button
               onClick={() => setExpandedId(null)}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-500"
@@ -610,14 +744,9 @@ export default function Principes() {
               {label.backAll}
             </button>
 
-            {/* Ajouter un bloc de texte : BLEU, même largeur/hauteur, fait défiler vers l’éditeur */}
+            {/* Ajouter un bloc de texte : bleu, comme Notes */}
             <button
-              onClick={() => {
-                if (newTextRef.current) {
-                  newTextRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  newTextRef.current.focus();
-                }
-              }}
+              onClick={() => expandedId && addTextBlock(expandedId)}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 text-sm"
             >
               <TextIcon size={16} />
@@ -632,21 +761,23 @@ export default function Principes() {
           </div>
         ) : (
           <div className="space-y-4">
-            {shownLists.map((list, idxInShown) => {
+            {shownLists.map((list) => {
               const isOpen = expandedId === list.id;
-              // index réel dans l'ensemble (utile pour move up/down quand tout est affiché)
-              const realIndex = expandedId ? lists.findIndex((l) => l.id === list.id) : idxInShown;
+              const listIndex = lists.findIndex((l) => l.id === list.id);
+              const canMoveUp = listIndex > 0;
+              const canMoveDown = listIndex !== -1 && listIndex < lists.length - 1;
 
               return (
                 <div
                   key={list.id}
-                  onMouseEnter={() => setHoverIdx(isOpen ? null : realIndex)}
-                  onMouseLeave={() => setHoverIdx(null)}
                   onClick={
                     !isOpen
                       ? () => {
                           setOpenItemMenu(null);
                           setExpandedId(list.id);
+                          try {
+                            window.scrollTo({ top: 0, behavior: 'auto' });
+                          } catch {}
                         }
                       : undefined
                   }
@@ -655,96 +786,101 @@ export default function Principes() {
                   } rounded-xl shadow p-4 ${!isOpen ? 'cursor-pointer' : ''}`}
                   role={!isOpen ? 'button' : undefined}
                   aria-expanded={isOpen}
-                  style={{ WebkitTapHighlightColor: 'transparent', position: 'relative' }}
+                  style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
-                  {/* En-tête : Titre + infos */}
-                  <div className="min-w-0">
-                    <div className="text-lg md:text-xl font-semibold leading-snug whitespace-normal break-words">
-                      {list.title}
+                  {/* Titre + infos + (optionnel) boutons de réorganisation de liste */}
+                  <div className="min-w-0 flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-lg md:text-xl font-semibold leading-snug whitespace-normal break-words">
+                        {list.title}
+                      </div>
+                      <div
+                        className={`mt-1 text-xs ${
+                          isDark ? 'text-white/60' : 'text-gray-500'
+                        }`}
+                      >
+                        {list.items.length} {label.verses} • {formatDate(list.updatedAt)}
+                      </div>
                     </div>
-                    <div
-                      className={`mt-1 text-xs ${
-                        isDark ? 'text-white/60' : 'text-gray-500'
-                      }`}
-                    >
-                      {list.items.length} {label.verses} • {formatDate(list.updatedAt)}
-                    </div>
+
+                    {!isOpen && (
+                      <div className="flex flex-col items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (canMoveUp) moveList(list.id, -1);
+                          }}
+                          disabled={!canMoveUp}
+                          title={label.moveUp}
+                          className={`inline-flex items-center justify-center rounded-full p-1 border text-xs ${
+                            isDark
+                              ? 'border-gray-600 text-gray-200 bg-gray-900'
+                              : 'border-gray-300 text-gray-700 bg-gray-50'
+                          } ${!canMoveUp ? 'opacity-40 cursor-default' : 'active:scale-95'}`}
+                        >
+                          <ArrowUp size={14} />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (canMoveDown) moveList(list.id, 1);
+                          }}
+                          disabled={!canMoveDown}
+                          title={label.moveDown}
+                          className={`inline-flex items-center justify-center rounded-full p-1 border text-xs ${
+                            isDark
+                              ? 'border-gray-600 text-gray-200 bg-gray-900'
+                              : 'border-gray-300 text-gray-700 bg-gray-50'
+                          } ${!canMoveDown ? 'opacity-40 cursor-default' : 'active:scale-95'}`}
+                        >
+                          <ArrowDown size={14} />
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  {/* --- Boutons Monter/Descendre (vue fermée) --- */}
-                  {!isOpen && hoverIdx === realIndex && (
-                    <div className="absolute right-3 top-3 flex gap-1">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const next = p_moveList(realIndex, realIndex - 1);
-                          setLists(next);
-                        }}
-                        disabled={realIndex === 0}
-                        className={`inline-flex items-center justify-center w-8 h-8 rounded ${
-                          isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-                        } disabled:opacity-50`}
-                        title={label.moveUp}
-                      >
-                        <ArrowUp size={16} />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const next = p_moveList(realIndex, realIndex + 1);
-                          setLists(next);
-                        }}
-                        disabled={realIndex === lists.length - 1}
-                        className={`inline-flex items-center justify-center w-8 h-8 rounded ${
-                          isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-                        } disabled:opacity-50`}
-                        title={label.moveDown}
-                      >
-                        <ArrowDown size={16} />
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Actions (vue ouverte) */}
+                  {/* Actions de la liste ouverte */}
                   {isOpen && (
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       <button
                         onClick={() => doRename(list.id, list.title)}
                         className={`${
                           isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-                        } px-3 py-2 rounded inline-flex items-center gap-2 text-sm`}
-                        title={label.rename}
+                        } px-3 py-2 rounded inline-flex items-center gap-2`}
+                        title={t('principlesPage.renameList')}
                       >
                         <Edit3 size={16} />
-                        {label.rename}
+                        {t('principlesPage.renameList')}
                       </button>
 
                       <button
                         onClick={() => doShare(list.id)}
-                        className="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-500 inline-flex items-center gap-2 text-sm"
-                        title={label.share}
+                        className="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-500 inline-flex items-center gap-2"
+                        title={t('shareLabel')}
                       >
                         <Share2 size={16} />
-                        {label.share}
+                        {t('shareLabel')}
                       </button>
 
                       <button
                         onClick={() => copyListText(list.id)}
                         className={`${
                           isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-                        } px-3 py-2 rounded inline-flex items-center gap-2 text-sm`}
-                        title={label.copy}
+                        } px-3 py-2 rounded inline-flex items-center gap-2`}
+                        title={t('copyLabel')}
                       >
                         <Copy size={16} />
-                        {label.copy}
+                        {t('copyLabel')}
                       </button>
 
-                      {/* Code pour cette étude */}
                       <button
                         onClick={() => doShareCode(list.id)}
                         className={`${
                           isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-                        } px-3 py-2 rounded inline-flex items-center gap-2 text-sm`}
+                        } px-3 py-2 rounded inline-flex items-center gap-2`}
                         title={label.shareCode}
                       >
                         <Copy size={16} />
@@ -753,11 +889,11 @@ export default function Principes() {
 
                       <button
                         onClick={() => doDelete(list.id)}
-                        className="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-500 inline-flex items-center gap-2 text-sm"
-                        title={label.deleteList}
+                        className="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-500 inline-flex items-center gap-2"
+                        title={label.deleteItem}
                       >
                         <Trash2 size={16} />
-                        {label.deleteList}
+                        {label.deleteItem}
                       </button>
                     </div>
                   )}
@@ -766,252 +902,202 @@ export default function Principes() {
                   {isOpen && (
                     <div className="mt-4">
                       {list.items.length === 0 ? (
-                        <div
-                          className={`${
-                            isDark ? 'text-white/70' : 'text-gray-600'
-                          } text-sm`}
-                        >
+                        <div className={`${isDark ? 'text-white/70' : 'text-gray-600'} text-sm`}>
                           {label.emptyList}
                         </div>
                       ) : (
-                        <ul className="space-y-3">
-                          {(list.items as AnyItem[]).map((it, idx) => {
-                            const isText = it.bookId === TEXT_SENTINEL;
-                            const menuOpen =
-                              openItemMenu?.listId === list.id &&
-                              openItemMenu?.idx === idx;
+                        <>
+                          <ul className="space-y-3">
+                            {(list.items as AnyItem[]).map((it, idx) => {
+                              const isText = it.bookId === TEXT_SENTINEL;
+                              const menuOpen =
+                                openItemMenu?.listId === list.id && openItemMenu?.idx === idx;
 
-                            // fond différent verset / bloc texte (comme Notes)
-                            const baseItemBg = isText
-                              ? isDark
-                                ? 'bg-gray-700/70 hover:bg-gray-700/90'
-                                : 'bg-indigo-50 hover:bg-indigo-100'
-                              : isDark
-                              ? 'bg-gray-600/40 hover:bg-gray-600/60'
-                              : 'bg-white hover:bg-gray-100';
+                              const baseItemBg = isText
+                                ? isDark
+                                  ? 'bg-gray-700/70 hover:bg-gray-700/90'
+                                  : 'bg-indigo-50 hover:bg-indigo-100'
+                                : isDark
+                                ? 'bg-gray-600/40 hover:bg-gray-600/60'
+                                : 'bg-white hover:bg-gray-100';
 
-                            const openInReading = () => {
-                              if (isText) return; // pas d'ouverture pour bloc texte
-                              const url = new URL(window.location.href);
-                              url.searchParams.set('b', it.bookId);
-                              url.searchParams.set('c', String(it.chapter));
-                              url.searchParams.set('v', String(it.verse));
-                              window.history.replaceState({}, '', url.toString());
-                              setPage('reading');
-                            };
+                              const openInReading = () => {
+                                if (isText) return;
+                                const url = new URL(window.location.href);
+                                url.searchParams.set('b', it.bookId);
+                                url.searchParams.set('c', String(it.chapter));
+                                url.searchParams.set('v', String(it.verse));
+                                window.history.replaceState({}, '', url.toString());
+                                setPage('reading');
+                              };
 
-                            return (
-                              <li
-                                key={idx}
-                                className={`${baseItemBg} rounded-md p-3 transition`}
-                              >
-                                <button
-                                  className="w-full text-left"
-                                  onClick={() =>
-                                    setOpenItemMenu(
-                                      menuOpen ? null : { listId: list.id, idx }
-                                    )
-                                  }
+                              const textBaseClass = isDark
+                                ? 'text-white mt-1 whitespace-pre-wrap'
+                                : 'text-gray-800 mt-1 whitespace-pre-wrap';
+                              const textClass = isText
+                                ? `${textBaseClass} font-serif`
+                                : textBaseClass;
+
+                              return (
+                                <li
+                                  key={idx}
+                                  id={`principle-item-${list.id}-${idx}`}
+                                  className={`${baseItemBg} rounded-md p-3 transition ${
+                                    isText ? 'border-l-4 border-indigo-400' : ''
+                                  }`}
                                 >
-                                  {/* En-tête : pour un verset on montre la réf, pour un bloc texte on n'affiche pas de titre */}
-                                  {!isText ? (
-                                    <div className="font-semibold">
-                                      {(it.bookName ?? it.bookId) || ' '}{' '}
-                                      {it.chapter}:{it.verse}
-                                    </div>
-                                  ) : null}
-
-                                  {it.text ? (
-                                    <div
-                                      style={{
-                                        fontSize: `${state.settings.fontSize}px`,
-                                        lineHeight: '1.55',
-                                      }}
-                                      className={
-                                        isDark
-                                          ? 'text-white mt-1'
-                                          : 'text-gray-800 mt-1'
-                                      }
-                                    >
-                                      {it.text}
-                                    </div>
-                                  ) : null}
-                                </button>
-
-                                {/* Actions de l'item — mêmes tailles que Notes */}
-                                {menuOpen && (
-                                  <div
-                                    className={`mt-3 flex flex-wrap items-center gap-2 rounded-md px-2 py-2 ${
-                                      isDark ? 'bg-gray-800' : 'bg-gray-200'
-                                    }`}
+                                  <button
+                                    className="w-full text-left"
+                                    onClick={() =>
+                                      setOpenItemMenu(
+                                        menuOpen ? null : { listId: list.id, idx }
+                                      )
+                                    }
                                   >
-                                    {!isText && (
-                                      <>
-                                        <button
-                                          onClick={openInReading}
-                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-500"
-                                        >
-                                          {label.open}
-                                        </button>
+                                    {!isText ? (
+                                      <div className="font-semibold">
+                                        {(it.bookName ?? it.bookId) || ''} {it.chapter}:{it.verse}
+                                      </div>
+                                    ) : null}
 
-                                        {/* Copier ce verset */}
-                                        <button
-                                          onClick={() => copyItemText(it)}
-                                          className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                            isDark
-                                              ? 'bg-gray-700 text-white'
-                                              : 'bg-white text-gray-800'
-                                          }`}
-                                          title={label.copy}
-                                        >
-                                          <Copy size={16} />
-                                          {label.copy}
-                                        </button>
-
-                                        {/* Partager ce verset */}
-                                        <button
-                                          onClick={() => shareItem(it)}
-                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500"
-                                          title={label.share}
-                                        >
-                                          <Share2 size={16} />
-                                          {label.share}
-                                        </button>
-                                      </>
-                                    )}
-
-                                    {/* Modifier (uniquement pour bloc de texte) */}
-                                    {isText && (
-                                      <button
-                                        onClick={() =>
-                                          editTextBlock(
-                                            list.id,
-                                            idx,
-                                            String(it.text || '')
-                                          )
-                                        }
-                                        className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500"
-                                        title={label.editTextBlock}
+                                    {it.text ? (
+                                      <div
+                                        style={{
+                                          fontSize: `${state.settings.fontSize}px`,
+                                          lineHeight: '1.55',
+                                        }}
+                                        className={textClass}
                                       >
-                                        <EditTextIcon size={16} />
-                                        {label.editTextBlock}
+                                        {it.text}
+                                      </div>
+                                    ) : null}
+                                  </button>
+
+                                  {menuOpen && (
+                                    <div
+                                      className={`mt-3 flex flex-wrap items-center gap-2 rounded-md px-2 py-2 ${
+                                        isDark ? 'bg-gray-800' : 'bg-gray-200'
+                                      }`}
+                                    >
+                                      {!isText && (
+                                        <>
+                                          <button
+                                            onClick={openInReading}
+                                            className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-500"
+                                          >
+                                            {label.open}
+                                          </button>
+
+                                          <button
+                                            onClick={() => copyItemText(it)}
+                                            className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
+                                              isDark
+                                                ? 'bg-gray-700 text-white'
+                                                : 'bg-white text-gray-800'
+                                            }`}
+                                            title={t('copyLabel')}
+                                          >
+                                            <Copy size={16} />
+                                            {t('copyLabel')}
+                                          </button>
+
+                                          <button
+                                            onClick={() => shareItem(it)}
+                                            className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500"
+                                            title={t('shareLabel')}
+                                          >
+                                            <Share2 size={16} />
+                                            {t('shareLabel')}
+                                          </button>
+                                        </>
+                                      )}
+
+                                      {isText && (
+                                        <button
+                                          onClick={() =>
+                                            editTextBlock(list.id, idx, String(it.text || ''))
+                                          }
+                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500"
+                                          title={label.editTextBlock}
+                                        >
+                                          <EditTextIcon size={16} />
+                                          {label.editTextBlock}
+                                        </button>
+                                      )}
+
+                                      <button
+                                        onClick={() => moveItem(list.id, idx, -1)}
+                                        className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
+                                          isDark
+                                            ? 'bg-gray-700 text-white'
+                                            : 'bg-white text-gray-800'
+                                        }`}
+                                        disabled={idx === 0}
+                                        title={label.moveUp}
+                                      >
+                                        <ArrowUp size={16} />
+                                        {label.moveUp}
                                       </button>
-                                    )}
 
-                                    <button
-                                      onClick={() => moveItem(list.id, idx, -1)}
-                                      className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                        isDark
-                                          ? 'bg-gray-700 text-white'
-                                          : 'bg-white text-gray-800'
-                                      }`}
-                                      disabled={idx === 0}
-                                      title={label.moveUp}
-                                    >
-                                      <ArrowUp size={16} />
-                                      {label.moveUp}
-                                    </button>
+                                      <button
+                                        onClick={() => moveItem(list.id, idx, 1)}
+                                        className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
+                                          isDark
+                                            ? 'bg-gray-700 text-white'
+                                            : 'bg-white text-gray-800'
+                                        }`}
+                                        disabled={idx === list.items.length - 1}
+                                        title={label.moveDown}
+                                      >
+                                        <ArrowDown size={16} />
+                                        {label.moveDown}
+                                      </button>
 
-                                    <button
-                                      onClick={() => moveItem(list.id, idx, 1)}
-                                      className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                        isDark
-                                          ? 'bg-gray-700 text-white'
-                                          : 'bg-white text-gray-800'
-                                      }`}
-                                      disabled={idx === list.items.length - 1}
-                                      title={label.moveDown}
-                                    >
-                                      <ArrowDown size={16} />
-                                      {label.moveDown}
-                                    </button>
+                                      <button
+                                        onClick={() => removeItem(list.id, idx)}
+                                        className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-red-600 text-white hover:bg-red-500"
+                                        title={label.deleteItem}
+                                      >
+                                        <Trash2 size={16} />
+                                        {label.deleteItem}
+                                      </button>
 
-                                    {/* Corbeille pour supprimer l'élément sélectionné */}
-                                    <button
-                                      onClick={() => removeItem(list.id, idx)}
-                                      className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-red-600 text-white hover:bg-red-500"
-                                      title={label.deleteItem}
-                                    >
-                                      <Trash2 size={16} />
-                                      {label.deleteItem}
-                                    </button>
+                                      <button
+                                        onClick={() => setOpenItemMenu(null)}
+                                        className={`px-2 py-1.5 rounded ${
+                                          isDark
+                                            ? 'bg-gray-700 text-white'
+                                            : 'bg-white text-gray-800'
+                                        }`}
+                                      >
+                                        {label.cancel}
+                                      </button>
 
-                                    {/* Annuler (fermer le menu) */}
-                                    <button
-                                      onClick={() => setOpenItemMenu(null)}
-                                      className={`px-2 py-1.5 rounded ${
-                                        isDark
-                                          ? 'bg-gray-700 text-white'
-                                          : 'bg-white text-gray-800'
-                                      }`}
-                                    >
-                                      {label.cancel}
-                                    </button>
+                                      <button
+                                        onClick={() => setOpenItemMenu(null)}
+                                        className="ml-auto px-2 py-1.5 rounded bg-green-600 text-white hover:bg-green-500"
+                                      >
+                                        OK
+                                      </button>
+                                    </div>
+                                  )}
+                                </li>
+                              );
+                            })}
+                          </ul>
 
-                                    {/* OK visible à droite */}
-                                    <button
-                                      onClick={() => setOpenItemMenu(null)}
-                                      className="ml-auto px-2 py-1.5 rounded bg-green-600 text-white hover:bg-green-500"
-                                    >
-                                      OK
-                                    </button>
-                                  </div>
-                                )}
-                              </li>
-                            );
-                          })}
-                        </ul>
+                          {/* Bouton "Ajouter un bloc texte" en bas de la liste ouverte */}
+                          <div className="mt-4 flex justify-center">
+                            <button
+                              onClick={() => addTextBlock(list.id)}
+                              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 text-sm"
+                            >
+                              <TextIcon size={16} />
+                              {label.addTextBlock}
+                            </button>
+                          </div>
+                        </>
                       )}
-
-                      {/* Éditeur de bloc texte en bas de l’étude (comme Notes) */}
-                      <div
-                        className={`mt-4 rounded-lg p-3 ${
-                          isDark
-                            ? 'bg-gray-800'
-                            : 'bg-indigo-50 border border-indigo-100'
-                        }`}
-                      >
-                        <label className="block text-sm font-semibold mb-2">
-                          {label.addTextBlock}
-                        </label>
-                        <textarea
-                          ref={newTextRef}
-                          className={`w-full rounded-md px-2 py-1.5 text-sm min-h-[120px] border resize-vertical ${
-                            isDark
-                              ? 'bg-gray-900 border-gray-600 text-white'
-                              : 'bg-white border-gray-300 text-gray-900'
-                          }`}
-                          style={{
-                            fontSize: `${state.settings.fontSize}px`,
-                            lineHeight: '1.55',
-                          }}
-                          value={textDrafts[list.id] ?? ''}
-                          onChange={(e) =>
-                            setTextDrafts((prev) => ({
-                              ...prev,
-                              [list.id]: e.target.value,
-                            }))
-                          }
-                          placeholder={label.newTextPlaceholder}
-                        />
-                        <div className="mt-2 flex justify-end">
-                          <button
-                            onClick={() => {
-                              const draft = (textDrafts[list.id] ?? '').trim();
-                              if (!draft) return;
-                              addTextBlock(list.id, draft);
-                              setTextDrafts((prev) => ({
-                                ...prev,
-                                [list.id]: '',
-                              }));
-                            }}
-                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-500"
-                          >
-                            <TextIcon size={16} />
-                            {label.addTextBlock}
-                          </button>
-                        </div>
-                      </div>
                     </div>
                   )}
                 </div>
@@ -1105,7 +1191,59 @@ export default function Principes() {
         </div>
       )}
 
-      {/* MODALE : notice Notes & Études (commune avec Notes) */}
+      {/* MODALE : édition / création d'un bloc de texte */}
+      {editingTextBlock && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setEditingTextBlock(null)}
+            aria-hidden="true"
+          />
+          <div
+            className={`relative w-full max-w-lg mx-4 rounded-2xl p-5 ${
+              isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
+            }`}
+          >
+            <h2 className="text-xl font-semibold mb-3">
+              {editingTextBlock.idx === null ? label.addTextBlock : label.editTextBlock}
+            </h2>
+            <textarea
+              className={`w-full rounded-md px-3 py-2 text-base min-h-[220px] border resize-vertical ${
+                isDark
+                  ? 'bg-gray-800 border-gray-600 text-white'
+                  : 'bg-gray-50 border-gray-300 text-gray-900'
+              }`}
+              style={{
+                fontSize: `${state.settings.fontSize}px`,
+                lineHeight: '1.6',
+              }}
+              value={editingTextValue}
+              onChange={(e) => setEditingTextValue(e.target.value)}
+              placeholder={label.newTextPlaceholder}
+            />
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => setEditingTextBlock(null)}
+                className={`px-3 py-1.5 rounded text-base ${
+                  isDark
+                    ? 'bg-gray-700 text-white'
+                    : 'bg-gray-200 text-gray-800'
+                }`}
+              >
+                {label.cancel}
+              </button>
+              <button
+                onClick={handleSaveTextBlock}
+                className="px-3 py-1.5 rounded text-base bg-green-600 text-white hover:bg-green-500"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODALE : Aide / mode d'emploi (même texte que Notes) */}
       {showHelp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div
@@ -1114,32 +1252,85 @@ export default function Principes() {
             aria-hidden="true"
           />
           <div
-            className={`relative w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto rounded-2xl p-4 ${
+            className={`relative w-full max-w-lg mx-4 rounded-2xl p-5 max-h-[90vh] overflow-y-auto ${
               isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
             }`}
           >
             <h2 className="text-xl font-semibold mb-3">
-              {t('notesHelpTitle')}
+              {label.helpTitle}
             </h2>
-            <p className="text-sm mb-3">{t('notesHelpIntro')}</p>
 
-            <div className="space-y-3 text-sm">
-              {Array.from({ length: 10 }).map((_, idx) => {
-                const n = idx + 1;
-                const titleKey = `notesHelp${n}Title`;
-                const bodyKey = `notesHelp${n}Body`;
-                return (
-                  <div key={n}>
-                    <h3 className="font-semibold mb-0.5">
-                      {t(titleKey as any)}
-                    </h3>
-                    <p className="opacity-90">{t(bodyKey as any)}</p>
-                  </div>
-                );
-              })}
+            <div
+              className="space-y-3 leading-relaxed text-left"
+              style={{
+                fontSize: `${state.settings.fontSize}px`,
+                lineHeight: 1.6,
+              }}
+            >
+              <p>{label.helpIntro}</p>
+
+              <p>
+                <strong>{label.help1Title}</strong>
+                <br />
+                {label.help1Body}
+              </p>
+
+              <p>
+                <strong>{label.help2Title}</strong>
+                <br />
+                {label.help2Body}
+              </p>
+
+              <p>
+                <strong>{label.help3Title}</strong>
+                <br />
+                {label.help3Body}
+              </p>
+
+              <p>
+                <strong>{label.help4Title}</strong>
+                <br />
+                {label.help4Body}
+              </p>
+
+              <p>
+                <strong>{label.help5Title}</strong>
+                <br />
+                {label.help5Body}
+              </p>
+
+              <p>
+                <strong>{label.help6Title}</strong>
+                <br />
+                {label.help6Body}
+              </p>
+
+              <p>
+                <strong>{label.help7Title}</strong>
+                <br />
+                {label.help7Body}
+              </p>
+
+              <p>
+                <strong>{label.help8Title}</strong>
+                <br />
+                {label.help8Body}
+              </p>
+
+              <p>
+                <strong>{label.help9Title}</strong>
+                <br />
+                {label.help9Body}
+              </p>
+
+              <p>
+                <strong>{label.help10Title}</strong>
+                <br />
+                {label.help10Body}
+              </p>
             </div>
 
-            <div className="mt-4 text-right">
+            <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => setShowHelp(false)}
                 className={`px-3 py-1.5 rounded text-sm ${
@@ -1148,7 +1339,7 @@ export default function Principes() {
                     : 'bg-gray-200 text-gray-800'
                 }`}
               >
-                {label.cancel}
+                OK
               </button>
             </div>
           </div>
@@ -1157,4 +1348,5 @@ export default function Principes() {
     </div>
   );
 }
+
 
