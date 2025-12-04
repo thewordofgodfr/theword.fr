@@ -32,6 +32,7 @@ import {
 /** Sentinelle pour distinguer un bloc de texte libre d'un verset */
 const TEXT_SENTINEL = '__TEXT__';
 const LAST_LIST_STORAGE_KEY = 'theword:lastNotesListId';
+const LIST_ORDER_STORAGE_KEY = 'theword:notesListOrder';
 
 type AnyItem = VerseRef & {
   kind?: 'text' | 'verse';
@@ -188,7 +189,45 @@ export default function Notes() {
     [t, language]
   );
 
-  const refresh = () => setLists(getAllLists());
+  const refresh = () => {
+    const all = getAllLists();
+
+    if (typeof window === 'undefined') {
+      setLists(all);
+      return;
+    }
+
+    let storedOrder: string[] = [];
+    try {
+      const raw = window.localStorage.getItem(LIST_ORDER_STORAGE_KEY);
+      if (raw) {
+        storedOrder = JSON.parse(raw);
+      }
+    } catch {
+      storedOrder = [];
+    }
+
+    // Ne garder que les ids encore existants
+    const validStored = storedOrder.filter((id) => all.some((l) => l.id === id));
+    // Ajouter les nouvelles listes en fin
+    const missingIds = all
+      .filter((l) => !validStored.includes(l.id))
+      .map((l) => l.id);
+    const finalOrder = [...validStored, ...missingIds];
+
+    const sorted = [...all].sort(
+      (a, b) => finalOrder.indexOf(a.id) - finalOrder.indexOf(b.id)
+    );
+
+    setLists(sorted);
+
+    try {
+      window.localStorage.setItem(LIST_ORDER_STORAGE_KEY, JSON.stringify(finalOrder));
+    } catch {
+      // ignore
+    }
+  };
+
   useEffect(() => {
     refresh();
   }, []);
@@ -290,6 +329,32 @@ export default function Notes() {
     deleteList(id);
     refresh();
     if (expandedId === id) setExpandedId(null);
+  };
+
+  // Réordonner les LISTES (monter / descendre)
+  const moveList = (id: string, dir: -1 | 1) => {
+    setLists((current) => {
+      const arr = [...current];
+      const index = arr.findIndex((l) => l.id === id);
+      if (index === -1) return current;
+
+      const target = index + dir;
+      if (target < 0 || target >= arr.length) return current;
+
+      const [moved] = arr.splice(index, 1);
+      arr.splice(target, 0, moved);
+
+      try {
+        if (typeof window !== 'undefined') {
+          const order = arr.map((l) => l.id);
+          window.localStorage.setItem(LIST_ORDER_STORAGE_KEY, JSON.stringify(order));
+        }
+      } catch {
+        // ignore
+      }
+
+      return arr;
+    });
   };
 
   // Partage au même format que "Copier", avec lien en plus
@@ -619,6 +684,9 @@ export default function Notes() {
           <div className="space-y-4">
             {shownLists.map((list) => {
               const isOpen = expandedId === list.id;
+              const listIndex = lists.findIndex((l) => l.id === list.id);
+              const canMoveUp = listIndex > 0;
+              const canMoveDown = listIndex !== -1 && listIndex < lists.length - 1;
 
               return (
                 <div
@@ -641,14 +709,58 @@ export default function Notes() {
                   aria-expanded={isOpen}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
-                  {/* Titre + infos */}
-                  <div className="min-w-0">
-                    <div className="text-lg md:text-xl font-semibold leading-snug whitespace-normal break-words">
-                      {list.title}
+                  {/* Titre + infos + (optionnel) boutons de réorganisation de liste */}
+                  <div className="min-w-0 flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-lg md:text-xl font-semibold leading-snug whitespace-normal break-words">
+                        {list.title}
+                      </div>
+                      <div
+                        className={`mt-1 text-xs ${
+                          isDark ? 'text-white/60' : 'text-gray-500'
+                        }`}
+                      >
+                        {list.items.length} {label.verses} • {formatDate(list.updatedAt)}
+                      </div>
                     </div>
-                    <div className={`mt-1 text-xs ${isDark ? 'text-white/60' : 'text-gray-500'}`}>
-                      {list.items.length} {label.verses} • {formatDate(list.updatedAt)}
-                    </div>
+
+                    {!isOpen && (
+                      <div className="flex flex-col items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (canMoveUp) moveList(list.id, -1);
+                          }}
+                          disabled={!canMoveUp}
+                          title={label.moveUp}
+                          className={`inline-flex items-center justify-center rounded-full p-1 border text-xs ${
+                            isDark
+                              ? 'border-gray-600 text-gray-200 bg-gray-900'
+                              : 'border-gray-300 text-gray-700 bg-gray-50'
+                          } ${!canMoveUp ? 'opacity-40 cursor-default' : 'active:scale-95'}`}
+                        >
+                          <ArrowUp size={14} />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (canMoveDown) moveList(list.id, 1);
+                          }}
+                          disabled={!canMoveDown}
+                          title={label.moveDown}
+                          className={`inline-flex items-center justify-center rounded-full p-1 border text-xs ${
+                            isDark
+                              ? 'border-gray-600 text-gray-200 bg-gray-900'
+                              : 'border-gray-300 text-gray-700 bg-gray-50'
+                          } ${!canMoveDown ? 'opacity-40 cursor-default' : 'active:scale-95'}`}
+                        >
+                          <ArrowDown size={14} />
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   {/* Actions de la liste ouverte */}
@@ -1157,4 +1269,5 @@ export default function Notes() {
     </div>
   );
 }
+
 
