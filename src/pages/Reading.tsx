@@ -638,33 +638,43 @@ export default function Reading() {
     }
   };
   const shareSelection = async () => {
-    if (!selectedBook || !chapter || selectedVerses.length === 0) return;
-    const chosen = chapter.verses
-      .filter(v => selectedVerses.includes(v.verse))
-      .sort((a, b) => a.verse - b.verse);
-    const ranges = compressRanges(chosen.map(v => v.verse));
-    const ref =
-      getBookName(selectedBook) + ' ' + chapter.chapter + ':' + ranges;
-    const body = chosen.map(v => String(v.text)).join('\n');
-    const shareUrl = 'https://www.theword.fr/#about';
-    const shareText = ref + '\n' + body + '\n\n' + shareUrl;
-    try {
-      const nav = navigator as any;
-      if (nav?.share) {
-        await nav.share({ title: ref, text: shareText });
+  if (!selectedBook || !chapter || selectedVerses.length === 0) return;
+
+  const chosen = chapter.verses
+    .filter(v => selectedVerses.includes(v.verse))
+    .sort((a, b) => a.verse - b.verse);
+
+  const ranges = compressRanges(chosen.map(v => v.verse));
+  const ref =
+    getBookName(selectedBook) + ' ' + chapter.chapter + ':' + ranges;
+
+  const body = chosen.map(v => String(v.text)).join('\n');
+  const shareUrl = 'https://www.theword.fr/#about';
+
+  const shareText = `${ref}
+
+${body}
+
+Découvrir l’application The Word :
+${shareUrl}`;
+
+  try {
+    const nav = navigator as any;
+    if (nav?.share) {
+      await nav.share({ title: ref, text: shareText });
+      setSelectedVerses([]);
+    } else {
+      const ok = await copyToClipboard(shareText);
+      if (ok) {
+        setCopiedKey('shared-fallback');
+        setTimeout(() => setCopiedKey(''), 1800);
         setSelectedVerses([]);
-      } else {
-        const ok = await copyToClipboard(shareText);
-        if (ok) {
-          setCopiedKey('shared-fallback');
-          setTimeout(() => setCopiedKey(''), 1800);
-          setSelectedVerses([]);
-        }
       }
-    } catch (e) {
-      console.error('share error', e);
     }
-  };
+  } catch (e) {
+    console.error('share error', e);
+  }
+};
 
   // ---- Ajout à une liste Notes / Principes ----
   const sortListsByTitle = (arr: VerseList[]) =>
