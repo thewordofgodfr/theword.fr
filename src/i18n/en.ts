@@ -168,7 +168,6 @@ const en: TranslationDict = {
     copy: 'Copy',
     deleteList: 'Delete',
 
-    // Titles for native share
     shareStudyTitle: 'Study',
     shareItemTitle: 'Verse',
   },
@@ -225,7 +224,7 @@ const en: TranslationDict = {
   versionsFootnote:
     'All Bible versions used are in the public domain. Some have been partially modernized (vocabulary, grammar) while remaining strictly faithful to the original manuscripts.',
 
-  // Quick slots / reading shortcuts (About + Reading)
+  // Quick slots
   quickSlotsIntro:
     'These 4 buttons, aligned to the right of the Book/Chapter selector, let you jump back to frequent readings to follow several books in parallel: use 1/2/3 for three locations, and the magnifier to resume the last passage (random verse or search).',
   quickSlotsIllustrationLabel: 'Shortcuts illustration',
@@ -234,10 +233,44 @@ const en: TranslationDict = {
   quickSlot2Tooltip: 'Shortcut 2',
   quickSlot3Tooltip: 'Shortcut 3',
 
+  // Notes help (how it works)
+  notesHelpTitle: 'Notes — how it works',
+  notesHelpIntro:
+    'The Notes page lets you keep verses, thoughts, meditations and prayers organised into lists. Everything is stored locally on your device, 100% offline, with no account and no internet connection needed.',
+  notesHelp1Title: '1. Note lists',
+  notesHelp1Body:
+    'Each card represents a note list (for example: "Sunday sermon", "Prayers for family", etc.). The orange "Create list" button adds a new list. The line under the title shows the number of items and the last modification date.',
+  notesHelp2Title: '2. Open and go back to lists',
+  notesHelp2Body:
+    'Tap a card to open a list. The "All lists" button at the top returns to the global view. When you come back from the Reading page, the app automatically reopens the last used list and scrolls to the end so you can continue taking notes easily.',
+  notesHelp3Title: '3. Add verses from the Bible',
+  notesHelp3Body:
+    'From the Reading page (and from search), you can add verses to your notes using the Notes button. The selected verses are saved in the list or lists you choose, with the reference and verse text.',
+  notesHelp4Title: '4. Free text blocks',
+  notesHelp4Body:
+    'In addition to verses, you can add free text blocks (reports, outlines, ideas, prayers, summaries, etc.). The "Add text block" button (at the top and bottom of the list) opens a large editor area. The text is stored as a full item in the list, which you can later edit, move or delete.',
+  notesHelp5Title: '5. Reorder items',
+  notesHelp5Body:
+    'By tapping an item you open its action menu. The "Move up" and "Move down" arrows let you change the order of items in the list to match your study or sermon structure.',
+  notesHelp6Title: '6. Copy and share a whole list',
+  notesHelp6Body:
+    'In an open list, the "Share" and "Copy" buttons let you export the entire content: title, references, texts and note blocks. You can then paste it into a message, a document or another tool, even while staying offline.',
+  notesHelp7Title: '7. Share with a TheWord code',
+  notesHelp7Body:
+    'The "Code" button generates a compact code you can send to someone. In their The Word app, they can use the import-by-code option to recreate exactly the same list (title + content) on their device.',
+  notesHelp8Title: '8. Import from a text document',
+  notesHelp8Body:
+    'The "Import from text" button lets you paste a complete document (Word notes, email, sermon outline, etc.). The app splits the text into blocks (separated by blank lines) and automatically creates a list of text blocks. Very handy to turn an existing document into notes inside The Word.',
+  notesHelp9Title: '9. Local storage and privacy',
+  notesHelp9Body:
+    'All your notes are stored only on your device. The Word does not sync anything to a server and does not collect any personal data. If you delete the app or clear browsing data, your note lists will be deleted as well.',
+  notesHelp10Title: '10. Ideas for using Notes',
+  notesHelp10Body:
+    'You can use Notes to prepare sermons, follow a study plan, keep a prayer list, write down what God reminds you of during the day, or store verses to memorise. Feel free to adapt the lists to your own way of meditating on the Word.',
+
   // Common
   loading: 'Loading...',
   error: 'Error loading content',
 };
 
 export default en;
-
