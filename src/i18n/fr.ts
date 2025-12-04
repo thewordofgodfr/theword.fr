@@ -258,7 +258,7 @@ const fr: TranslationDict = {
     'Dans une liste de Notes ou une Étude ouverte, les boutons « Partager » et « Copier » permettent de récupérer tout le contenu : titre, références, textes et blocs de notes. Vous pouvez ensuite coller ce contenu dans un message, un document et un autre outil, ou par exemple l’envoyer à quelqu’un par SMS, WhatsApp ou autre application de messagerie.',
   notesHelp6Title: '6. Partage par code The Word',
   notesHelp6Body:
-    'Le bouton « Code » génère un code compact que vous pouvez envoyer à quelqu’un qui possède aussi l’application The Word. Dans son application, cette personne peut utiliser l’option d’import par code pour recréer exactement la même liste de Notes ou la même Étude (titre + contenu) sur son appareil. Le bouton « Code » permet aussi de transformer une Note en étude : on peut ainsi transférer tout le contenu d’une liste de note vers étude.',
+    'Le bouton « Code » génère un code compact que vous pouvez envoyer à quelqu’un qui possède aussi l’application The Word. Dans son application, cette personne peut utiliser l’option d’import par code pour recréer exactement la même liste de Notes ou la même Étude (titre + contenu) sur son appareil. Le bouton « Code » permet aussi de transformer une Note en Étude : on peut ainsi transférer tout le contenu d’une liste de Notes vers Études.',
   notesHelp7Title: '7. Importer à partir d’un texte',
   notesHelp7Body:
     'Le bouton « Importer depuis un texte » permet de coller un document complet (notes Word, e-mail, prédication, plan d’étude, etc.). L’application découpe le texte en blocs (séparés par des lignes vides) et crée automatiquement une liste ou une étude composée de ces blocs de texte. C’est très pratique pour transformer rapidement un document existant en Notes ou en Étude dans The Word.',
@@ -267,10 +267,10 @@ const fr: TranslationDict = {
     'Toutes vos Notes et Études sont enregistrées uniquement sur votre appareil. The Word ne synchronise rien sur un serveur et ne collecte aucune donnée personnelle. Si vous supprimez l’application ou effacez les données de navigation, les listes de Notes et les Études seront également effacées.',
   notesHelp9Title: '9. Idées d’utilisation',
   notesHelp9Body:
-    'Vous pouvez utiliser les Notes pour préparer des prédications, suivre un plan d’étude personnel, garder une liste de prières, noter ce que Dieu vous rappelle pendant la journée ou conserver des versets à apprendre par cœur. Utilisez les Études pour construire des parcours bibliques complets (par thèmes, par livres, pour un groupe de maison, un groupe de jeunes, une série de messages, etc.) que vous pourrez ensuite enseigner ou partager facilement.',
+    'Vous pouvez utiliser les Notes pour préparer des prédications, suivre un plan d’étude personnel, garder une liste de prières, noter ce que Dieu vous rappelle pendant la journée ou conserver des versets à apprendre par cœur. Utilisez les Études pour construire des parcours bibliques complets (par thèmes, par livres, pour un groupe de maison, une série de messages, etc.) que vous pourrez ensuite enseigner ou partager facilement.',
   notesHelp10Title: '10. Notes & Études ensemble',
   notesHelp10Body:
-    'N’hésitez pas à combiner Notes et Études : par exemple, gardez vos pensées quotidiennes et vos prières dans Notes, et réservez les Études pour les plans que vous souhaitez retravailler, imprimer, enseigner ou partager avec un groupe.',
+    'N’hésitez pas à combiner Notes et Études : par exemple, gardez vos pensées quotidiennes et vos prières dans Notes, et réservez les Études pour les plans que vous souhaitez retravailler, enseigner ou partager avec un groupe.',
 
   // Common
   loading: 'Chargement...',
