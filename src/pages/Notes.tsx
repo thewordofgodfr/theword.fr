@@ -21,7 +21,7 @@ import {
   ArrowUp,
   ArrowDown,
   Type as TextIcon,
-  Edit2 as EditTextIcon, // <- icône crayon pour modifier un bloc texte
+  Edit2 as EditTextIcon,
   HelpCircle,
 } from 'lucide-react';
 import {
@@ -124,7 +124,7 @@ export default function Notes() {
 
   const label = useMemo(
     () => ({
-      title: t('notes'), // libellé général "Notes"
+      title: t('notes'),
       create: t('notesPage.create'),
       placeholder: t('notesPage.placeholder'),
       empty: t('notesPage.empty'),
@@ -160,38 +160,30 @@ export default function Notes() {
       emptyList: t('notesPage.emptyList'),
       importFromTextTitle: t('notesPage.importFromTextTitle'),
       documentContent: t('notesPage.documentContent'),
-    }),
-    [t, language]
-  );
 
-  // Textes d’aide (i18n)
-  const notesHelp = useMemo(
-    () => ({
-      title: t('notesHelp.title'),
-      intro: t('notesHelp.intro'),
-      s1Title: t('notesHelp.s1Title'),
-      s1Body: t('notesHelp.s1Body'),
-      s2Title: t('notesHelp.s2Title'),
-      s2Body: t('notesHelp.s2Body'),
-      s3Title: t('notesHelp.s3Title'),
-      s3Body: t('notesHelp.s3Body'),
-      s4Title: t('notesHelp.s4Title'),
-      s4Body: t('notesHelp.s4Body'),
-      s5Title: t('notesHelp.s5Title'),
-      s5Body: t('notesHelp.s5Body'),
-      s6Title: t('notesHelp.s6Title'),
-      s6Body: t('notesHelp.s6Body'),
-      s7Title: t('notesHelp.s7Title'),
-      s7Body: t('notesHelp.s7Body'),
-      s8Title: t('notesHelp.s8Title'),
-      s8Body: t('notesHelp.s8Body'),
-      s9Title: t('notesHelp.s9Title'),
-      s9Body: t('notesHelp.s9Body'),
-      s10Title: t('notesHelp.s10Title'),
-      s10Body: t('notesHelp.s10Body'),
-      ok: t('notesHelp.ok'),
-      buttonTitle: t('notesHelp.helpButtonTitle'),
-      buttonAria: t('notesHelp.helpButtonAria'),
+      // Aide / mode d'emploi (i18n)
+      helpTitle: t('notesHelpTitle'),
+      helpIntro: t('notesHelpIntro'),
+      help1Title: t('notesHelp1Title'),
+      help1Body: t('notesHelp1Body'),
+      help2Title: t('notesHelp2Title'),
+      help2Body: t('notesHelp2Body'),
+      help3Title: t('notesHelp3Title'),
+      help3Body: t('notesHelp3Body'),
+      help4Title: t('notesHelp4Title'),
+      help4Body: t('notesHelp4Body'),
+      help5Title: t('notesHelp5Title'),
+      help5Body: t('notesHelp5Body'),
+      help6Title: t('notesHelp6Title'),
+      help6Body: t('notesHelp6Body'),
+      help7Title: t('notesHelp7Title'),
+      help7Body: t('notesHelp7Body'),
+      help8Title: t('notesHelp8Title'),
+      help8Body: t('notesHelp8Body'),
+      help9Title: t('notesHelp9Title'),
+      help9Body: t('notesHelp9Body'),
+      help10Title: t('notesHelp10Title'),
+      help10Body: t('notesHelp10Body'),
     }),
     [t, language]
   );
@@ -225,7 +217,6 @@ export default function Notes() {
   // si la liste mémorisée n'existe plus (supprimée), on nettoie l'état
   useEffect(() => {
     if (!expandedId) return;
-    // IMPORTANT : attendre que les listes soient chargées avant de décider
     if (!lists.length) return;
     if (!lists.some((l) => l.id === expandedId)) {
       setExpandedId(null);
@@ -247,7 +238,6 @@ export default function Notes() {
     if (el && 'scrollIntoView' in el) {
       (el as HTMLElement).scrollIntoView({ block: 'center', behavior: 'auto' });
     }
-    // On ne scrolle qu'une seule fois, pas à chaque petite mise à jour
     setShouldScrollToLast(false);
   }, [lists, expandedId, shouldScrollToLast]);
 
@@ -264,7 +254,6 @@ export default function Notes() {
     const title = prompt(label.placeholder) ?? '';
     const trimmed = title.trim();
     if (!trimmed) return;
-    // éviter doublons de titre (insensible à la casse)
     const exists = getAllLists().find(
       (l) => (l.title || '').trim().toLowerCase() === trimmed.toLowerCase()
     );
@@ -333,12 +322,11 @@ export default function Notes() {
   const doShareCode = async (id: string) => {
     const list = getListById(id);
     if (!list) return;
-    const code = encodeSharedList('note', list); // <- type "note"
+    const code = encodeSharedList('note', list);
     try {
       await navigator.clipboard.writeText(code);
       alert(label.shareCodeCopied);
     } catch {
-      // fallback : on affiche le code dans un prompt pour copier à la main
       prompt(label.shareCode, code);
     }
   };
@@ -366,7 +354,7 @@ export default function Notes() {
     } catch {}
   };
 
-  // --- Import direct depuis un TEXTE (mini outil interne) ---
+  // --- Import direct depuis un TEXTE ---
   const openImportFromText = () => {
     setImportTextTitle('');
     setImportTextBody('');
@@ -410,7 +398,7 @@ export default function Notes() {
     } catch {}
   };
 
-  // --- opérations de copie/partage pour UN élément (verset ou bloc texte) ---
+  // --- opérations de copie/partage pour UN élément ---
   const copyItemText = async (it: AnyItem) => {
     const txt = buildItemPlainText(it);
     if (!txt) return;
@@ -432,7 +420,6 @@ export default function Notes() {
       }
     } catch {}
   };
-  // ---------------------------------------------------------------
 
   // ---------- opérations sur items ----------
   const updateItems = (listId: string, updater: (items: AnyItem[]) => AnyItem[]) => {
@@ -471,7 +458,7 @@ export default function Notes() {
     );
   };
 
-  // Ouverture d'un nouveau bloc texte (multi-lignes) via une modale
+  // Ouverture d'un nouveau bloc texte
   const addTextBlock = (listId: string) => {
     setEditingTextBlock({
       listId,
@@ -480,7 +467,7 @@ export default function Notes() {
     });
   };
 
-  // Édition d'un bloc texte existant (multi-lignes) via une modale
+  // Édition d'un bloc texte existant
   const editTextBlock = (listId: string, idx: number, currentText: string) => {
     setEditingTextBlock({
       listId,
@@ -492,14 +479,12 @@ export default function Notes() {
   const handleSaveTextBlock = () => {
     if (!editingTextBlock) return;
     const raw = editingTextValue;
-    // pas de bloc entièrement vide
     if (!raw.trim()) {
       setEditingTextBlock(null);
       return;
     }
 
     if (editingTextBlock.idx === null) {
-      // nouveau bloc
       updateItems(editingTextBlock.listId, (items) => {
         const arr = [...items];
         const newItem: AnyItem = {
@@ -515,7 +500,6 @@ export default function Notes() {
         return arr;
       });
     } else {
-      // édition d'un bloc existant
       const idx = editingTextBlock.idx;
       updateItems(editingTextBlock.listId, (items) => {
         const arr = [...items];
@@ -532,7 +516,7 @@ export default function Notes() {
   // quand une liste est ouverte, n'afficher qu'elle
   const shownLists = expandedId ? lists.filter((l) => l.id === expandedId) : lists;
 
-  // format date sans heure (création / modif) — affichage simple type 31/12/2025
+  // format date simple
   const formatDate = (d: string | number | Date) =>
     new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' });
 
@@ -554,8 +538,8 @@ export default function Notes() {
             {/* Bouton aide / mode d'emploi */}
             <button
               type="button"
-              aria-label={notesHelp.buttonAria}
-              title={notesHelp.buttonTitle}
+              aria-label="Aide sur la page Notes"
+              title="Aide / Mode d'emploi"
               onClick={() => setShowHelp(true)}
               className={`inline-flex items-center justify-center rounded-full p-2 border text-sm ${
                 isDark
@@ -569,7 +553,7 @@ export default function Notes() {
 
           {!expandedId && (
             <div className="mt-4 space-y-2">
-              {/* Gros bouton primaire : + Créer une liste (ORANGE) */}
+              {/* Gros bouton : créer une liste */}
               <button
                 onClick={doCreate}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-orange-500 text-white font-semibold text-sm shadow hover:bg-orange-400 active:scale-[0.98]"
@@ -578,9 +562,8 @@ export default function Notes() {
                 {label.create}
               </button>
 
-              {/* Ligne de boutons secondaires alignés à droite */}
+              {/* Boutons secondaires à droite */}
               <div className="flex flex-wrap items-center justify-end gap-2">
-                {/* Importer depuis un TEXTE (Texte → Liste) avec liseret harmonisé */}
                 <button
                   onClick={openImportFromText}
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
@@ -593,7 +576,6 @@ export default function Notes() {
                   {label.importTextButton}
                 </button>
 
-                {/* Importer depuis un CODE TheWord (même liseret) */}
                 <button
                   onClick={doImportFromCode}
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
@@ -612,7 +594,6 @@ export default function Notes() {
 
         {expandedId && (
           <div className="mb-4 flex flex-col sm:flex-row sm:items-center gap-2">
-            {/* Bouton retour : ORANGE, pleine largeur sur mobile */}
             <button
               onClick={() => setExpandedId(null)}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-orange-500 text-white font-semibold text-sm hover:bg-orange-400"
@@ -620,7 +601,6 @@ export default function Notes() {
               {label.backAll}
             </button>
 
-            {/* Ajouter un bloc de texte : BLEU, même largeur/hauteur */}
             <button
               onClick={() => expandedId && addTextBlock(expandedId)}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 text-sm"
@@ -643,13 +623,11 @@ export default function Notes() {
               return (
                 <div
                   key={list.id}
-                  // Toute la carte cliquable en "liste des notes" (vue fermée)
                   onClick={
                     !isOpen
                       ? () => {
                           setOpenItemMenu(null);
                           setExpandedId(list.id);
-                          // Lorsqu'on ouvre une note depuis la liste, on remonte tout en haut
                           try {
                             window.scrollTo({ top: 0, behavior: 'auto' });
                           } catch {}
@@ -663,7 +641,7 @@ export default function Notes() {
                   aria-expanded={isOpen}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
-                  {/* En-tête : Titre sur toute la largeur + infos (sans heure) */}
+                  {/* Titre + infos */}
                   <div className="min-w-0">
                     <div className="text-lg md:text-xl font-semibold leading-snug whitespace-normal break-words">
                       {list.title}
@@ -673,8 +651,7 @@ export default function Notes() {
                     </div>
                   </div>
 
-                  {/* En vue LISTE (fermée), on n'affiche AUCUNE icône d'action.
-                      En vue OUVERTE, on place les icônes SOUS le titre pour libérer la largeur. */}
+                  {/* Actions de la liste ouverte */}
                   {isOpen && (
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       <button
@@ -708,7 +685,6 @@ export default function Notes() {
                         {t('copyLabel')}
                       </button>
 
-                      {/* Nouveau : bouton "Code" pour cette liste */}
                       <button
                         onClick={() => doShareCode(list.id)}
                         className={`${
@@ -755,7 +731,7 @@ export default function Notes() {
                                 : 'bg-white hover:bg-gray-100';
 
                               const openInReading = () => {
-                                if (isText) return; // pas d'ouverture pour bloc texte
+                                if (isText) return;
                                 const url = new URL(window.location.href);
                                 url.searchParams.set('b', it.bookId);
                                 url.searchParams.set('c', String(it.chapter));
@@ -787,7 +763,6 @@ export default function Notes() {
                                       )
                                     }
                                   >
-                                    {/* En-tête : pour un verset on montre la réf, pour un bloc texte on n'affiche pas de titre */}
                                     {!isText ? (
                                       <div className="font-semibold">
                                         {(it.bookName ?? it.bookId) || ''} {it.chapter}:{it.verse}
@@ -807,7 +782,6 @@ export default function Notes() {
                                     ) : null}
                                   </button>
 
-                                  {/* Actions de l'item */}
                                   {menuOpen && (
                                     <div
                                       className={`mt-3 flex flex-wrap items-center gap-2 rounded-md px-2 py-2 ${
@@ -823,7 +797,6 @@ export default function Notes() {
                                             {label.open}
                                           </button>
 
-                                          {/* Copier ce verset */}
                                           <button
                                             onClick={() => copyItemText(it)}
                                             className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
@@ -837,10 +810,9 @@ export default function Notes() {
                                             {t('copyLabel')}
                                           </button>
 
-                                          {/* Partager ce verset */}
                                           <button
                                             onClick={() => shareItem(it)}
-                                            className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text.white hover:bg-indigo-500"
+                                            className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500"
                                             title={t('shareLabel')}
                                           >
                                             <Share2 size={16} />
@@ -849,7 +821,6 @@ export default function Notes() {
                                         </>
                                       )}
 
-                                      {/* Modifier (uniquement pour bloc de texte) */}
                                       {isText && (
                                         <button
                                           onClick={() =>
@@ -891,7 +862,6 @@ export default function Notes() {
                                         {label.moveDown}
                                       </button>
 
-                                      {/* Corbeille pour supprimer l'élément sélectionné */}
                                       <button
                                         onClick={() => removeItem(list.id, idx)}
                                         className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-red-600 text-white hover:bg-red-500"
@@ -901,7 +871,6 @@ export default function Notes() {
                                         {label.deleteItem}
                                       </button>
 
-                                      {/* Annuler (fermer le menu) */}
                                       <button
                                         onClick={() => setOpenItemMenu(null)}
                                         className={`px-2 py-1.5 rounded ${
@@ -913,7 +882,6 @@ export default function Notes() {
                                         {label.cancel}
                                       </button>
 
-                                      {/* OK visible à droite */}
                                       <button
                                         onClick={() => setOpenItemMenu(null)}
                                         className="ml-auto px-2 py-1.5 rounded bg-green-600 text-white hover:bg-green-500"
@@ -950,7 +918,7 @@ export default function Notes() {
 
       {/* MODALE : importer depuis un TEXTE */}
       {showImportFromText && (
-        <div className="fixed inset-0 z-50 flex.items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div
             className="absolute inset-0 bg-black/60"
             onClick={() => setShowImportFromText(false)}
@@ -983,11 +951,11 @@ export default function Notes() {
             </div>
 
             <div className="mb-3">
-              <label.className="block text-sm mb-1">
+              <label className="block text-sm mb-1">
                 {label.documentContent}
               </label>
               <textarea
-                className={`w-full rounded-md px-2 py-1.5 text-sm min-h-[160px] border.resize-vertical ${
+                className={`w-full rounded-md px-2 py-1.5 text-sm min-h-[160px] border resize-vertical ${
                   isDark
                     ? 'bg-gray-800 border-gray-600 text-white'
                     : 'bg-gray-50 border-gray-300 text-gray-900'
@@ -1032,9 +1000,9 @@ export default function Notes() {
         </div>
       )}
 
-      {/* MODALE : édition / création d'un bloc de texte multi-lignes */}
+      {/* MODALE : édition / création d'un bloc de texte */}
       {editingTextBlock && (
-        <div className="fixed inset-0 z-50 flex.items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div
             className="absolute inset-0 bg-black/60"
             onClick={() => setEditingTextBlock(null)}
@@ -1049,7 +1017,7 @@ export default function Notes() {
               {editingTextBlock.idx === null ? label.addTextBlock : label.editTextBlock}
             </h2>
             <textarea
-              className={`w-full rounded-md px-3.py-2 text-base min-h-[220px] border.resize-vertical ${
+              className={`w-full rounded-md px-3 py-2 text-base min-h-[220px] border resize-vertical ${
                 isDark
                   ? 'bg-gray-800 border-gray-600 text-white'
                   : 'bg-gray-50 border-gray-300 text-gray-900'
@@ -1084,9 +1052,9 @@ export default function Notes() {
         </div>
       )}
 
-      {/* MODALE : Aide / mode d'emploi de la page Notes */}
+      {/* MODALE : Aide / mode d'emploi */}
       {showHelp && (
-        <div className="fixed inset-0 z-50 flex.items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div
             className="absolute inset-0 bg-black/60"
             onClick={() => setShowHelp(false)}
@@ -1097,82 +1065,77 @@ export default function Notes() {
               isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
             }`}
           >
-            <h2
-              className="font-semibold mb-3"
-              style={{
-                fontSize: `${state.settings.fontSize + 4}px`,
-              }}
-            >
-              {notesHelp.title}
+            <h2 className="text-xl font-semibold mb-3">
+              {label.helpTitle}
             </h2>
 
             <div
-              className="space-y-3 leading-relaxed"
+              className="space-y-3 leading-relaxed text-left"
               style={{
                 fontSize: `${state.settings.fontSize}px`,
                 lineHeight: 1.6,
               }}
             >
-              <p>{notesHelp.intro}</p>
+              <p>{label.helpIntro}</p>
 
               <p>
-                <strong>{notesHelp.s1Title}</strong>
+                <strong>{label.help1Title}</strong>
                 <br />
-                {notesHelp.s1Body}
+                {label.help1Body}
               </p>
 
               <p>
-                <strong>{notesHelp.s2Title}</strong>
+                <strong>{label.help2Title}</strong>
                 <br />
-                {notesHelp.s2Body}
+                {label.help2Body}
               </p>
 
               <p>
-                <strong>{notesHelp.s3Title}</strong>
+                <strong>{label.help3Title}</strong>
                 <br />
-                {notesHelp.s3Body}
+                {label.help3Body}
               </p>
 
               <p>
-                <strong>{notesHelp.s4Title}</strong>
+                <strong>{label.help4Title}</strong>
                 <br />
-                {notesHelp.s4Body}
+                {label.help4Body}
               </p>
 
               <p>
-                <strong>{notesHelp.s5Title}</strong>
+                <strong>{label.help5Title}</strong>
                 <br />
-                {notesHelp.s5Body}
+                {label.help5Body}
               </p>
 
               <p>
-                <strong>{notesHelp.s6Title}</strong>
+                <strong>{label.help6Title}</strong>
                 <br />
-                {notesHelp.s6Body}
+                {label.help6Body}
               </p>
 
               <p>
-                <strong>{notesHelp.s7Title}</strong>
+                <strong>{label.help7Title}</strong>
                 <br />
-                {notesHelp.s7Body}
+                {label.help7Body}
               </p>
 
               <p>
-                <strong>{notesHelp.s8Title}</strong>
+                <strong>{label.help8Title}</strong>
                 <br />
-                {notesHelp.s8Body}
+                {label.help8Body}
               </p>
 
               <p>
-                <strong>{notesHelp.s9Title}</strong>
+                <strong>{label.help9Title}</strong>
                 <br />
-                {notesHelp.s9Body}
+                {label.help9Body}
               </p>
 
               <p>
-                <strong>{notesHelp.s10Title}</strong>
+                <strong>{label.help10Title}</strong>
                 <br />
-                {notesHelp.s10Body}
+                {label.help10Body}
               </p>
             </div>
 
@@ -1185,7 +1148,7 @@ export default function Notes() {
                     : 'bg-gray-200 text-gray-800'
                 }`}
               >
-                {notesHelp.ok}
+                OK
               </button>
             </div>
           </div>
