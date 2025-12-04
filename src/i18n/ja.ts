@@ -9,7 +9,7 @@ const ja: TranslationDict = {
   settings: "設定",
   about: "このアプリについて",
   notes: "ノート",
-  principles: "学び",
+  principles: "聖書研究",
 
   // Home page
   randomVerse: "ランダムな聖句",
@@ -36,7 +36,7 @@ const ja: TranslationDict = {
   verseWord: "節",
   versesSelectedSuffix: "節が選択されています",
   toNotes: "ノートへ",
-  toPrinciples: "学びへ",
+  toPrinciples: "聖書研究へ",
   copyLabel: "コピー",
   shareLabel: "共有",
   cancel: "キャンセル",
