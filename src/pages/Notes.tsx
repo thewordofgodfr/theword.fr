@@ -178,6 +178,8 @@ export default function Notes() {
   // si la liste mémorisée n'existe plus (supprimée), on nettoie l'état
   useEffect(() => {
     if (!expandedId) return;
+    // IMPORTANT : attendre que les listes soient chargées avant de décider
+    if (!lists.length) return;
     if (!lists.some((l) => l.id === expandedId)) {
       setExpandedId(null);
     }
@@ -946,27 +948,31 @@ export default function Notes() {
             aria-hidden="true"
           />
           <div
-            className={`relative w-full max-w-lg mx-4 rounded-2xl p-4 ${
+            className={`relative w-full max-w-lg mx-4 rounded-2xl p-5 ${
               isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
             }`}
           >
-            <h2 className="text-lg font-semibold mb-2">
+            <h2 className="text-xl font-semibold mb-3">
               {editingTextBlock.idx === null ? label.addTextBlock : label.editTextBlock}
             </h2>
             <textarea
-              className={`w-full rounded-md px-2 py-1.5 text-sm min-h-[180px] border resize-vertical ${
+              className={`w-full rounded-md px-3 py-2 text-base min-h-[220px] border resize-vertical ${
                 isDark
                   ? 'bg-gray-800 border-gray-600 text-white'
                   : 'bg-gray-50 border-gray-300 text-gray-900'
               }`}
+              style={{
+                fontSize: `${state.settings.fontSize}px`,
+                lineHeight: '1.6',
+              }}
               value={editingTextValue}
               onChange={(e) => setEditingTextValue(e.target.value)}
               placeholder={label.newTextPlaceholder}
             />
-            <div className="flex justify-end gap-2 mt-3">
+            <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => setEditingTextBlock(null)}
-                className={`px-3 py-1.5 rounded text-sm ${
+                className={`px-3 py-1.5 rounded text-base ${
                   isDark
                     ? 'bg-gray-700 text-white'
                     : 'bg-gray-200 text-gray-800'
@@ -976,7 +982,7 @@ export default function Notes() {
               </button>
               <button
                 onClick={handleSaveTextBlock}
-                className="px-3 py-1.5 rounded text-sm bg-green-600 text-white hover:bg-green-500"
+                className="px-3 py-1.5 rounded text-base bg-green-600 text-white hover:bg-green-500"
               >
                 OK
               </button>
