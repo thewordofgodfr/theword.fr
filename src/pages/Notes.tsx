@@ -357,14 +357,16 @@ export default function Notes() {
     });
   };
 
-  // Partage au même format que "Copier", avec lien en plus
+    // Partage au même format que "Copier", avec lien en plus
   const doShare = async (id: string) => {
     const list = getListById(id);
     if (!list) return;
+
     const payload = `${buildPlainListText(list)}
 
-    Découvrir l’application The Word :
-    https://www.theword.fr/#about;
+Découvrir l’application The Word :
+https://www.theword.fr/#about`;
+
     try {
       const nav: any = navigator;
       if (nav?.share) {
@@ -375,6 +377,7 @@ export default function Notes() {
       }
     } catch {}
   };
+
 
   const copyListText = async (id: string) => {
     const list = getListById(id);
