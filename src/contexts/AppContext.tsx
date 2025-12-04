@@ -9,7 +9,14 @@ import React, {
 import { AppSettings, Language, Theme } from '../types/bible';
 
 /** Pages supportées dans l’app */
-type Page = 'home' | 'reading' | 'settings' | 'about' | 'search' | 'notes';
+type Page =
+  | 'home'
+  | 'reading'
+  | 'settings'
+  | 'about'
+  | 'search'
+  | 'notes'
+  | 'principes';
 
 interface ReadingContext {
   book: string;
@@ -52,6 +59,43 @@ const STORAGE_KEYS = {
 const FIRST_RUN_KEY = 'tw_firstRun_v2';
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
+
+/**
+ * Association entre les pages internes et le hash dans l’URL.
+ * Cela permet d’avoir des liens du type :
+ *  - #home
+ *  - #reading
+ *  - #search
+ *  - #notes
+ *  - #principes
+ *  - #settings
+ *  - #about
+ */
+const PAGE_HASH_MAP: Record<Page, string> = {
+  home: '#home',
+  reading: '#reading',
+  search: '#search',
+  settings: '#settings',
+  about: '#about',
+  notes: '#notes',
+  principes: '#principes',
+};
+
+const HASH_PAGE_MAP: Record<string, Page> = {
+  '#home': 'home',
+  '#reading': 'reading',
+  '#search': 'search',
+  '#settings': 'settings',
+  '#about': 'about',
+  '#notes': 'notes',
+  '#principes': 'principes',
+};
+
+const getInitialPageFromHash = (): Page => {
+  if (typeof window === 'undefined') return 'home';
+  const hash = window.location.hash;
+  return HASH_PAGE_MAP[hash] || 'home';
+};
 
 /**
  * Détermine la langue par défaut
@@ -118,7 +162,7 @@ const initialState: AppState = {
     fontSize: 25,
     language: getInitialLanguage(),
   },
-  currentPage: 'home',
+  currentPage: getInitialPageFromHash(),
 };
 
 function appReducer(state: AppState, action: AppAction): AppState {
@@ -307,6 +351,41 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [state.settings.theme]);
 
+  // Synchroniser la page avec le hash de l’URL (liens externes, bouton retour, etc.)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Si on arrive sans hash, on force #home pour avoir une URL explicite
+    if (!window.location.hash) {
+      const initialPage = getInitialPageFromHash();
+      const initialHash = PAGE_HASH_MAP[initialPage] || '#home';
+      window.history.replaceState(
+        null,
+        '',
+        window.location.pathname + window.location.search + initialHash
+      );
+    }
+
+    const handleHashChange = () => {
+      const newPage = getInitialPageFromHash();
+      dispatch({ type: 'SET_PAGE', payload: newPage });
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
+
+  // Mettre à jour le hash quand la page change (clic sur le menu, navigation interne, etc.)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const targetHash = PAGE_HASH_MAP[state.currentPage] || '#home';
+    if (window.location.hash !== targetHash) {
+      window.location.hash = targetHash;
+    }
+  }, [state.currentPage]);
+
   const updateSettings = (newSettings: Partial<AppSettings>) => {
     Object.entries(newSettings).forEach(([key, value]) => {
       switch (key) {
@@ -325,6 +404,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const setPage = (page: Page) => {
+    dispatch({ type: 'SET_PAGE', payload: page });
+  };
+
   const navigateToVerse = (book: string, chapter: number, verse?: number) => {
     dispatch({ type: 'SET_READING_CONTEXT', payload: { book, chapter, verse } });
     dispatch({ type: 'SET_PAGE', payload: 'reading' });
@@ -332,10 +415,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const saveReadingPosition = (book: string, chapter: number) => {
     dispatch({ type: 'SAVE_READING_POSITION', payload: { book, chapter } });
-  };
-
-  const setPage = (page: Page) => {
-    dispatch({ type: 'SET_PAGE', payload: page });
   };
 
   return (
