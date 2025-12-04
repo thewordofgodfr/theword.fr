@@ -233,40 +233,40 @@ const en: TranslationDict = {
   quickSlot2Tooltip: 'Shortcut 2',
   quickSlot3Tooltip: 'Shortcut 3',
 
-  // Notes + Studies help (shared how-to)
+    // Notes + Studies help (shared how-to)
   notesHelpTitle: 'Notes & Studies — how it works',
   notesHelpIntro:
-    'The Notes and Studies pages let you keep verses, thoughts, meditations and Bible outlines neatly organised. Everything is stored locally on your device, 100% offline, with no account and no internet connection. Use Notes mainly for personal lists (sermons you hear, prayers, thoughts, themes, etc.) and Studies to build structured Bible studies that you can later teach or share with others.',
-  notesHelp1Title: '1. Notes and Studies lists',
+    'The Notes and Studies pages let you memorise verses, create themed lists and build real studies by combining verses and text blocks. Everything is stored locally on your device, 100% offline, with no account and no internet connection.',
+  notesHelp1Title: '1. Notes & Studies home page',
   notesHelp1Body:
-    'Each card represents either a Notes list (for example: “Sunday sermon”, “Prayers for family”, etc.) or a Study (for example: “Study on faith”, “Youth Bible course”, etc.). The orange “Create list” button on the Notes page and the green “Create study” button on the Studies page let you add new sets. The line under the title shows the number of items and the last modification date.',
-  notesHelp2Title: '2. Open and go back to lists / studies',
+    'Groups all your Notes and Studies lists. Tap a list to open its content. The “All lists” or “All studies” button at the top returns to the global view. When you come back from the Reading page, the app automatically reopens the last Notes list or Study you used and scrolls to the end so you can continue working easily.',
+  notesHelp2Title: '2. Add verses from the Bible',
   notesHelp2Body:
-    'Tap a card to open its content. The “All lists” or “All studies” button at the top returns to the global view. When you come back from the Reading page, the app automatically reopens the last Notes list or Study you used and scrolls to the end so you can continue working easily.',
-  notesHelp3Title: '3. Add verses from the Bible',
+    'From the Reading page, you can add verses either to your Notes or to your Studies using the dedicated buttons. The selected verses are saved in the list(s) or study(ies) you choose, with the reference and verse text. You can memorise the same verse in several different lists.',
+  notesHelp3Title: '3. Free text blocks',
   notesHelp3Body:
-    'From the Reading page (and from Search), you can add verses either to your Notes or to your Studies using the dedicated buttons. The selected verses are saved in the list(s) or study(ies) you choose, with the reference and verse text. This lets you, for example, prepare a structured Bible plan in Studies while keeping more personal applications in Notes.',
-  notesHelp4Title: '4. Free text blocks',
+    'In addition to verses, you can add free text blocks (comments, personal ideas, questions, sermon points, etc.). The “Add text block” button (at the top and bottom of an open list or study) opens a large editor area. The text is stored as a full item that you can then edit, move or delete.',
+  notesHelp4Title: '4. Reorder items',
   notesHelp4Body:
-    'In addition to verses, you can add free text blocks (reports, detailed outlines, ideas, prayers, summaries, questions, etc.). The “Add text block” button (at the top and bottom of an open list or study) shows a large editor area. The text is stored as a full item that you can later edit, move or delete.',
-  notesHelp5Title: '5. Reorder items',
+    'By tapping an item (verse or text block), you open its action menu. The “Move up” and “Move down” arrows let you change the order of items in the list or study, so you can adapt the structure to your Bible study, sermon or meditation time.',
+  notesHelp5Title: '5. Copy and share a whole list',
   notesHelp5Body:
-    'By tapping an item (verse or text block) you open its action menu. The “Move up” and “Move down” arrows let you change the order of items in the list or study, so you can shape the structure of your Bible study, sermon or meditation time.',
-  notesHelp6Title: '6. Copy and share a whole list or study',
+    'In an open Notes list or Study, the “Share” and “Copy” buttons let you retrieve all the content: title, references, texts and note blocks. You can then paste this content into a message, a document or another tool, or for example send it to someone by SMS, WhatsApp or another messaging app.',
+  notesHelp6Title: '6. Share with a The Word code',
   notesHelp6Body:
-    'In an open Notes list or Study, the “Share” and “Copy” buttons let you export the entire content: title, references, texts and note blocks. You can then paste it into a message, a document or another tool, even while staying offline – for example, to send your study to someone.',
-  notesHelp7Title: '7. Share with a TheWord code',
+    'The “Code” button generates a compact code you can send to someone who also has the The Word app. In their app, they can use the import-by-code option to recreate exactly the same Notes list or Study (title and content) on their device. The “Code” button also lets you turn a Note into a Study, so you can transfer the entire content of a Notes list into Studies.',
+  notesHelp7Title: '7. Import from a text',
   notesHelp7Body:
-    'The “Code” button generates a compact code you can send to someone. In their The Word app, they can use the import-by-code option to recreate exactly the same Notes list or Study (title + content) on their device.',
-  notesHelp8Title: '8. Import from a text document',
+    'The “Import from text” button lets you paste a complete document (Word notes, email, sermon, study plan, etc.). The app splits the text into blocks (separated by blank lines) and automatically creates a list or study made up of those text blocks. This is very handy to quickly turn an existing document into Notes or a Study inside The Word.',
+  notesHelp8Title: '8. Local storage and privacy',
   notesHelp8Body:
-    'The “Import from text” button lets you paste a complete document (Word notes, email, sermon outline, study plan, etc.). The app splits the text into blocks (separated by blank lines) and automatically creates a list or study made of text blocks. Very handy to turn an existing document into Notes or a Study inside The Word.',
-  notesHelp9Title: '9. Local storage and privacy',
-  notesHelp9Body:
     'All your Notes and Studies are stored only on your device. The Word does not sync anything to a server and does not collect any personal data. If you delete the app or clear browsing data, your Notes lists and Studies will be deleted as well.',
-  notesHelp10Title: '10. Ideas for using Notes & Studies',
+  notesHelp9Title: '9. Ideas for use',
+  notesHelp9Body:
+    'You can use Notes to prepare sermons, follow a personal study plan, keep a prayer list, write down what God reminds you of during the day or store verses to memorise. Use Studies to build complete Bible courses (by theme, by book, for a home group, youth group, sermon series, etc.) that you can then teach or share easily.',
+  notesHelp10Title: '10. Notes & Studies together',
   notesHelp10Body:
-    'You can use Notes to prepare sermons, follow a personal study plan, keep a prayer list, write down what God reminds you of during the day, or store verses to memorise. Use Studies to build full Bible courses (by theme, by book, for a home group, youth group, sermon series, etc.) that you can then teach or share easily.',
+    'Do not hesitate to combine Notes and Studies: for example, keep your daily thoughts and prayers in Notes, and reserve Studies for plans you want to rework, print, teach or share with a group.',
 
   // Common
   loading: 'Loading...',
