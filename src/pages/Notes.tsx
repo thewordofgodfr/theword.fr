@@ -361,7 +361,10 @@ export default function Notes() {
   const doShare = async (id: string) => {
     const list = getListById(id);
     if (!list) return;
-    const payload = buildPlainListText(list) + '\nhttps://www.theword.fr\n';
+    const payload = `${buildPlainListText(list)}
+
+    Découvrir l’application The Word :
+    https://www.theword.fr/#about;
     try {
       const nav: any = navigator;
       if (nav?.share) {
