@@ -115,6 +115,9 @@ export default function Notes() {
   } | null>(null);
   const [editingTextValue, setEditingTextValue] = useState('');
 
+  // Flag pour savoir si on doit scroller automatiquement vers le dernier élément
+  const [shouldScrollToLast, setShouldScrollToLast] = useState(false);
+
   const label = useMemo(
     () => ({
       title: t('notes'), // libellé général "Notes"
@@ -162,6 +165,14 @@ export default function Notes() {
     refresh();
   }, []);
 
+  // Au premier montage : si une liste était mémorisée, on activera le scroll auto vers la fin
+  useEffect(() => {
+    if (expandedId) {
+      setShouldScrollToLast(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // mémoriser / nettoyer la dernière liste ouverte (pour aller/retour Lecture ↔ Notes)
   useEffect(() => {
     try {
@@ -185,19 +196,24 @@ export default function Notes() {
     }
   }, [lists, expandedId]);
 
-  // quand une liste est ouverte, on descend automatiquement sur le dernier élément
-  // pratique pour la prise de notes en direct lors d'une réunion
+  // quand une liste restaurée est ouverte (depuis Lecture ou au chargement),
+  // on descend automatiquement sur le dernier élément
   useEffect(() => {
-    if (!expandedId) return;
+    if (!expandedId || !shouldScrollToLast) return;
     const list = lists.find((l) => l.id === expandedId);
-    if (!list || !list.items.length) return;
+    if (!list || !list.items.length) {
+      setShouldScrollToLast(false);
+      return;
+    }
 
     const lastIdx = list.items.length - 1;
     const el = document.getElementById(`note-item-${expandedId}-${lastIdx}`);
     if (el && 'scrollIntoView' in el) {
       (el as HTMLElement).scrollIntoView({ block: 'center', behavior: 'auto' });
     }
-  }, [lists, expandedId]);
+    // On ne scrolle qu'une seule fois, pas à chaque petite mise à jour
+    setShouldScrollToLast(false);
+  }, [lists, expandedId, shouldScrollToLast]);
 
   // synchroniser la valeur de la modale d'édition avec le bloc courant
   useEffect(() => {
@@ -659,192 +675,205 @@ export default function Notes() {
                           {label.emptyList}
                         </div>
                       ) : (
-                        <ul className="space-y-3">
-                          {(list.items as AnyItem[]).map((it, idx) => {
-                            const isText = it.bookId === TEXT_SENTINEL;
-                            const menuOpen =
-                              openItemMenu?.listId === list.id && openItemMenu?.idx === idx;
+                        <>
+                          <ul className="space-y-3">
+                            {(list.items as AnyItem[]).map((it, idx) => {
+                              const isText = it.bookId === TEXT_SENTINEL;
+                              const menuOpen =
+                                openItemMenu?.listId === list.id && openItemMenu?.idx === idx;
 
-                            const baseItemBg = isText
-                              ? isDark
-                                ? 'bg-gray-700/70 hover:bg-gray-700/90'
-                                : 'bg-indigo-50 hover:bg-indigo-100'
-                              : isDark
-                              ? 'bg-gray-600/40 hover:bg-gray-600/60'
-                              : 'bg-white hover:bg-gray-100';
+                              const baseItemBg = isText
+                                ? isDark
+                                  ? 'bg-gray-700/70 hover:bg-gray-700/90'
+                                  : 'bg-indigo-50 hover:bg-indigo-100'
+                                : isDark
+                                ? 'bg-gray-600/40 hover:bg-gray-600/60'
+                                : 'bg-white hover:bg-gray-100';
 
-                            const openInReading = () => {
-                              if (isText) return; // pas d'ouverture pour bloc texte
-                              const url = new URL(window.location.href);
-                              url.searchParams.set('b', it.bookId);
-                              url.searchParams.set('c', String(it.chapter));
-                              url.searchParams.set('v', String(it.verse));
-                              window.history.replaceState({}, '', url.toString());
-                              setPage('reading');
-                            };
+                              const openInReading = () => {
+                                if (isText) return; // pas d'ouverture pour bloc texte
+                                const url = new URL(window.location.href);
+                                url.searchParams.set('b', it.bookId);
+                                url.searchParams.set('c', String(it.chapter));
+                                url.searchParams.set('v', String(it.verse));
+                                window.history.replaceState({}, '', url.toString());
+                                setPage('reading');
+                              };
 
-                            const textBaseClass = isDark
-                              ? 'text-white mt-1 whitespace-pre-wrap'
-                              : 'text-gray-800 mt-1 whitespace-pre-wrap';
-                            const textClass = isText
-                              ? `${textBaseClass} font-serif`
-                              : textBaseClass;
+                              const textBaseClass = isDark
+                                ? 'text-white mt-1 whitespace-pre-wrap'
+                                : 'text-gray-800 mt-1 whitespace-pre-wrap';
+                              const textClass = isText
+                                ? `${textBaseClass} font-serif`
+                                : textBaseClass;
 
-                            return (
-                              <li
-                                key={idx}
-                                id={`note-item-${list.id}-${idx}`}
-                                className={`${baseItemBg} rounded-md p-3 transition ${
-                                  isText ? 'border-l-4 border-indigo-400' : ''
-                                }`}
-                              >
-                                <button
-                                  className="w-full text-left"
-                                  onClick={() =>
-                                    setOpenItemMenu(
-                                      menuOpen ? null : { listId: list.id, idx }
-                                    )
-                                  }
+                              return (
+                                <li
+                                  key={idx}
+                                  id={`note-item-${list.id}-${idx}`}
+                                  className={`${baseItemBg} rounded-md p-3 transition ${
+                                    isText ? 'border-l-4 border-indigo-400' : ''
+                                  }`}
                                 >
-                                  {/* En-tête : pour un verset on montre la réf, pour un bloc texte on n'affiche pas de titre */}
-                                  {!isText ? (
-                                    <div className="font-semibold">
-                                      {(it.bookName ?? it.bookId) || ''} {it.chapter}:{it.verse}
-                                    </div>
-                                  ) : null}
-
-                                  {it.text ? (
-                                    <div
-                                      style={{
-                                        fontSize: `${state.settings.fontSize}px`,
-                                        lineHeight: '1.55',
-                                      }}
-                                      className={textClass}
-                                    >
-                                      {it.text}
-                                    </div>
-                                  ) : null}
-                                </button>
-
-                                {/* Actions de l'item */}
-                                {menuOpen && (
-                                  <div
-                                    className={`mt-3 flex flex-wrap items-center gap-2 rounded-md px-2 py-2 ${
-                                      isDark ? 'bg-gray-800' : 'bg-gray-200'
-                                    }`}
+                                  <button
+                                    className="w-full text-left"
+                                    onClick={() =>
+                                      setOpenItemMenu(
+                                        menuOpen ? null : { listId: list.id, idx }
+                                      )
+                                    }
                                   >
-                                    {!isText && (
-                                      <>
-                                        <button
-                                          onClick={openInReading}
-                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-500"
-                                        >
-                                          {label.open}
-                                        </button>
+                                    {/* En-tête : pour un verset on montre la réf, pour un bloc texte on n'affiche pas de titre */}
+                                    {!isText ? (
+                                      <div className="font-semibold">
+                                        {(it.bookName ?? it.bookId) || ''} {it.chapter}:{it.verse}
+                                      </div>
+                                    ) : null}
 
-                                        {/* Copier ce verset */}
-                                        <button
-                                          onClick={() => copyItemText(it)}
-                                          className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                            isDark
-                                              ? 'bg-gray-700 text-white'
-                                              : 'bg-white text-gray-800'
-                                          }`}
-                                          title={t('copyLabel')}
-                                        >
-                                          <Copy size={16} />
-                                          {t('copyLabel')}
-                                        </button>
-
-                                        {/* Partager ce verset */}
-                                        <button
-                                          onClick={() => shareItem(it)}
-                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500"
-                                          title={t('shareLabel')}
-                                        >
-                                          <Share2 size={16} />
-                                          {t('shareLabel')}
-                                        </button>
-                                      </>
-                                    )}
-
-                                    {/* Modifier (uniquement pour bloc de texte) */}
-                                    {isText && (
-                                      <button
-                                        onClick={() =>
-                                          editTextBlock(list.id, idx, String(it.text || ''))
-                                        }
-                                        className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500"
-                                        title={label.editTextBlock}
+                                    {it.text ? (
+                                      <div
+                                        style={{
+                                          fontSize: `${state.settings.fontSize}px`,
+                                          lineHeight: '1.55',
+                                        }}
+                                        className={textClass}
                                       >
-                                        <EditTextIcon size={16} />
-                                        {label.editTextBlock}
+                                        {it.text}
+                                      </div>
+                                    ) : null}
+                                  </button>
+
+                                  {/* Actions de l'item */}
+                                  {menuOpen && (
+                                    <div
+                                      className={`mt-3 flex flex-wrap items-center gap-2 rounded-md px-2 py-2 ${
+                                        isDark ? 'bg-gray-800' : 'bg-gray-200'
+                                      }`}
+                                    >
+                                      {!isText && (
+                                        <>
+                                          <button
+                                            onClick={openInReading}
+                                            className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-500"
+                                          >
+                                            {label.open}
+                                          </button>
+
+                                          {/* Copier ce verset */}
+                                          <button
+                                            onClick={() => copyItemText(it)}
+                                            className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
+                                              isDark
+                                                ? 'bg-gray-700 text-white'
+                                                : 'bg-white text-gray-800'
+                                            }`}
+                                            title={t('copyLabel')}
+                                          >
+                                            <Copy size={16} />
+                                            {t('copyLabel')}
+                                          </button>
+
+                                          {/* Partager ce verset */}
+                                          <button
+                                            onClick={() => shareItem(it)}
+                                            className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500"
+                                            title={t('shareLabel')}
+                                          >
+                                            <Share2 size={16} />
+                                            {t('shareLabel')}
+                                          </button>
+                                        </>
+                                      )}
+
+                                      {/* Modifier (uniquement pour bloc de texte) */}
+                                      {isText && (
+                                        <button
+                                          onClick={() =>
+                                            editTextBlock(list.id, idx, String(it.text || ''))
+                                          }
+                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500"
+                                          title={label.editTextBlock}
+                                        >
+                                          <EditTextIcon size={16} />
+                                          {label.editTextBlock}
+                                        </button>
+                                      )}
+
+                                      <button
+                                        onClick={() => moveItem(list.id, idx, -1)}
+                                        className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
+                                          isDark
+                                            ? 'bg-gray-700 text-white'
+                                            : 'bg-white text-gray-800'
+                                        }`}
+                                        disabled={idx === 0}
+                                        title={label.moveUp}
+                                      >
+                                        <ArrowUp size={16} />
+                                        {label.moveUp}
                                       </button>
-                                    )}
 
-                                    <button
-                                      onClick={() => moveItem(list.id, idx, -1)}
-                                      className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                        isDark
-                                          ? 'bg-gray-700 text-white'
-                                          : 'bg-white text-gray-800'
-                                      }`}
-                                      disabled={idx === 0}
-                                      title={label.moveUp}
-                                    >
-                                      <ArrowUp size={16} />
-                                      {label.moveUp}
-                                    </button>
+                                      <button
+                                        onClick={() => moveItem(list.id, idx, 1)}
+                                        className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
+                                          isDark
+                                            ? 'bg-gray-700 text-white'
+                                            : 'bg-white text-gray-800'
+                                        }`}
+                                        disabled={idx === list.items.length - 1}
+                                        title={label.moveDown}
+                                      >
+                                        <ArrowDown size={16} />
+                                        {label.moveDown}
+                                      </button>
 
-                                    <button
-                                      onClick={() => moveItem(list.id, idx, 1)}
-                                      className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                        isDark
-                                          ? 'bg-gray-700 text-white'
-                                          : 'bg-white text-gray-800'
-                                      }`}
-                                      disabled={idx === list.items.length - 1}
-                                      title={label.moveDown}
-                                    >
-                                      <ArrowDown size={16} />
-                                      {label.moveDown}
-                                    </button>
+                                      {/* Corbeille pour supprimer l'élément sélectionné */}
+                                      <button
+                                        onClick={() => removeItem(list.id, idx)}
+                                        className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-red-600 text-white hover:bg-red-500"
+                                        title={label.deleteItem}
+                                      >
+                                        <Trash2 size={16} />
+                                        {label.deleteItem}
+                                      </button>
 
-                                    {/* Corbeille pour supprimer l'élément sélectionné */}
-                                    <button
-                                      onClick={() => removeItem(list.id, idx)}
-                                      className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-red-600 text-white hover:bg-red-500"
-                                      title={label.deleteItem}
-                                    >
-                                      <Trash2 size={16} />
-                                      {label.deleteItem}
-                                    </button>
+                                      {/* Annuler (fermer le menu) */}
+                                      <button
+                                        onClick={() => setOpenItemMenu(null)}
+                                        className={`px-2 py-1.5 rounded ${
+                                          isDark
+                                            ? 'bg-gray-700 text-white'
+                                            : 'bg-white text-gray-800'
+                                        }`}
+                                      >
+                                        {label.cancel}
+                                      </button>
 
-                                    {/* Annuler (fermer le menu) */}
-                                    <button
-                                      onClick={() => setOpenItemMenu(null)}
-                                      className={`px-2 py-1.5 rounded ${
-                                        isDark
-                                          ? 'bg-gray-700 text-white'
-                                          : 'bg-white text-gray-800'
-                                      }`}
-                                    >
-                                      {label.cancel}
-                                    </button>
+                                      {/* OK visible à droite */}
+                                      <button
+                                        onClick={() => setOpenItemMenu(null)}
+                                        className="ml-auto px-2 py-1.5 rounded bg-green-600 text-white hover:bg-green-500"
+                                      >
+                                        OK
+                                      </button>
+                                    </div>
+                                  )}
+                                </li>
+                              );
+                            })}
+                          </ul>
 
-                                    {/* OK visible à droite */}
-                                    <button
-                                      onClick={() => setOpenItemMenu(null)}
-                                      className="ml-auto px-2 py-1.5 rounded bg-green-600 text-white hover:bg-green-500"
-                                    >
-                                      OK
-                                    </button>
-                                  </div>
-                                )}
-                              </li>
-                            );
-                          })}
-                        </ul>
+                          {/* Bouton "Ajouter un bloc texte" en bas de la liste ouverte */}
+                          <div className="mt-4 flex justify-center">
+                            <button
+                              onClick={() => addTextBlock(list.id)}
+                              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 text-sm"
+                            >
+                              <TextIcon size={16} />
+                              {label.addTextBlock}
+                            </button>
+                          </div>
+                        </>
                       )}
                     </div>
                   )}
