@@ -30,6 +30,7 @@ import {
 
 /** Sentinelle pour distinguer un bloc de texte libre d'un verset */
 const TEXT_SENTINEL = '__TEXT__';
+const LAST_LIST_STORAGE_KEY = 'theword:lastNotesListId';
 
 type AnyItem = VerseRef & {
   kind?: 'text' | 'verse';
@@ -88,7 +89,14 @@ export default function Notes() {
   const isDark = state.settings.theme === 'dark';
 
   const [lists, setLists] = useState<VerseList[]>([]);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      return window.localStorage.getItem(LAST_LIST_STORAGE_KEY) || null;
+    } catch {
+      return null;
+    }
+  });
 
   // item sélectionné pour afficher ses actions
   const [openItemMenu, setOpenItemMenu] = useState<{ listId: string; idx: number } | null>(null);
@@ -98,6 +106,14 @@ export default function Notes() {
   const [importTextTitle, setImportTextTitle] = useState('');
   const [importTextBody, setImportTextBody] = useState('');
   const [importSplitBlocks, setImportSplitBlocks] = useState(true);
+
+  // --- Édition multi-lignes d'un bloc texte (création + édition) ---
+  const [editingTextBlock, setEditingTextBlock] = useState<{
+    listId: string;
+    idx: number | null; // null = nouveau bloc
+    initialValue: string;
+  } | null>(null);
+  const [editingTextValue, setEditingTextValue] = useState('');
 
   const label = useMemo(
     () => ({
@@ -145,6 +161,50 @@ export default function Notes() {
   useEffect(() => {
     refresh();
   }, []);
+
+  // mémoriser / nettoyer la dernière liste ouverte (pour aller/retour Lecture ↔ Notes)
+  useEffect(() => {
+    try {
+      if (expandedId) {
+        window.localStorage.setItem(LAST_LIST_STORAGE_KEY, expandedId);
+      } else {
+        window.localStorage.removeItem(LAST_LIST_STORAGE_KEY);
+      }
+    } catch {
+      // ignore
+    }
+  }, [expandedId]);
+
+  // si la liste mémorisée n'existe plus (supprimée), on nettoie l'état
+  useEffect(() => {
+    if (!expandedId) return;
+    if (!lists.some((l) => l.id === expandedId)) {
+      setExpandedId(null);
+    }
+  }, [lists, expandedId]);
+
+  // quand une liste est ouverte, on descend automatiquement sur le dernier élément
+  // pratique pour la prise de notes en direct lors d'une réunion
+  useEffect(() => {
+    if (!expandedId) return;
+    const list = lists.find((l) => l.id === expandedId);
+    if (!list || !list.items.length) return;
+
+    const lastIdx = list.items.length - 1;
+    const el = document.getElementById(`note-item-${expandedId}-${lastIdx}`);
+    if (el && 'scrollIntoView' in el) {
+      (el as HTMLElement).scrollIntoView({ block: 'center', behavior: 'auto' });
+    }
+  }, [lists, expandedId]);
+
+  // synchroniser la valeur de la modale d'édition avec le bloc courant
+  useEffect(() => {
+    if (editingTextBlock) {
+      setEditingTextValue(editingTextBlock.initialValue ?? '');
+    } else {
+      setEditingTextValue('');
+    }
+  }, [editingTextBlock]);
 
   const doCreate = () => {
     const title = prompt(label.placeholder) ?? '';
@@ -348,31 +408,62 @@ export default function Notes() {
     );
   };
 
+  // Ouverture d'un nouveau bloc texte (multi-lignes) via une modale
   const addTextBlock = (listId: string) => {
-    const txt = prompt(label.newTextPlaceholder) ?? '';
-    const trimmed = txt.trim();
-    if (!trimmed) return;
-    const newItem: AnyItem = {
-      bookId: TEXT_SENTINEL,
-      bookName: '',
-      chapter: 0,
-      verse: 0,
-      text: trimmed,
-      translation: state.settings.language,
-      kind: 'text',
-    };
-    updateItems(listId, (items) => [...items, newItem]);
+    setEditingTextBlock({
+      listId,
+      idx: null,
+      initialValue: '',
+    });
   };
 
+  // Édition d'un bloc texte existant (multi-lignes) via une modale
   const editTextBlock = (listId: string, idx: number, currentText: string) => {
-    const txt = prompt(label.newTextPlaceholder, currentText) ?? '';
-    updateItems(listId, (items) => {
-      const arr = [...items];
-      if (idx < 0 || idx >= arr.length) return arr;
-      const prev = (arr[idx] || {}) as AnyItem;
-      arr[idx] = { ...(prev as any), text: txt } as AnyItem;
-      return arr;
+    setEditingTextBlock({
+      listId,
+      idx,
+      initialValue: currentText || '',
     });
+  };
+
+  const handleSaveTextBlock = () => {
+    if (!editingTextBlock) return;
+    const raw = editingTextValue;
+    // pas de bloc entièrement vide
+    if (!raw.trim()) {
+      setEditingTextBlock(null);
+      return;
+    }
+
+    if (editingTextBlock.idx === null) {
+      // nouveau bloc
+      updateItems(editingTextBlock.listId, (items) => {
+        const arr = [...items];
+        const newItem: AnyItem = {
+          bookId: TEXT_SENTINEL,
+          bookName: '',
+          chapter: 0,
+          verse: 0,
+          text: raw,
+          translation: state.settings.language,
+          kind: 'text',
+        };
+        arr.push(newItem);
+        return arr;
+      });
+    } else {
+      // édition d'un bloc existant
+      const idx = editingTextBlock.idx;
+      updateItems(editingTextBlock.listId, (items) => {
+        const arr = [...items];
+        if (idx < 0 || idx >= arr.length) return arr;
+        const prev = (arr[idx] || {}) as AnyItem;
+        arr[idx] = { ...prev, text: raw } as AnyItem;
+        return arr;
+      });
+    }
+
+    setEditingTextBlock(null);
   };
 
   // quand une liste est ouverte, n'afficher qu'elle
@@ -453,7 +544,7 @@ export default function Notes() {
 
             {/* Ajouter un bloc de texte : BLEU, même largeur/hauteur */}
             <button
-              onClick={() => addTextBlock(expandedId)}
+              onClick={() => expandedId && addTextBlock(expandedId)}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 text-sm"
             >
               <TextIcon size={16} />
@@ -590,10 +681,20 @@ export default function Notes() {
                               setPage('reading');
                             };
 
+                            const textBaseClass = isDark
+                              ? 'text-white mt-1 whitespace-pre-wrap'
+                              : 'text-gray-800 mt-1 whitespace-pre-wrap';
+                            const textClass = isText
+                              ? `${textBaseClass} font-serif`
+                              : textBaseClass;
+
                             return (
                               <li
                                 key={idx}
-                                className={`${baseItemBg} rounded-md p-3 transition`}
+                                id={`note-item-${list.id}-${idx}`}
+                                className={`${baseItemBg} rounded-md p-3 transition ${
+                                  isText ? 'border-l-4 border-indigo-400' : ''
+                                }`}
                               >
                                 <button
                                   className="w-full text-left"
@@ -616,7 +717,7 @@ export default function Notes() {
                                         fontSize: `${state.settings.fontSize}px`,
                                         lineHeight: '1.55',
                                       }}
-                                      className={isDark ? 'text-white mt-1' : 'text-gray-800 mt-1'}
+                                      className={textClass}
                                     >
                                       {it.text}
                                     </div>
@@ -668,7 +769,9 @@ export default function Notes() {
                                     {/* Modifier (uniquement pour bloc de texte) */}
                                     {isText && (
                                       <button
-                                        onClick={() => editTextBlock(list.id, idx, String(it.text || ''))}
+                                        onClick={() =>
+                                          editTextBlock(list.id, idx, String(it.text || ''))
+                                        }
                                         className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500"
                                         title={label.editTextBlock}
                                       >
@@ -828,6 +931,54 @@ export default function Notes() {
                 className="px-3 py-1.5 rounded text-sm bg-blue-600 text-white hover:bg-blue-500"
               >
                 {label.importTextCreate}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODALE : édition / création d'un bloc de texte multi-lignes */}
+      {editingTextBlock && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setEditingTextBlock(null)}
+            aria-hidden="true"
+          />
+          <div
+            className={`relative w-full max-w-lg mx-4 rounded-2xl p-4 ${
+              isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
+            }`}
+          >
+            <h2 className="text-lg font-semibold mb-2">
+              {editingTextBlock.idx === null ? label.addTextBlock : label.editTextBlock}
+            </h2>
+            <textarea
+              className={`w-full rounded-md px-2 py-1.5 text-sm min-h-[180px] border resize-vertical ${
+                isDark
+                  ? 'bg-gray-800 border-gray-600 text-white'
+                  : 'bg-gray-50 border-gray-300 text-gray-900'
+              }`}
+              value={editingTextValue}
+              onChange={(e) => setEditingTextValue(e.target.value)}
+              placeholder={label.newTextPlaceholder}
+            />
+            <div className="flex justify-end gap-2 mt-3">
+              <button
+                onClick={() => setEditingTextBlock(null)}
+                className={`px-3 py-1.5 rounded text-sm ${
+                  isDark
+                    ? 'bg-gray-700 text-white'
+                    : 'bg-gray-200 text-gray-800'
+                }`}
+              >
+                {label.cancel}
+              </button>
+              <button
+                onClick={handleSaveTextBlock}
+                className="px-3 py-1.5 rounded text-sm bg-green-600 text-white hover:bg-green-500"
+              >
+                OK
               </button>
             </div>
           </div>
