@@ -263,10 +263,10 @@ const en: TranslationDict = {
     'All your Notes and Studies are stored only on your device. The Word does not sync anything to a server and does not collect any personal data. If you delete the app or clear browsing data, your Notes lists and Studies will be deleted as well.',
   notesHelp9Title: '9. Ideas for use',
   notesHelp9Body:
-    'You can use Notes to prepare sermons, follow a personal study plan, keep a prayer list, write down what God reminds you of during the day or store verses to memorise. Use Studies to build complete Bible courses (by theme, by book, for a home group, youth group, sermon series, etc.) that you can then teach or share easily.',
+    'You can use Notes to prepare sermons, follow a personal study plan, keep a prayer list, write down what God reminds you of during the day or store verses to memorise. Use Studies to build complete Bible courses (by theme, by book, for a home group, sermon series, etc.) that you can then teach or share easily.',
   notesHelp10Title: '10. Notes & Studies together',
   notesHelp10Body:
-    'Do not hesitate to combine Notes and Studies: for example, keep your daily thoughts and prayers in Notes, and reserve Studies for plans you want to rework, print, teach or share with a group.',
+    'Do not hesitate to combine Notes and Studies: for example, keep your daily thoughts and prayers in Notes, and reserve Studies for plans you want to rework, teach or share with a group.',
 
   // Common
   loading: 'Loading...',
