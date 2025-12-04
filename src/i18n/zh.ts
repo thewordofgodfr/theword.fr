@@ -9,7 +9,7 @@ const zh: TranslationDict = {
   settings: "设置",
   about: "关于",
   notes: "笔记",
-  principles: "研读",
+  principles: "查经",
 
   // Home page
   randomVerse: "随机经文",
@@ -36,7 +36,7 @@ const zh: TranslationDict = {
   verseWord: "节",
   versesSelectedSuffix: "节已选",
   toNotes: "前往笔记",
-  toPrinciples: "前往研读",
+  toPrinciples: "前往查经",
   copyLabel: "复制",
   shareLabel: "分享",
   cancel: "取消",
