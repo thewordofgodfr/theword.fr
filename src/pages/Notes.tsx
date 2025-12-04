@@ -22,6 +22,7 @@ import {
   ArrowDown,
   Type as TextIcon,
   Edit2 as EditTextIcon, // <- icône crayon pour modifier un bloc texte
+  HelpCircle,
 } from 'lucide-react';
 import {
   encodeSharedList,
@@ -117,6 +118,9 @@ export default function Notes() {
 
   // Flag pour savoir si on doit scroller automatiquement vers le dernier élément
   const [shouldScrollToLast, setShouldScrollToLast] = useState(false);
+
+  // Aide / mode d'emploi
+  const [showHelp, setShowHelp] = useState(false);
 
   const label = useMemo(
     () => ({
@@ -240,6 +244,9 @@ export default function Notes() {
     const created = createList(trimmed);
     refresh();
     setExpandedId(created.id);
+    try {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    } catch {}
   };
 
   const doRename = (id: string, current: string) => {
@@ -322,6 +329,9 @@ export default function Notes() {
     refresh();
     setExpandedId(created.id);
     alert(label.importSuccess);
+    try {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    } catch {}
   };
 
   // --- Import direct depuis un TEXTE (mini outil interne) ---
@@ -363,6 +373,9 @@ export default function Notes() {
     refresh();
     setExpandedId(created.id);
     setShowImportFromText(false);
+    try {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    } catch {}
   };
 
   // --- opérations de copie/partage pour UN élément (verset ou bloc texte) ---
@@ -496,7 +509,7 @@ export default function Notes() {
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* HEADER */}
         <div className="mb-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <h1
               className={`text-2xl md:text-3xl font-bold ${
                 isDark ? 'text-white' : 'text-gray-800'
@@ -505,6 +518,21 @@ export default function Notes() {
               <ListIcon className="w-6 h-6" />
               {label.title}
             </h1>
+
+            {/* Bouton aide / mode d'emploi */}
+            <button
+              type="button"
+              aria-label="Aide sur la page Notes"
+              title="Aide / Mode d'emploi"
+              onClick={() => setShowHelp(true)}
+              className={`inline-flex items-center justify-center rounded-full p-2 border text-sm ${
+                isDark
+                  ? 'border-gray-600 text-gray-200 hover:border-indigo-400 hover:text-white'
+                  : 'border-gray-300 text-gray-600 hover:border-indigo-500 hover:text-gray-900'
+              }`}
+            >
+              <HelpCircle className="w-5 h-5" />
+            </button>
           </div>
 
           {!expandedId && (
@@ -589,6 +617,10 @@ export default function Notes() {
                       ? () => {
                           setOpenItemMenu(null);
                           setExpandedId(list.id);
+                          // Lorsqu'on ouvre une note depuis la liste, on remonte tout en haut
+                          try {
+                            window.scrollTo({ top: 0, behavior: 'auto' });
+                          } catch {}
                         }
                       : undefined
                   }
@@ -1012,6 +1044,133 @@ export default function Notes() {
               <button
                 onClick={handleSaveTextBlock}
                 className="px-3 py-1.5 rounded text-base bg-green-600 text-white hover:bg-green-500"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODALE : Aide / mode d'emploi de la page Notes */}
+      {showHelp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setShowHelp(false)}
+            aria-hidden="true"
+          />
+          <div
+            className={`relative w-full max-w-lg mx-4 rounded-2xl p-5 max-h-[90vh] overflow-y-auto ${
+              isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
+            }`}
+          >
+            <h2 className="text-xl font-semibold mb-3">
+              Notes — mode d&apos;emploi
+            </h2>
+
+            <div className="space-y-3 text-sm leading-relaxed">
+              <p>
+                La page <strong>Notes</strong> vous permet de garder vos versets, pensées,
+                méditations et prières organisés par listes. Tout est stocké localement sur
+                votre appareil, <strong>100&nbsp;% hors ligne</strong>, sans compte et sans
+                connexion internet.
+              </p>
+
+              <p>
+                <strong>1. Listes de notes</strong><br />
+                Chaque carte représente une liste de notes (par exemple&nbsp;: &laquo;&nbsp;Prédication
+                du dimanche&nbsp;&raquo;, &laquo;&nbsp;Prières pour la famille&nbsp;&raquo;, etc.).
+                Le bouton <em>&laquo;&nbsp;Créer une liste&nbsp;&raquo;</em> (orange) permet
+                d&apos;ajouter une nouvelle liste. La ligne sous le titre indique le nombre
+                d&apos;éléments et la date de dernière modification.
+              </p>
+
+              <p>
+                <strong>2. Ouvrir et revenir aux listes</strong><br />
+                Touchez une carte pour ouvrir une liste. Le bouton
+                <em> &laquo;&nbsp;Toutes les listes&nbsp;&raquo;</em> en haut permet de revenir
+                à la vue globale. Quand vous revenez depuis la page Lecture, l&apos;application
+                réouvre automatiquement la dernière liste utilisée et se place à la fin, pour
+                continuer vos notes facilement.
+              </p>
+
+              <p>
+                <strong>3. Ajouter des versets depuis la Bible</strong><br />
+                Depuis la page <em>Lecture</em> (et la recherche), vous pouvez ajouter des versets
+                à vos notes en utilisant le bouton dédié pour les Notes. Les versets choisis
+                sont enregistrés dans la ou les listes que vous sélectionnez, avec la référence
+                et le texte du verset.
+              </p>
+
+              <p>
+                <strong>4. Blocs de texte libres</strong><br />
+                En plus des versets, vous pouvez ajouter des <em>blocs de texte</em> (compte-rendus,
+                plans, idées, prières, résumés, etc.). Le bouton
+                <em> &laquo;&nbsp;Ajouter un bloc texte&nbsp;&raquo;</em> (en haut et en bas de
+                la liste) ouvre une grande zone d&apos;édition. Le texte est enregistré comme un
+                élément à part entière dans la liste, que vous pouvez ensuite modifier,
+                déplacer ou supprimer.
+              </p>
+
+              <p>
+                <strong>5. Réorganiser les éléments</strong><br />
+                En appuyant sur un élément, vous ouvrez son menu d&apos;actions. Les flèches
+                <em>Monter</em> et <em>Descendre</em> permettent de changer l&apos;ordre
+                des éléments dans la liste pour adapter la structure à votre étude ou à votre
+                prédication.
+              </p>
+
+              <p>
+                <strong>6. Copier et partager une liste entière</strong><br />
+                Dans une liste ouverte, les boutons <em>Partager</em> et <em>Copier</em> permettent
+                de récupérer tout le contenu de la liste&nbsp;: titre, références, textes et blocs
+                de notes. Vous pouvez ensuite coller ce contenu dans un message, un document ou un
+                autre outil, même en restant hors ligne.
+              </p>
+
+              <p>
+                <strong>7. Partage par code TheWord</strong><br />
+                Le bouton <em>&laquo;&nbsp;Code&nbsp;&raquo;</em> génère un code compact que vous
+                pouvez envoyer à quelqu&apos;un. Dans son application The Word, cette personne
+                peut utiliser l&apos;option d&apos;import par code pour recréer exactement la
+                même liste (titre + contenu) sur son appareil.
+              </p>
+
+              <p>
+                <strong>8. Importer à partir d&apos;un texte</strong><br />
+                Le bouton <em>&laquo;&nbsp;Importer depuis un texte&nbsp;&raquo;</em> permet de
+                coller un document complet (notes Word, mail, prédication, etc.). L&apos;application
+                découpe le texte en blocs (séparés par des lignes vides) et crée automatiquement
+                une liste de blocs de texte. Pratique pour transformer rapidement un document
+                existant en notes dans The Word.
+              </p>
+
+              <p>
+                <strong>9. Gestion locale et confidentialité</strong><br />
+                Toutes vos notes sont enregistrées <strong>uniquement sur votre appareil</strong>.
+                The Word ne synchronise rien sur un serveur et ne collecte aucune donnée personnelle.
+                Si vous supprimez l&apos;application ou effacez les données de navigation,
+                les listes de notes seront également effacées.
+              </p>
+
+              <p>
+                <strong>10. Idées d&apos;utilisation</strong><br />
+                Vous pouvez utiliser les Notes pour&nbsp;: préparer des prédications, suivre un
+                plan d&apos;étude, garder une liste de prières, noter ce que Dieu vous rappelle
+                pendant la journée, ou encore conserver des versets pour les apprendre par cœur.
+                À vous d&apos;adapter les listes à votre manière de méditer la Parole.
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => setShowHelp(false)}
+                className={`px-3 py-1.5 rounded text-sm ${
+                  isDark
+                    ? 'bg-gray-700 text-white'
+                    : 'bg-gray-200 text-gray-800'
+                }`}
               >
                 OK
               </button>
