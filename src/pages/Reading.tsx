@@ -891,9 +891,12 @@ ${shareUrl}`;
     };
     setOtherLangTarget(target);
 
-    const targetLangs = ALL_LANG_CODES.filter(
-      l => l !== state.settings.language
-    ) as LangCode[];
+  const currentLang = state.settings.language as LangCode;
+
+  const targetLangs = [
+    currentLang,
+    ...ALL_LANG_CODES.filter(l => l !== currentLang),
+  ] as LangCode[];
 
     const initial = targetLangs.map(lang => ({
       lang,
