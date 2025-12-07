@@ -1894,7 +1894,7 @@ ${shareUrl}`;
                   Verset indisponible pour cette langue.
                 </p>
               ) : (
-                <p className="text-base md:text-lg leading-relaxed">
+                <p className="text-lg md:text-xl leading-relaxed">
                   {entry.text}
                 </p>
               )}
