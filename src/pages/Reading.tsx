@@ -7,7 +7,7 @@ import { BibleBook, BibleChapter } from '../types/bible';
 import {
   ChevronDown, Book, ChevronLeft, ChevronRight,
   Copy as CopyIcon, Check, Search as SearchIcon, Share2 as ShareIcon,
-  ListPlus as ListPlusIcon
+  ListPlus as ListPlusIcon, Languages as LanguagesIcon
 } from 'lucide-react';
 import { readSlot as readQuickSlot, saveSlot as saveQuickSlot, type QuickSlot } from '../services/readingSlots';
 import { getAllLists, createList, addVersesToList } from '../services/collectionsService';
@@ -80,6 +80,29 @@ function addVersesToPrincipleList(listId: string, verses: VerseRef[]): void {
   writeAllPrinciples(all);
 }
 
+/* ========= Liste des langues disponibles pour la vue multi-langues ========= */
+
+const ALL_LANG_CODES = [
+  'fr',
+  'en',
+  'ru',
+  'es',
+  'ar',
+  'de',
+  'hi',
+  'id',
+  'it',
+  'ja',
+  'ko',
+  'pt',
+  'sw',
+  'tr',
+  'yo',
+  'zh',
+] as const;
+
+type LangCode = (typeof ALL_LANG_CODES)[number];
+
 /* ================================== Page =================================== */
 
 export default function Reading() {
@@ -129,10 +152,31 @@ export default function Reading() {
 
   // Thèmes des slots
   type SlotKey = 1 | 2 | 3;
-  const SLOT_THEMES: Record<SlotKey, { solid: string; solidHover: string; mobileBtn: string; mobileBtnHover: string; lightPaper: string; }> = {
-    1: { solid: 'bg-amber-600 text-white',   solidHover: 'hover:bg-amber-500',  mobileBtn: 'bg-amber-600 text-white',  mobileBtnHover: 'hover:bg-amber-500',  lightPaper: 'bg-amber-50' },
-    2: { solid: 'bg-violet-600 text-white',  solidHover: 'hover:bg-violet-500', mobileBtn: 'bg-violet-600 text-white', mobileBtnHover: 'hover:bg-violet-500', lightPaper: 'bg-violet-50' },
-    3: { solid: 'bg-emerald-600 text-white', solidHover: 'hover:bg-emerald-500',mobileBtn: 'bg-emerald-600 text-white',mobileBtnHover: 'hover:bg-emerald-500',lightPaper: 'bg-emerald-50' },
+  const SLOT_THEMES: Record<
+    SlotKey,
+    { solid: string; solidHover: string; mobileBtn: string; mobileBtnHover: string; lightPaper: string }
+  > = {
+    1: {
+      solid: 'bg-amber-600 text-white',
+      solidHover: 'hover:bg-amber-500',
+      mobileBtn: 'bg-amber-600 text-white',
+      mobileBtnHover: 'hover:bg-amber-500',
+      lightPaper: 'bg-amber-50',
+    },
+    2: {
+      solid: 'bg-violet-600 text-white',
+      solidHover: 'hover:bg-violet-500',
+      mobileBtn: 'bg-violet-600 text-white',
+      mobileBtnHover: 'hover:bg-violet-500',
+      lightPaper: 'bg-violet-50',
+    },
+    3: {
+      solid: 'bg-emerald-600 text-white',
+      solidHover: 'hover:bg-emerald-500',
+      mobileBtn: 'bg-emerald-600 text-white',
+      mobileBtnHover: 'hover:bg-emerald-500',
+      lightPaper: 'bg-emerald-50',
+    },
   };
 
   const fetchChapter = async (book: BibleBook, chapterNum: number) => {
@@ -321,8 +365,10 @@ export default function Reading() {
   const resolveBook = (bookIdentifier: string): BibleBook | null => {
     let found = books.find(b => b.name === bookIdentifier);
     if (found) return found;
-    found = books.find(b => b.nameEn === bookIdentifier); if (found) return found;
-    found = books.find(b => b.nameFr === bookIdentifier); if (found) return found;
+    found = books.find(b => b.nameEn === bookIdentifier);
+    if (found) return found;
+    found = books.find(b => b.nameFr === bookIdentifier);
+    if (found) return found;
     return null;
   };
 
@@ -360,7 +406,7 @@ export default function Reading() {
       setSelectedBook(b);
       setSelectedChapter(slot.chapter);
       setSelectedVerses([]);
-      setHighlightedVerse(null);              // pas de surlignage
+      setHighlightedVerse(null); // pas de surlignage
       setScrollTargetVerse(slot.verse ?? null); // on utilise le verset pour le scroll uniquement
 
       try {
@@ -384,8 +430,8 @@ export default function Reading() {
     setSelectedBook(book);
     setSelectedChapter(slot.chapter);
     setSelectedVerses([]);
-    setHighlightedVerse(null);                 // pas de surlignage pour 1/2/3
-    setScrollTargetVerse(slot.verse ?? null);  // juste pour le scroll
+    setHighlightedVerse(null); // pas de surlignage pour 1/2/3
+    setScrollTargetVerse(slot.verse ?? null); // juste pour le scroll
     try {
       window.scrollTo({ top: 0 });
     } catch {}
@@ -394,9 +440,7 @@ export default function Reading() {
   }
 
   const activeTheme =
-    activeSlot === 1 || activeSlot === 2 || activeSlot === 3
-      ? SLOT_THEMES[activeSlot as SlotKey]
-      : null;
+    activeSlot === 1 || activeSlot === 2 || activeSlot === 3 ? SLOT_THEMES[activeSlot as SlotKey] : null;
   const desktopChipBase =
     'inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm whitespace-nowrap';
   const desktopChipColors = activeTheme ? activeTheme.solid : 'bg-blue-600 text-white';
@@ -521,7 +565,7 @@ export default function Reading() {
     books,
     dispatch,
     hasLoadedContext,
-    saveReadingPosition
+    saveReadingPosition,
   ]);
 
   const suppressAutoSaveUntil = useRef<number>(0);
@@ -539,8 +583,7 @@ export default function Reading() {
       const el = document.getElementById(`verse-${v}`);
       if (el) {
         const rect = el.getBoundingClientRect();
-        const current =
-          window.scrollY || document.documentElement.scrollTop || 0;
+        const current = window.scrollY || document.documentElement.scrollTop || 0;
         const target = current + rect.top - offset;
         window.scrollTo({
           top: Math.max(target, 0),
@@ -559,11 +602,7 @@ export default function Reading() {
       const v = scrollTargetVerse ?? highlightedVerse;
       if (v !== null) {
         const isHighlight = highlightedVerse !== null && v === highlightedVerse;
-        scrollToVerseNumber(
-          v,
-          isHighlight,
-          isHighlight ? HIGHLIGHT_EXTRA_OFFSET : 0
-        );
+        scrollToVerseNumber(v, isHighlight, isHighlight ? HIGHLIGHT_EXTRA_OFFSET : 0);
         return;
       }
       if (Date.now() < programmaticScrollUntil.current) return;
@@ -591,13 +630,11 @@ export default function Reading() {
     scrollTargetVerse,
     state.settings.language,
     selectedBook?.name,
-    selectedChapter
+    selectedChapter,
   ]);
 
   const toggleSelectVerse = (num: number) => {
-    setSelectedVerses(prev =>
-      prev.includes(num) ? prev.filter(n => n !== num) : [...prev, num]
-    );
+    setSelectedVerses(prev => (prev.includes(num) ? prev.filter(n => n !== num) : [...prev, num]));
   };
   const compressRanges = (nums: number[]) => {
     if (nums.length === 0) return '';
@@ -605,8 +642,7 @@ export default function Reading() {
     const parts: string[] = [];
     let start = sorted[0];
     let prev = sorted[0];
-    const push = () =>
-      start === prev ? parts.push(`${start}`) : parts.push(`${start}-${prev}`);
+    const push = () => (start === prev ? parts.push(`${start}`) : parts.push(`${start}-${prev}`));
     for (let i = 1; i < sorted.length; i++) {
       const n = sorted[i];
       if (n === prev + 1) prev = n;
@@ -626,8 +662,7 @@ export default function Reading() {
       .filter(v => selectedVerses.includes(v.verse))
       .sort((a, b) => a.verse - b.verse);
     const ranges = compressRanges(chosen.map(v => v.verse));
-    const ref =
-      getBookName(selectedBook) + ' ' + chapter.chapter + ':' + ranges;
+    const ref = getBookName(selectedBook) + ' ' + chapter.chapter + ':' + ranges;
     const body = chosen.map(v => String(v.text)).join('\n');
     const payload = ref + '\n' + body;
     const ok = await copyToClipboard(payload);
@@ -637,44 +672,44 @@ export default function Reading() {
       setSelectedVerses([]);
     }
   };
+
   const shareSelection = async () => {
-  if (!selectedBook || !chapter || selectedVerses.length === 0) return;
+    if (!selectedBook || !chapter || selectedVerses.length === 0) return;
 
-  const chosen = chapter.verses
-    .filter(v => selectedVerses.includes(v.verse))
-    .sort((a, b) => a.verse - b.verse);
+    const chosen = chapter.verses
+      .filter(v => selectedVerses.includes(v.verse))
+      .sort((a, b) => a.verse - b.verse);
 
-  const ranges = compressRanges(chosen.map(v => v.verse));
-  const ref =
-    getBookName(selectedBook) + ' ' + chapter.chapter + ':' + ranges;
+    const ranges = compressRanges(chosen.map(v => v.verse));
+    const ref = getBookName(selectedBook) + ' ' + chapter.chapter + ':' + ranges;
 
-  const body = chosen.map(v => String(v.text)).join('\n');
-  const shareUrl = 'https://www.theword.fr/#about';
+    const body = chosen.map(v => String(v.text)).join('\n');
+    const shareUrl = 'https://www.theword.fr/#about';
 
-  const shareText = `${ref}
+    const shareText = `${ref}
 
 ${body}
 
 Découvrir l’application The Word :
 ${shareUrl}`;
 
-  try {
-    const nav = navigator as any;
-    if (nav?.share) {
-      await nav.share({ title: ref, text: shareText });
-      setSelectedVerses([]);
-    } else {
-      const ok = await copyToClipboard(shareText);
-      if (ok) {
-        setCopiedKey('shared-fallback');
-        setTimeout(() => setCopiedKey(''), 1800);
+    try {
+      const nav = navigator as any;
+      if (nav?.share) {
+        await nav.share({ title: ref, text: shareText });
         setSelectedVerses([]);
+      } else {
+        const ok = await copyToClipboard(shareText);
+        if (ok) {
+          setCopiedKey('shared-fallback');
+          setTimeout(() => setCopiedKey(''), 1800);
+          setSelectedVerses([]);
+        }
       }
+    } catch (e) {
+      console.error('share error', e);
     }
-  } catch (e) {
-    console.error('share error', e);
-  }
-};
+  };
 
   // ---- Ajout à une liste Notes / Principes ----
   const sortListsByTitle = (arr: VerseList[]) =>
@@ -689,19 +724,42 @@ ${shareUrl}`;
   const [notesListsForModal, setNotesListsForModal] = useState<VerseList[]>([]);
   const [selectedNotesListIds, setSelectedNotesListIds] = useState<string[]>([]);
   const [newNotesListTitle, setNewNotesListTitle] = useState<string>('');
+  const [pendingVersesForNotes, setPendingVersesForNotes] = useState<VerseRef[] | null>(null);
 
-  const openAddToNotes = () => {
+  const openAddToNotes = (customVerses?: VerseRef[]) => {
+    if (!selectedBook || !chapter) return;
+
+    let versesToAdd: VerseRef[] | null = null;
+
+    if (customVerses && customVerses.length > 0) {
+      versesToAdd = customVerses;
+    } else {
+      if (selectedVerses.length === 0) return;
+      const chosen = chapter.verses
+        .filter(v => selectedVerses.includes(v.verse))
+        .sort((a, b) => a.verse - b.verse)
+        .map<VerseRef>(v => ({
+          bookId: selectedBook.name,
+          bookName: getBookName(selectedBook),
+          chapter: v.chapter,
+          verse: v.verse,
+          text: v.text,
+          translation: state.settings.language,
+        }));
+      versesToAdd = chosen;
+    }
+
     const all = sortListsByTitle(getAllLists());
     setNotesListsForModal(all);
-    // -> plus de liste pré-sélectionnée par défaut
     setSelectedNotesListIds([]);
     setNewNotesListTitle('');
+    setPendingVersesForNotes(versesToAdd);
     setShowAddToNotes(true);
   };
 
   const confirmAddToNotes = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!selectedBook || !chapter || selectedVerses.length === 0) return;
+    if (!pendingVersesForNotes || pendingVersesForNotes.length === 0) return;
 
     const typed = newNotesListTitle.trim();
     const allLists = getAllLists();
@@ -719,27 +777,16 @@ ${shareUrl}`;
 
     if (targetIds.length === 0) return;
 
-    const chosen = chapter.verses
-      .filter(v => selectedVerses.includes(v.verse))
-      .sort((a, b) => a.verse - b.verse)
-      .map<VerseRef>(v => ({
-        bookId: selectedBook.name,
-        bookName: getBookName(selectedBook),
-        chapter: v.chapter,
-        verse: v.verse,
-        text: v.text,
-        translation: state.settings.language,
-      }));
-
     try {
       targetIds.forEach(id => {
-        addVersesToList(id, chosen);
+        addVersesToList(id, pendingVersesForNotes);
       });
     } catch (err) {
       console.error('addVerses error', err);
     }
 
     setShowAddToNotes(false);
+    setPendingVersesForNotes(null);
     setSelectedVerses([]);
     // Toast spécifique Notes : orange
     setCopiedKey('added-to-notes');
@@ -748,25 +795,45 @@ ${shareUrl}`;
 
   // PRINCIPES (localStorage twog:principles:v1)
   const [showAddToPrinciples, setShowAddToPrinciples] = useState(false);
-  const [principlesListsForModal, setPrinciplesListsForModal] =
-    useState<VerseList[]>([]);
-  const [selectedPrincipleListIds, setSelectedPrincipleListIds] =
-    useState<string[]>([]);
-  const [newPrincipleListTitle, setNewPrincipleListTitle] =
-    useState<string>('');
+  const [principlesListsForModal, setPrinciplesListsForModal] = useState<VerseList[]>([]);
+  const [selectedPrincipleListIds, setSelectedPrincipleListIds] = useState<string[]>([]);
+  const [newPrincipleListTitle, setNewPrincipleListTitle] = useState<string>('');
+  const [pendingVersesForPrinciples, setPendingVersesForPrinciples] = useState<VerseRef[] | null>(null);
 
-  const openAddToPrinciples = () => {
+  const openAddToPrinciples = (customVerses?: VerseRef[]) => {
+    if (!selectedBook || !chapter) return;
+
+    let versesToAdd: VerseRef[] | null = null;
+
+    if (customVerses && customVerses.length > 0) {
+      versesToAdd = customVerses;
+    } else {
+      if (selectedVerses.length === 0) return;
+      const chosen = chapter.verses
+        .filter(v => selectedVerses.includes(v.verse))
+        .sort((a, b) => a.verse - b.verse)
+        .map<VerseRef>(v => ({
+          bookId: selectedBook.name,
+          bookName: getBookName(selectedBook),
+          chapter: v.chapter,
+          verse: v.verse,
+          text: v.text,
+          translation: state.settings.language,
+        }));
+      versesToAdd = chosen;
+    }
+
     const all = sortListsByTitle(getAllPrinciplesLists());
     setPrinciplesListsForModal(all);
-    // -> plus de liste pré-sélectionnée par défaut
     setSelectedPrincipleListIds([]);
     setNewPrincipleListTitle('');
+    setPendingVersesForPrinciples(versesToAdd);
     setShowAddToPrinciples(true);
   };
 
   const confirmAddToPrinciples = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!selectedBook || !chapter || selectedVerses.length === 0) return;
+    if (!pendingVersesForPrinciples || pendingVersesForPrinciples.length === 0) return;
 
     const typed = newPrincipleListTitle.trim();
     const all = getAllPrinciplesLists();
@@ -784,36 +851,160 @@ ${shareUrl}`;
 
     if (targetIds.length === 0) return;
 
-    const chosen = chapter.verses
-      .filter(v => selectedVerses.includes(v.verse))
-      .sort((a, b) => a.verse - b.verse)
-      .map<VerseRef>(v => ({
-        bookId: selectedBook.name,
-        bookName: getBookName(selectedBook),
-        chapter: v.chapter,
-        verse: v.verse,
-        text: v.text,
-        translation: state.settings.language,
-      }));
-
     try {
       targetIds.forEach(id => {
-        addVersesToPrincipleList(id, chosen);
+        addVersesToPrincipleList(id, pendingVersesForPrinciples);
       });
     } catch (err) {
       console.error('addVerses principles error', err);
     }
 
     setShowAddToPrinciples(false);
+    setPendingVersesForPrinciples(null);
     setSelectedVerses([]);
     // Toast spécifique Principes : vert (comme avant)
     setCopiedKey('added-to-principles');
     setTimeout(() => setCopiedKey(''), 1600);
   };
 
-  const swipeStart = useRef<{ x: number; y: number; time: number } | null>(
-    null
-  );
+  /* ===== Vue multi-langue pour un verset sélectionné ===== */
+
+  const [showOtherLangs, setShowOtherLangs] = useState(false);
+  const [otherLangTarget, setOtherLangTarget] = useState<{
+    bookId: string;
+    chapter: number;
+    verse: number;
+  } | null>(null);
+  const [otherLangVerses, setOtherLangVerses] = useState<
+    { lang: LangCode; text: string | null; loading: boolean; error?: string }[]
+  >([]);
+
+  const openOtherLangs = () => {
+    if (!selectedBook || !chapter || selectedVerses.length === 0) return;
+
+    const verseNumber = [...selectedVerses].sort((a, b) => a - b)[0];
+
+    const target = {
+      bookId: selectedBook.name,
+      chapter: selectedChapter,
+      verse: verseNumber,
+    };
+    setOtherLangTarget(target);
+
+    const targetLangs = ALL_LANG_CODES.filter(
+      l => l !== state.settings.language
+    ) as LangCode[];
+
+    const initial = targetLangs.map(lang => ({
+      lang,
+      text: null,
+      loading: true,
+      error: undefined as string | undefined,
+    }));
+    setOtherLangVerses(initial);
+    setShowOtherLangs(true);
+
+    targetLangs.forEach(lang => {
+      (async () => {
+        try {
+          const ch = await getChapter(selectedBook.name, selectedChapter, lang as any);
+          const vv = ch.verses.find(v => v.verse === verseNumber);
+          setOtherLangVerses(prev =>
+            prev.map(entry =>
+              entry.lang === lang
+                ? {
+                    ...entry,
+                    text: vv ? String(vv.text) : null,
+                    loading: false,
+                    error: vv ? undefined : 'missing',
+                  }
+                : entry
+            )
+          );
+        } catch (err) {
+          console.error('multilang error', err);
+          setOtherLangVerses(prev =>
+            prev.map(entry =>
+              entry.lang === lang
+                ? { ...entry, text: null, loading: false, error: 'error' }
+                : entry
+            )
+          );
+        }
+      })();
+    });
+  };
+
+  const copyOtherLangVerse = async (entryLang: LangCode, text: string | null) => {
+    if (!otherLangTarget || !selectedBook || !text) return;
+    const ref =
+      getBookName(selectedBook) + ' ' + otherLangTarget.chapter + ':' + otherLangTarget.verse;
+    const payload = ref + '\n' + text;
+    const ok = await copyToClipboard(payload);
+    if (ok) {
+      setCopiedKey('selection');
+      setTimeout(() => setCopiedKey(''), 1500);
+    }
+  };
+
+  const shareOtherLangVerse = async (entryLang: LangCode, text: string | null) => {
+    if (!otherLangTarget || !selectedBook || !text) return;
+    const ref =
+      getBookName(selectedBook) + ' ' + otherLangTarget.chapter + ':' + otherLangTarget.verse;
+    const shareUrl = 'https://www.theword.fr/#about';
+
+    const shareText = `${ref}
+
+${text}
+
+Découvrir l’application The Word :
+${shareUrl}`;
+
+    try {
+      const nav = navigator as any;
+      if (nav?.share) {
+        await nav.share({ title: ref, text: shareText });
+      } else {
+        const ok = await copyToClipboard(shareText);
+        if (ok) {
+          setCopiedKey('shared-fallback');
+          setTimeout(() => setCopiedKey(''), 1800);
+        }
+      }
+    } catch (e) {
+      console.error('share other lang error', e);
+    }
+  };
+
+  const sendOtherLangVerseToNotes = (entryLang: LangCode, text: string | null) => {
+    if (!otherLangTarget || !selectedBook || !text) return;
+    const verseRef: VerseRef = {
+      bookId: otherLangTarget.bookId,
+      bookName: getBookName(selectedBook),
+      chapter: otherLangTarget.chapter,
+      verse: otherLangTarget.verse,
+      text,
+      translation: entryLang,
+    };
+    openAddToNotes([verseRef]);
+    setShowOtherLangs(false);
+  };
+
+  const sendOtherLangVerseToPrinciples = (entryLang: LangCode, text: string | null) => {
+    if (!otherLangTarget || !selectedBook || !text) return;
+    const verseRef: VerseRef = {
+      bookId: otherLangTarget.bookId,
+      bookName: getBookName(selectedBook),
+      chapter: otherLangTarget.chapter,
+      verse: otherLangTarget.verse,
+      text,
+      translation: entryLang,
+    };
+    openAddToPrinciples([verseRef]);
+    setShowOtherLangs(false);
+  };
+
+  const swipeStart = useRef<{ x: number; y: number; time: number } | null>(null);
   const swipeHandled = useRef(false);
   const onTouchStart = (e: React.TouchEvent) => {
     const tTouch = e.touches[0];
@@ -825,8 +1016,7 @@ ${shareUrl}`;
     swipeHandled.current = false;
   };
   const onTouchMove = (e: React.TouchEvent) => {
-    if (!swipeStart.current || swipeHandled.current || loading || !selectedBook)
-      return;
+    if (!swipeStart.current || swipeHandled.current || loading || !selectedBook) return;
     const tTouch = e.touches[0];
     const dx = tTouch.clientX - swipeStart.current.x;
     const dy = tTouch.clientY - swipeStart.current.y;
@@ -843,7 +1033,7 @@ ${shareUrl}`;
     swipeHandled.current = false;
   };
 
-    const stickyOffset = NAV_H + cmdH + 12;
+  const stickyOffset = NAV_H + cmdH + 12;
 
   const scrollDebounce = useRef<number | null>(null);
   const [showBottomRandom, setShowBottomRandom] = useState(false);
@@ -867,11 +1057,7 @@ ${shareUrl}`;
           // Si on est en mode slot mémoire (1/2/3), on met à jour ce slot.
           // Sinon, si on est en mode loupe (dernier tap = 0), on met à jour le slot 0.
           const slotToUpdate =
-            activeSlot && activeSlot !== 0
-              ? activeSlot
-              : lastTappedSlot === 0
-              ? 0
-              : null;
+            activeSlot && activeSlot !== 0 ? activeSlot : lastTappedSlot === 0 ? 0 : null;
 
           if (slotToUpdate !== null) {
             saveQuickSlot(slotToUpdate, {
@@ -884,12 +1070,8 @@ ${shareUrl}`;
 
           const nearBottom =
             window.innerHeight +
-              (window.scrollY ||
-                document.documentElement.scrollTop ||
-                0) >=
-            (document.documentElement.scrollHeight ||
-              document.body.scrollHeight) -
-              180;
+              (window.scrollY || document.documentElement.scrollTop || 0) >=
+            (document.documentElement.scrollHeight || document.body.scrollHeight) - 180;
           setShowBottomRandom(
             nearBottom && lastTappedSlot === 0 && selectedVerses.length === 0
           );
@@ -901,15 +1083,7 @@ ${shareUrl}`;
       window.removeEventListener('scroll', onScroll);
       if (scrollDebounce.current) window.clearTimeout(scrollDebounce.current);
     };
-  }, [
-    chapter,
-    selectedBook?.name,
-    selectedChapter,
-    activeSlot,
-    cmdH,
-    lastTappedSlot,
-    selectedVerses.length
-  ]);
+  }, [chapter, selectedBook?.name, selectedChapter, activeSlot, cmdH, lastTappedSlot, selectedVerses.length]);
 
   const pickNewRandom = async () => {
     try {
@@ -1012,8 +1186,7 @@ ${shareUrl}`;
                             let cls = '';
                             if (i === 0) {
                               // Loupe toujours bien bleue, comme les boutons Livre / Chapitre
-                              cls =
-                                'bg-blue-600 text-white hover:bg-blue-500';
+                              cls = 'bg-blue-600 text-white hover:bg-blue-500';
                             } else {
                               const theme = SLOT_THEMES[i as SlotKey];
                               cls = filled
@@ -1041,9 +1214,7 @@ ${shareUrl}`;
                             const isPressed = isActive;
 
                             // Même rond blanc pour loupe + 1/2/3 quand sélectionnés
-                            const activeRing = isActive
-                              ? 'border-2 border-white'
-                              : '';
+                            const activeRing = isActive ? 'border-2 border-white' : '';
 
                             const numGlow =
                               isNumeric && isActive
@@ -1142,9 +1313,7 @@ ${shareUrl}`;
                         }
                         const isPressed = isActive;
 
-                        const activeRing = isActive
-                          ? 'border-2 border-white'
-                          : '';
+                        const activeRing = isActive ? 'border-2 border-white' : '';
 
                         const numGlow =
                           isNumeric && isActive
@@ -1204,18 +1373,25 @@ ${shareUrl}`;
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={openAddToNotes}
+                    onClick={() => openAddToNotes()}
                     className="inline-flex items-center px-3 py-2 rounded bg-orange-500 text-white hover:bg-orange-400"
                   >
                     <ListPlusIcon size={16} className="mr-2" />
                     {t('toNotes')}
                   </button>
                   <button
-                    onClick={openAddToPrinciples}
+                    onClick={() => openAddToPrinciples()}
                     className="inline-flex items-center px-3 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-500"
                   >
                     <ListPlusIcon size={16} className="mr-2" />
                     {t('toPrinciples')}
+                  </button>
+                  <button
+                    onClick={openOtherLangs}
+                    className="inline-flex items-center px-3 py-2 rounded bg-teal-600 text-white hover:bg-teal-500"
+                  >
+                    <LanguagesIcon size={16} className="mr-2" />
+                    {t('showInOtherLangs')}
                   </button>
                   <button
                     onClick={copySelection}
@@ -1250,7 +1426,6 @@ ${shareUrl}`;
               onTouchEnd={onTouchEnd}
               style={{ touchAction: 'manipulation' }}
             >
-
               {loading ? (
                 <div className="flex items-center justify-center py-16">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400" />
@@ -1402,30 +1577,27 @@ ${shareUrl}`;
                 </div>
 
                 <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 pb-10">
-                  {Array.from(
-                    { length: selectedBook.chapters },
-                    (_, i) => i + 1
-                  ).map(num => {
-                    const active =
-                      num === selectedChapter
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-800 text-white hover:bg-gray-700';
-                    return (
-                      <button
-                        key={`chap-${num}`}
-                        onClick={() => {
-                          handleChapterSelect(num);
-                          setShowChapterPicker(false);
-                        }}
-                        className={`h-10 rounded-lg text-lg font-medium ${active}`}
-                        aria-current={
-                          num === selectedChapter ? 'page' : undefined
-                        }
-                      >
-                        {num}
-                      </button>
-                    );
-                  })}
+                  {Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map(
+                    num => {
+                      const active =
+                        num === selectedChapter
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-800 text-white hover:bg-gray-700';
+                      return (
+                        <button
+                          key={`chap-${num}`}
+                          onClick={() => {
+                            handleChapterSelect(num);
+                            setShowChapterPicker(false);
+                          }}
+                          className={`h-10 rounded-lg text-lg font-medium ${active}`}
+                          aria-current={num === selectedChapter ? 'page' : undefined}
+                        >
+                          {num}
+                        </button>
+                      );
+                    }
+                  )}
                 </div>
               </div>
             </div>
@@ -1438,14 +1610,14 @@ ${shareUrl}`;
                 {/* Ligne 1 : Notes / Principes */}
                 <div className="flex items-center justify-center gap-2">
                   <button
-                    onClick={openAddToNotes}
+                    onClick={() => openAddToNotes()}
                     className="inline-flex items-center px-3 py-1.5 rounded-full bg-orange-500 text-white text-sm"
                   >
                     <ListPlusIcon size={16} className="mr-1" />
                     {t('notes')}
                   </button>
                   <button
-                    onClick={openAddToPrinciples}
+                    onClick={() => openAddToPrinciples()}
                     className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-600 text-white text-sm"
                   >
                     <ListPlusIcon size={16} className="mr-1" />
@@ -1453,14 +1625,21 @@ ${shareUrl}`;
                   </button>
                 </div>
 
-                {/* Ligne 2 : Copier / Partager / Annuler */}
-                <div className="flex items-center justify-center gap-2">
+                {/* Ligne 2 : Copier / Autres langues / Partager / Annuler */}
+                <div className="flex items-center justify-center gap-2 flex-wrap">
                   <button
                     onClick={copySelection}
                     className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-600 text-white text-sm"
                   >
                     <CopyIcon size={16} className="mr-1" />
                     {t('copyLabel')}
+                  </button>
+                  <button
+                    onClick={openOtherLangs}
+                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-teal-600 text-white text-sm"
+                  >
+                    <LanguagesIcon size={16} className="mr-1" />
+                    {t('showInOtherLangs')}
                   </button>
                   <button
                     onClick={shareSelection}
@@ -1638,6 +1817,101 @@ ${shareUrl}`;
             </div>
           )}
 
+          {/* MODAL : verset dans autres langues */}
+          {showOtherLangs && otherLangTarget && selectedBook && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div
+                className="absolute inset-0 bg-black/60"
+                onClick={() => setShowOtherLangs(false)}
+                aria-hidden="true"
+              />
+              <div className="relative bg-gray-900 text-white rounded-xl shadow-lg p-4 w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
+                <h3 className="text-xl md:text-2xl font-semibold mb-1">
+                  {t('showInOtherLangs')}
+                </h3>
+                <p className="text-sm text-white/70 mb-3">
+                  {getBookName(selectedBook)} {otherLangTarget.chapter}:{otherLangTarget.verse}
+                </p>
+
+                <div className="space-y-3">
+                  {otherLangVerses.map(entry => {
+                    const hasText = !!entry.text && !entry.error;
+                    return (
+                      <div
+                        key={entry.lang}
+                        className="border border-gray-700 rounded-lg px-3 py-2"
+                      >
+                        <div className="flex items-center justify-between mb-1 gap-2">
+                          <span className="text-xs font-semibold uppercase tracking-wide text-gray-300">
+                            {entry.lang.toUpperCase()}
+                          </span>
+                          {hasText && (
+                            <div className="flex items-center gap-1 flex-wrap justify-end">
+                              <button
+                                onClick={() =>
+                                  sendOtherLangVerseToNotes(entry.lang, entry.text)
+                                }
+                                className="px-2 py-1 rounded-full bg-orange-500 text-white text-[11px]"
+                              >
+                                {t('notes')}
+                              </button>
+                              <button
+                                onClick={() =>
+                                  sendOtherLangVerseToPrinciples(entry.lang, entry.text)
+                                }
+                                className="px-2 py-1 rounded-full bg-emerald-600 text-white text-[11px]"
+                              >
+                                {t('principles')}
+                              </button>
+                              <button
+                                onClick={() =>
+                                  copyOtherLangVerse(entry.lang, entry.text)
+                                }
+                                className="px-2 py-1 rounded-full bg-blue-600 text-white text-[11px]"
+                              >
+                                {t('copyLabel')}
+                              </button>
+                              <button
+                                onClick={() =>
+                                  shareOtherLangVerse(entry.lang, entry.text)
+                                }
+                                className="px-2 py-1 rounded-full bg-indigo-500 text-white text-[11px]"
+                              >
+                                {t('shareLabel')}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        {entry.loading ? (
+                          <p className="text-xs text-white/70">
+                            {t('loading')}
+                          </p>
+                        ) : !entry.text || entry.error ? (
+                          <p className="text-xs text-white/60 italic">
+                            Verset indisponible pour cette langue.
+                          </p>
+                        ) : (
+                          <p className="text-sm leading-relaxed">
+                            {entry.text}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-4 flex justify-end">
+                  <button
+                    onClick={() => setShowOtherLangs(false)}
+                    className="px-3 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm"
+                  >
+                    {t('close')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* TOASTS */}
           {copiedKey === 'selection' && (
             <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-green-600 text-white z-50">
@@ -1686,4 +1960,5 @@ ${shareUrl}`;
     </div>
   );
 }
+
 
