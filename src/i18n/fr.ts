@@ -30,6 +30,7 @@ const fr: TranslationDict = {
 
   // Reading – compléments
   chooseBook: 'Choisir un livre',
+  showInOtherLangs: 'Autres langues',
   chooseChapter: 'Choisir un chapitre',
   prevChapter: 'Chapitre précédent',
   nextChapter: 'Chapitre suivant',
