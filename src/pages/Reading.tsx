@@ -1607,60 +1607,60 @@ ${shareUrl}`;
           )}
 
           {/* BARRE SELECTION (mobile) */}
-          {selectedVerses.length > 0 && (
-            <div className="sm:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
-              <div className="bg-white/5 text-white shadow-lg rounded-2xl px-3 py-2 space-y-2 max-w-[95vw]">
-                {/* Ligne 1 : Notes / Principes */}
-                <div className="flex items-center justify-center gap-2">
-                  <button
-                    onClick={() => openAddToNotes()}
-                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-orange-500 text-white text-sm"
-                  >
-                    <ListPlusIcon size={16} className="mr-1" />
-                    {t('notes')}
-                  </button>
-                  <button
-                    onClick={() => openAddToPrinciples()}
-                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-600 text-white text-sm"
-                  >
-                    <ListPlusIcon size={16} className="mr-1" />
-                    {t('principles')}
-                  </button>
-                </div>
+{selectedVerses.length > 0 && (
+  <div className="sm:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-full px-3">
+    <div className="bg-white/5 text-white shadow-lg rounded-2xl px-3 py-2 space-y-2 max-w-[500px] mx-auto">
+      {/* Ligne 1 : Notes / Principes / Autres langues */}
+      <div className="flex items-center justify-center gap-2">
+        <button
+          onClick={() => openAddToNotes()}
+          className="inline-flex items-center px-3 py-1.5 rounded-full bg-orange-500 text-white text-sm"
+        >
+          <ListPlusIcon size={16} className="mr-1" />
+          {t('notes')}
+        </button>
+        <button
+          onClick={() => openAddToPrinciples()}
+          className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-600 text-white text-sm"
+        >
+          <ListPlusIcon size={16} className="mr-1" />
+          {t('principles')}
+        </button>
+        <button
+          onClick={openOtherLangs}
+          className="inline-flex items-center px-3 py-1.5 rounded-full bg-teal-600 text-white text-sm"
+        >
+          <LanguagesIcon size={16} className="mr-1" />
+          {t('showInOtherLangs')}
+        </button>
+      </div>
 
-                {/* Ligne 2 : Copier / Autres langues / Partager / Annuler */}
-                <div className="flex items-center justify-center gap-2 flex-wrap">
-                  <button
-                    onClick={copySelection}
-                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-600 text-white text-sm"
-                  >
-                    <CopyIcon size={16} className="mr-1" />
-                    {t('copyLabel')}
-                  </button>
-                  <button
-                    onClick={openOtherLangs}
-                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-teal-600 text-white text-sm"
-                  >
-                    <LanguagesIcon size={16} className="mr-1" />
-                    {t('showInOtherLangs')}
-                  </button>
-                  <button
-                    onClick={shareSelection}
-                    className="bg-indigo-500 hover:bg-indigo-400 text-white px-3 py-1.5 rounded-full inline-flex items-center text-sm"
-                  >
-                    <ShareIcon size={16} className="mr-1" />
-                    {t('shareLabel')}
-                  </button>
-                  <button
-                    onClick={() => setSelectedVerses([])}
-                    className="bg-slate-500 hover:bg-slate-400 text-white px-3 py-1.5 rounded-full text-sm"
-                  >
-                    {t('cancel')}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+      {/* Ligne 2 : Copier / Partager / Annuler */}
+      <div className="flex items-center justify-center gap-2">
+        <button
+          onClick={copySelection}
+          className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-600 text-white text-sm"
+        >
+          <CopyIcon size={16} className="mr-1" />
+          {t('copyLabel')}
+        </button>
+        <button
+          onClick={shareSelection}
+          className="bg-indigo-500 hover:bg-indigo-400 text-white px-3 py-1.5 rounded-full inline-flex items-center text-sm"
+        >
+          <ShareIcon size={16} className="mr-1" />
+          {t('shareLabel')}
+        </button>
+        <button
+          onClick={() => setSelectedVerses([])}
+          className="bg-slate-500 hover:bg-slate-400 text-white px-3 py-1.5 rounded-full text-sm"
+        >
+          {t('cancel')}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
           {/* MODAL : ajout vers NOTES */}
           {showAddToNotes && (
