@@ -1821,99 +1821,99 @@ ${shareUrl}`;
           )}
 
           {/* MODAL : verset dans autres langues */}
-          {showOtherLangs && otherLangTarget && selectedBook && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center">
-              <div
-                className="absolute inset-0 bg-black/60"
-                onClick={() => setShowOtherLangs(false)}
-                aria-hidden="true"
-              />
-              <div className="relative bg-gray-900 text-white rounded-xl shadow-lg p-4 w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
-                <h3 className="text-xl md:text-2xl font-semibold mb-1">
-                  {t('showInOtherLangs')}
-                </h3>
-                <p className="text-sm text-white/70 mb-3">
-                  {getBookName(selectedBook)} {otherLangTarget.chapter}:{otherLangTarget.verse}
-                </p>
+{showOtherLangs && otherLangTarget && selectedBook && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div
+      className="absolute inset-0 bg-black/60"
+      onClick={() => setShowOtherLangs(false)}
+      aria-hidden="true"
+    />
+    <div className="relative bg-gray-900 text-white rounded-xl shadow-lg p-4 w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
+      <h3 className="text-2xl md:text-3xl font-semibold mb-2">
+        {t('showInOtherLangs')}
+      </h3>
+      <p className="text-base text-white/70 mb-4">
+        {getBookName(selectedBook)} {otherLangTarget.chapter}:{otherLangTarget.verse}
+      </p>
 
-                <div className="space-y-3">
-                  {otherLangVerses.map(entry => {
-                    const hasText = !!entry.text && !entry.error;
-                    return (
-                      <div
-                        key={entry.lang}
-                        className="border border-gray-700 rounded-lg px-3 py-2"
-                      >
-                        <div className="flex items-center justify-between mb-1 gap-2">
-                          <span className="text-xs font-semibold uppercase tracking-wide text-gray-300">
-                            {entry.lang.toUpperCase()}
-                          </span>
-                          {hasText && (
-                            <div className="flex items-center gap-1 flex-wrap justify-end">
-                              <button
-                                onClick={() =>
-                                  sendOtherLangVerseToNotes(entry.lang, entry.text)
-                                }
-                                className="px-2 py-1 rounded-full bg-orange-500 text-white text-[11px]"
-                              >
-                                {t('notes')}
-                              </button>
-                              <button
-                                onClick={() =>
-                                  sendOtherLangVerseToPrinciples(entry.lang, entry.text)
-                                }
-                                className="px-2 py-1 rounded-full bg-emerald-600 text-white text-[11px]"
-                              >
-                                {t('principles')}
-                              </button>
-                              <button
-                                onClick={() =>
-                                  copyOtherLangVerse(entry.lang, entry.text)
-                                }
-                                className="px-2 py-1 rounded-full bg-blue-600 text-white text-[11px]"
-                              >
-                                {t('copyLabel')}
-                              </button>
-                              <button
-                                onClick={() =>
-                                  shareOtherLangVerse(entry.lang, entry.text)
-                                }
-                                className="px-2 py-1 rounded-full bg-indigo-500 text-white text-[11px]"
-                              >
-                                {t('shareLabel')}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                        {entry.loading ? (
-                          <p className="text-xs text-white/70">
-                            {t('loading')}
-                          </p>
-                        ) : !entry.text || entry.error ? (
-                          <p className="text-xs text-white/60 italic">
-                            Verset indisponible pour cette langue.
-                          </p>
-                        ) : (
-                          <p className="text-sm leading-relaxed">
-                            {entry.text}
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="mt-4 flex justify-end">
-                  <button
-                    onClick={() => setShowOtherLangs(false)}
-                    className="px-3 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm"
-                  >
-                    {t('close')}
-                  </button>
-                </div>
+      <div className="space-y-3">
+        {otherLangVerses.map(entry => {
+          const hasText = !!entry.text && !entry.error;
+          return (
+            <div
+              key={entry.lang}
+              className="border border-gray-700 rounded-lg px-3 py-3"
+            >
+              <div className="flex items-center justify-between mb-2 gap-2">
+                <span className="text-sm font-semibold uppercase tracking-wide text-gray-300">
+                  {entry.lang.toUpperCase()}
+                </span>
+                {hasText && (
+                  <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                    <button
+                      onClick={() =>
+                        sendOtherLangVerseToNotes(entry.lang, entry.text)
+                      }
+                      className="px-2.5 py-1 rounded-full bg-orange-500 text-white text-xs"
+                    >
+                      {t('notes')}
+                    </button>
+                    <button
+                      onClick={() =>
+                        sendOtherLangVerseToPrinciples(entry.lang, entry.text)
+                      }
+                      className="px-2.5 py-1 rounded-full bg-emerald-600 text-white text-xs"
+                    >
+                      {t('principles')}
+                    </button>
+                    <button
+                      onClick={() =>
+                        copyOtherLangVerse(entry.lang, entry.text)
+                      }
+                      className="px-2.5 py-1 rounded-full bg-blue-600 text-white text-xs"
+                    >
+                      {t('copyLabel')}
+                    </button>
+                    <button
+                      onClick={() =>
+                        shareOtherLangVerse(entry.lang, entry.text)
+                      }
+                      className="px-2.5 py-1 rounded-full bg-indigo-500 text-white text-xs"
+                    >
+                      {t('shareLabel')}
+                    </button>
+                  </div>
+                )}
               </div>
+              {entry.loading ? (
+                <p className="text-sm text-white/70">
+                  {t('loading')}
+                </p>
+              ) : !entry.text || entry.error ? (
+                <p className="text-sm text-white/60 italic">
+                  Verset indisponible pour cette langue.
+                </p>
+              ) : (
+                <p className="text-base md:text-lg leading-relaxed">
+                  {entry.text}
+                </p>
+              )}
             </div>
-          )}
+          );
+        })}
+      </div>
+
+      <div className="mt-4 flex justify-end">
+        <button
+          onClick={() => setShowOtherLangs(false)}
+          className="px-4 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm"
+        >
+          {t('close')}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
           {/* TOASTS */}
           {copiedKey === 'selection' && (
