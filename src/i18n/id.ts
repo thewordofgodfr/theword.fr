@@ -30,6 +30,7 @@ const id: TranslationDict = {
 
   // Reading – extras
   chooseBook: "Pilih suatu kitab",
+  showInOtherLangs: 'Bahasa lain',
   chooseChapter: "Pilih suatu pasal",
   prevChapter: "Pasal sebelumnya",
   nextChapter: "Pasal berikutnya",
