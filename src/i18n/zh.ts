@@ -30,6 +30,7 @@ const zh: TranslationDict = {
 
   // Reading – extras
   chooseBook: "选择一本书",
+  showInOtherLangs: '其他语言',
   chooseChapter: "选择一章",
   prevChapter: "上一章",
   nextChapter: "下一章",
