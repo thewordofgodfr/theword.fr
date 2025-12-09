@@ -1,0 +1,282 @@
+// src/i18n/he.ts
+import type { TranslationDict } from './types';
+
+const he: TranslationDict = {
+  // Navigation
+  home: 'דף הבית',
+  reading: 'קריאה',
+  search: 'חיפוש',
+  settings: 'הגדרות',
+  about: 'אודות',
+  notes: 'הערות',
+  principles: 'לימודים',
+
+  // Home page
+  randomVerse: 'פסוק אקראי',
+  newVerse: 'פסוק חדש',
+  copyVerse: 'העתק פסוק',
+  verseCopied: 'הפסוק הועתק!',
+  godSpeaks: 'אלוהים מדבר אליך',
+  openJeremiah: 'פתח את ירמיהו כ״ג 29',
+  jeremiah23Quote:
+    '«הֲלוֹא כֹה דְבָרִי כָּאֵשׁ, נְאֻם־יְהוָה, וּכְפַטִּישׁ יְפֹצֵץ סָלַע» (ירמיהו כ״ג 29)',
+
+  // Reading page
+  selectBook: 'בחר ספר',
+  selectChapter: 'בחר פרק',
+  chapter: 'פרק',
+  oldTestament: 'הברית הישנה',
+  newTestament: 'הברית החדשה',
+
+  // Reading – compléments
+  chooseBook: 'בחר ספר',
+  showInOtherLangs: 'שפות אחרות',
+  chooseChapter: 'בחר פרק',
+  prevChapter: 'פרק קודם',
+  nextChapter: 'הפרק הבא',
+  verseWord: 'פסוק',
+  versesSelectedSuffix: 'פסוק(ים) נבחר(ים)',
+  toNotes: 'אל הערות',
+  toPrinciples: 'אל הלימודים',
+  copyLabel: 'העתק',
+  shareLabel: 'שתף',
+  cancel: 'ביטול',
+  close: 'סגור',
+  notesModalTitle: 'הוסף לרשימה (הערות)',
+  notesNoList: 'אין רשימות עדיין. צור רשימה חדשה כאן למטה.',
+  notesNewListOptional: 'רשימה חדשה (לא חובה)',
+  principlesModalTitle: 'הוסף ללימוד (לימודים)',
+  principlesNoList: 'אין לימודים עדיין. צור לימוד חדש כאן למטה.',
+  principlesNewListOptional: 'לימוד חדש (לא חובה)',
+  selectionCopied: 'הבחירה הועתקה',
+  textReadyToShare: 'הטקסט מוכן לשיתוף (הועתק)',
+  addedToList: 'נוסף לרשימה',
+  newRandom: 'אקראי חדש',
+  swipeLabel: 'החלק',
+  searchSlotLabel: 'חיפוש',
+  searchSlotEmpty: 'חיפוש (ריק)',
+  memorySlotLabel: 'זיכרון',
+  emptySlotSuffix: '(ריק)',
+  untitledList: '(ללא כותרת)',
+
+  // Petit libellé court pour “Copié”
+  copiedShort: 'הועתק',
+
+  // *** Search page ***
+  searchTitle: 'חיפוש בתנ״ך',
+  searchPlaceholder: 'הקלד את החיפוש שלך',
+  searchMinChars: 'הקלד לפחות 2 תווים',
+  searchSearching: 'מחפש…',
+  searchResults: 'תוצאות',
+  searchExpandAll: 'פתח הכול',
+  searchCollapseAll: 'סגור הכול',
+  searchNoResults: 'לא נמצאו פסוקים.',
+  searchClear: 'נקה',
+  searchOpenInReading: 'פתח במסך הקריאה',
+
+  // Bloc Notes (page Notes)
+  notesPage: {
+    create: 'צור רשימה',
+    placeholder: 'כותרת הרשימה…',
+    empty: 'אין רשימות עדיין.',
+    items: 'פריטים',
+    backAll: '← כל הרשימות',
+    addTextBlock: 'הוסף בלוק טקסט',
+    editTextBlock: 'עריכת הבלוק',
+    deleteItem: 'מחק',
+    moveUp: 'הזז למעלה',
+    moveDown: 'הזז למטה',
+    open: 'פתח',
+    confirmDeleteItem: 'למחוק פריט זה?',
+    newTextPlaceholder: 'הטקסט שלך…',
+
+    // Partage / import via code
+    shareCode: 'קוד',
+    importCode: 'ייבוא מקוד',
+    importPrompt: 'הדבק כאן את קוד השיתוף TheWord:',
+    importError: 'קוד לא תקף.',
+    importSuccess: 'הרשימה יובאה בהצלחה ✅',
+    shareCodeCopied: 'הקוד הועתק ללוח ✅',
+
+    // Import direct depuis un texte
+    importTextButton: 'טקסט → רשימה',
+    importTextTitlePlaceholder: 'כותרת הרשימה החדשה',
+    importTextDefaultTitle: 'ייבוא טקסט',
+    importTextBodyPlaceholder: 'הדבק כאן את הטקסט שלך…',
+    importTextNoBody: 'אנא הדבק טקסט לייבוא.',
+    importTextNoBlock:
+      'לא אותרו בלוקים (השאר שורות ריקות כדי להפריד בין בלוקים).',
+    importTextSplitLabel:
+      'פצל לבלוקים (מופרדים לפחות בשורה ריקה אחת)',
+    importTextInfo: 'כל בלוק יהפוך לפריט ברשימה.',
+    importTextCreate: 'צור את הרשימה',
+
+    duplicateTitle: 'כותרת זהה כבר קיימת.',
+    confirmDeleteList: 'למחוק רשימה זו?',
+    emptyList: 'רשימה ריקה.',
+
+    importFromTextTitle: 'ייבוא מטקסט',
+    documentContent: 'תוכן המסמך',
+    renameList: 'שנה שם',
+  },
+
+  // Bloc Études (page Études)
+  principlesPage: {
+    create: 'צור לימוד',
+    placeholder: 'כותרת הלימוד…',
+    empty: 'אין לימודים עדיין.',
+    items: 'פריטים',
+    backAll: '← כל הלימודים',
+    addTextBlock: 'הוסף בלוק טקסט',
+    editTextBlock: 'עריכת הבלוק',
+    deleteItem: 'מחק',
+    moveUp: 'הזז למעלה',
+    moveDown: 'הזז למטה',
+    open: 'פתח',
+    openReading: 'פתח בקריאה',
+    confirmDeleteItem: 'למחוק פריט זה?',
+    newTextPlaceholder: 'הטקסט שלך…',
+
+    // Partage / import via code
+    shareCode: 'קוד',
+    importCode: 'ייבוא מקוד',
+    importPrompt: 'הדבק כאן את קוד השיתוף TheWord (הערה או לימוד):',
+    importError: 'קוד לא תקף.',
+    importSuccess: 'הלימוד יובא בהצלחה ✅',
+    shareCodeCopied: 'הקוד הועתק ללוח ✅',
+
+    // Import direct depuis un texte
+    importTextButton: 'טקסט → לימוד',
+    importTextTitlePlaceholder: 'כותרת הלימוד החדש',
+    importTextDefaultTitle: 'ייבוא טקסט',
+    importTextBodyPlaceholder: 'הדבק כאן את הטקסט שלך…',
+    importTextNoBody: 'אנא הדבק טקסט לייבוא.',
+    importTextNoBlock:
+      'לא אותרו בלוקים (השאר שורות ריקות כדי להפריד בין בלוקים).',
+    importTextSplitLabel:
+      'פצל לבלוקים (מופרדים לפחות בשורה ריקה אחת)',
+    importTextInfo: 'כל בלוק יהפוך לפריט בלימוד.',
+    importTextCreate: 'צור את הלימוד',
+
+    duplicateTitle: 'קיים כבר לימוד עם אותה כותרת.',
+    confirmDeleteList: 'למחוק לימוד זה?',
+    emptyList: 'לימוד ריק.',
+
+    importFromTextTitle: 'ייבוא מטקסט',
+    documentContent: 'תוכן המסמך',
+    renameList: 'שנה שם',
+    share: 'שתף',
+    copy: 'העתק',
+    deleteList: 'מחק',
+
+    shareStudyTitle: 'לימוד',
+    shareItemTitle: 'פסוק',
+  },
+
+  // Settings page
+  appearance: 'מראה',
+  lightMode: 'מצב בהיר',
+  darkMode: 'מצב כהה',
+  fontSize: 'גודל גופן',
+  language: 'שפה',
+  french: 'צרפתית',
+  english: 'אנגלית',
+  fontSizeXLLabel: 'מצב כבדי ראייה (XL)',
+  fontSizePreview: 'תצוגה מקדימה של גודל הגופן שנבחר.',
+  updates: 'עדכונים',
+  updatesDescription:
+    'בדוק אם קיימת גרסה חדשה של האפליקציה ויישם אותה.',
+  applyUpdate: 'החל את העדכון',
+  checkUpdatesButton: 'בדוק עדכונים',
+  updatesChecking: 'בודק…',
+  updatesUpToDate: 'האפליקציה שלך מעודכנת.',
+  updatesReady:
+    'גרסה חדשה מוכנה. לחץ על «החל את העדכון».',
+  updatesUnavailable:
+    'עדכון אוטומטי אינו זמין (Service Worker לא זוהה).',
+  updatesError: 'שגיאה במהלך הבדיקה. נסה שוב.',
+
+  // About / versions
+  aboutTitle: '',
+  aboutDescription:
+    'The Word מאפשרת לך לגלות את דבר אלוהים דרך פסוקים אקראיים וקריאה מלאה של כתבי הקודש.',
+  aboutIntro:
+    'TheWord: קריאה של המקרא ללא חיבור, חיפוש מיידי, הערות נושאיות, שיתוף בלחיצה אחת. ניתן להשתמש גם ב-TheWord ברשת: www.theword.fr',
+  bibleVersions: 'גרסאות של המקרא',
+  frenchVersion:
+    'צרפתית: Louis Segond 1910 (LSG) – מהדורת 2025 – נחלת הכלל',
+  englishVersion:
+    'אנגלית: King James Version (KJV) – נחלת הכלל',
+  frenchVersionDetails:
+    'תרגום הייחוס לצרפתית, שנעשה על-ידי לואי סגונד בשנת 1910 ועודכן ב-2025 (המודרניזציה של אוצר המילים והדקדוק, תוך נאמנות לכתבי היד).',
+  englishVersionDetails:
+    'תרגום קלאסי באנגלית (KJV), פורסם בשנת 1611, עודכן ב-1769 ומודרניזציה מוגבלת ב-2025.',
+  otherLanguagesNote:
+    'שפות נוספות (גרמנית, פורטוגזית וכו׳) נמצאות בתהליך הכנה. עד אז, אם תרגום הממשק חסר, האפליקציה תשתמש באנגלית כברירת מחדל.',
+  randomFeature: 'פונקציית האקראי',
+  randomFeatureDesc:
+    'מחולל הפסוקים האקראיים שלנו בוחר מתוך יותר מ-31,000 פסוקים כדי להעניק לך השראה יומיומית.',
+  musicLink: 'מוזיקה של הבורא',
+  versesLabel: 'פסוקים',
+  booksLabel: 'ספרים',
+  readingShortcuts: 'קיצורי קריאה',
+  notesIntro:
+    'ארגן את הקטעים האהובים עליך ואת מחשבותיך ברשימות נושאיות.',
+  notesPoint1: 'הוסף פסוקים או בלוקים של טקסט חופשי.',
+  notesPoint2:
+    'גע בפריט כדי לפתוח את התפריט (פתח במסך הקריאה, הזז למעלה/למטה, מחק וכו׳).',
+  notesPoint3: 'שנה את שם הרשימות שלך, העתק אותן או שתף אותן.',
+  createdWithLove: 'נוצר באהבה כדי להפיץ את דבר אלוהים',
+  versionsFootnote:
+    'כל גרסאות המקרא המשמשות באפליקציה הן בנחלת הכלל. חלקן עודכנו חלקית (אוצר מילים, דקדוק) תוך שמירה קפדנית על הנאמנות לכתבי היד המקוריים.',
+
+  // Quick slots
+  quickSlotsIntro:
+    'ארבעת הכפתורים מימין לבורר הספר/פרק מאפשרים לחזור מיידית לקריאות נפוצות ולקרוא כמה ספרים במקביל: השתמש ב-1/2/3 לשלושה מקומות שונים, ובזכוכית המגדלת כדי לחזור למעבר האחרון (פסוק אקראי או חיפוש).',
+  quickSlotsIllustrationLabel: 'איור של קיצורי הדרך',
+  quickSlotLastPassageTooltip: 'המעבר האחרון',
+  quickSlot1ActiveTooltip: 'קיצור 1 (פעיל)',
+  quickSlot2Tooltip: 'קיצור 2',
+  quickSlot3Tooltip: 'קיצור 3',
+
+  // Aide Notes + Études (mode d'emploi commun)
+  notesHelpTitle: 'הערות ולימודים — מדריך שימוש',
+  notesHelpIntro:
+    'עמודי ההערות והלימודים מאפשרים לך לשמור פסוקים, ליצור רשימות לפי נושא ולבנות לימודים אמיתיים על-ידי שילוב פסוקים ובלוקים של טקסט. הכול נשמר מקומית במכשיר שלך, 100% ללא חיבור, ללא חשבון וללא אינטרנט.',
+  notesHelp1Title: '1. דף הבית של הערות ולימודים',
+  notesHelp1Body:
+    'מרכז את רשימות ההערות או הלימודים שלך. גע ברשימה כדי לפתוח את תוכנה. הכפתור «כל הרשימות» או «כל הלימודים» למעלה מאפשר לחזור לתצוגה הכוללת. כאשר אתה חוזר ממסך הקריאה, האפליקציה פותחת מחדש אוטומטית את רשימת ההערות או הלימוד האחרונים שבהם השתמשת וממקמת אותך בסוף כדי להמשיך בקלות.',
+  notesHelp2Title: '2. הוספת פסוקים מהמקרא',
+  notesHelp2Body:
+    'ממסך הקריאה תוכל להוסיף פסוקים להערות או ללימודים באמצעות הכפתורים הייעודיים. הפסוקים שנבחרו נשמרים ברשימות או בלימודים שבחרת, עם ההפניה והטקסט המלא של הפסוק. ניתן לשמור אותו פסוק במספר רשימות שונות.',
+  notesHelp3Title: '3. בלוקים של טקסט חופשי',
+  notesHelp3Body:
+    'בנוסף לפסוקים, ניתן להוסיף בלוקים של טקסט חופשי (הערות, רעיונות אישיים, שאלות, נקודות לדרשה וכו׳). הכפתור «הוסף בלוק טקסט» (בראש ובתחתית רשימה או לימוד פתוחים) מציג אזור עריכה גדול. הטקסט נשמר כפריט עצמאי שניתן אחר כך לערוך, להזיז או למחוק.',
+  notesHelp4Title: '4. ארגון מחדש של הפריטים',
+  notesHelp4Body:
+    'לחיצה על פריט (פסוק או בלוק טקסט) פותחת את תפריט הפעולות שלו. החיצים «הזז למעלה» ו«הזז למטה» מאפשרים לשנות את סדר הפריטים ברשימה או בלימוד, כדי להתאים את המבנה ללימוד המקרא, לדרשה או לזמן המדיטציה שלך.',
+  notesHelp5Title: '5. העתקה ושיתוף של רשימה שלמה',
+  notesHelp5Body:
+    'בתוך רשימת הערות או לימוד פתוחים, הכפתורים «שתף» ו«העתק» מאפשרים לקבל את כל התוכן: כותרת, הפניות, טקסטים ובלוקי הערות. אפשר להדביק תוכן זה בהודעה, במסמך או בכל כלי אחר, או לשלוח אותו למישהו ב-SMS, WhatsApp או אפליקציית מסרים אחרת.',
+  notesHelp6Title: '6. שיתוף באמצעות קוד The Word',
+  notesHelp6Body:
+    'הכפתור «קוד» יוצר קוד קצר שתוכל לשלוח למי שמשתמש גם באפליקציית The Word. באפליקציה שלו ניתן להשתמש באפשרות ייבוא לפי קוד כדי ליצור בדיוק את אותה רשימת הערות או אותו לימוד (כותרת + תוכן) במכשיר שלו. הכפתור «קוד» מאפשר גם להעביר רשימת הערות אל הלימודים.',
+  notesHelp7Title: '7. ייבוא מתוך טקסט',
+  notesHelp7Body:
+    'הכפתור «ייבוא מטקסט» מאפשר להדביק מסמך שלם (הערות Word, דוא״ל, דרשה, תוכנית לימוד וכו׳). האפליקציה מחלקת את הטקסט לבלוקים (המופרדים בשורות ריקות) ויוצרת באופן אוטומטי רשימה או לימוד המורכבים מהבלוקים האלה. זה כלי מעשי מאוד להפיכת מסמך קיים להערות או ללימוד בתוך The Word.',
+  notesHelp8Title: '8. ניהול מקומי וסודיות',
+  notesHelp8Body:
+    'כל ההערות והלימודים נשמרים אך ורק במכשיר שלך. The Word אינה מסנכרנת דבר לשרת ואינה אוספת נתונים אישיים. אם תסיר את האפליקציה או תמחק את נתוני הגלישה, רשימות ההערות והלימודים יימחקו גם הן.',
+  notesHelp9Title: '9. רעיונות לשימוש',
+  notesHelp9Body:
+    'באפשרותך להשתמש בהערות להכנת דרשות, לעקוב אחר תוכנית לימוד אישית, לשמור רשימת תפילות, לרשום מה שאלוהים מזכיר לך במהלך היום או לשמור פסוקים לשינון בעל פה. השתמש בלימודים לבניית מסלולי לימוד מלאים (לפי נושאים, לפי ספרים, לקבוצות בית, לסדרות מסרים וכו׳) שתוכל ללמד או לשתף בקלות.',
+  notesHelp10Title: '10. הערות ולימודים יחד',
+  notesHelp10Body:
+    'שלב בין הערות ולימודים: לדוגמה, שמור את המחשבות והתפילות היומיומיות שלך בהערות, והקדש את הלימודים לתוכניות שברצונך לפתח, ללמד או לשתף עם קבוצה.',
+
+  // Common
+  loading: 'טוען...',
+  error: 'שגיאה בעת הטעינה',
+};
+
+export default he;
