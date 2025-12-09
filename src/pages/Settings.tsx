@@ -23,7 +23,9 @@ type FlagCode =
   | 'tr'
   | 'ja'
   | 'ko'
-  | 'yo';
+  | 'yo'
+  | 'he'
+  | 'el';
 
 /** Petit composant Flag inline SVG pour compatibilité desktop/mobile */
 const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> = ({
@@ -263,6 +265,54 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
     );
   }
 
+  if (code === 'he') {
+    // Hébreu / Israël : bandes bleues + étoile de David simplifiée
+    return (
+      <span className={`inline-block ${className}`} style={style}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Hebrew" role="img">
+          <rect width="3" height="2" fill="#FFFFFF" />
+          <rect width="3" height="0.25" y="0" fill="#0038B8" />
+          <rect width="3" height="0.25" y="1.75" fill="#0038B8" />
+          {/* étoile de David simplifiée */}
+          <polygon
+            points="1.5,0.6 1.35,0.9 1.65,0.9"
+            fill="#0038B8"
+          />
+          <polygon
+            points="1.5,1.4 1.35,1.1 1.65,1.1"
+            fill="#0038B8"
+          />
+          <polygon
+            points="1.3,0.8 1.7,0.8 1.5,1.2"
+            fill="none"
+            stroke="#0038B8"
+            strokeWidth="0.05"
+          />
+        </svg>
+      </span>
+    );
+  }
+
+  if (code === 'el') {
+    // Grèce simplifiée : bleu / blanc + croix
+    return (
+      <span className={`inline-block ${className}`} style={style}>
+        <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Greece" role="img">
+          <rect width="3" height="2" fill="#0D5EAF" />
+          {/* bandes blanches simplifiées */}
+          <rect width="3" height="0.2" y="0.3" fill="#FFFFFF" />
+          <rect width="3" height="0.2" y="0.7" fill="#FFFFFF" />
+          <rect width="3" height="0.2" y="1.1" fill="#FFFFFF" />
+          <rect width="3" height="0.2" y="1.5" fill="#FFFFFF" />
+          {/* canton avec croix */}
+          <rect width="1.2" height="1.2" x="0" y="0" fill="#0D5EAF" />
+          <rect width="0.3" height="1.2" x="0.45" y="0" fill="#FFFFFF" />
+          <rect width="1.2" height="0.3" x="0" y="0.45" fill="#FFFFFF" />
+        </svg>
+      </span>
+    );
+  }
+
   // Fallback gris (ne devrait pas arriver)
   return (
     <span className={`inline-block ${className}`} style={style}>
@@ -358,6 +408,16 @@ const LANGUAGE_CONFIG: Record<
     label: 'Yorùbá',
     subtitle: 'Biblica Yoruba Bible',
   },
+  he: {
+    flag: 'he',
+    label: 'עִבְרִית',
+    subtitle: 'תנ״ך בעברית מקראית',
+  },
+  el: {
+    flag: 'el',
+    label: 'Ελληνικά',
+    subtitle: 'Κείμενο στην Κοινή Ελληνική',
+  },
 };
 
 /** Langues réellement disponibles (Bible + interface) */
@@ -378,6 +438,8 @@ const AVAILABLE_LANGUAGES: Language[] = [
   'ja',
   'ko',
   'yo',
+  'he',
+  'el',
 ];
 
 export default function Settings() {
