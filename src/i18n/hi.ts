@@ -30,6 +30,7 @@ const hi: TranslationDict = {
 
   // Reading – extras
   chooseBook: "कोई पुस्तक चुनें",
+  showInOtherLangs: 'अन्य भाषाएँ',
   chooseChapter: "कोई अध्याय चुनें",
   prevChapter: "पिछला अध्याय",
   nextChapter: "अगला अध्याय",
