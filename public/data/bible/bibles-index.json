@@ -14,5 +14,7 @@
   "tr": ["/data/bible/tr/verses.jsonl"],
   "ja": ["/data/bible/ja/verses.jsonl"],
   "ko": ["/data/bible/ko/verses.jsonl"],
-  "yo": ["/data/bible/yo/verses.jsonl"]
+  "yo": ["/data/bible/yo/verses.jsonl"],
+  "he": ["/data/bible/he/verses.jsonl"],
+  "el": ["/data/bible/el/verses.jsonl"]
 }
