@@ -42,6 +42,8 @@ export const SUPPORTED_LANGUAGES = [
   'ja', // Japonais
   'ko', // Coréen
   'yo', // Yoruba
+  'he', // Hébreu biblique
+  'el', // Grec (Κοινή / grec ancien)
 ] as const;
 
 export type Language = (typeof SUPPORTED_LANGUAGES)[number];
