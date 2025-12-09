@@ -18,6 +18,8 @@ import ko from './ko';
 import ja from './ja';
 import yo from './yo';
 import tr from './tr';
+import he from './he';
+import el from './el';
 
 export const translations: Partial<Record<Language, TranslationDict>> = {
   fr,
@@ -36,6 +38,8 @@ export const translations: Partial<Record<Language, TranslationDict>> = {
   ja,
   yo,
   tr,
+  he,
+  el,
 };
 
 const FALLBACK_LANG: Language = 'en';
@@ -48,3 +52,4 @@ export function getTranslations(lang: Language): TranslationDict {
   }
   return dict;
 }
+
