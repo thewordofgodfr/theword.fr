@@ -30,6 +30,7 @@ const ar: TranslationDict = {
 
   // Reading – extras
   chooseBook: "اختر سفراً",
+  showInOtherLangs: 'لغات أخرى',
   chooseChapter: "اختر إصحاحاً",
   prevChapter: "الإصحاح السابق",
   nextChapter: "الإصحاح التالي",
