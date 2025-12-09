@@ -30,6 +30,7 @@ const ko: TranslationDict = {
 
   // Reading – extras
   chooseBook: "책을 선택하세요",
+  showInOtherLangs: '다른 언어',
   chooseChapter: "장을 선택하세요",
   prevChapter: "이전 장",
   nextChapter: "다음 장",
