@@ -30,6 +30,7 @@ const yo: TranslationDict = {
 
   // Reading – extras
   chooseBook: "Yan ìwé kan",
+  showInOtherLangs: 'Awọn ede miiran',
   chooseChapter: "Yan apá kan",
   prevChapter: "Apá tó kọjá",
   nextChapter: "Apá tó kàn",
