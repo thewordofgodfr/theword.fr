@@ -30,6 +30,7 @@ const ru: TranslationDict = {
 
   // Reading – compléments
   chooseBook: 'Выбрать книгу',
+  showInOtherLangs: 'Другие языки',
   chooseChapter: 'Выбрать главу',
   prevChapter: 'Предыдущая глава',
   nextChapter: 'Следующая глава',
