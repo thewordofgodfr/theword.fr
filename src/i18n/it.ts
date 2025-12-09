@@ -30,6 +30,7 @@ const it: TranslationDict = {
 
   // Reading – extras
   chooseBook: "Scegli un libro",
+  showInOtherLangs: 'Altre lingue',
   chooseChapter: "Scegli un capitolo",
   prevChapter: "Capitolo precedente",
   nextChapter: "Capitolo successivo",
