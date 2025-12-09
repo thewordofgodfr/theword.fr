@@ -85,6 +85,8 @@ function addVersesToPrincipleList(listId: string, verses: VerseRef[]): void {
 const ALL_LANG_CODES = [
   'fr',
   'en',
+  'el',
+  'he',
   'ru',
   'es',
   'ar',
@@ -891,16 +893,37 @@ ${shareUrl}`;
     };
     setOtherLangTarget(target);
 
-  const currentLang = state.settings.language as LangCode;
+    const currentLang = state.settings.language as LangCode;
 
-  const targetLangs = [
-    currentLang,
-    ...ALL_LANG_CODES.filter(l => l !== currentLang),
-  ] as LangCode[];
+    // Ordre souhaité :
+    // 1) langue courante
+    // 2) anglais (en)
+    // 3) grec (el)
+    // 4) hébreu (he)
+    // 5) toutes les autres langues
+    const preferred: LangCode[] = [];
+
+    if (ALL_LANG_CODES.includes(currentLang)) {
+      preferred.push(currentLang);
+    }
+
+    (['en', 'el', 'he'] as LangCode[]).forEach(code => {
+      if (
+        ALL_LANG_CODES.includes(code) &&
+        code !== currentLang &&
+        !preferred.includes(code)
+      ) {
+        preferred.push(code);
+      }
+    });
+
+    const remaining = ALL_LANG_CODES.filter(l => !preferred.includes(l));
+
+    const targetLangs: LangCode[] = [...preferred, ...remaining];
 
     const initial = targetLangs.map(lang => ({
       lang,
-      text: null,
+      text: null as string | null,
       loading: true,
       error: undefined as string | undefined,
     }));
@@ -1531,6 +1554,7 @@ ${shareUrl}`;
                           ? 'bg-blue-600 text-white'
                           : 'bg-gray-800 text-white hover:bg-gray-700'
                       }`}
+
                     >
                       {getBookName(book)}
                     </button>
@@ -1607,60 +1631,60 @@ ${shareUrl}`;
           )}
 
           {/* BARRE SELECTION (mobile) */}
-{selectedVerses.length > 0 && (
-  <div className="sm:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-full px-3">
-    <div className="bg-white/5 text-white shadow-lg rounded-2xl px-3 py-2 space-y-2 max-w-[500px] mx-auto">
-      {/* Ligne 1 : Notes / Principes / Autres langues */}
-      <div className="flex items-center justify-center gap-2">
-        <button
-          onClick={() => openAddToNotes()}
-          className="inline-flex items-center px-3 py-1.5 rounded-full bg-orange-500 text-white text-sm"
-        >
-          <ListPlusIcon size={16} className="mr-1" />
-          {t('notes')}
-        </button>
-        <button
-          onClick={() => openAddToPrinciples()}
-          className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-600 text-white text-sm"
-        >
-          <ListPlusIcon size={16} className="mr-1" />
-          {t('principles')}
-        </button>
-        <button
-          onClick={openOtherLangs}
-          className="inline-flex items-center px-3 py-1.5 rounded-full bg-teal-600 text-white text-sm"
-        >
-          <LanguagesIcon size={16} className="mr-1" />
-          {t('showInOtherLangs')}
-        </button>
-      </div>
+          {selectedVerses.length > 0 && (
+            <div className="sm:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-full px-3">
+              <div className="bg-white/5 text-white shadow-lg rounded-2xl px-3 py-2 space-y-2 max-w-[500px] mx-auto">
+                {/* Ligne 1 : Notes / Principes / Autres langues */}
+                <div className="flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => openAddToNotes()}
+                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-orange-500 text-white text-sm"
+                  >
+                    <ListPlusIcon size={16} className="mr-1" />
+                    {t('notes')}
+                  </button>
+                  <button
+                    onClick={() => openAddToPrinciples()}
+                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-600 text-white text-sm"
+                  >
+                    <ListPlusIcon size={16} className="mr-1" />
+                    {t('principles')}
+                  </button>
+                  <button
+                    onClick={openOtherLangs}
+                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-teal-600 text-white text-sm"
+                  >
+                    <LanguagesIcon size={16} className="mr-1" />
+                    {t('showInOtherLangs')}
+                  </button>
+                </div>
 
-      {/* Ligne 2 : Copier / Partager / Annuler */}
-      <div className="flex items-center justify-center gap-2">
-        <button
-          onClick={copySelection}
-          className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-600 text-white text-sm"
-        >
-          <CopyIcon size={16} className="mr-1" />
-          {t('copyLabel')}
-        </button>
-        <button
-          onClick={shareSelection}
-          className="bg-indigo-500 hover:bg-indigo-400 text-white px-3 py-1.5 rounded-full inline-flex items-center text-sm"
-        >
-          <ShareIcon size={16} className="mr-1" />
-          {t('shareLabel')}
-        </button>
-        <button
-          onClick={() => setSelectedVerses([])}
-          className="bg-slate-500 hover:bg-slate-400 text-white px-3 py-1.5 rounded-full text-sm"
-        >
-          {t('cancel')}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+                {/* Ligne 2 : Copier / Partager / Annuler */}
+                <div className="flex items-center justify-center gap-2">
+                  <button
+                    onClick={copySelection}
+                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-600 text-white text-sm"
+                  >
+                    <CopyIcon size={16} className="mr-1" />
+                    {t('copyLabel')}
+                  </button>
+                  <button
+                    onClick={shareSelection}
+                    className="bg-indigo-500 hover:bg-indigo-400 text-white px-3 py-1.5 rounded-full inline-flex items-center text-sm"
+                  >
+                    <ShareIcon size={16} className="mr-1" />
+                    {t('shareLabel')}
+                  </button>
+                  <button
+                    onClick={() => setSelectedVerses([])}
+                    className="bg-slate-500 hover:bg-slate-400 text-white px-3 py-1.5 rounded-full text-sm"
+                  >
+                    {t('cancel')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* MODAL : ajout vers NOTES */}
           {showAddToNotes && (
@@ -1821,99 +1845,99 @@ ${shareUrl}`;
           )}
 
           {/* MODAL : verset dans autres langues */}
-{showOtherLangs && otherLangTarget && selectedBook && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center">
-    <div
-      className="absolute inset-0 bg-black/60"
-      onClick={() => setShowOtherLangs(false)}
-      aria-hidden="true"
-    />
-    <div className="relative bg-gray-900 text-white rounded-xl shadow-lg p-4 w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
-      <h3 className="text-2xl md:text-3xl font-semibold mb-2">
-        {t('showInOtherLangs')}
-      </h3>
-      <p className="text-base text-white/70 mb-4">
-        {getBookName(selectedBook)} {otherLangTarget.chapter}:{otherLangTarget.verse}
-      </p>
+          {showOtherLangs && otherLangTarget && selectedBook && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div
+                className="absolute inset-0 bg-black/60"
+                onClick={() => setShowOtherLangs(false)}
+                aria-hidden="true"
+              />
+              <div className="relative bg-gray-900 text-white rounded-xl shadow-lg p-4 w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
+                <h3 className="text-2xl md:text-3xl font-semibold mb-2">
+                  {t('showInOtherLangs')}
+                </h3>
+                <p className="text-base text-white/70 mb-4">
+                  {getBookName(selectedBook)} {otherLangTarget.chapter}:{otherLangTarget.verse}
+                </p>
 
-      <div className="space-y-3">
-        {otherLangVerses.map(entry => {
-          const hasText = !!entry.text && !entry.error;
-          return (
-            <div
-              key={entry.lang}
-              className="border border-gray-700 rounded-lg px-3 py-3"
-            >
-              <div className="flex items-center justify-between mb-2 gap-2">
-                <span className="text-sm font-semibold uppercase tracking-wide text-gray-300">
-                  {entry.lang.toUpperCase()}
-                </span>
-                {hasText && (
-                  <div className="flex items-center gap-1.5 flex-wrap justify-end">
-                    <button
-                      onClick={() =>
-                        sendOtherLangVerseToNotes(entry.lang, entry.text)
-                      }
-                      className="px-2.5 py-1 rounded-full bg-orange-500 text-white text-xs"
-                    >
-                      {t('notes')}
-                    </button>
-                    <button
-                      onClick={() =>
-                        sendOtherLangVerseToPrinciples(entry.lang, entry.text)
-                      }
-                      className="px-2.5 py-1 rounded-full bg-emerald-600 text-white text-xs"
-                    >
-                      {t('principles')}
-                    </button>
-                    <button
-                      onClick={() =>
-                        copyOtherLangVerse(entry.lang, entry.text)
-                      }
-                      className="px-2.5 py-1 rounded-full bg-blue-600 text-white text-xs"
-                    >
-                      {t('copyLabel')}
-                    </button>
-                    <button
-                      onClick={() =>
-                        shareOtherLangVerse(entry.lang, entry.text)
-                      }
-                      className="px-2.5 py-1 rounded-full bg-indigo-500 text-white text-xs"
-                    >
-                      {t('shareLabel')}
-                    </button>
-                  </div>
-                )}
+                <div className="space-y-3">
+                  {otherLangVerses.map(entry => {
+                    const hasText = !!entry.text && !entry.error;
+                    return (
+                      <div
+                        key={entry.lang}
+                        className="border border-gray-700 rounded-lg px-3 py-3"
+                      >
+                        <div className="flex items-center justify-between mb-2 gap-2">
+                          <span className="text-sm font-semibold uppercase tracking-wide text-gray-300">
+                            {entry.lang.toUpperCase()}
+                          </span>
+                          {hasText && (
+                            <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                              <button
+                                onClick={() =>
+                                  sendOtherLangVerseToNotes(entry.lang, entry.text)
+                                }
+                                className="px-2.5 py-1 rounded-full bg-orange-500 text-white text-xs"
+                              >
+                                {t('notes')}
+                              </button>
+                              <button
+                                onClick={() =>
+                                  sendOtherLangVerseToPrinciples(entry.lang, entry.text)
+                                }
+                                className="px-2.5 py-1 rounded-full bg-emerald-600 text-white text-xs"
+                              >
+                                {t('principles')}
+                              </button>
+                              <button
+                                onClick={() =>
+                                  copyOtherLangVerse(entry.lang, entry.text)
+                                }
+                                className="px-2.5 py-1 rounded-full bg-blue-600 text-white text-xs"
+                              >
+                                {t('copyLabel')}
+                              </button>
+                              <button
+                                onClick={() =>
+                                  shareOtherLangVerse(entry.lang, entry.text)
+                                }
+                                className="px-2.5 py-1 rounded-full bg-indigo-500 text-white text-xs"
+                              >
+                                {t('shareLabel')}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        {entry.loading ? (
+                          <p className="text-sm text-white/70">
+                            {t('loading')}
+                          </p>
+                        ) : !entry.text || entry.error ? (
+                          <p className="text-sm text-white/60 italic">
+                            Verset indisponible pour cette langue.
+                          </p>
+                        ) : (
+                          <p className="text-xl md:text-2xl leading-relaxed">
+                            {entry.text}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-4 flex justify-end">
+                  <button
+                    onClick={() => setShowOtherLangs(false)}
+                    className="px-4 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm"
+                  >
+                    {t('close')}
+                  </button>
+                </div>
               </div>
-              {entry.loading ? (
-                <p className="text-sm text-white/70">
-                  {t('loading')}
-                </p>
-              ) : !entry.text || entry.error ? (
-                <p className="text-sm text-white/60 italic">
-                  Verset indisponible pour cette langue.
-                </p>
-              ) : (
-                <p className="text-xl md:text-2xl leading-relaxed">
-                  {entry.text}
-                </p>
-              )}
             </div>
-          );
-        })}
-      </div>
-
-      <div className="mt-4 flex justify-end">
-        <button
-          onClick={() => setShowOtherLangs(false)}
-          className="px-4 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm"
-        >
-          {t('close')}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+          )}
 
           {/* TOASTS */}
           {copiedKey === 'selection' && (
@@ -1963,5 +1987,4 @@ ${shareUrl}`;
     </div>
   );
 }
-
 
