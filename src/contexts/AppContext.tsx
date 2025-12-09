@@ -100,8 +100,8 @@ const getInitialPageFromHash = (): Page => {
 /**
  * Détermine la langue par défaut
  * 1. Si localStorage contient déjà une langue → on la réutilise.
- * 2. Sinon, on regarde navigator.language et on mappe vers les 16 langues supportées :
- *    fr, en, ru, es, ar, de, hi, id, it, ja, ko, pt, sw, tr, yo, zh
+ * 2. Sinon, on regarde navigator.language et on mappe vers les 18 langues supportées :
+ *    fr, en, ru, es, ar, de, hi, id, it, ja, ko, pt, sw, tr, yo, zh, he, el
  * 3. Si aucune correspondance → 'en'
  */
 const getInitialLanguage = (): Language => {
@@ -138,6 +138,10 @@ const getInitialLanguage = (): Language => {
       tr: 'tr',
       yo: 'yo',
       zh: 'zh',
+      he: 'he',
+      iw: 'he', // ancien code pour hébreu dans certains navigateurs
+      el: 'el',
+      gr: 'el', // au cas où un navigateur renverrait "gr"
     };
 
     const mapped = browserToAppLangMap[base];
@@ -440,4 +444,3 @@ export function useApp() {
   }
   return context;
 }
-
