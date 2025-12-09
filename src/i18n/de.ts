@@ -23,6 +23,7 @@ const de: TranslationDict = {
 
   // Reading page
   selectBook: "Buch wählen",
+  showInOtherLangs: 'Andere Sprachen',
   selectChapter: "Kapitel wählen",
   chapter: "Kapitel",
   oldTestament: "Altes Testament",
