@@ -30,6 +30,7 @@ const ja: TranslationDict = {
 
   // Reading – extras
   chooseBook: "書を選択してください",
+  showInOtherLangs: '他の言語',
   chooseChapter: "章を選択してください",
   prevChapter: "前の章",
   nextChapter: "次の章",
