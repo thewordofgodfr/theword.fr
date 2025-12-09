@@ -30,6 +30,7 @@ const sw: TranslationDict = {
 
   // Reading – extras
   chooseBook: "Chagua kitabu",
+  showInOtherLangs: 'Lugha nyingine',
   chooseChapter: "Chagua sura",
   prevChapter: "Sura iliyotangulia",
   nextChapter: "Sura inayofuata",
