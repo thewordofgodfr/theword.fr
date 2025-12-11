@@ -39,6 +39,8 @@ function normalizeLigatures(s: string) {
 function normalizeForSearch(s: string) {
   const noLig = normalizeLigatures(s);
   const deAccented = noLig.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  // retire niqqud & te'amim
+.replace(/[\u0591-\u05C7]/g, '')
   return deAccented
     .toLowerCase()
     .replace(/[^\p{L}\p{N}]+/gu, ' ')
