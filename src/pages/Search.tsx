@@ -30,20 +30,23 @@ function normalizeLigatures(s: string) {
   return s.replace(/œ/g, 'oe').replace(/Œ/g, 'oe').replace(/æ/g, 'ae').replace(/Æ/g, 'ae');
 }
 
-/**
- * Normalisation compatible Unicode :
- * - enlève les accents
- * - conserve toutes les lettres/chiffres (toutes écritures) via \p{L}\p{N}
- * - remplace le reste par des espaces
- */
+// Lettres/chiffres autorisés : latin, grec (deux blocs) et hébreu
+const ALNUM = /[A-Za-z0-9\u0370-\u03FF\u1F00-\u1FFF\u0590-\u05FF]/;
+
 function normalizeForSearch(s: string) {
   const noLig = normalizeLigatures(s);
-  const deAccented = noLig.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  // retire niqqud & te'amim
-.replace(/[\u0591-\u05C7]/g, '')
+  // NFD pour séparer les diacritiques, puis on supprime :
+  // - accents latins (0300–036F)
+  // - niqqud/te'amim hébreux (0591–05C7)
+  const deAccented = noLig
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\u0591-\u05C7]/g, '');
+
   return deAccented
     .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    // on garde latin + grec + hébreu
+    .replace(/[^A-Za-z0-9\u0370-\u03FF\u1F00-\u1FFF\u0590-\u05FF]+/g, ' ')
     .trim()
     .replace(/\s+/g, ' ');
 }
@@ -56,11 +59,16 @@ function buildNormalizedWithMap(input: string) {
 
   for (let i = 0; i < src.length; i++) {
     const ch = src[i];
-    const base = ch.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    // retire diacritiques latins + niqqud hébreux
+    const base = ch
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[\u0591-\u05C7]/g, '');
+
     let emitted = false;
     for (let k = 0; k < base.length; k++) {
       const c = base[k];
-      if (/[\p{L}\p{N}]/u.test(c)) {
+      if (ALNUM.test(c)) {
         normChars.push(c.toLowerCase());
         idxMap.push(i);
         emitted = true;
