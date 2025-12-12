@@ -869,13 +869,13 @@ ${shareUrl}`;
     setTimeout(() => setCopiedKey(''), 1600);
   };
 
-  /* ===== Vue multi-langue pour un verset sélectionné ===== */
+  /* ===== Vue multi-langue pour un ou plusieurs versets sélectionnés ===== */
 
   const [showOtherLangs, setShowOtherLangs] = useState(false);
   const [otherLangTarget, setOtherLangTarget] = useState<{
     bookId: string;
     chapter: number;
-    verse: number;
+    verses: number[];
   } | null>(null);
   const [otherLangVerses, setOtherLangVerses] = useState<
     { lang: LangCode; text: string | null; loading: boolean; error?: string }[]
@@ -884,12 +884,13 @@ ${shareUrl}`;
   const openOtherLangs = () => {
     if (!selectedBook || !chapter || selectedVerses.length === 0) return;
 
-    const verseNumber = [...selectedVerses].sort((a, b) => a - b)[0];
+    // On prend tous les versets sélectionnés, triés
+    const sortedVerses = [...selectedVerses].sort((a, b) => a - b);
 
     const target = {
       bookId: selectedBook.name,
       chapter: selectedChapter,
-      verse: verseNumber,
+      verses: sortedVerses,
     };
     setOtherLangTarget(target);
 
@@ -918,7 +919,6 @@ ${shareUrl}`;
     });
 
     const remaining = ALL_LANG_CODES.filter(l => !preferred.includes(l));
-
     const targetLangs: LangCode[] = [...preferred, ...remaining];
 
     const initial = targetLangs.map(lang => ({
@@ -934,15 +934,21 @@ ${shareUrl}`;
       (async () => {
         try {
           const ch = await getChapter(selectedBook.name, selectedChapter, lang as any);
-          const vv = ch.verses.find(v => v.verse === verseNumber);
+          // On récupère tous les versets sélectionnés pour ce chapitre/langue
+          const selectedForLang = ch.verses
+            .filter(v => sortedVerses.includes(v.verse))
+            .sort((a, b) => a.verse - b.verse);
+
+          const combinedText = selectedForLang.map(v => String(v.text)).join('\n');
+
           setOtherLangVerses(prev =>
             prev.map(entry =>
               entry.lang === lang
                 ? {
                     ...entry,
-                    text: vv ? String(vv.text) : null,
+                    text: selectedForLang.length > 0 ? combinedText : null,
                     loading: false,
-                    error: vv ? undefined : 'missing',
+                    error: selectedForLang.length > 0 ? undefined : 'missing',
                   }
                 : entry
             )
@@ -963,8 +969,9 @@ ${shareUrl}`;
 
   const copyOtherLangVerse = async (entryLang: LangCode, text: string | null) => {
     if (!otherLangTarget || !selectedBook || !text) return;
+    const range = compressRanges(otherLangTarget.verses);
     const ref =
-      getBookName(selectedBook) + ' ' + otherLangTarget.chapter + ':' + otherLangTarget.verse;
+      getBookName(selectedBook) + ' ' + otherLangTarget.chapter + ':' + range;
     const payload = ref + '\n' + text;
     const ok = await copyToClipboard(payload);
     if (ok) {
@@ -975,8 +982,9 @@ ${shareUrl}`;
 
   const shareOtherLangVerse = async (entryLang: LangCode, text: string | null) => {
     if (!otherLangTarget || !selectedBook || !text) return;
+    const range = compressRanges(otherLangTarget.verses);
     const ref =
-      getBookName(selectedBook) + ' ' + otherLangTarget.chapter + ':' + otherLangTarget.verse;
+      getBookName(selectedBook) + ' ' + otherLangTarget.chapter + ':' + range;
     const shareUrl = 'https://www.theword.fr/#about';
 
     const shareText = `${ref}
@@ -1002,19 +1010,36 @@ ${shareUrl}`;
     }
   };
 
+  // Pour Notes / Principes, on envoie un bloc unique correspondant à la plage de versets
   const sendOtherLangVerseToNotes = (entryLang: LangCode, text: string | null) => {
     if (!otherLangTarget || !selectedBook || !text) return;
     const verseRef: VerseRef = {
       bookId: otherLangTarget.bookId,
       bookName: getBookName(selectedBook),
       chapter: otherLangTarget.chapter,
-      verse: otherLangTarget.verse,
+      // On garde le premier verset comme "ancre" pour la référence
+      verse: otherLangTarget.verses[0],
       text,
       translation: entryLang,
     };
     openAddToNotes([verseRef]);
     setShowOtherLangs(false);
   };
+
+  const sendOtherLangVerseToPrinciples = (entryLang: LangCode, text: string | null) => {
+    if (!otherLangTarget || !selectedBook || !text) return;
+    const verseRef: VerseRef = {
+      bookId: otherLangTarget.bookId,
+      bookName: getBookName(selectedBook),
+      chapter: otherLangTarget.chapter,
+      verse: otherLangTarget.verses[0],
+      text,
+      translation: entryLang,
+    };
+    openAddToPrinciples([verseRef]);
+    setShowOtherLangs(false);
+  };
+
 
   const sendOtherLangVerseToPrinciples = (entryLang: LangCode, text: string | null) => {
     if (!otherLangTarget || !selectedBook || !text) return;
@@ -1844,7 +1869,7 @@ ${shareUrl}`;
             </div>
           )}
 
-          {/* MODAL : verset dans autres langues */}
+          {/* MODAL : verset (ou plusieurs) dans autres langues */}
           {showOtherLangs && otherLangTarget && selectedBook && (
             <div className="fixed inset-0 z-50 flex items-center justify-center">
               <div
@@ -1857,7 +1882,9 @@ ${shareUrl}`;
                   {t('showInOtherLangs')}
                 </h3>
                 <p className="text-base text-white/70 mb-4">
-                  {getBookName(selectedBook)} {otherLangTarget.chapter}:{otherLangTarget.verse}
+                  {getBookName(selectedBook)}{' '}
+                  {otherLangTarget.chapter}:
+                  {compressRanges(otherLangTarget.verses)}
                 </p>
 
                 <div className="space-y-3">
