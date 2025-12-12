@@ -1041,20 +1041,6 @@ ${shareUrl}`;
   };
 
 
-  const sendOtherLangVerseToPrinciples = (entryLang: LangCode, text: string | null) => {
-    if (!otherLangTarget || !selectedBook || !text) return;
-    const verseRef: VerseRef = {
-      bookId: otherLangTarget.bookId,
-      bookName: getBookName(selectedBook),
-      chapter: otherLangTarget.chapter,
-      verse: otherLangTarget.verse,
-      text,
-      translation: entryLang,
-    };
-    openAddToPrinciples([verseRef]);
-    setShowOtherLangs(false);
-  };
-
   const swipeStart = useRef<{ x: number; y: number; time: number } | null>(null);
   const swipeHandled = useRef(false);
   const onTouchStart = (e: React.TouchEvent) => {
