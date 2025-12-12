@@ -190,6 +190,7 @@ export default function Principes() {
     listId: string;
     idx: number | null; // null = nouveau bloc
     initialValue: string;
+    insertAt?: number | null; // position d'insertion (si nouveau bloc)
   } | null>(null);
   const [editingTextValue, setEditingTextValue] = useState('');
 
@@ -289,9 +290,7 @@ export default function Principes() {
       .map((l) => l.id);
     const finalOrder = [...validStored, ...missingIds];
 
-    const sorted = [...all].sort(
-      (a, b) => finalOrder.indexOf(a.id) - finalOrder.indexOf(b.id)
-    );
+    const sorted = [...all].sort((a, b) => finalOrder.indexOf(a.id) - finalOrder.indexOf(b.id));
 
     setLists(sorted);
 
@@ -431,25 +430,25 @@ export default function Principes() {
   };
 
   // Partage au même format que "Copier", avec lien en plus
-const doShare = async (id: string) => {
-  const list = p_getListById(id);
-  if (!list) return;
+  const doShare = async (id: string) => {
+    const list = p_getListById(id);
+    if (!list) return;
 
-  const payload = `${buildPlainListText(list)}
+    const payload = `${buildPlainListText(list)}
 
 Découvrir l’application The Word :
 https://www.theword.fr/#about`;
 
-  try {
-    const nav: any = navigator;
-    if (nav?.share) {
-      await nav.share({ title: list.title || label.title, text: payload });
-    } else {
-      await navigator.clipboard.writeText(payload);
-      alert(t('textReadyToShare') + ' ✅');
-    }
-  } catch {}
-};
+    try {
+      const nav: any = navigator;
+      if (nav?.share) {
+        await nav.share({ title: list.title || label.title, text: payload });
+      } else {
+        await navigator.clipboard.writeText(payload);
+        alert(t('textReadyToShare') + ' ✅');
+      }
+    } catch {}
+  };
 
   const copyListText = async (id: string) => {
     const list = p_getListById(id);
@@ -506,8 +505,7 @@ https://www.theword.fr/#about`;
   };
 
   const handleCreateFromText = () => {
-    const title =
-      (importTextTitle || '').trim() || label.importTextDefaultTitle;
+    const title = (importTextTitle || '').trim() || label.importTextDefaultTitle;
     const raw = (importTextBody || '').trim();
 
     if (!raw) {
@@ -542,31 +540,31 @@ https://www.theword.fr/#about`;
   };
 
   // --- opérations de copie/partage pour UN élément ---
-const copyItemText = async (it: AnyItem) => {
-  const txt = buildItemPlainText(it);
-  if (!txt) return;
-  try {
-    await navigator.clipboard.writeText(txt);
-    alert(label.copied + ' ✅');
-  } catch {}
-};
+  const copyItemText = async (it: AnyItem) => {
+    const txt = buildItemPlainText(it);
+    if (!txt) return;
+    try {
+      await navigator.clipboard.writeText(txt);
+      alert(label.copied + ' ✅');
+    } catch {}
+  };
 
-const shareItem = async (it: AnyItem) => {
-  const payload = `${buildItemPlainText(it)}
+  const shareItem = async (it: AnyItem) => {
+    const payload = `${buildItemPlainText(it)}
 
 Découvrir l’application The Word :
 https://www.theword.fr/#about`;
 
-  try {
-    const nav: any = navigator;
-    if (nav?.share) {
-      await nav.share({ title: t('verseWord'), text: payload });
-    } else {
-      await navigator.clipboard.writeText(payload);
-      alert(t('textReadyToShare') + ' ✅');
-    }
-  } catch {}
-};
+    try {
+      const nav: any = navigator;
+      if (nav?.share) {
+        await nav.share({ title: t('verseWord'), text: payload });
+      } else {
+        await navigator.clipboard.writeText(payload);
+        alert(t('textReadyToShare') + ' ✅');
+      }
+    } catch {}
+  };
 
   // ---------- opérations sur items ----------
   const updateItems = (listId: string, updater: (items: AnyItem[]) => AnyItem[]) => {
@@ -605,12 +603,23 @@ https://www.theword.fr/#about`;
     );
   };
 
-  // Ouverture d'un nouveau bloc texte
+  // Ouverture d'un nouveau bloc texte (par défaut : en fin de liste)
   const addTextBlock = (listId: string) => {
     setEditingTextBlock({
       listId,
       idx: null,
       initialValue: '',
+      insertAt: null,
+    });
+  };
+
+  // Insérer un nouveau bloc texte à une position précise (ex: entre 2 items)
+  const insertTextBlockAt = (listId: string, insertAt: number) => {
+    setEditingTextBlock({
+      listId,
+      idx: null,
+      initialValue: '',
+      insertAt,
     });
   };
 
@@ -643,7 +652,18 @@ https://www.theword.fr/#about`;
           translation: state.settings.language,
           kind: 'text',
         };
-        arr.push(newItem);
+
+        const insertAt =
+          typeof editingTextBlock.insertAt === 'number'
+            ? Math.max(0, Math.min(arr.length, editingTextBlock.insertAt))
+            : null;
+
+        if (insertAt === null) {
+          arr.push(newItem); // comportement actuel : ajouter en fin
+        } else {
+          arr.splice(insertAt, 0, newItem); // ✅ insertion entre 2 items
+        }
+
         return arr;
       });
     } else {
@@ -790,9 +810,9 @@ https://www.theword.fr/#about`;
                         }
                       : undefined
                   }
-                  className={`${
-                    isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
-                  } rounded-xl shadow p-4 ${!isOpen ? 'cursor-pointer' : ''}`}
+                  className={`${isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} rounded-xl shadow p-4 ${
+                    !isOpen ? 'cursor-pointer' : ''
+                  }`}
                   role={!isOpen ? 'button' : undefined}
                   aria-expanded={isOpen}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
@@ -803,11 +823,7 @@ https://www.theword.fr/#about`;
                       <div className="text-xl md:text-xl font-semibold leading-snug whitespace-normal break-words">
                         {list.title}
                       </div>
-                      <div
-                        className={`mt-1 text-xs ${
-                          isDark ? 'text-white/60' : 'text-gray-500'
-                        }`}
-                      >
+                      <div className={`mt-1 text-xs ${isDark ? 'text-white/60' : 'text-gray-500'}`}>
                         {list.items.length} {label.verses} • {formatDate(list.updatedAt)}
                       </div>
                     </div>
@@ -943,9 +959,7 @@ https://www.theword.fr/#about`;
                               const textBaseClass = isDark
                                 ? 'text-white mt-1 whitespace-pre-wrap'
                                 : 'text-gray-800 mt-1 whitespace-pre-wrap';
-                              const textClass = isText
-                                ? `${textBaseClass} font-serif`
-                                : textBaseClass;
+                              const textClass = isText ? `${textBaseClass} font-serif` : textBaseClass;
 
                               return (
                                 <li
@@ -958,9 +972,7 @@ https://www.theword.fr/#about`;
                                   <button
                                     className="w-full text-left"
                                     onClick={() =>
-                                      setOpenItemMenu(
-                                        menuOpen ? null : { listId: list.id, idx }
-                                      )
+                                      setOpenItemMenu(menuOpen ? null : { listId: list.id, idx })
                                     }
                                   >
                                     {!isText ? (
@@ -1000,9 +1012,7 @@ https://www.theword.fr/#about`;
                                           <button
                                             onClick={() => copyItemText(it)}
                                             className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                              isDark
-                                                ? 'bg-gray-700 text-white'
-                                                : 'bg-white text-gray-800'
+                                              isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
                                             }`}
                                             title={t('copyLabel')}
                                           >
@@ -1023,9 +1033,7 @@ https://www.theword.fr/#about`;
 
                                       {isText && (
                                         <button
-                                          onClick={() =>
-                                            editTextBlock(list.id, idx, String(it.text || ''))
-                                          }
+                                          onClick={() => editTextBlock(list.id, idx, String(it.text || ''))}
                                           className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500"
                                           title={label.editTextBlock}
                                         >
@@ -1037,9 +1045,7 @@ https://www.theword.fr/#about`;
                                       <button
                                         onClick={() => moveItem(list.id, idx, -1)}
                                         className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                          isDark
-                                            ? 'bg-gray-700 text-white'
-                                            : 'bg-white text-gray-800'
+                                          isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
                                         }`}
                                         disabled={idx === 0}
                                         title={label.moveUp}
@@ -1051,15 +1057,25 @@ https://www.theword.fr/#about`;
                                       <button
                                         onClick={() => moveItem(list.id, idx, 1)}
                                         className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                          isDark
-                                            ? 'bg-gray-700 text-white'
-                                            : 'bg-white text-gray-800'
+                                          isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
                                         }`}
                                         disabled={idx === list.items.length - 1}
                                         title={label.moveDown}
                                       >
                                         <ArrowDown size={16} />
                                         {label.moveDown}
+                                      </button>
+
+                                      {/* ✅ Insérer un bloc texte juste après cet item */}
+                                      <button
+                                        onClick={() => insertTextBlockAt(list.id, idx + 1)}
+                                        className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
+                                          isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
+                                        }`}
+                                        title={label.addTextBlock}
+                                      >
+                                        <TextIcon size={16} />
+                                        {label.addTextBlock}
                                       </button>
 
                                       <button
@@ -1074,9 +1090,7 @@ https://www.theword.fr/#about`;
                                       <button
                                         onClick={() => setOpenItemMenu(null)}
                                         className={`px-2 py-1.5 rounded ${
-                                          isDark
-                                            ? 'bg-gray-700 text-white'
-                                            : 'bg-white text-gray-800'
+                                          isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
                                         }`}
                                       >
                                         {label.cancel}
@@ -1129,14 +1143,10 @@ https://www.theword.fr/#about`;
               isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
             }`}
           >
-            <h2 className="text-lg font-semibold mb-2">
-              {label.importFromTextTitle}
-            </h2>
+            <h2 className="text-lg font-semibold mb-2">{label.importFromTextTitle}</h2>
 
             <div className="mb-3">
-              <label className="block text-sm mb-1">
-                {label.importTextTitlePlaceholder}
-              </label>
+              <label className="block text-sm mb-1">{label.importTextTitlePlaceholder}</label>
               <input
                 type="text"
                 className={`w-full rounded-md px-2 py-1.5 text-sm border ${
@@ -1151,9 +1161,7 @@ https://www.theword.fr/#about`;
             </div>
 
             <div className="mb-3">
-              <label className="block text-sm mb-1">
-                {label.documentContent}
-              </label>
+              <label className="block text-sm mb-1">{label.documentContent}</label>
               <textarea
                 className={`w-full rounded-md px-2 py-1.5 text-sm min-h-[160px] border resize-vertical ${
                   isDark
@@ -1164,9 +1172,7 @@ https://www.theword.fr/#about`;
                 onChange={(e) => setImportTextBody(e.target.value)}
                 placeholder={label.importTextBodyPlaceholder}
               />
-              <div className="mt-1 text-xs opacity-75">
-                {label.importTextInfo}
-              </div>
+              <div className="mt-1 text-xs opacity-75">{label.importTextInfo}</div>
             </div>
 
             <label className="flex items-center gap-2 text-sm mb-4">
@@ -1182,9 +1188,7 @@ https://www.theword.fr/#about`;
               <button
                 onClick={() => setShowImportFromText(false)}
                 className={`px-3 py-1.5 rounded text-sm ${
-                  isDark
-                    ? 'bg-gray-700 text-white'
-                    : 'bg-gray-200 text-gray-800'
+                  isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
                 }`}
               >
                 {label.cancel}
@@ -1234,9 +1238,7 @@ https://www.theword.fr/#about`;
               <button
                 onClick={() => setEditingTextBlock(null)}
                 className={`px-3 py-1.5 rounded text-base ${
-                  isDark
-                    ? 'bg-gray-700 text-white'
-                    : 'bg-gray-200 text-gray-800'
+                  isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
                 }`}
               >
                 {label.cancel}
@@ -1255,19 +1257,13 @@ https://www.theword.fr/#about`;
       {/* MODALE : Aide / mode d'emploi (même texte que Notes) */}
       {showHelp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-black/60"
-            onClick={() => setShowHelp(false)}
-            aria-hidden="true"
-          />
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowHelp(false)} aria-hidden="true" />
           <div
             className={`relative w-full max-w-lg mx-4 rounded-2xl p-5 max-h-[90vh] overflow-y-auto ${
               isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
             }`}
           >
-            <h2 className="text-xl font-semibold mb-3">
-              {label.helpTitle}
-            </h2>
+            <h2 className="text-xl font-semibold mb-3">{label.helpTitle}</h2>
 
             <div
               className="space-y-3 leading-relaxed text-left"
@@ -1343,9 +1339,7 @@ https://www.theword.fr/#about`;
               <button
                 onClick={() => setShowHelp(false)}
                 className={`px-3 py-1.5 rounded text-sm ${
-                  isDark
-                    ? 'bg-gray-700 text-white'
-                    : 'bg-gray-200 text-gray-800'
+                  isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
                 }`}
               >
                 OK
@@ -1357,5 +1351,6 @@ https://www.theword.fr/#about`;
     </div>
   );
 }
+
 
 
