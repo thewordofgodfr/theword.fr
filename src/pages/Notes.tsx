@@ -966,46 +966,44 @@ https://www.theword.fr/#about`;
                                         </>
                                       )}
 
-                                      {isText && (
-                                        <button
-                                          onClick={() =>
-                                            editTextBlock(list.id, idx, String(it.text || ''))
-                                          }
-                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500"
-                                          title={label.editTextBlock}
-                                        >
-                                          <EditTextIcon size={16} />
-                                          {label.editTextBlock}
-                                        </button>
-                                      )}
+{isText && (
+  <button
+    onClick={() => editTextBlock(list.id, idx, String(it.text || ''))}
+    className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500"
+    title={label.editTextBlock}
+  >
+    <EditTextIcon size={16} />
+    {label.editTextBlock}
+  </button>
+)}
 
-                                      <button
-                                        onClick={() => moveItem(list.id, idx, -1)}
-                                        className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                          isDark
-                                            ? 'bg-gray-700 text-white'
-                                            : 'bg-white text-gray-800'
-                                        }`}
-                                        disabled={idx === 0}
-                                        title={label.moveUp}
-                                      >
-                                        <ArrowUp size={16} />
-                                        {label.moveUp}
-                                      </button>
-                                                                             
-                                      <button
-                                        onClick={() => moveItem(list.id, idx, 1)}
-                                        className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                          isDark
-                                            ? 'bg-gray-700 text-white'
-                                            : 'bg-white text-gray-800'
-                                        }`}
-                                        disabled={idx === list.items.length - 1}
-                                        title={label.moveDown}
-                                      >
-                                        <ArrowDown size={16} />
-                                        {label.moveDown}
-                                      </button>
+{/* ✅ Forcer Monter + Descendre à rester ensemble (et donc sous "Modifier" sur Android) */}
+<div className="flex flex-wrap items-center gap-2 w-full">
+  <button
+    onClick={() => moveItem(list.id, idx, -1)}
+    className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
+      isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
+    }`}
+    disabled={idx === 0}
+    title={label.moveUp}
+  >
+    <ArrowUp size={16} />
+    {label.moveUp}
+  </button>
+
+  <button
+    onClick={() => moveItem(list.id, idx, 1)}
+    className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
+      isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
+    }`}
+    disabled={idx === list.items.length - 1}
+    title={label.moveDown}
+  >
+    <ArrowDown size={16} />
+    {label.moveDown}
+  </button>
+</div>
+
                                       
                                       <button
                                         onClick={() => insertTextBlockAt(list.id, idx + 1)}
