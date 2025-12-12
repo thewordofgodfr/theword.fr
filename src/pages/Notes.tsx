@@ -992,20 +992,7 @@ https://www.theword.fr/#about`;
                                         <ArrowUp size={16} />
                                         {label.moveUp}
                                       </button>
-                                      
-                                        <button
-    onClick={() => insertTextBlockAt(list.id, idx + 1)}
-    className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-      isDark
-        ? 'bg-gray-700 text-white'
-        : 'bg-white text-gray-800'
-    }`}
-    title={label.addTextBlock}
-  >
-    <TextIcon size={16} />
-    {label.addTextBlock}
-  </button>
-                                      
+                                                                             
                                       <button
                                         onClick={() => moveItem(list.id, idx, 1)}
                                         className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
@@ -1019,7 +1006,20 @@ https://www.theword.fr/#about`;
                                         <ArrowDown size={16} />
                                         {label.moveDown}
                                       </button>
-
+                                      
+                                      <button
+                                        onClick={() => insertTextBlockAt(list.id, idx + 1)}
+                                        className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
+                                          isDark
+                                            ? 'bg-gray-700 text-white'
+                                            : 'bg-white text-gray-800'
+                                        }`}
+                                        title={label.addTextBlock}
+                                      >
+                                        <TextIcon size={16} />
+                                        {label.addTextBlock}
+                                      </button>
+                                      
                                       <button
                                         onClick={() => removeItem(list.id, idx)}
                                         className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-red-600 text-white hover:bg-red-500"
