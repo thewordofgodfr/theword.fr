@@ -110,10 +110,11 @@ export default function Notes() {
   const [importSplitBlocks, setImportSplitBlocks] = useState(true);
 
   // --- Édition multi-lignes d'un bloc texte (création + édition) ---
-  const [editingTextBlock, setEditingTextBlock] = useState<{
+    const [editingTextBlock, setEditingTextBlock] = useState<{
     listId: string;
     idx: number | null; // null = nouveau bloc
     initialValue: string;
+    insertAt?: number | null; // position d'insertion (si nouveau bloc)
   } | null>(null);
   const [editingTextValue, setEditingTextValue] = useState('');
 
@@ -533,12 +534,23 @@ https://www.theword.fr/#about`;
     );
   };
 
-  // Ouverture d'un nouveau bloc texte
+    // Ouverture d'un nouveau bloc texte (par défaut : en fin de liste)
   const addTextBlock = (listId: string) => {
     setEditingTextBlock({
       listId,
       idx: null,
       initialValue: '',
+      insertAt: null,
+    });
+  };
+
+  // Insérer un nouveau bloc texte à une position précise (ex: entre 2 items)
+  const insertTextBlockAt = (listId: string, insertAt: number) => {
+    setEditingTextBlock({
+      listId,
+      idx: null,
+      initialValue: '',
+      insertAt,
     });
   };
 
@@ -559,7 +571,7 @@ https://www.theword.fr/#about`;
       return;
     }
 
-    if (editingTextBlock.idx === null) {
+        if (editingTextBlock.idx === null) {
       updateItems(editingTextBlock.listId, (items) => {
         const arr = [...items];
         const newItem: AnyItem = {
@@ -571,7 +583,18 @@ https://www.theword.fr/#about`;
           translation: state.settings.language,
           kind: 'text',
         };
-        arr.push(newItem);
+
+        const insertAt =
+          typeof editingTextBlock.insertAt === 'number'
+            ? Math.max(0, Math.min(arr.length, editingTextBlock.insertAt))
+            : null;
+
+        if (insertAt === null) {
+          arr.push(newItem); // comportement actuel: ajouter en fin
+        } else {
+          arr.splice(insertAt, 0, newItem); // ✅ insertion entre 2 items
+        }
+
         return arr;
       });
     } else {
@@ -969,7 +992,20 @@ https://www.theword.fr/#about`;
                                         <ArrowUp size={16} />
                                         {label.moveUp}
                                       </button>
-
+                                      
+                                        <button
+    onClick={() => insertTextBlockAt(list.id, idx + 1)}
+    className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
+      isDark
+        ? 'bg-gray-700 text-white'
+        : 'bg-white text-gray-800'
+    }`}
+    title={label.addTextBlock}
+  >
+    <TextIcon size={16} />
+    {label.addTextBlock}
+  </button>
+                                      
                                       <button
                                         onClick={() => moveItem(list.id, idx, 1)}
                                         className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
