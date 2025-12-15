@@ -1,10 +1,10 @@
 // sw-v7.js — prod: https+cache propre+MAJ immédiate + fallback navigation robuste + precache assets index + fix navigate
-const CACHE_VERSION = 'v342';
+const CACHE_VERSION = 'v343';
 const CACHE_NAME = `twog-${CACHE_VERSION}`;
 const APP_SHELL = ['/', '/index.html', '/favicon.ico', '/logo192.png', '/logo512.png', '/site.webmanifest'];
 
 const BIBLES_INDEX_URL = '/data/bible/bibles-index.json';
-const PRECACHE_FULL_BIBLE = true;
+const PRECACHE_FULL_BIBLE = false;
 const PRECACHE_CHUNK = 15;
 
 const ORIGIN = self.location.origin;
