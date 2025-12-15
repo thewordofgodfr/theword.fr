@@ -14,11 +14,43 @@ try {
   const meta = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null;
   if (meta) meta.content = theme === 'dark' ? '#111827' : '#ffffff';
 } catch {}
+
 createRoot(rootEl).render(
   <StrictMode>
     <App />
   </StrictMode>
 );
+
+function getCurrentLangFromLocalStorage(): string | null {
+  try {
+    const raw = localStorage.getItem('bibleApp_settings');
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    const lang = (obj?.language ?? obj?.lang ?? null);
+    return typeof lang === 'string' ? lang : null;
+  } catch {
+    return null;
+  }
+}
+
+async function sendCoreLangToSW() {
+  try {
+    const lang = getCurrentLangFromLocalStorage();
+    if (!lang) return;
+
+    // attendre qu'un controller existe
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({ type: 'SET_CORE_LANG', lang });
+      return;
+    }
+
+    // sinon attendre "ready" puis re-tenter
+    const reg = await navigator.serviceWorker.ready;
+    if (reg?.active) {
+      reg.active.postMessage({ type: 'SET_CORE_LANG', lang });
+    }
+  } catch {}
+}
 
 // --- PWA: Service Worker (MAJ immédiate, un seul SW: /sw-v7.js) ---
 if ('serviceWorker' in navigator) {
@@ -55,8 +87,13 @@ if ('serviceWorker' in navigator) {
         });
       });
 
+      // Dès que possible, envoyer la langue core au SW
+      await sendCoreLangToSW();
+
       // Quand le contrôleur change → rechargement automatique
       navigator.serviceWorker.addEventListener('controllerchange', () => {
+        // Après prise de contrôle, renvoyer la langue (au cas où)
+        sendCoreLangToSW();
         window.location.reload();
       });
     } catch (err) {
