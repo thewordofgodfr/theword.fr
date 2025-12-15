@@ -3,7 +3,7 @@
 // Precache Bible LIMITÉ (fr, en, el, he, es, it, de, pt)
 // Runtime cache pour le reste (offline safe Android)
 
-const CACHE_VERSION = 'v344'; // ← bump obligatoire
+const CACHE_VERSION = 'v345'; // ← bump obligatoire
 const CACHE_NAME = `twog-${CACHE_VERSION}`;
 
 const APP_SHELL = [
