@@ -233,18 +233,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       if (saved) {
         const parsed = JSON.parse(saved) as Partial<AppSettings>;
+
+        // Option A: on force sombre, même si un ancien storage contient "light"
+        const forcedTheme: Theme = 'dark';
+
         const merged: AppSettings = {
           ...initialState.settings,
           ...parsed,
+          theme: forcedTheme,
           fontSize: normalizeFontSize((parsed as any)?.fontSize),
         };
+
         dispatch({ type: 'LOAD_SETTINGS', payload: merged });
 
-        // Corriger une éventuelle valeur de fontSize invalide déjà stockée
-        if (
+        // Réécrire si fontSize invalide OU si theme n'était pas dark
+        const parsedTheme = (parsed as any)?.theme;
+        const shouldRewrite =
           !parsed.fontSize ||
-          normalizeFontSize(parsed.fontSize as any) !== parsed.fontSize
-        ) {
+          normalizeFontSize(parsed.fontSize as any) !== parsed.fontSize ||
+          (parsedTheme && parsedTheme !== 'dark');
+
+        if (shouldRewrite) {
           try {
             localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(merged));
           } catch {
@@ -270,7 +279,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
+        // Option A: toujours sombre dans le storage
+        const toSave: AppSettings = { ...state.settings, theme: 'dark' } as AppSettings;
+        localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(toSave));
         localStorage.setItem(STORAGE_KEYS.language, state.settings.language);
       }
     } catch {
@@ -278,82 +289,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [state.settings]);
 
-  // Appliquer le thème (classe HTML, meta theme-color, etc.)
+  // Appliquer le thème (classe HTML, meta theme-color, etc.) — Option A: dark-only strict
   useEffect(() => {
     try {
       if (typeof document === 'undefined' || typeof window === 'undefined') return;
 
       const root = document.documentElement;
 
-      const appDark = state.settings.theme === 'dark';
-      const media =
-        'matchMedia' in window ? window.matchMedia('(prefers-color-scheme: dark)') : null;
-      const prefersDark = !!media?.matches;
-
-      // Si l’app est en "dark", on force sombre.
-      // Sinon, si l’app est en "light" mais l’OS est sombre, on adopte sombre.
-      const useDarkSkin = appDark || (!appDark && prefersDark);
+      const useDarkSkin = true; // <- DARK-ONLY STRICT
 
       root.classList.toggle('dark', useDarkSkin);
       root.classList.toggle('theme-dark-blue', useDarkSkin);
-      root.setAttribute('data-theme', useDarkSkin ? 'dark' : 'light');
+      root.setAttribute('data-theme', 'dark');
 
       const metaTheme = ensureMeta('theme-color');
       const metaColorScheme = ensureMeta('color-scheme');
       const metaSupportedSchemes = ensureMeta('supported-color-schemes');
 
-      if (useDarkSkin) {
-        (root.style as any).colorScheme = 'dark';
-        document.body.style.backgroundColor = '#0f172a';
-        document.body.style.color = '#ffffff';
-        if (metaTheme) metaTheme.content = '#0f172a';
-        if (metaColorScheme) metaColorScheme.content = 'dark';
-        if (metaSupportedSchemes) metaSupportedSchemes.content = 'dark';
-      } else {
-        (root.style as any).colorScheme = 'light';
-        (root.style as any).forcedColorAdjust = 'none';
-        document.body.style.backgroundColor = '#ffffff';
-        document.body.style.color = '#111827';
-        if (metaTheme) metaTheme.content = '#ffffff';
-        if (metaColorScheme) metaColorScheme.content = 'light';
-        if (metaSupportedSchemes) metaSupportedSchemes.content = 'light';
-      }
-
-      const onChange = () => {
-        const nowPrefersDark =
-          'matchMedia' in window
-            ? !!window.matchMedia('(prefers-color-scheme: dark)').matches
-            : false;
-
-        const nowUseDark =
-          state.settings.theme === 'dark' ||
-          (state.settings.theme === 'light' && nowPrefersDark);
-
-        root.classList.toggle('dark', nowUseDark);
-        root.classList.toggle('theme-dark-blue', nowUseDark);
-        root.setAttribute('data-theme', nowUseDark ? 'dark' : 'light');
-
-        if (metaTheme) metaTheme.content = nowUseDark ? '#0f172a' : '#ffffff';
-        (root.style as any).colorScheme = nowUseDark ? 'dark' : 'light';
-        document.body.style.backgroundColor = nowUseDark ? '#0f172a' : '#ffffff';
-        document.body.style.color = nowUseDark ? '#ffffff' : '#111827';
-      };
-
-      // Abonnement aux changements système
-      media?.addEventListener?.('change', onChange);
-      // Fallback vieux navigateurs
-      // @ts-expect-error - addListener peut exister selon l’implémentation
-      media?.addListener?.(onChange);
-
-      return () => {
-        media?.removeEventListener?.('change', onChange);
-        // @ts-expect-error - removeListener peut exister selon l’implémentation
-        media?.removeListener?.(onChange);
-      };
+      (root.style as any).colorScheme = 'dark';
+      document.body.style.backgroundColor = '#0f172a';
+      document.body.style.color = '#ffffff';
+      if (metaTheme) metaTheme.content = '#0f172a';
+      if (metaColorScheme) metaColorScheme.content = 'dark';
+      if (metaSupportedSchemes) metaSupportedSchemes.content = 'dark';
     } catch {
       /* ignore */
     }
-  }, [state.settings.theme]);
+  }, []); // <- plus besoin de dépendre d’un "theme"
 
   // Synchroniser la page avec le hash de l’URL (liens externes, bouton retour, etc.)
   useEffect(() => {
@@ -394,7 +356,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     Object.entries(newSettings).forEach(([key, value]) => {
       switch (key) {
         case 'theme':
-          dispatch({ type: 'SET_THEME', payload: value as Theme });
+          // Option A: on ignore toute tentative de changer le thème
+          dispatch({ type: 'SET_THEME', payload: 'dark' as Theme });
           break;
         case 'fontSize':
           dispatch({ type: 'SET_FONT_SIZE', payload: normalizeFontSize(value) });
