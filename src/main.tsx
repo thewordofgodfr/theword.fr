@@ -5,15 +5,22 @@ import './index.css';
 
 const rootEl = document.getElementById('root')!;
 
-// main.tsx (avant createRoot)
+/* =========================================================
+   Option A — DARK ONLY STRICT
+   Appliquer le thème sombre AVANT React (anti flash blanc)
+   ========================================================= */
 try {
-  const raw = localStorage.getItem('bibleApp_settings');
-  const theme = raw ? (JSON.parse(raw).theme ?? 'dark') : 'dark';
-  document.documentElement.style.colorScheme = theme;
-  document.body.style.backgroundColor = theme === 'dark' ? '#111827' : '#ffffff';
+  const root = document.documentElement;
+  root.style.colorScheme = 'dark';
+
+  document.body.style.backgroundColor = '#0f172a';
+  document.body.style.color = '#ffffff';
+
   const meta = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null;
-  if (meta) meta.content = theme === 'dark' ? '#111827' : '#ffffff';
-} catch {}
+  if (meta) meta.content = '#0f172a';
+} catch {
+  /* ignore */
+}
 
 createRoot(rootEl).render(
   <StrictMode>
@@ -21,12 +28,15 @@ createRoot(rootEl).render(
   </StrictMode>
 );
 
+/* =========================================================
+   Langue cœur → Service Worker
+   ========================================================= */
 function getCurrentLangFromLocalStorage(): string | null {
   try {
     const raw = localStorage.getItem('bibleApp_settings');
     if (!raw) return null;
     const obj = JSON.parse(raw);
-    const lang = (obj?.language ?? obj?.lang ?? null);
+    const lang = obj?.language ?? obj?.lang ?? null;
     return typeof lang === 'string' ? lang : null;
   } catch {
     return null;
@@ -38,18 +48,20 @@ async function sendCoreLangToSW() {
     const lang = getCurrentLangFromLocalStorage();
     if (!lang) return;
 
-    // attendre qu'un controller existe
+    // Si un controller existe déjà
     if (navigator.serviceWorker.controller) {
       navigator.serviceWorker.controller.postMessage({ type: 'SET_CORE_LANG', lang });
       return;
     }
 
-    // sinon attendre "ready" puis re-tenter
+    // Sinon attendre le SW prêt
     const reg = await navigator.serviceWorker.ready;
     if (reg?.active) {
       reg.active.postMessage({ type: 'SET_CORE_LANG', lang });
     }
-  } catch {}
+  } catch {
+    /* ignore */
+  }
 }
 
 // --- PWA: Service Worker (MAJ immédiate, un seul SW: /sw-v7.js) ---
@@ -61,7 +73,10 @@ if ('serviceWorker' in navigator) {
       await Promise.all(
         regs.map(async (reg) => {
           const scriptURL =
-            reg.active?.scriptURL || reg.waiting?.scriptURL || reg.installing?.scriptURL || '';
+            reg.active?.scriptURL ||
+            reg.waiting?.scriptURL ||
+            reg.installing?.scriptURL ||
+            '';
           if (!scriptURL.endsWith('/sw-v7.js')) {
             await reg.unregister();
           }
@@ -71,13 +86,12 @@ if ('serviceWorker' in navigator) {
       // 2) Enregistrer le nouveau SW
       const reg = await navigator.serviceWorker.register('/sw-v7.js', { scope: '/' });
 
-      // Vérifier tout de suite s'il y a une nouvelle version
+      // Vérifier immédiatement les mises à jour
       reg.update();
 
-      // Si un SW est déjà prêt en attente, on le promeut
+      // Promouvoir un SW en attente
       if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
 
-      // Quand une nouvelle version est détectée, on la prend
       reg.addEventListener('updatefound', () => {
         const nw = reg.installing;
         nw?.addEventListener('statechange', () => {
@@ -87,12 +101,11 @@ if ('serviceWorker' in navigator) {
         });
       });
 
-      // Dès que possible, envoyer la langue core au SW
+      // Envoyer la langue au SW dès que possible
       await sendCoreLangToSW();
 
-      // Quand le contrôleur change → rechargement automatique
+      // Rechargement automatique après prise de contrôle
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        // Après prise de contrôle, renvoyer la langue (au cas où)
         sendCoreLangToSW();
         window.location.reload();
       });
@@ -101,3 +114,4 @@ if ('serviceWorker' in navigator) {
     }
   });
 }
+
