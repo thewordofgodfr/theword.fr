@@ -882,90 +882,100 @@ ${shareUrl}`;
   >([]);
 
   const openOtherLangs = () => {
-    if (!selectedBook || !chapter || selectedVerses.length === 0) return;
+  if (!selectedBook || !chapter || selectedVerses.length === 0) return;
 
-    // On prend tous les versets sélectionnés, triés
-    const sortedVerses = [...selectedVerses].sort((a, b) => a - b);
+  // On prend tous les versets sélectionnés, triés
+  const sortedVerses = [...selectedVerses].sort((a, b) => a - b);
 
-    const target = {
-      bookId: selectedBook.name,
-      chapter: selectedChapter,
-      verses: sortedVerses,
-    };
-    setOtherLangTarget(target);
-
-    const currentLang = state.settings.language as LangCode;
-
-    // Ordre souhaité :
-    // 1) langue courante
-    // 2) anglais (en)
-    // 3) grec (el)
-    // 4) hébreu (he)
-    // 5) toutes les autres langues
-    const preferred: LangCode[] = [];
-
-    if (ALL_LANG_CODES.includes(currentLang)) {
-      preferred.push(currentLang);
-    }
-
-    (['en', 'el', 'he'] as LangCode[]).forEach(code => {
-      if (
-        ALL_LANG_CODES.includes(code) &&
-        code !== currentLang &&
-        !preferred.includes(code)
-      ) {
-        preferred.push(code);
-      }
-    });
-
-    const remaining = ALL_LANG_CODES.filter(l => !preferred.includes(l));
-    const targetLangs: LangCode[] = [...preferred, ...remaining];
-
-    const initial = targetLangs.map(lang => ({
-      lang,
-      text: null as string | null,
-      loading: true,
-      error: undefined as string | undefined,
-    }));
-    setOtherLangVerses(initial);
-    setShowOtherLangs(true);
-
-    targetLangs.forEach(lang => {
-      (async () => {
-        try {
-          const ch = await getChapter(selectedBook.name, selectedChapter, lang as any);
-          // On récupère tous les versets sélectionnés pour ce chapitre/langue
-          const selectedForLang = ch.verses
-            .filter(v => sortedVerses.includes(v.verse))
-            .sort((a, b) => a.verse - b.verse);
-
-          const combinedText = selectedForLang.map(v => String(v.text)).join('\n');
-
-          setOtherLangVerses(prev =>
-            prev.map(entry =>
-              entry.lang === lang
-                ? {
-                    ...entry,
-                    text: selectedForLang.length > 0 ? combinedText : null,
-                    loading: false,
-                    error: selectedForLang.length > 0 ? undefined : 'missing',
-                  }
-                : entry
-            )
-          );
-        } catch (err) {
-          console.error('multilang error', err);
-          setOtherLangVerses(prev =>
-            prev.map(entry =>
-              entry.lang === lang
-                ? { ...entry, text: null, loading: false, error: 'error' }
-                : entry
-            )
-          );
-        }
-      })();
-    });
+  const target = {
+    bookId: selectedBook.name,
+    chapter: selectedChapter,
+    verses: sortedVerses,
   };
+  setOtherLangTarget(target);
+
+  const currentLang = state.settings.language as LangCode;
+
+  // CORE souhaité :
+  // - langue courante
+  // - fr (si pas déjà la langue courante)
+  // - en (si pas déjà la langue courante)
+  // - el
+  // - he
+  const core: LangCode[] = [];
+  const pushIfOk = (lc: LangCode) => {
+    if (ALL_LANG_CODES.includes(lc) && !core.includes(lc)) core.push(lc);
+  };
+
+  if (ALL_LANG_CODES.includes(currentLang)) pushIfOk(currentLang);
+  if (currentLang !== 'fr') pushIfOk('fr');
+  if (currentLang !== 'en') pushIfOk('en');
+  pushIfOk('el');
+  pushIfOk('he');
+
+  // Toutes les autres (pas chargées par défaut)
+  const remaining = ALL_LANG_CODES.filter(l => !core.includes(l));
+  const targetLangs: LangCode[] = [...core, ...remaining];
+
+  // État initial : CORE = loading true (on va fetch), autres = loading false (au clic)
+  const initial = targetLangs.map(lang => ({
+    lang,
+    text: null as string | null,
+    loading: core.includes(lang),
+    error: undefined as string | undefined,
+  }));
+  setOtherLangVerses(initial);
+  setShowOtherLangs(true);
+
+  // Helper de chargement d'une seule langue (réutilisable au clic)
+  const loadOneLang = async (lang: LangCode) => {
+    try {
+      // met en loading
+      setOtherLangVerses(prev =>
+        prev.map(e => (e.lang === lang ? { ...e, loading: true, error: undefined } : e))
+      );
+
+      const ch = await getChapter(selectedBook.name, selectedChapter, lang as any);
+
+      const selectedForLang = ch.verses
+        .filter(v => sortedVerses.includes(v.verse))
+        .sort((a, b) => a.verse - b.verse);
+
+      const combinedText = selectedForLang.map(v => String(v.text)).join('\n');
+
+      setOtherLangVerses(prev =>
+        prev.map(entry =>
+          entry.lang === lang
+            ? {
+                ...entry,
+                text: selectedForLang.length > 0 ? combinedText : null,
+                loading: false,
+                error: selectedForLang.length > 0 ? undefined : 'missing',
+              }
+            : entry
+        )
+      );
+    } catch (err) {
+      console.error('multilang error', err);
+      setOtherLangVerses(prev =>
+        prev.map(entry =>
+          entry.lang === lang
+            ? { ...entry, text: null, loading: false, error: 'error' }
+            : entry
+        )
+      );
+    }
+  };
+
+  // 1) Charger seulement les langues CORE automatiquement
+  core.forEach(lang => {
+    loadOneLang(lang);
+  });
+
+  // 2) Exposer la fonction au clic via une ref "temporaire" sur window (simple)
+  //    (Sinon tu peux la remonter dans un useCallback + state, mais là on reste minimal)
+  (window as any).__twogLoadOtherLang = loadOneLang;
+};
 
   const copyOtherLangVerse = async (entryLang: LangCode, text: string | null) => {
     if (!otherLangTarget || !selectedBook || !text) return;
@@ -1882,63 +1892,53 @@ ${shareUrl}`;
                         className="border border-gray-700 rounded-lg px-3 py-3"
                       >
                         <div className="flex items-center justify-between mb-2 gap-2">
-                          <span className="text-sm font-semibold uppercase tracking-wide text-gray-300">
-                            {entry.lang.toUpperCase()}
-                          </span>
-                          {hasText && (
-                            <div className="flex items-center gap-1.5 flex-wrap justify-end">
-                              <button
-                                onClick={() =>
-                                  sendOtherLangVerseToNotes(entry.lang, entry.text)
-                                }
-                                className="px-2.5 py-1 rounded-full bg-orange-500 text-white text-xs"
-                              >
-                                {t('notes')}
-                              </button>
-                              <button
-                                onClick={() =>
-                                  sendOtherLangVerseToPrinciples(entry.lang, entry.text)
-                                }
-                                className="px-2.5 py-1 rounded-full bg-emerald-600 text-white text-xs"
-                              >
-                                {t('principles')}
-                              </button>
-                              <button
-                                onClick={() =>
-                                  copyOtherLangVerse(entry.lang, entry.text)
-                                }
-                                className="px-2.5 py-1 rounded-full bg-blue-600 text-white text-xs"
-                              >
-                                {t('copyLabel')}
-                              </button>
-                              <button
-                                onClick={() =>
-                                  shareOtherLangVerse(entry.lang, entry.text)
-                                }
-                                className="px-2.5 py-1 rounded-full bg-indigo-500 text-white text-xs"
-                              >
-                                {t('shareLabel')}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                        {entry.loading ? (
-                          <p className="text-sm text-white/70">
-                            {t('loading')}
-                          </p>
-                        ) : !entry.text || entry.error ? (
-                          <p className="text-sm text-white/60 italic">
-                            Verset indisponible pour cette langue.
-                          </p>
-                        ) : (
-                          <p className="text-xl md:text-2xl leading-relaxed">
-                            {entry.text}
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+  <span className="text-sm font-semibold uppercase tracking-wide text-gray-300">
+    {entry.lang.toUpperCase()}
+  </span>
+
+  {/* Si pas de texte, pas d'erreur, et pas en train de charger => on propose "Charger" */}
+  {!entry.loading && !entry.text && !entry.error && (
+    <button
+      onClick={() => {
+        const fn = (window as any).__twogLoadOtherLang as ((l: LangCode) => Promise<void>) | undefined;
+        fn?.(entry.lang);
+      }}
+      className="px-2.5 py-1 rounded-full bg-gray-700 hover:bg-gray-600 text-white text-xs"
+    >
+      Charger
+    </button>
+  )}
+
+  {/* Actions quand le texte est dispo */}
+  {!!entry.text && !entry.error && (
+    <div className="flex items-center gap-1.5 flex-wrap justify-end">
+      <button
+        onClick={() => sendOtherLangVerseToNotes(entry.lang, entry.text)}
+        className="px-2.5 py-1 rounded-full bg-orange-500 text-white text-xs"
+      >
+        {t('notes')}
+      </button>
+      <button
+        onClick={() => sendOtherLangVerseToPrinciples(entry.lang, entry.text)}
+        className="px-2.5 py-1 rounded-full bg-emerald-600 text-white text-xs"
+      >
+        {t('principles')}
+      </button>
+      <button
+        onClick={() => copyOtherLangVerse(entry.lang, entry.text)}
+        className="px-2.5 py-1 rounded-full bg-blue-600 text-white text-xs"
+      >
+        {t('copyLabel')}
+      </button>
+      <button
+        onClick={() => shareOtherLangVerse(entry.lang, entry.text)}
+        className="px-2.5 py-1 rounded-full bg-indigo-500 text-white text-xs"
+      >
+        {t('shareLabel')}
+      </button>
+    </div>
+  )}
+</div>
 
                 <div className="mt-4 flex justify-end">
                   <button
