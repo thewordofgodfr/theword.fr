@@ -529,9 +529,11 @@ https://www.theword.fr/#about`;
       arr.splice(to, 0, moved);
       return arr;
     });
-    setOpenItemMenu(({ listId: l, idx: i }) =>
-      l === listId ? { listId, idx: Math.max(0, i + dir) } : null
-    );
+    setOpenItemMenu((prev) => {
+  if (!prev) return null;
+  if (prev.listId !== listId) return prev;
+  return { listId, idx: Math.max(0, prev.idx + dir) };
+});
   };
 
     // Ouverture d'un nouveau bloc texte (par défaut : en fin de liste)
