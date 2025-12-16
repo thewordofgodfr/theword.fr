@@ -1473,10 +1473,10 @@ ${shareUrl}`;
                   </button>
                 </div>
 
-                <div className="max-h-[70vh] overflow-y-auto p-4 space-y-6">
+                <div className="max-h-[70vh] overflow-y-auto p-4 space-y-8">
                   {/* Ancien Testament */}
                   <div>
-                    <div className="text-sm font-semibold text-white/70 mb-2">
+                    <div className="text-lg font-extrabold text-white/90 mb-3 tracking-wide">
                       {t('oldTestament')}
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -1506,7 +1506,7 @@ ${shareUrl}`;
 
                   {/* Nouveau Testament */}
                   <div>
-                    <div className="text-sm font-semibold text-white/70 mb-2">
+                    <div className="text-lg font-extrabold text-white/90 mb-3 tracking-wide">
                       {t('newTestament')}
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
