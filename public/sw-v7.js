@@ -4,7 +4,7 @@
 // ✅ Precache assets Vite + precache bibles CORE
 // ✅ Runtime cache data en CORE/EXTRA selon langue
 
-const CACHE_VERSION = 'v359'; // ← bump obligatoire
+const CACHE_VERSION = 'v360'; // ← bump obligatoire
 const CACHE_APP = `twog-app-${CACHE_VERSION}`;
 const CACHE_DATA_CORE = `twog-data-core-${CACHE_VERSION}`;
 const CACHE_DATA_EXTRA = `twog-data-extra-${CACHE_VERSION}`;
