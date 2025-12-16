@@ -6,13 +6,25 @@
 :root { --nav-h: 64px; }
 html { scroll-padding-top: var(--nav-h); }
 
-/* Typo : noir en clair, blanc en sombre */
-@layer base {
-  body { @apply text-gray-900; }
-  .dark body { @apply text-white; }
+/* =========================================================
+   Option A — DARK ONLY STRICT (minimal safe)
+   - On force le "dark" au niveau document
+   - On garde les anciens blocs light en secours, mais ils ne
+     s'activent plus (data-theme est toujours "dark")
+   ========================================================= */
+html[data-theme="dark"] {
+  color-scheme: dark !important;
 }
 
-/* ======= FORCE LIGHT (désactive les inversions auto-dark en clair) ======= */
+/* Typo : (dark-only) -> texte clair par défaut */
+@layer base {
+  body { @apply text-white; }
+}
+
+/* ======= (legacy) FORCE LIGHT =======
+   Conservé pour compat (ancien code), mais ne devrait
+   plus jamais s'activer car data-theme reste "dark".
+*/
 html[data-theme="light"] {
   color-scheme: light !important;
   forced-color-adjust: none !important;
@@ -25,16 +37,14 @@ html[data-theme="light"] body {
 }
 
 /* ==========================================================
-   📌 OS en sombre + APP en clair  => texte "blanc blanc"
-   (on NE change PAS les fonds ; juste la couleur du texte)
+   (legacy) OS en sombre + APP en clair  => texte "blanc blanc"
+   Conservé (ne devrait plus s'activer en Option A)
    ========================================================== */
 @media (prefers-color-scheme: dark) {
-  /* Couleur de base */
   html[data-theme="light"]:not(.theme-dark-blue) body {
     color: #ffffff !important;
   }
 
-  /* Surclasse les utilitaires Tailwind de texte souvent utilisés */
   html[data-theme="light"]:not(.theme-dark-blue) .text-gray-50,
   html[data-theme="light"]:not(.theme-dark-blue) .text-gray-100,
   html[data-theme="light"]:not(.theme-dark-blue) .text-gray-200,
@@ -54,7 +64,6 @@ html[data-theme="light"] body {
     color: #ffffff !important;
   }
 
-  /* Placeholders (inputs) bien blancs aussi */
   html[data-theme="light"]:not(.theme-dark-blue) ::placeholder {
     color: #ffffff !important;
     opacity: 0.9 !important;
@@ -112,8 +121,12 @@ html.theme-dark-blue .text-white\/70,
 html.theme-dark-blue .text-white\/60 { color: var(--tw-db-text) !important; }
 
 /* Surfaces translucides (sticky bars, overlays translucides) */
-html.theme-dark-blue .bg-gray-800\/95 { background-color: color-mix(in srgb, var(--tw-db-surface) 95%, transparent) !important; }
-html.theme-dark-blue .bg-white\/95 { background-color: color-mix(in srgb, var(--tw-db-surface) 95%, transparent) !important; }
+html.theme-dark-blue .bg-gray-800\/95 {
+  background-color: color-mix(in srgb, var(--tw-db-surface) 95%, transparent) !important;
+}
+html.theme-dark-blue .bg-white\/95 {
+  background-color: color-mix(in srgb, var(--tw-db-surface) 95%, transparent) !important;
+}
 
 /* Ombres un peu renforcées en sombre */
 html.theme-dark-blue .shadow,
