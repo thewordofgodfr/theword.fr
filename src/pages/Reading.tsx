@@ -1453,6 +1453,140 @@ ${shareUrl}`;
               </div>
             </div>
           )}
+          {/* MODAL : Choix du livre */}
+          {showBookPicker && (
+            <div className="fixed inset-0 z-50 flex items-start justify-center pt-24">
+              <div
+                className="absolute inset-0 bg-black/60"
+                onClick={() => setShowBookPicker(false)}
+                aria-hidden="true"
+              />
+              <div className="relative w-full max-w-3xl mx-4 bg-gray-900 text-white border border-gray-700 rounded-xl shadow-lg overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+                  <div className="font-semibold text-lg">{t('chooseBook')}</div>
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm"
+                    onClick={() => setShowBookPicker(false)}
+                  >
+                    {t('close')}
+                  </button>
+                </div>
+
+                <div className="max-h-[70vh] overflow-y-auto p-4 space-y-6">
+                  {/* Ancien Testament */}
+                  <div>
+                    <div className="text-sm font-semibold text-white/70 mb-2">
+                      {t('oldTestament')}
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {oldTestamentBooks.map(b => {
+                        const isCurrent = selectedBook?.name === b.name;
+                        return (
+                          <button
+                            key={b.name}
+                            type="button"
+                            onClick={() => handleBookSelect(b)}
+                            className={`text-left px-3 py-2 rounded-md border transition-colors ${
+                              isCurrent
+                                ? 'border-blue-400 bg-blue-600/30'
+                                : 'border-gray-700 bg-white/5 hover:bg-white/10'
+                            }`}
+                          >
+                            <div className="font-semibold text-sm">{getBookName(b)}</div>
+                            <div className="text-xs text-white/60">
+                              {b.chapters} {t('chapter')}
+                              {b.chapters > 1 ? 's' : ''}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Nouveau Testament */}
+                  <div>
+                    <div className="text-sm font-semibold text-white/70 mb-2">
+                      {t('newTestament')}
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {newTestamentBooks.map(b => {
+                        const isCurrent = selectedBook?.name === b.name;
+                        return (
+                          <button
+                            key={b.name}
+                            type="button"
+                            onClick={() => handleBookSelect(b)}
+                            className={`text-left px-3 py-2 rounded-md border transition-colors ${
+                              isCurrent
+                                ? 'border-blue-400 bg-blue-600/30'
+                                : 'border-gray-700 bg-white/5 hover:bg-white/10'
+                            }`}
+                          >
+                            <div className="font-semibold text-sm">{getBookName(b)}</div>
+                            <div className="text-xs text-white/60">
+                              {b.chapters} {t('chapter')}
+                              {b.chapters > 1 ? 's' : ''}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* MODAL : Choix du chapitre */}
+          {showChapterPicker && selectedBook && (
+            <div className="fixed inset-0 z-50 flex items-start justify-center pt-24">
+              <div
+                className="absolute inset-0 bg-black/60"
+                onClick={() => setShowChapterPicker(false)}
+                aria-hidden="true"
+              />
+              <div className="relative w-full max-w-2xl mx-4 bg-gray-900 text-white border border-gray-700 rounded-xl shadow-lg overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+                  <div className="font-semibold text-lg">
+                    {t('chooseChapter')} — {getBookName(selectedBook)}
+                  </div>
+                  <button
+                    type="button"
+                    className="px-3 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm"
+                    onClick={() => setShowChapterPicker(false)}
+                  >
+                    {t('close')}
+                  </button>
+                </div>
+
+                <div className="max-h-[70vh] overflow-y-auto p-4">
+                  <div className="grid grid-cols-5 sm:grid-cols-8 gap-2">
+                    {Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map(n => {
+                      const isCurrent = n === selectedChapter;
+                      return (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() => {
+                            setShowChapterPicker(false);
+                            handleChapterSelect(n);
+                          }}
+                          className={`px-0 py-2 rounded-md text-sm font-semibold border transition-colors ${
+                            isCurrent
+                              ? 'border-blue-400 bg-blue-600/30'
+                              : 'border-gray-700 bg-white/5 hover:bg-white/10'
+                          }`}
+                        >
+                          {n}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {selectedBook ? (
             <div
