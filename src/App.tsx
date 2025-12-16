@@ -35,7 +35,7 @@ function AppContent() {
   }, [state.currentPage]);
 
   useEffect(() => {
-    const { language, theme } = state.settings;
+    const { language } = state.settings;
     const titles = {
       fr: {
         home: 'The Word – Verset aléatoire',
@@ -45,7 +45,7 @@ function AppContent() {
         about: 'À propos',
         notes: 'Notes',
         principes: 'Principes fondamentaux', // <- NOUVEAU
-        fallback: 'TheWord.fr'
+        fallback: 'TheWord.fr',
       },
       en: {
         home: 'The Word – Random verse',
@@ -55,19 +55,17 @@ function AppContent() {
         about: 'About',
         notes: 'Notes',
         principes: 'Core Studies', // <- NEW
-        fallback: 'TheWord.fr'
+        fallback: 'TheWord.fr',
       },
     } as const;
+
     const dict = language === 'fr' ? titles.fr : titles.en;
     const pageKey = (state.currentPage as keyof typeof dict) || 'fallback';
     document.title = dict[pageKey] ?? dict.fallback;
 
-    const root = document.documentElement;
-    if (theme === 'dark') root.classList.add('dark'); else root.classList.remove('dark');
-
     // IMPORTANT : on met directement le code langue (fr, en, es, ru, pt, etc.)
-    root.setAttribute('lang', language);
-  }, [state.currentPage, state.settings.language, state.settings.theme]);
+    document.documentElement.setAttribute('lang', language);
+  }, [state.currentPage, state.settings.language]);
 
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
@@ -86,23 +84,27 @@ function AppContent() {
 
   const renderCurrentPage = () => {
     switch (state.currentPage) {
-      case 'home': return <Home />;
-      case 'reading': return <Reading />;
-      case 'search': return <Search />;
-      case 'settings': return <Settings />;
-      case 'about': return <About />;
-      case 'notes': return <Notes />;
-      case 'principes': return <Principes />; // <- NOUVELLE ROUTE
-      default: return <Home />;
+      case 'home':
+        return <Home />;
+      case 'reading':
+        return <Reading />;
+      case 'search':
+        return <Search />;
+      case 'settings':
+        return <Settings />;
+      case 'about':
+        return <About />;
+      case 'notes':
+        return <Notes />;
+      case 'principes':
+        return <Principes />; // <- NOUVELLE ROUTE
+      default:
+        return <Home />;
     }
   };
 
   return (
-    <div
-      className={`min-h-screen transition-colors duration-200 ${
-        state.settings.theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
-      }`}
-    >
+    <div className="min-h-screen transition-colors duration-200 bg-gray-900">
       <Navigation />
       <main>{renderCurrentPage()}</main>
     </div>
@@ -116,5 +118,4 @@ export default function App() {
     </AppProvider>
   );
 }
-
 
