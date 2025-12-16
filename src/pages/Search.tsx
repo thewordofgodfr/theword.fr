@@ -316,7 +316,7 @@ export default function Search() {
   const { state, navigateToVerse } = useApp();
   const { t, language } = useTranslation();
 
-  // ✅ on force le mode sombre (tu as retiré le toggle clair/sombre)
+  // ✅ on force le mode sombre
   const isDark = true;
 
   const queryKey = `twog:search:lastQuery:${state.settings.language}`;
@@ -339,9 +339,6 @@ export default function Search() {
   const [results, setResults] = useState<ResultItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-
-  // ✅ limite pour éviter les freezes WebView Android quand il y a énormément de résultats
-  const MAX_RESULTS = 600;
 
   const books = useMemo(() => getBibleBooks(), []);
   const getBookName = (id: string) => {
@@ -372,11 +369,9 @@ export default function Search() {
       try {
         const res = await searchInBible(query, state.settings.language);
 
-        // ✅ on limite le volume traité/affiché pour préserver les perfs (Android)
-        const capped = res.length > MAX_RESULTS ? res.slice(0, MAX_RESULTS) : res;
-
+        // ✅ PAS DE LIMITE : on garde tout
         const enriched: ResultItem[] = [];
-        for (const v of capped) {
+        for (const v of res) {
           const occ = countMatchesFlexible(v.text, query);
           if (occ > 0) enriched.push({ ...v, occ });
         }
@@ -489,11 +484,6 @@ export default function Search() {
 
   const totalOccurrences = useMemo(() => results.reduce((s, v) => s + v.occ, 0), [results]);
 
-  const wasCapped = useMemo(() => {
-    // si on a exactement MAX_RESULTS, on peut informer l'utilisateur (sans certitude que res initial > MAX)
-    return results.length >= MAX_RESULTS;
-  }, [results.length]);
-
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-950' : 'bg-gray-50'} transition-colors`}>
       <div className="max-w-4xl mx-auto px-4 py-5">
@@ -542,9 +532,9 @@ export default function Search() {
             </div>
           </form>
 
-          {/* Ligne d’infos + actions — une seule ligne */}
-          <div className="mt-2 text-sm flex items-center justify-between gap-2">
-            <div className={`${isDark ? 'text-white' : 'text-gray-600'} flex-1 min-w-0 truncate`}>
+          {/* ✅ Android: si le texte est long, on met les boutons sur une ligne dessous */}
+          <div className="mt-2 text-sm">
+            <div className={`${isDark ? 'text-white' : 'text-gray-600'} break-words`}>
               {loading ? (
                 <>
                   <Loader2 className="inline mr-2 animate-spin" size={16} />
@@ -553,11 +543,6 @@ export default function Search() {
               ) : query.trim().length >= 2 ? (
                 <>
                   {t('searchResults')} "{query}" ({totalOccurrences})
-                  {wasCapped && (
-                    <span className="ml-2 text-white/60">
-                      — {t('searchResults')} {t('searchResults')} {/* fallback si pas de clé i18n */}
-                    </span>
-                  )}
                 </>
               ) : (
                 t('searchMinChars')
@@ -565,7 +550,7 @@ export default function Search() {
             </div>
 
             {grouped.length > 1 && totalOccurrences > 0 && !loading && (
-              <div className="flex flex-shrink-0 space-x-2">
+              <div className="mt-2 flex flex-wrap gap-2">
                 <button
                   onClick={expandAll}
                   className="text-xs px-2 py-1 rounded border border-transparent bg-blue-600 text-white hover:bg-blue-500"
@@ -574,26 +559,23 @@ export default function Search() {
                 </button>
                 <button
                   onClick={collapseAll}
-                  className={`text-xs px-2 py-1 rounded ${isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                  className={`text-xs px-2 py-1 rounded ${
+                    isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
                 >
                   {t('searchCollapseAll')}
                 </button>
               </div>
             )}
           </div>
-
-          {/* Info perf (optionnel, discret) */}
-          {query.trim().length >= 2 && !loading && results.length >= MAX_RESULTS && (
-            <div className="mt-2 text-xs text-white/60">
-              Résultats limités à {MAX_RESULTS} pour éviter les ralentissements sur Android.
-            </div>
-          )}
         </div>
 
         {/* Résultats */}
         <div className="mt-4">
           {totalOccurrences === 0 && !loading && query.trim().length >= 2 && (
-            <div className={`${isDark ? 'text-white' : 'text-gray-600'} text-center py-10`}>{t('searchNoResults')}</div>
+            <div className={`${isDark ? 'text-white' : 'text-gray-600'} text-center py-10`}>
+              {t('searchNoResults')}
+            </div>
           )}
 
           {grouped.map(group => {
@@ -664,3 +646,4 @@ export default function Search() {
     </div>
   );
 }
+
