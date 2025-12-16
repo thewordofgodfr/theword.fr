@@ -1493,8 +1493,8 @@ ${shareUrl}`;
                                 : 'border-gray-700 bg-white/5 hover:bg-white/10'
                             }`}
                           >
-                            <div className="font-semibold text-sm">{getBookName(b)}</div>
-                            <div className="text-xs text-white/60">
+                            <div className="font-extrabold text-lg sm:text-xl leading-tight">{getBookName(b)}</div>
+                            <div className="text-base sm:text-lg text-white/70">
                               {b.chapters} {t('chapter')}
                               {b.chapters > 1 ? 's' : ''}
                             </div>
@@ -1523,8 +1523,8 @@ ${shareUrl}`;
                                 : 'border-gray-700 bg-white/5 hover:bg-white/10'
                             }`}
                           >
-                            <div className="font-semibold text-sm">{getBookName(b)}</div>
-                            <div className="text-xs text-white/60">
+                            <div className="font-extrabold text-lg sm:text-xl leading-tight">{getBookName(b)}</div>
+                            <div className="text-base sm:text-lg text-white/70">
                               {b.chapters} {t('chapter')}
                               {b.chapters > 1 ? 's' : ''}
                             </div>
@@ -1572,7 +1572,7 @@ ${shareUrl}`;
                             setShowChapterPicker(false);
                             handleChapterSelect(n);
                           }}
-                          className={`px-0 py-2 rounded-md text-sm font-semibold border transition-colors ${
+                          className={`flex items-center justify-center h-11 sm:h-12 rounded-lg text-base sm:text-lg font-bold border transition-colors ${
                             isCurrent
                               ? 'border-blue-400 bg-blue-600/30'
                               : 'border-gray-700 bg-white/5 hover:bg-white/10'
