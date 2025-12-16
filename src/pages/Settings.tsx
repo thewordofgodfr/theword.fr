@@ -274,14 +274,8 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
           <rect width="3" height="0.25" y="0" fill="#0038B8" />
           <rect width="3" height="0.25" y="1.75" fill="#0038B8" />
           {/* étoile de David simplifiée */}
-          <polygon
-            points="1.5,0.6 1.35,0.9 1.65,0.9"
-            fill="#0038B8"
-          />
-          <polygon
-            points="1.5,1.4 1.35,1.1 1.65,1.1"
-            fill="#0038B8"
-          />
+          <polygon points="1.5,0.6 1.35,0.9 1.65,0.9" fill="#0038B8" />
+          <polygon points="1.5,1.4 1.35,1.1 1.65,1.1" fill="#0038B8" />
           <polygon
             points="1.3,0.8 1.7,0.8 1.5,1.2"
             fill="none"
@@ -324,10 +318,7 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
 };
 
 /** Config d'affichage par langue (titre + sous-titre + drapeau) */
-const LANGUAGE_CONFIG: Record<
-  Language,
-  { flag: FlagCode; label: string; subtitle: string }
-> = {
+const LANGUAGE_CONFIG: Record<Language, { flag: FlagCode; label: string; subtitle: string }> = {
   fr: {
     flag: 'fr',
     label: 'Français',
@@ -442,11 +433,30 @@ const AVAILABLE_LANGUAGES: Language[] = [
   'el',
 ];
 
+/** Option A : ordre des langues → [user] , en, el, he, puis le reste */
+function buildLanguageOrder(current: Language): Language[] {
+  const priority: Language[] = [current, 'en', 'el', 'he'];
+  const out: Language[] = [];
+  const seen = new Set<string>();
+
+  const push = (l: Language) => {
+    if (!seen.has(l)) {
+      out.push(l);
+      seen.add(l);
+    }
+  };
+
+  priority.forEach(push);
+  AVAILABLE_LANGUAGES.forEach(push);
+
+  return out;
+}
+
 export default function Settings() {
   const { state, updateSettings } = useApp();
   const { t } = useTranslation();
 
-  // Force le thème sombre si besoin (inchangé)
+  // Option A : thème sombre strict (inchangé, mais garde-fou)
   useEffect(() => {
     if (state.settings.theme !== 'dark') updateSettings({ theme: 'dark' });
   }, [state.settings.theme, updateSettings]);
@@ -595,45 +605,40 @@ export default function Settings() {
     </button>
   );
 
+  const orderedLangs = buildLanguageOrder(state.settings.language);
+
   return (
-    <div
-      className={`min-h-[100svh] ${
-        isDark ? 'bg-gray-900' : 'bg-gray-50'
-      } transition-colors duration-200`}
-    >
+    <div className={`min-h-[100svh] bg-gray-900 transition-colors duration-200`}>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1
-              className={`text-3xl md:text-4xl font-bold mb-2 ${
-                isDark ? 'text-white' : 'text-gray-800'
-              }`}
-            >
+            <h1 className={`text-3xl md:text-4xl font-bold mb-2 text-white`}>
               {t('settings')}
             </h1>
           </div>
 
           {/* 1) Langue */}
-          <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 mb-6`}>
-            <h2
-              className={`text-xl font-semibold mb-6 ${
-                isDark ? 'text-white' : 'text-gray-800'
-              } flex items-center`}
-            >
+          <div className={`bg-gray-800 rounded-xl shadow-lg p-6 mb-6`}>
+            <h2 className={`text-xl font-semibold mb-6 text-white flex items-center`}>
               <Globe size={24} className="mr-3" />
               {t('language')}
             </h2>
 
             <div className="space-y-4">
-              {AVAILABLE_LANGUAGES.map(lang => {
+              {orderedLangs.map((lang) => {
                 const cfg = LANGUAGE_CONFIG[lang];
+                if (!cfg) return null;
+
+                // Diminutif : fr, en, es...
+                const abbr = String(lang).toLowerCase();
+
                 return (
                   <LangButton
                     key={lang}
                     active={state.settings.language === lang}
                     flag={<FlagIcon code={cfg.flag} />}
-                    title={cfg.label}
+                    title={`${cfg.label} (${abbr})`}
                     subtitle={cfg.subtitle}
                     onClick={() => updateSettings({ language: lang })}
                   />
@@ -643,27 +648,19 @@ export default function Settings() {
           </div>
 
           {/* 2) Apparence + Taille de police */}
-          <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 mb-6`}>
-            <h2
-              className={`text-xl font-semibold mb-6 ${
-                isDark ? 'text-white' : 'text-gray-800'
-              } flex items-center`}
-            >
+          <div className={`bg-gray-800 rounded-xl shadow-lg p-6 mb-6`}>
+            <h2 className={`text-xl font-semibold mb-6 text-white flex items-center`}>
               <Palette size={24} className="mr-3" />
               {t('appearance')}
             </h2>
 
             <div>
-              <div
-                className={`block text-sm font-medium mb-4 ${
-                  isDark ? 'text-white' : 'text-gray-700'
-                }`}
-              >
+              <div className={`block text-sm font-medium mb-4 text-white`}>
                 {t('fontSize')}
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                {fontSizes.map(value => {
+                {fontSizes.map((value) => {
                   const isSelected = state.settings.fontSize === value;
                   return (
                     <button
@@ -677,9 +674,7 @@ export default function Settings() {
                       className={`px-4 py-3 rounded-lg border-2 font-medium transition-all duration-200 ${
                         isSelected
                           ? 'border-green-500 bg-green-50 text-green-700'
-                          : isDark
-                          ? 'border-gray-600 bg-gray-700 text-white hover:border-gray-500'
-                          : 'border-gray-300 bg-gray-50 text-gray-600 hover:border-gray-400'
+                          : 'border-gray-600 bg-gray-700 text-white hover:border-gray-500'
                       }`}
                     >
                       {value}px
@@ -702,9 +697,7 @@ export default function Settings() {
                       className={`w-full px-4 py-4 rounded-lg border-2 font-semibold tracking-wide transition-all duration-200 ${
                         isXL
                           ? 'border-green-500 bg-green-50 text-green-700'
-                          : isDark
-                          ? 'border-gray-500 bg-gray-700 text-white hover:border-gray-400'
-                          : 'border-gray-300 bg-gray-50 text-gray-700 hover:border-gray-400'
+                          : 'border-gray-500 bg-gray-700 text-white hover:border-gray-400'
                       }`}
                     >
                       {t('fontSizeXLLabel')}
@@ -713,15 +706,8 @@ export default function Settings() {
                 })()}
               </div>
 
-              <div
-                className={`mt-4 p-4 ${
-                  isDark ? 'bg-gray-700' : 'bg-gray-100'
-                } rounded-lg`}
-              >
-                <p
-                  className={isDark ? 'text-white' : 'text-gray-700'}
-                  style={{ fontSize: `${state.settings.fontSize}px` }}
-                >
+              <div className={`mt-4 p-4 bg-gray-700 rounded-lg`}>
+                <p className="text-white" style={{ fontSize: `${state.settings.fontSize}px` }}>
                   {t('fontSizePreview')}
                 </p>
               </div>
@@ -729,22 +715,14 @@ export default function Settings() {
           </div>
 
           {/* 3) Mises à jour */}
-          <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6`}>
-            <h2
-              className={`text-xl font-semibold mb-6 ${
-                isDark ? 'text-white' : 'text-gray-800'
-              } flex items-center`}
-            >
+          <div className={`bg-gray-800 rounded-xl shadow-lg p-6`}>
+            <h2 className={`text-xl font-semibold mb-6 text-white flex items-center`}>
               <RefreshCcw size={22} className="mr-3" />
               {t('updates')}
             </h2>
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div
-                className={`${isDark ? 'text-white/80' : 'text-gray-700'} text-sm`}
-              >
-                {t('updatesDescription')}
-              </div>
+              <div className={`text-white/80 text-sm`}>{t('updatesDescription')}</div>
 
               <div className="flex gap-3">
                 {updateStatus === 'ready' ? (
@@ -761,9 +739,7 @@ export default function Settings() {
                     className={`px-4 py-2 rounded-lg border-2 font-medium transition-all duration-200 ${
                       updateStatus === 'checking'
                         ? 'opacity-70 cursor-wait border-gray-500 text-gray-300'
-                        : isDark
-                        ? 'border-gray-600 bg-gray-700 text-white hover:border-gray-500'
-                        : 'border-gray-300 bg-gray-50 text-gray-700 hover:border-gray-400'
+                        : 'border-gray-600 bg-gray-700 text-white hover:border-gray-500'
                     }`}
                   >
                     {t('checkUpdatesButton')}
@@ -775,35 +751,23 @@ export default function Settings() {
             {/* Statut */}
             <div className="mt-4 text-sm">
               {updateStatus === 'checking' && (
-                <p className={isDark ? 'text-white/80' : 'text-gray-700'}>
-                  {t('updatesChecking')}
-                </p>
+                <p className="text-white/80">{t('updatesChecking')}</p>
               )}
-              {updateStatus === 'upToDate' && (
-                <p className="text-green-500">{t('updatesUpToDate')}</p>
-              )}
-              {updateStatus === 'ready' && (
-                <p className="text-yellow-400">{t('updatesReady')}</p>
-              )}
+              {updateStatus === 'upToDate' && <p className="text-green-500">{t('updatesUpToDate')}</p>}
+              {updateStatus === 'ready' && <p className="text-yellow-400">{t('updatesReady')}</p>}
               {updateStatus === 'unavailable' && (
                 <p className="text-red-400">{t('updatesUnavailable')}</p>
               )}
-              {updateStatus === 'error' && (
-                <p className="text-red-400">{t('updatesError')}</p>
-              )}
+              {updateStatus === 'error' && <p className="text-red-400">{t('updatesError')}</p>}
             </div>
           </div>
 
           {/* Footer : Version uniquement */}
           <div className="mt-8 text-center text-xs">
             {versionInfo ? (
-              <p className={isDark ? 'text-white/70' : 'text-gray-600'}>
-                Version {versionInfo?.version ?? '0.0.0'}
-              </p>
+              <p className="text-white/70">Version {versionInfo?.version ?? '0.0.0'}</p>
             ) : (
-              <p className={isDark ? 'text-white/50' : 'text-gray-500'}>
-                {versionError ? 'version.json indisponible' : '…'}
-              </p>
+              <p className="text-white/50">{versionError ? 'version.json indisponible' : '…'}</p>
             )}
           </div>
         </div>
