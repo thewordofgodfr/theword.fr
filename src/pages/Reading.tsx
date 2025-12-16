@@ -1709,6 +1709,166 @@ ${shareUrl}`;
               </div>
             </div>
           )}
+          
+          {/* MODAL : ajout vers NOTES */}
+          {showAddToNotes && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div
+                className="absolute inset-0 bg-black/60"
+                onClick={() => setShowAddToNotes(false)}
+                aria-hidden="true"
+              />
+              <div className="relative bg-gray-900 text-white rounded-xl shadow-lg p-4 w-full max-w-md mx-4">
+                <h3 className="text-xl md:text-2xl font-semibold mb-2">
+                  {t('notesModalTitle')}
+                </h3>
+
+                <form onSubmit={confirmAddToNotes}>
+                  <div className="max-h-64 overflow-y-auto mt-2 space-y-1">
+                    {notesListsForModal.length === 0 ? (
+                      <p className="text-base text-white/70">
+                        {t('notesNoList')}
+                      </p>
+                    ) : (
+                      notesListsForModal.map(l => (
+                        <label
+                          key={l.id}
+                          className="flex items-center gap-2 px-2 py-2 rounded hover:bg-white/5 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            name="notesList"
+                            className="accent-emerald-500"
+                            value={l.id}
+                            checked={selectedNotesListIds.includes(l.id)}
+                            onChange={e => {
+                              const checked = e.target.checked;
+                              setSelectedNotesListIds(prev =>
+                                checked
+                                  ? [...prev, l.id]
+                                  : prev.filter(id => id !== l.id)
+                              );
+                            }}
+                          />
+                          <span className="text-lg truncate">
+                            {l.title || t('untitledList')}
+                          </span>
+                        </label>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="mt-3">
+                    <label className="block text-lg mb-1">
+                      {t('notesNewListOptional')}
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full rounded-md bg-gray-800 border border-gray-600 px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      value={newNotesListTitle}
+                      onChange={e => setNewNotesListTitle(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="mt-4 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddToNotes(false)}
+                      className="px-3 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm"
+                    >
+                      {t('cancel')}
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-sm"
+                    >
+                      OK
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+          
+          {/* MODAL : ajout vers PRINCIPES */}
+          {showAddToPrinciples && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div
+                className="absolute inset-0 bg-black/60"
+                onClick={() => setShowAddToPrinciples(false)}
+                aria-hidden="true"
+              />
+              <div className="relative bg-gray-900 text-white rounded-xl shadow-lg p-4 w-full max-w-md mx-4">
+                <h3 className="text-xl md:text-2xl font-semibold mb-2">
+                  {t('principlesModalTitle')}
+                </h3>
+
+                <form onSubmit={confirmAddToPrinciples}>
+                  <div className="max-h-64 overflow-y-auto mt-2 space-y-1">
+                    {principlesListsForModal.length === 0 ? (
+                      <p className="text-base text-white/70">
+                        {t('principlesNoList')}
+                      </p>
+                    ) : (
+                      principlesListsForModal.map(l => (
+                        <label
+                          key={l.id}
+                          className="flex items-center gap-2 px-2 py-2 rounded hover:bg-white/5 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            name="principleList"
+                            className="accent-indigo-400"
+                            value={l.id}
+                            checked={selectedPrincipleListIds.includes(l.id)}
+                            onChange={e => {
+                              const checked = e.target.checked;
+                              setSelectedPrincipleListIds(prev =>
+                                checked
+                                  ? [...prev, l.id]
+                                  : prev.filter(id => id !== l.id)
+                              );
+                            }}
+                          />
+                          <span className="text-lg truncate">
+                            {l.title || t('untitledList')}
+                          </span>
+                        </label>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="mt-3">
+                    <label className="block text-lg mb-1">
+                      {t('principlesNewListOptional')}
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full rounded-md bg-gray-800 border border-gray-600 px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      value={newPrincipleListTitle}
+                      onChange={e => setNewPrincipleListTitle(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="mt-4 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddToPrinciples(false)}
+                      className="px-3 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm"
+                    >
+                      {t('cancel')}
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-sm"
+                    >
+                      OK
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
 
           {/* MODAL : verset (ou plusieurs) dans autres langues */}
           {showOtherLangs && otherLangTarget && selectedBook && (
