@@ -2,15 +2,35 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
-import { getBibleBooks, getChapter, getRandomVerse, copyToClipboard } from '../services/bibleService';
+import {
+  getBibleBooks,
+  getChapter,
+  getRandomVerse,
+  copyToClipboard,
+} from '../services/bibleService';
 import { BibleBook, BibleChapter } from '../types/bible';
 import {
-  ChevronDown, Book, ChevronLeft, ChevronRight,
-  Copy as CopyIcon, Check, Search as SearchIcon, Share2 as ShareIcon,
-  ListPlus as ListPlusIcon, Languages as LanguagesIcon
+  ChevronDown,
+  Book,
+  ChevronLeft,
+  ChevronRight,
+  Copy as CopyIcon,
+  Check,
+  Search as SearchIcon,
+  Share2 as ShareIcon,
+  ListPlus as ListPlusIcon,
+  Languages as LanguagesIcon,
 } from 'lucide-react';
-import { readSlot as readQuickSlot, saveSlot as saveQuickSlot, type QuickSlot } from '../services/readingSlots';
-import { getAllLists, createList, addVersesToList } from '../services/collectionsService';
+import {
+  readSlot as readQuickSlot,
+  saveSlot as saveQuickSlot,
+  type QuickSlot,
+} from '../services/readingSlots';
+import {
+  getAllLists,
+  createList,
+  addVersesToList,
+} from '../services/collectionsService';
 import type { VerseRef, VerseList } from '../types/collections';
 
 /* ========= Helpers de stockage pour PRINCIPES (même format que Principes.tsx) ========= */
@@ -41,7 +61,12 @@ function writeAllPrinciples(all: VerseList[]) {
 }
 
 function makePrincipleId() {
-  return 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+  return (
+    'p_' +
+    Date.now().toString(36) +
+    '_' +
+    Math.random().toString(36).slice(2, 8)
+  );
 }
 
 function getAllPrinciplesLists(): VerseList[] {
@@ -156,7 +181,13 @@ export default function Reading() {
   type SlotKey = 1 | 2 | 3;
   const SLOT_THEMES: Record<
     SlotKey,
-    { solid: string; solidHover: string; mobileBtn: string; mobileBtnHover: string; lightPaper: string }
+    {
+      solid: string;
+      solidHover: string;
+      mobileBtn: string;
+      mobileBtnHover: string;
+      lightPaper: string;
+    }
   > = {
     1: {
       solid: 'bg-amber-600 text-white',
@@ -203,7 +234,12 @@ export default function Reading() {
   };
 
   // --- Quick slots state (loupe + 1/2/3) ---
-  const [quickSlots, setQuickSlots] = useState<QuickSlot[]>([null, null, null, null]);
+  const [quickSlots, setQuickSlots] = useState<QuickSlot[]>([
+    null,
+    null,
+    null,
+    null,
+  ]);
   const [activeSlot, setActiveSlot] = useState<number | null>(null);
   const [lastTappedSlot, setLastTappedSlot] = useState<number | null>(null);
 
@@ -224,7 +260,10 @@ export default function Reading() {
     if (!selectedBook) return;
     if (activeSlot !== null && activeSlot !== 0) {
       try {
-        saveQuickSlot(activeSlot, { book: selectedBook.name, chapter: selectedChapter });
+        saveQuickSlot(activeSlot, {
+          book: selectedBook.name,
+          chapter: selectedChapter,
+        });
         refreshSlots();
       } catch {}
     }
@@ -442,7 +481,10 @@ export default function Reading() {
   }
 
   const activeTheme =
-    activeSlot === 1 || activeSlot === 2 || activeSlot === 3 ? SLOT_THEMES[activeSlot as SlotKey] : null;
+    activeSlot === 1 || activeSlot === 2 || activeSlot === 3
+      ? SLOT_THEMES[activeSlot as SlotKey]
+      : null;
+
   const desktopChipBase =
     'inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm whitespace-nowrap';
   const desktopChipColors = activeTheme ? activeTheme.solid : 'bg-blue-600 text-white';
@@ -572,6 +614,7 @@ export default function Reading() {
 
   const suppressAutoSaveUntil = useRef<number>(0);
   const programmaticScrollUntil = useRef<number>(0);
+
   function scrollToVerseNumber(v: number, smooth: boolean, extraTop = 0) {
     const now = Date.now();
     const lockMs = 2500;
@@ -579,6 +622,7 @@ export default function Reading() {
     programmaticScrollUntil.current = now + lockMs;
     const baseOffset = NAV_H + cmdH + 14;
     const offset = baseOffset + extraTop;
+
     let tries = 0;
     const maxTries = 24;
     const tick = () => {
@@ -638,6 +682,7 @@ export default function Reading() {
   const toggleSelectVerse = (num: number) => {
     setSelectedVerses(prev => (prev.includes(num) ? prev.filter(n => n !== num) : [...prev, num]));
   };
+
   const compressRanges = (nums: number[]) => {
     if (nums.length === 0) return '';
     const sorted = [...nums].sort((a, b) => a - b);
@@ -768,21 +813,15 @@ ${shareUrl}`;
     let targetIds = [...selectedNotesListIds];
 
     if (typed) {
-      const existing = allLists.find(
-        l => (l.title || '').trim().toLowerCase() === typed.toLowerCase()
-      );
+      const existing = allLists.find(l => (l.title || '').trim().toLowerCase() === typed.toLowerCase());
       const newId = existing ? existing.id : createList(typed).id;
-      if (!targetIds.includes(newId)) {
-        targetIds.push(newId);
-      }
+      if (!targetIds.includes(newId)) targetIds.push(newId);
     }
 
     if (targetIds.length === 0) return;
 
     try {
-      targetIds.forEach(id => {
-        addVersesToList(id, pendingVersesForNotes);
-      });
+      targetIds.forEach(id => addVersesToList(id, pendingVersesForNotes));
     } catch (err) {
       console.error('addVerses error', err);
     }
@@ -790,7 +829,6 @@ ${shareUrl}`;
     setShowAddToNotes(false);
     setPendingVersesForNotes(null);
     setSelectedVerses([]);
-    // Toast spécifique Notes : orange
     setCopiedKey('added-to-notes');
     setTimeout(() => setCopiedKey(''), 1600);
   };
@@ -842,21 +880,15 @@ ${shareUrl}`;
     let targetIds = [...selectedPrincipleListIds];
 
     if (typed) {
-      const existing = all.find(
-        l => (l.title || '').trim().toLowerCase() === typed.toLowerCase()
-      );
+      const existing = all.find(l => (l.title || '').trim().toLowerCase() === typed.toLowerCase());
       const newId = existing ? existing.id : createPrincipleList(typed).id;
-      if (!targetIds.includes(newId)) {
-        targetIds.push(newId);
-      }
+      if (!targetIds.includes(newId)) targetIds.push(newId);
     }
 
     if (targetIds.length === 0) return;
 
     try {
-      targetIds.forEach(id => {
-        addVersesToPrincipleList(id, pendingVersesForPrinciples);
-      });
+      targetIds.forEach(id => addVersesToPrincipleList(id, pendingVersesForPrinciples));
     } catch (err) {
       console.error('addVerses principles error', err);
     }
@@ -864,7 +896,6 @@ ${shareUrl}`;
     setShowAddToPrinciples(false);
     setPendingVersesForPrinciples(null);
     setSelectedVerses([]);
-    // Toast spécifique Principes : vert (comme avant)
     setCopiedKey('added-to-principles');
     setTimeout(() => setCopiedKey(''), 1600);
   };
@@ -877,111 +908,113 @@ ${shareUrl}`;
     chapter: number;
     verses: number[];
   } | null>(null);
+
   const [otherLangVerses, setOtherLangVerses] = useState<
     { lang: LangCode; text: string | null; loading: boolean; error?: string }[]
   >([]);
 
+  // ✅ Ref interne (au lieu de window.__xxx)
+  const loadOtherLangRef = useRef<((lang: LangCode) => void) | null>(null);
+
   const openOtherLangs = () => {
-  if (!selectedBook || !chapter || selectedVerses.length === 0) return;
+    if (!selectedBook || !chapter || selectedVerses.length === 0) return;
 
-  // On prend tous les versets sélectionnés, triés
-  const sortedVerses = [...selectedVerses].sort((a, b) => a - b);
+    // On prend tous les versets sélectionnés, triés
+    const sortedVerses = [...selectedVerses].sort((a, b) => a - b);
 
-  const target = {
-    bookId: selectedBook.name,
-    chapter: selectedChapter,
-    verses: sortedVerses,
+    const target = {
+      bookId: selectedBook.name,
+      chapter: selectedChapter,
+      verses: sortedVerses,
+    };
+    setOtherLangTarget(target);
+
+    const currentLang = state.settings.language as LangCode;
+
+    // CORE souhaité :
+    // - langue courante
+    // - fr (si pas déjà la langue courante)
+    // - en (si pas déjà la langue courante)
+    // - el
+    // - he
+    const core: LangCode[] = [];
+    const pushIfOk = (lc: LangCode) => {
+      if (ALL_LANG_CODES.includes(lc) && !core.includes(lc)) core.push(lc);
+    };
+
+    if (ALL_LANG_CODES.includes(currentLang)) pushIfOk(currentLang);
+    if (currentLang !== 'fr') pushIfOk('fr');
+    if (currentLang !== 'en') pushIfOk('en');
+    pushIfOk('el');
+    pushIfOk('he');
+
+    // Toutes les autres (pas chargées par défaut)
+    const remaining = ALL_LANG_CODES.filter(l => !core.includes(l));
+    const targetLangs: LangCode[] = [...core, ...remaining];
+
+    // État initial : CORE = loading true (on va fetch), autres = loading false (au clic)
+    const initial = targetLangs.map(lang => ({
+      lang,
+      text: null as string | null,
+      loading: core.includes(lang),
+      error: undefined as string | undefined,
+    }));
+    setOtherLangVerses(initial);
+    setShowOtherLangs(true);
+
+    // Helper de chargement d'une seule langue (réutilisable au clic)
+    const loadOneLang = async (lang: LangCode) => {
+      try {
+        // met en loading
+        setOtherLangVerses(prev =>
+          prev.map(e => (e.lang === lang ? { ...e, loading: true, error: undefined } : e))
+        );
+
+        const ch = await getChapter(selectedBook.name, selectedChapter, lang as any);
+
+        const selectedForLang = ch.verses
+          .filter(v => sortedVerses.includes(v.verse))
+          .sort((a, b) => a.verse - b.verse);
+
+        const combinedText = selectedForLang.map(v => String(v.text)).join('\n');
+
+        setOtherLangVerses(prev =>
+          prev.map(entry =>
+            entry.lang === lang
+              ? {
+                  ...entry,
+                  text: selectedForLang.length > 0 ? combinedText : null,
+                  loading: false,
+                  error: selectedForLang.length > 0 ? undefined : 'missing',
+                }
+              : entry
+          )
+        );
+      } catch (err) {
+        console.error('multilang error', err);
+        setOtherLangVerses(prev =>
+          prev.map(entry =>
+            entry.lang === lang ? { ...entry, text: null, loading: false, error: 'error' } : entry
+          )
+        );
+      }
+    };
+
+    // ✅ On stocke la fonction dans la ref pour le bouton "Charger"
+    loadOtherLangRef.current = (lang: LangCode) => {
+      loadOneLang(lang);
+    };
+
+    // 1) Charger seulement les langues CORE automatiquement
+    core.forEach(lang => {
+      loadOneLang(lang);
+    });
   };
-  setOtherLangTarget(target);
-
-  const currentLang = state.settings.language as LangCode;
-
-  // CORE souhaité :
-  // - langue courante
-  // - fr (si pas déjà la langue courante)
-  // - en (si pas déjà la langue courante)
-  // - el
-  // - he
-  const core: LangCode[] = [];
-  const pushIfOk = (lc: LangCode) => {
-    if (ALL_LANG_CODES.includes(lc) && !core.includes(lc)) core.push(lc);
-  };
-
-  if (ALL_LANG_CODES.includes(currentLang)) pushIfOk(currentLang);
-  if (currentLang !== 'fr') pushIfOk('fr');
-  if (currentLang !== 'en') pushIfOk('en');
-  pushIfOk('el');
-  pushIfOk('he');
-
-  // Toutes les autres (pas chargées par défaut)
-  const remaining = ALL_LANG_CODES.filter(l => !core.includes(l));
-  const targetLangs: LangCode[] = [...core, ...remaining];
-
-  // État initial : CORE = loading true (on va fetch), autres = loading false (au clic)
-  const initial = targetLangs.map(lang => ({
-    lang,
-    text: null as string | null,
-    loading: core.includes(lang),
-    error: undefined as string | undefined,
-  }));
-  setOtherLangVerses(initial);
-  setShowOtherLangs(true);
-
-  // Helper de chargement d'une seule langue (réutilisable au clic)
-  const loadOneLang = async (lang: LangCode) => {
-    try {
-      // met en loading
-      setOtherLangVerses(prev =>
-        prev.map(e => (e.lang === lang ? { ...e, loading: true, error: undefined } : e))
-      );
-
-      const ch = await getChapter(selectedBook.name, selectedChapter, lang as any);
-
-      const selectedForLang = ch.verses
-        .filter(v => sortedVerses.includes(v.verse))
-        .sort((a, b) => a.verse - b.verse);
-
-      const combinedText = selectedForLang.map(v => String(v.text)).join('\n');
-
-      setOtherLangVerses(prev =>
-        prev.map(entry =>
-          entry.lang === lang
-            ? {
-                ...entry,
-                text: selectedForLang.length > 0 ? combinedText : null,
-                loading: false,
-                error: selectedForLang.length > 0 ? undefined : 'missing',
-              }
-            : entry
-        )
-      );
-    } catch (err) {
-      console.error('multilang error', err);
-      setOtherLangVerses(prev =>
-        prev.map(entry =>
-          entry.lang === lang
-            ? { ...entry, text: null, loading: false, error: 'error' }
-            : entry
-        )
-      );
-    }
-  };
-
-  // 1) Charger seulement les langues CORE automatiquement
-  core.forEach(lang => {
-    loadOneLang(lang);
-  });
-
-  // 2) Exposer la fonction au clic via une ref "temporaire" sur window (simple)
-  //    (Sinon tu peux la remonter dans un useCallback + state, mais là on reste minimal)
-  (window as any).__twogLoadOtherLang = loadOneLang;
-};
 
   const copyOtherLangVerse = async (entryLang: LangCode, text: string | null) => {
     if (!otherLangTarget || !selectedBook || !text) return;
     const range = compressRanges(otherLangTarget.verses);
-    const ref =
-      getBookName(selectedBook) + ' ' + otherLangTarget.chapter + ':' + range;
+    const ref = getBookName(selectedBook) + ' ' + otherLangTarget.chapter + ':' + range;
     const payload = ref + '\n' + text;
     const ok = await copyToClipboard(payload);
     if (ok) {
@@ -993,8 +1026,7 @@ ${shareUrl}`;
   const shareOtherLangVerse = async (entryLang: LangCode, text: string | null) => {
     if (!otherLangTarget || !selectedBook || !text) return;
     const range = compressRanges(otherLangTarget.verses);
-    const ref =
-      getBookName(selectedBook) + ' ' + otherLangTarget.chapter + ':' + range;
+    const ref = getBookName(selectedBook) + ' ' + otherLangTarget.chapter + ':' + range;
     const shareUrl = 'https://www.theword.fr/#about';
 
     const shareText = `${ref}
@@ -1027,7 +1059,6 @@ ${shareUrl}`;
       bookId: otherLangTarget.bookId,
       bookName: getBookName(selectedBook),
       chapter: otherLangTarget.chapter,
-      // On garde le premier verset comme "ancre" pour la référence
       verse: otherLangTarget.verses[0],
       text,
       translation: entryLang,
@@ -1049,7 +1080,6 @@ ${shareUrl}`;
     openAddToPrinciples([verseRef]);
     setShowOtherLangs(false);
   };
-
 
   const swipeStart = useRef<{ x: number; y: number; time: number } | null>(null);
   const swipeHandled = useRef(false);
@@ -1101,8 +1131,6 @@ ${shareUrl}`;
             else break;
           }
 
-          // Si on est en mode slot mémoire (1/2/3), on met à jour ce slot.
-          // Sinon, si on est en mode loupe (dernier tap = 0), on met à jour le slot 0.
           const slotToUpdate =
             activeSlot && activeSlot !== 0 ? activeSlot : lastTappedSlot === 0 ? 0 : null;
 
@@ -1116,12 +1144,10 @@ ${shareUrl}`;
           }
 
           const nearBottom =
-            window.innerHeight +
-              (window.scrollY || document.documentElement.scrollTop || 0) >=
+            window.innerHeight + (window.scrollY || document.documentElement.scrollTop || 0) >=
             (document.documentElement.scrollHeight || document.body.scrollHeight) - 180;
-          setShowBottomRandom(
-            nearBottom && lastTappedSlot === 0 && selectedVerses.length === 0
-          );
+
+          setShowBottomRandom(nearBottom && lastTappedSlot === 0 && selectedVerses.length === 0);
         } catch {}
       }, 160);
     };
@@ -1142,7 +1168,6 @@ ${shareUrl}`;
       setSelectedBook(b);
       setSelectedChapter(v.chapter);
       setSelectedVerses([]);
-      // ICI : verset aléatoire = on surligne une fois
       setHighlightedVerse(v.verse);
       setScrollTargetVerse(v.verse);
       setTapped(0);
@@ -1187,9 +1212,7 @@ ${shareUrl}`;
                           title={getBookName(selectedBook)}
                           aria-label={t('chooseBook')}
                         >
-                          <span className="truncate w-[13ch]">
-                            {shortBookName(selectedBook)}
-                          </span>
+                          <span className="truncate w-[13ch]">{shortBookName(selectedBook)}</span>
                           <ChevronDown className="w-3.5 h-3.5 opacity-90" />
                         </button>
 
@@ -1208,9 +1231,7 @@ ${shareUrl}`;
                         >
                           <span className="truncate">
                             <span className="md:hidden">Ch.</span>
-                            <span className="hidden md:inline">
-                              {t('chapter')}
-                            </span>{' '}
+                            <span className="hidden md:inline">{t('chapter')}</span>{' '}
                             {selectedChapter}
                           </span>
                           <ChevronDown className="w-3.5 h-3.5 opacity-90" />
@@ -1227,12 +1248,10 @@ ${shareUrl}`;
                               ? 'relative overflow-visible w-7 h-7 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
                               : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all box-border';
 
-                            const isActive =
-                              i === 0 ? lastTappedSlot === 0 : activeSlot === i;
+                            const isActive = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
 
                             let cls = '';
                             if (i === 0) {
-                              // Loupe toujours bien bleue, comme les boutons Livre / Chapitre
                               cls = 'bg-blue-600 text-white hover:bg-blue-500';
                             } else {
                               const theme = SLOT_THEMES[i as SlotKey];
@@ -1241,28 +1260,17 @@ ${shareUrl}`;
                                 : 'bg-gray-800 text-white border border-gray-600';
                             }
 
-                            const refText = s
-                              ? `${s.book} ${s.chapter}${
-                                  s.verse ? ':' + s.verse : ''
-                                }`
-                              : '';
+                            const refText = s ? `${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : '';
                             let title: string;
                             if (i === 0) {
-                              title = s
-                                ? `${t('searchSlotLabel')}: ${refText}`
-                                : t('searchSlotEmpty');
+                              title = s ? `${t('searchSlotLabel')}: ${refText}` : t('searchSlotEmpty');
                             } else {
                               title = s
                                 ? `${t('memorySlotLabel')} ${i}: ${refText}`
-                                : `${t('memorySlotLabel')} ${i} ${t(
-                                    'emptySlotSuffix'
-                                  )}`;
+                                : `${t('memorySlotLabel')} ${i} ${t('emptySlotSuffix')}`;
                             }
-                            const isPressed = isActive;
 
-                            // Même rond blanc pour loupe + 1/2/3 quand sélectionnés
                             const activeRing = isActive ? 'border-2 border-white' : '';
-
                             const numGlow =
                               isNumeric && isActive
                                 ? 'shadow-[0_0_0_2px_rgba(37,99,235,0.9),0_0_10px_rgba(37,99,235,0.6)]'
@@ -1275,14 +1283,10 @@ ${shareUrl}`;
                                 onClick={() => jumpToSlot(i)}
                                 aria-label={title}
                                 title={title}
-                                aria-pressed={isPressed}
-                                aria-current={isPressed ? 'true' : undefined}
+                                aria-pressed={isActive}
+                                aria-current={isActive ? 'true' : undefined}
                               >
-                                {i === 0 ? (
-                                  <SearchIcon className="w-4 h-4" />
-                                ) : (
-                                  <span className="relative z-[1]">{i}</span>
-                                )}
+                                {i === 0 ? <SearchIcon className="w-4 h-4" /> : <span className="relative z-[1]">{i}</span>}
                               </button>
                             );
                           })}
@@ -1317,7 +1321,7 @@ ${shareUrl}`;
 
                   {/* Desktop : actions à droite (slots + flèches) */}
                   <div className="hidden md:flex items-center gap-2 ml-auto">
-                    {/* Loupe + slots (desktop) — mêmes tailles/couleurs que mobile */}
+                    {/* Loupe + slots (desktop) */}
                     <div className="flex items-center gap-2 mr-2">
                       {[0, 1, 2, 3].map(i => {
                         const s = quickSlots[i];
@@ -1328,8 +1332,7 @@ ${shareUrl}`;
                           ? 'relative overflow-visible w-7 h-7 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
                           : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all box-border';
 
-                        const isActive =
-                          i === 0 ? lastTappedSlot === 0 : activeSlot === i;
+                        const isActive = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
 
                         let cls = '';
                         if (i === 0) {
@@ -1341,27 +1344,17 @@ ${shareUrl}`;
                             : 'bg-gray-800 text-white border border-gray-600';
                         }
 
-                        const refText = s
-                          ? `${s.book} ${s.chapter}${
-                              s.verse ? ':' + s.verse : ''
-                            }`
-                          : '';
+                        const refText = s ? `${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : '';
                         let title: string;
                         if (i === 0) {
-                          title = s
-                            ? `${t('searchSlotLabel')}: ${refText}`
-                            : t('searchSlotEmpty');
+                          title = s ? `${t('searchSlotLabel')}: ${refText}` : t('searchSlotEmpty');
                         } else {
                           title = s
                             ? `${t('memorySlotLabel')} ${i}: ${refText}`
-                            : `${t('memorySlotLabel')} ${i} ${t(
-                                'emptySlotSuffix'
-                              )}`;
+                            : `${t('memorySlotLabel')} ${i} ${t('emptySlotSuffix')}`;
                         }
-                        const isPressed = isActive;
 
                         const activeRing = isActive ? 'border-2 border-white' : '';
-
                         const numGlow =
                           isNumeric && isActive
                             ? 'shadow-[0_0_0_2px_rgba(37,99,235,0.9),0_0_10px_rgba(37,99,235,0.6)]'
@@ -1374,14 +1367,10 @@ ${shareUrl}`;
                             onClick={() => jumpToSlot(i)}
                             aria-label={title}
                             title={title}
-                            aria-pressed={isPressed}
-                            aria-current={isPressed ? 'true' : undefined}
+                            aria-pressed={isActive}
+                            aria-current={isActive ? 'true' : undefined}
                           >
-                            {i === 0 ? (
-                              <SearchIcon className="w-4 h-4" />
-                            ) : (
-                              <span className="relative z-[1]">{i}</span>
-                            )}
+                            {i === 0 ? <SearchIcon className="w-4 h-4" /> : <span className="relative z-[1]">{i}</span>}
                           </button>
                         );
                       })}
@@ -1476,9 +1465,7 @@ ${shareUrl}`;
               {loading ? (
                 <div className="flex items-center justify-center py-16">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400" />
-                  <span className="ml-4 text-lg text-white">
-                    {t('loading')}
-                  </span>
+                  <span className="ml-4 text-lg text-white">{t('loading')}</span>
                 </div>
               ) : chapter ? (
                 <div>
@@ -1495,19 +1482,12 @@ ${shareUrl}`;
                           key={v.verse}
                           id={`verse-${v.verse}`}
                           onClick={() => toggleSelectVerse(v.verse)}
-                          style={{
-                            scrollMarginTop: NAV_H + cmdH + 12,
-                          }}
+                          style={{ scrollMarginTop: NAV_H + cmdH + 12 }}
                           className={`relative cursor-pointer px-1 sm:px-2 py-2 sm:py-2.5 rounded-md transition-colors ${selectedBg} ${highlightCls}`}
                         >
                           <span className="absolute right-2 top-0.5 sm:top-1 text-[11px] sm:text-xs select-none pointer-events-none text-white">
                             {t('verseWord')} {v.verse}
-                            {isSelected && (
-                              <Check
-                                size={14}
-                                className="inline ml-1 text-blue-300"
-                              />
-                            )}
+                            {isSelected && <Check size={14} className="inline ml-1 text-blue-300" />}
                           </span>
                           <div
                             className="text-white"
@@ -1527,8 +1507,7 @@ ${shareUrl}`;
                 <div className="text-center py-16 text-white/80">
                   <p className="text-lg mb-2">{t('selectChapter')}</p>
                   <p className="text-sm">
-                    {getBookName(selectedBook)} - {selectedBook.chapters}{' '}
-                    {t('chapter')}
+                    {getBookName(selectedBook)} - {selectedBook.chapters} {t('chapter')}
                     {selectedBook.chapters > 1 ? 's' : ''}
                   </p>
                 </div>
@@ -1538,116 +1517,6 @@ ${shareUrl}`;
             <div className="text-white/80 text-center py-16">
               <Book size={48} className="mx-auto mb-4 opacity-50" />
               <p className="text-lg">{t('selectBook')}</p>
-            </div>
-          )}
-
-          {/* Pickers */}
-          {showBookPicker && (
-            <div className="fixed inset-0 z-50">
-              <div
-                className="absolute inset-0 bg-black/60"
-                onClick={() => setShowBookPicker(false)}
-                aria-hidden="true"
-              />
-              <div className="absolute inset-0 bg-gray-900 p-4 overflow-y-auto">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-white">
-                    {t('selectBook')}
-                  </h3>
-                  <button
-                    onClick={() => setShowBookPicker(false)}
-                    className="text-white bg-gray-700 px-3 py-1 rounded"
-                  >
-                    {t('close')}
-                  </button>
-                </div>
-
-                <h4 className="text-lg font-bold uppercase tracking-wide mb-2 text-white/80">
-                  {t('oldTestament')}
-                </h4>
-                <div className="columns-2 md:columns-3 lg:columns-4 gap-2 mb-6">
-                  {oldTestamentBooks.map(book => (
-                    <button
-                      key={`ot-${book.name}`}
-                      onClick={() => handleBookSelect(book)}
-                      className={`w-full inline-block mb-2 break-inside-avoid px-3 py-2 rounded-lg text-lg ${
-                        selectedBook?.name === book.name
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-800 text-white hover:bg-gray-700'
-                      }`}
-
-                    >
-                      {getBookName(book)}
-                    </button>
-                  ))}
-                </div>
-
-                <h4 className="text-lg font-bold uppercase tracking-wide mb-2 text-white/80">
-                  {t('newTestament')}
-                </h4>
-                <div className="columns-2 md:columns-3 lg:columns-4 gap-2 pb-10">
-                  {newTestamentBooks.map(book => (
-                    <button
-                      key={`nt-${book.name}`}
-                      onClick={() => handleBookSelect(book)}
-                      className={`w-full inline-block mb-2 break-inside-avoid px-3 py-2 rounded-lg text-lg ${
-                        selectedBook?.name === book.name
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-800 text-white hover:bg-gray-700'
-                      }`}
-                    >
-                      {getBookName(book)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {showChapterPicker && selectedBook && (
-            <div className="fixed inset-0 z-50">
-              <div
-                className="absolute inset-0 bg-black/60"
-                onClick={() => setShowChapterPicker(false)}
-                aria-hidden="true"
-              />
-              <div className="absolute inset-0 bg-gray-900 p-4 overflow-y-auto">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-white">
-                    {t('chooseChapter')}
-                  </h3>
-                  <button
-                    onClick={() => setShowChapterPicker(false)}
-                    className="text-white bg-gray-700 px-3 py-1 rounded"
-                  >
-                    {t('close')}
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 pb-10">
-                  {Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map(
-                    num => {
-                      const active =
-                        num === selectedChapter
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-800 text-white hover:bg-gray-700';
-                      return (
-                        <button
-                          key={`chap-${num}`}
-                          onClick={() => {
-                            handleChapterSelect(num);
-                            setShowChapterPicker(false);
-                          }}
-                          className={`h-10 rounded-lg text-lg font-medium ${active}`}
-                          aria-current={num === selectedChapter ? 'page' : undefined}
-                        >
-                          {num}
-                        </button>
-                      );
-                    }
-                  )}
-                </div>
-              </div>
             </div>
           )}
 
@@ -1707,164 +1576,6 @@ ${shareUrl}`;
             </div>
           )}
 
-          {/* MODAL : ajout vers NOTES */}
-          {showAddToNotes && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center">
-              <div
-                className="absolute inset-0 bg-black/60"
-                onClick={() => setShowAddToNotes(false)}
-                aria-hidden="true"
-              />
-              <div className="relative bg-gray-900 text-white rounded-xl shadow-lg p-4 w-full max-w-md mx-4">
-                <h3 className="text-xl md:text-2xl font-semibold mb-2">
-                  {t('notesModalTitle')}
-                </h3>
-                <form onSubmit={confirmAddToNotes}>
-                  <div className="max-h-64 overflow-y-auto mt-2 space-y-1">
-                    {notesListsForModal.length === 0 ? (
-                      <p className="text-base text-white/70">
-                        {t('notesNoList')}
-                      </p>
-                    ) : (
-                      notesListsForModal.map(l => (
-                        <label
-                          key={l.id}
-                          className="flex items-center gap-2 px-2 py-2 rounded hover:bg-white/5 cursor-pointer"
-                        >
-                          <input
-                            type="checkbox"
-                            name="notesList"
-                            className="accent-emerald-500"
-                            value={l.id}
-                            checked={selectedNotesListIds.includes(l.id)}
-                            onChange={e => {
-                              const checked = e.target.checked;
-                              setSelectedNotesListIds(prev =>
-                                checked
-                                  ? [...prev, l.id]
-                                  : prev.filter(id => id !== l.id)
-                              );
-                            }}
-                          />
-                          <span className="text-lg truncate">
-                            {l.title || t('untitledList')}
-                          </span>
-                        </label>
-                      ))
-                    )}
-                  </div>
-
-                  <div className="mt-3">
-                    <label className="block text-lg mb-1">
-                      {t('notesNewListOptional')}
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full rounded-md bg-gray-800 border border-gray-600 px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      value={newNotesListTitle}
-                      onChange={e => setNewNotesListTitle(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="mt-4 flex justify-end gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowAddToNotes(false)}
-                      className="px-3 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm"
-                    >
-                      {t('cancel')}
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-sm"
-                    >
-                      OK
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* MODAL : ajout vers PRINCIPES */}
-          {showAddToPrinciples && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center">
-              <div
-                className="absolute inset-0 bg-black/60"
-                onClick={() => setShowAddToPrinciples(false)}
-                aria-hidden="true"
-              />
-              <div className="relative bg-gray-900 text-white rounded-xl shadow-lg p-4 w-full max-w-md mx-4">
-                <h3 className="text-xl md:text-2xl font-semibold mb-2">
-                  {t('principlesModalTitle')}
-                </h3>
-                <form onSubmit={confirmAddToPrinciples}>
-                  <div className="max-h-64 overflow-y-auto mt-2 space-y-1">
-                    {principlesListsForModal.length === 0 ? (
-                      <p className="text-base text-white/70">
-                        {t('principlesNoList')}
-                      </p>
-                    ) : (
-                      principlesListsForModal.map(l => (
-                        <label
-                          key={l.id}
-                          className="flex items-center gap-2 px-2 py-2 rounded hover:bg-white/5 cursor-pointer"
-                        >
-                          <input
-                            type="checkbox"
-                            name="principleList"
-                            className="accent-indigo-400"
-                            value={l.id}
-                            checked={selectedPrincipleListIds.includes(l.id)}
-                            onChange={e => {
-                              const checked = e.target.checked;
-                              setSelectedPrincipleListIds(prev =>
-                                checked
-                                  ? [...prev, l.id]
-                                  : prev.filter(id => id !== l.id)
-                              );
-                            }}
-                          />
-                          <span className="text-lg truncate">
-                            {l.title || t('untitledList')}
-                          </span>
-                        </label>
-                      ))
-                    )}
-                  </div>
-
-                  <div className="mt-3">
-                    <label className="block text-lg mb-1">
-                      {t('principlesNewListOptional')}
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full rounded-md bg-gray-800 border border-gray-600 px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      value={newPrincipleListTitle}
-                      onChange={e => setNewPrincipleListTitle(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="mt-4 flex justify-end gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowAddToPrinciples(false)}
-                      className="px-3 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm"
-                    >
-                      {t('cancel')}
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-sm"
-                    >
-                      OK
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-
           {/* MODAL : verset (ou plusieurs) dans autres langues */}
           {showOtherLangs && otherLangTarget && selectedBook && (
             <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -1878,67 +1589,78 @@ ${shareUrl}`;
                   {t('showInOtherLangs')}
                 </h3>
                 <p className="text-base text-white/70 mb-4">
-                  {getBookName(selectedBook)}{' '}
-                  {otherLangTarget.chapter}:
-                  {compressRanges(otherLangTarget.verses)}
+                  {getBookName(selectedBook)} {otherLangTarget.chapter}:{compressRanges(otherLangTarget.verses)}
                 </p>
 
                 <div className="space-y-3">
                   {otherLangVerses.map(entry => {
                     const hasText = !!entry.text && !entry.error;
+                    const canLoadManually = !entry.loading && !entry.text && !entry.error;
+
                     return (
                       <div
                         key={entry.lang}
                         className="border border-gray-700 rounded-lg px-3 py-3"
                       >
                         <div className="flex items-center justify-between mb-2 gap-2">
-  <span className="text-sm font-semibold uppercase tracking-wide text-gray-300">
-    {entry.lang.toUpperCase()}
-  </span>
+                          <span className="text-sm font-semibold uppercase tracking-wide text-gray-300">
+                            {entry.lang.toUpperCase()}
+                          </span>
 
-  {/* Si pas de texte, pas d'erreur, et pas en train de charger => on propose "Charger" */}
-  {!entry.loading && !entry.text && !entry.error && (
-    <button
-      onClick={() => {
-        const fn = (window as any).__twogLoadOtherLang as ((l: LangCode) => Promise<void>) | undefined;
-        fn?.(entry.lang);
-      }}
-      className="px-2.5 py-1 rounded-full bg-gray-700 hover:bg-gray-600 text-white text-xs"
-    >
-      Charger
-    </button>
-  )}
+                          {canLoadManually && (
+                            <button
+                              onClick={() => loadOtherLangRef.current?.(entry.lang)}
+                              className="px-2.5 py-1 rounded-full bg-gray-700 hover:bg-gray-600 text-white text-xs"
+                            >
+                              Charger
+                            </button>
+                          )}
 
-  {/* Actions quand le texte est dispo */}
-  {!!entry.text && !entry.error && (
-    <div className="flex items-center gap-1.5 flex-wrap justify-end">
-      <button
-        onClick={() => sendOtherLangVerseToNotes(entry.lang, entry.text)}
-        className="px-2.5 py-1 rounded-full bg-orange-500 text-white text-xs"
-      >
-        {t('notes')}
-      </button>
-      <button
-        onClick={() => sendOtherLangVerseToPrinciples(entry.lang, entry.text)}
-        className="px-2.5 py-1 rounded-full bg-emerald-600 text-white text-xs"
-      >
-        {t('principles')}
-      </button>
-      <button
-        onClick={() => copyOtherLangVerse(entry.lang, entry.text)}
-        className="px-2.5 py-1 rounded-full bg-blue-600 text-white text-xs"
-      >
-        {t('copyLabel')}
-      </button>
-      <button
-        onClick={() => shareOtherLangVerse(entry.lang, entry.text)}
-        className="px-2.5 py-1 rounded-full bg-indigo-500 text-white text-xs"
-      >
-        {t('shareLabel')}
-      </button>
-    </div>
-  )}
-</div>
+                          {hasText && (
+                            <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                              <button
+                                onClick={() => sendOtherLangVerseToNotes(entry.lang, entry.text)}
+                                className="px-2.5 py-1 rounded-full bg-orange-500 text-white text-xs"
+                              >
+                                {t('notes')}
+                              </button>
+                              <button
+                                onClick={() =>
+                                  sendOtherLangVerseToPrinciples(entry.lang, entry.text)
+                                }
+                                className="px-2.5 py-1 rounded-full bg-emerald-600 text-white text-xs"
+                              >
+                                {t('principles')}
+                              </button>
+                              <button
+                                onClick={() => copyOtherLangVerse(entry.lang, entry.text)}
+                                className="px-2.5 py-1 rounded-full bg-blue-600 text-white text-xs"
+                              >
+                                {t('copyLabel')}
+                              </button>
+                              <button
+                                onClick={() => shareOtherLangVerse(entry.lang, entry.text)}
+                                className="px-2.5 py-1 rounded-full bg-indigo-500 text-white text-xs"
+                              >
+                                {t('shareLabel')}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {entry.loading ? (
+                          <p className="text-sm text-white/70">{t('loading')}</p>
+                        ) : !entry.text || entry.error ? (
+                          <p className="text-sm text-white/60 italic">
+                            Verset indisponible pour cette langue.
+                          </p>
+                        ) : (
+                          <p className="text-xl md:text-2xl leading-relaxed">{entry.text}</p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
 
                 <div className="mt-4 flex justify-end">
                   <button
@@ -1963,7 +1685,6 @@ ${shareUrl}`;
               {t('textReadyToShare')}
             </div>
           )}
-          {/* Ajouté à la liste — Notes = orange, Principes = vert */}
           {copiedKey === 'added-to-notes' && (
             <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-orange-500 text-white z-50">
               {t('addedToList')}
@@ -1972,27 +1693,6 @@ ${shareUrl}`;
           {copiedKey === 'added-to-principles' && (
             <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-emerald-600 text-white z-50">
               {t('addedToList')}
-            </div>
-          )}
-
-          {false && showBottomRandom && (
-            <div className="fixed bottom-4 right-4 z-40 sm:right-6 sm:bottom-6">
-              <button
-                onClick={pickNewRandom}
-                className="px-3 py-2 rounded-full shadow-lg bg-indigo-600 text-white text-sm active:scale-95"
-              >
-                {t('newRandom')}
-              </button>
-            </div>
-          )}
-
-          {showSwipeHint && (
-            <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
-              <div className="w-1/2 max-w-xs text-center px-4 py-3 rounded-2xl text-base font-bold shadow-2xl ring-2 ring-blue-200 bg-blue-600/95 text-white flex items-center justify-center">
-                <span className="opacity-90 mr-2">◀</span>
-                {t('swipeLabel')}
-                <span className="opacity-90 ml-2">▶</span>
-              </div>
             </div>
           )}
         </div>
