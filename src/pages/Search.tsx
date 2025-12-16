@@ -3,13 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { getBibleBooks, searchInBible } from '../services/bibleService';
 import type { BibleVerse } from '../types/bible';
-import {
-  ChevronDown,
-  ChevronRight,
-  Loader2,
-  Search as SearchIcon,
-  X,
-} from 'lucide-react';
+import { ChevronDown, ChevronRight, Loader2, Search as SearchIcon, X } from 'lucide-react';
 import { saveSlot as saveQuickSlot } from '../services/readingSlots';
 import { useTranslation } from '../hooks/useTranslation';
 
@@ -209,9 +203,7 @@ function countMatchesFlexible(text: string, query: string): number {
       const normWord = normalizeForSearch(word);
       if (!normWord) continue;
 
-      const match = endsWithSpace
-        ? normWord === normQuery
-        : normWord.startsWith(normQuery);
+      const match = endsWithSpace ? normWord === normQuery : normWord.startsWith(normQuery);
 
       if (match) count++;
     }
@@ -252,9 +244,7 @@ function highlightFlexible(text: string, query: string) {
       const normWord = normalizeForSearch(word);
       if (!normWord) continue;
 
-      const match = endsWithSpace
-        ? normWord === normQuery
-        : normWord.startsWith(normQuery);
+      const match = endsWithSpace ? normWord === normQuery : normWord.startsWith(normQuery);
 
       if (match) {
         ranges.push({ start: w.start, end: w.end });
@@ -325,13 +315,15 @@ function highlightFlexible(text: string, query: string) {
 export default function Search() {
   const { state, navigateToVerse } = useApp();
   const { t, language } = useTranslation();
-  const isDark = state.settings.theme === 'dark';
+
+  // ✅ on force le mode sombre (tu as retiré le toggle clair/sombre)
+  const isDark = true;
 
   const queryKey = `twog:search:lastQuery:${state.settings.language}`;
-  const expandedKey = (q: string) =>
-    `twog:search:expanded:${state.settings.language}:${q.trim().toLowerCase()}`;
-  const scrollKey = (q: string) =>
-    `twog:search:scroll:${state.settings.language}:${q.trim().toLowerCase()}`;
+
+  // ✅ clés sessionStorage stables (PAS par requête) pour éviter d'en créer des centaines
+  const expandedKey = `twog:search:expanded:${state.settings.language}`;
+  const scrollKey = `twog:search:scroll:${state.settings.language}`;
 
   const [query, setQuery] = useState<string>('');
   useEffect(() => {
@@ -339,6 +331,7 @@ export default function Search() {
     if (saved) setQuery(saved);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.settings.language]);
+
   useEffect(() => {
     sessionStorage.setItem(queryKey, query);
   }, [query, queryKey]);
@@ -347,11 +340,14 @@ export default function Search() {
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
+  // ✅ limite pour éviter les freezes WebView Android quand il y a énormément de résultats
+  const MAX_RESULTS = 600;
+
   const books = useMemo(() => getBibleBooks(), []);
   const getBookName = (id: string) => {
     const b = books.find(x => x.name === id);
     if (!b) return id;
-    // Pour l’instant : FR → nameFr, sinon → nameEn (y compris RU)
+    // Pour l’instant : FR → nameFr, sinon → nameEn
     return state.settings.language === 'fr' ? b.nameFr : b.nameEn;
   };
   const bibleOrder = (id: string) => {
@@ -374,11 +370,13 @@ export default function Search() {
     const handle = setTimeout(async () => {
       setLoading(true);
       try {
-        // Moissonnage côté service
         const res = await searchInBible(query, state.settings.language);
-        // Enrichissement avec le nombre d'occurrences, puis filtrage
+
+        // ✅ on limite le volume traité/affiché pour préserver les perfs (Android)
+        const capped = res.length > MAX_RESULTS ? res.slice(0, MAX_RESULTS) : res;
+
         const enriched: ResultItem[] = [];
-        for (const v of res) {
+        for (const v of capped) {
           const occ = countMatchesFlexible(v.text, query);
           if (occ > 0) enriched.push({ ...v, occ });
         }
@@ -417,11 +415,12 @@ export default function Search() {
     }
     let restored: Record<string, boolean> | null = null;
     try {
-      const raw = sessionStorage.getItem(expandedKey(query));
+      const raw = sessionStorage.getItem(expandedKey);
       if (raw) restored = JSON.parse(raw);
     } catch {
       restored = null;
     }
+
     if (restored && Object.keys(restored).length) {
       const next: Record<string, boolean> = {};
       for (const g of grouped) next[g.bookId] = !!restored[g.bookId];
@@ -433,38 +432,37 @@ export default function Search() {
       setExpanded(next);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [grouped, query, state.settings.language]);
+  }, [grouped, state.settings.language]);
 
   useEffect(() => {
     if (!grouped.length) return;
     try {
-      sessionStorage.setItem(expandedKey(query), JSON.stringify(expanded));
+      sessionStorage.setItem(expandedKey, JSON.stringify(expanded));
     } catch {}
-  }, [expanded, grouped, query, state.settings.language]);
+  }, [expanded, grouped, expandedKey]);
 
   // Restauration du scroll
   useEffect(() => {
     if (!grouped.length || loading) return;
-    const raw = sessionStorage.getItem(scrollKey(query));
+    const raw = sessionStorage.getItem(scrollKey);
     const y = raw ? parseInt(raw, 10) : 0;
     if (Number.isFinite(y) && y > 0) {
       setTimeout(() => window.scrollTo({ top: y, behavior: 'auto' }), 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [grouped, loading, query, state.settings.language]);
+  }, [grouped, loading, state.settings.language]);
 
   useEffect(() => {
-    const save = () => sessionStorage.setItem(scrollKey(query), String(window.scrollY || 0));
+    const save = () => sessionStorage.setItem(scrollKey, String(window.scrollY || 0));
     window.addEventListener('beforeunload', save);
     return () => {
       save();
       window.removeEventListener('beforeunload', save);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, state.settings.language]);
+  }, [state.settings.language]);
 
-  const toggleGroup = (bookId: string) =>
-    setExpanded(prev => ({ ...prev, [bookId]: !prev[bookId] }));
+  const toggleGroup = (bookId: string) => setExpanded(prev => ({ ...prev, [bookId]: !prev[bookId] }));
   const expandAll = () => {
     const next: Record<string, boolean> = {};
     for (const g of grouped) next[g.bookId] = true;
@@ -478,24 +476,26 @@ export default function Search() {
   const clearQuery = () => {
     setQuery('');
     setResults([]);
-    sessionStorage.removeItem(scrollKey(query));
+    sessionStorage.removeItem(scrollKey);
   };
 
   const openInReading = (v: ResultItem) => {
     try {
       saveQuickSlot(0, { book: v.book, chapter: v.chapter, verse: v.verse });
     } catch {}
-    sessionStorage.setItem(scrollKey(query), String(window.scrollY || 0));
+    sessionStorage.setItem(scrollKey, String(window.scrollY || 0));
     navigateToVerse(v.book, v.chapter, v.verse);
   };
 
-  const totalOccurrences = useMemo(
-    () => results.reduce((s, v) => s + v.occ, 0),
-    [results]
-  );
+  const totalOccurrences = useMemo(() => results.reduce((s, v) => s + v.occ, 0), [results]);
+
+  const wasCapped = useMemo(() => {
+    // si on a exactement MAX_RESULTS, on peut informer l'utilisateur (sans certitude que res initial > MAX)
+    return results.length >= MAX_RESULTS;
+  }, [results.length]);
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} transition-colors`}>
+    <div className={`min-h-screen ${isDark ? 'bg-gray-950' : 'bg-gray-50'} transition-colors`}>
       <div className="max-w-4xl mx-auto px-4 py-5">
         {/* En-tête / titre */}
         <h1 className={`text-xl font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -503,15 +503,11 @@ export default function Search() {
         </h1>
 
         {/* Petit masque collant */}
-        <div
-          className={`sticky top-0 z-20 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}
-          style={{ height: 8 }}
-          aria-hidden
-        />
+        <div className={`sticky top-0 z-20 ${isDark ? 'bg-gray-950' : 'bg-gray-50'}`} style={{ height: 8 }} aria-hidden />
 
         {/* Barre de recherche (sticky) */}
         <div
-          className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow border ${
+          className={`${isDark ? 'bg-gray-900' : 'bg-white'} rounded-xl shadow border ${
             isDark ? 'border-gray-700' : 'border-gray-200'
           } p-3 sticky top-[var(--nav-h)] z-30`}
         >
@@ -526,7 +522,7 @@ export default function Search() {
               placeholder={t('searchPlaceholder')}
               className={`w-full pl-10 pr-20 py-3 rounded-lg border-2 focus:outline-none transition ${
                 isDark
-                  ? 'bg-gray-900 border-gray-700 text-white placeholder-gray-400 focus:border-blue-500'
+                  ? 'bg-gray-950 border-gray-700 text-white placeholder-gray-400 focus:border-blue-500'
                   : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500'
               }`}
             />
@@ -536,9 +532,7 @@ export default function Search() {
                   type="button"
                   onClick={clearQuery}
                   className={`p-2 rounded-lg ${
-                    isDark
-                      ? 'text-white/80 hover:text-white hover:bg-gray-700'
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                    isDark ? 'text-white/80 hover:text-white hover:bg-gray-800' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                   }`}
                   aria-label={t('searchClear')}
                 >
@@ -559,6 +553,11 @@ export default function Search() {
               ) : query.trim().length >= 2 ? (
                 <>
                   {t('searchResults')} "{query}" ({totalOccurrences})
+                  {wasCapped && (
+                    <span className="ml-2 text-white/60">
+                      — {t('searchResults')} {t('searchResults')} {/* fallback si pas de clé i18n */}
+                    </span>
+                  )}
                 </>
               ) : (
                 t('searchMinChars')
@@ -575,25 +574,26 @@ export default function Search() {
                 </button>
                 <button
                   onClick={collapseAll}
-                  className={`text-xs px-2 py-1 rounded ${
-                    isDark
-                      ? 'bg-gray-700 text-white hover:bg-gray-600'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
+                  className={`text-xs px-2 py-1 rounded ${isDark ? 'bg-gray-800 text-white hover:bg-gray-700' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                 >
                   {t('searchCollapseAll')}
                 </button>
               </div>
             )}
           </div>
+
+          {/* Info perf (optionnel, discret) */}
+          {query.trim().length >= 2 && !loading && results.length >= MAX_RESULTS && (
+            <div className="mt-2 text-xs text-white/60">
+              Résultats limités à {MAX_RESULTS} pour éviter les ralentissements sur Android.
+            </div>
+          )}
         </div>
 
         {/* Résultats */}
         <div className="mt-4">
           {totalOccurrences === 0 && !loading && query.trim().length >= 2 && (
-            <div className={`${isDark ? 'text-white' : 'text-gray-600'} text-center py-10`}>
-              {t('searchNoResults')}
-            </div>
+            <div className={`${isDark ? 'text-white' : 'text-gray-600'} text-center py-10`}>{t('searchNoResults')}</div>
           )}
 
           {grouped.map(group => {
@@ -602,7 +602,7 @@ export default function Search() {
             return (
               <div
                 key={group.bookId}
-                className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border rounded-lg mb-3 overflow-hidden`}
+                className={`${isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'} border rounded-lg mb-3 overflow-hidden`}
               >
                 <button
                   onClick={() => toggleGroup(group.bookId)}
@@ -630,14 +630,18 @@ export default function Search() {
                           role="button"
                           tabIndex={0}
                           onClick={() => openInReading(v)}
-                          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && openInReading(v)}
-                          className={`${isDark ? 'bg-gray-700/50 hover:bg-gray-700' : 'bg-gray-50 hover:bg-gray-100'} cursor-pointer rounded-md p-3 border ${isDark ? 'border-gray-700' : 'border-gray-200'} transition`}
+                          onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && openInReading(v)}
+                          className={`${
+                            isDark ? 'bg-gray-800/60 hover:bg-gray-800' : 'bg-gray-50 hover:bg-gray-100'
+                          } cursor-pointer rounded-md p-3 border ${isDark ? 'border-gray-700' : 'border-gray-200'} transition`}
                           title={t('searchOpenInReading')}
                         >
                           <div className={`${isDark ? 'text-blue-300' : 'text-blue-700'} font-medium mb-1 flex items-center gap-2`}>
-                            <span>{getBookName(v.book)} {v.chapter}:{v.verse}</span>
+                            <span>
+                              {getBookName(v.book)} {v.chapter}:{v.verse}
+                            </span>
                             {v.occ > 1 && (
-                              <span className={`${isDark ? 'bg-gray-600 text-white' : 'bg-gray-200 text-gray-700'} text-[11px] px-1.5 py-0.5 rounded`}>
+                              <span className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-700'} text-[11px] px-1.5 py-0.5 rounded`}>
                                 ({v.occ})
                               </span>
                             )}
