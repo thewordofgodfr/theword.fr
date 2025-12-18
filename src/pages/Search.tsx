@@ -297,7 +297,7 @@ export default function Search() {
 
   const queryKey = `twog:search:lastQuery:${state.settings.language}`;
 
-  // ✅ clés sessionStorage stables (PAS par requête) + on associe à la query
+  // ✅ clés sessionStorage stables + on associe à la query
   const expandedKey = `twog:search:expanded:${state.settings.language}`;
   const expandedQueryKey = `twog:search:expandedQuery:${state.settings.language}`;
   const scrollKey = `twog:search:scroll:${state.settings.language}`;
@@ -320,8 +320,15 @@ export default function Search() {
 
   // ✅ dernière requête réellement exécutée (normalisée)
   const lastExecutedQidRef = useRef<string>('');
-
   const currentQid = useMemo(() => normalizeForSearch(query.trim()), [query]);
+
+  // ✅ IMPORTANT : au montage (retour depuis Lecture), on considère la query actuelle comme "déjà exécutée"
+  // pour éviter de reset à tort.
+  useEffect(() => {
+    if (!lastExecutedQidRef.current && currentQid) {
+      lastExecutedQidRef.current = currentQid;
+    }
+  }, [currentQid]);
 
   const books = useMemo(() => getBibleBooks(), []);
   const getBookName = (id: string) => {
@@ -341,12 +348,10 @@ export default function Search() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language]);
 
-  // ✅ Reset propre si la query change (nouveau mot) : on ferme tout, MAIS on ne détruit
-  // la restauration que si c’est une query différente de celle sauvegardée.
+  // ✅ reset UNIQUEMENT si c’est VRAIMENT une nouvelle query (différente de celle sauvegardée)
   const resetUiForNewQuery = (qid: string) => {
     setExpanded({});
     try {
-      // on ne garde PAS l’état "expanded/scroll" d’une autre query
       sessionStorage.removeItem(expandedKey);
       sessionStorage.removeItem(expandedQueryKey);
       sessionStorage.removeItem(scrollKey);
@@ -355,7 +360,6 @@ export default function Search() {
     try {
       window.scrollTo({ top: 0, behavior: 'auto' });
     } catch {}
-    lastExecutedQidRef.current = qid;
   };
 
   // Lancer la recherche (debounce)
@@ -377,9 +381,19 @@ export default function Search() {
     }
 
     const handle = setTimeout(async () => {
-      // ✅ Nouvelle requête exécutée : on ferme tout et on invalide l’état précédent
-      // (MAIS uniquement parce que la query est différente)
-      if (currentQid && currentQid !== lastExecutedQidRef.current) {
+      // ✅ Lire la query sauvegardée (celle pour laquelle on doit restaurer expanded/scroll)
+      let savedExpandedQid = '';
+      let savedScrollQid = '';
+      try {
+        savedExpandedQid = sessionStorage.getItem(expandedQueryKey) || '';
+        savedScrollQid = sessionStorage.getItem(scrollQueryKey) || '';
+      } catch {}
+
+      // ✅ Si la query actuelle est la même que celle sauvegardée → surtout NE PAS reset
+      const isSameAsSaved = !!currentQid && (currentQid === savedExpandedQid || currentQid === savedScrollQid);
+
+      // ✅ Si c’est une nouvelle query (différente de la précédente + différente de la sauvegarde) → reset
+      if (currentQid && currentQid !== lastExecutedQidRef.current && !isSameAsSaved) {
         resetUiForNewQuery(currentQid);
       }
 
@@ -387,13 +401,15 @@ export default function Search() {
       try {
         const res = await searchInBible(query, state.settings.language);
 
-        // ✅ PAS DE LIMITE : on garde tout
         const enriched: ResultItem[] = [];
         for (const v of res) {
           const occ = countMatchesFlexible(v.text, query);
           if (occ > 0) enriched.push({ ...v, occ });
         }
         setResults(enriched);
+
+        // ✅ on marque cette query comme "exécutée"
+        lastExecutedQidRef.current = currentQid || '';
       } finally {
         setLoading(false);
       }
@@ -453,7 +469,6 @@ export default function Search() {
       for (const g of grouped) next[g.bookId] = !!restoredExpanded[g.bookId];
       setExpanded(next);
     } else {
-      // par défaut : tout fermé (et c’est l’utilisateur qui ouvre)
       const next: Record<string, boolean> = {};
       for (const g of grouped) next[g.bookId] = false;
       setExpanded(next);
