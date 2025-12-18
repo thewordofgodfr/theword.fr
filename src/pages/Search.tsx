@@ -94,17 +94,12 @@ function isLetterOrDigit(ch: string) {
   return /[\p{L}\p{N}]/u.test(ch);
 }
 
-/**
- * Découpe le texte original en "mots" (séquences de lettres/chiffres)
- * et retourne leurs bornes dans la chaîne originale.
- */
 function scanWords(text: string): Array<{ start: number; end: number }> {
   const res: Array<{ start: number; end: number }> = [];
   const len = text.length;
   let i = 0;
 
   while (i < len) {
-    // sauter les séparateurs
     while (i < len && !isLetterOrDigit(text[i])) i++;
     if (i >= len) break;
     const start = i;
@@ -116,10 +111,6 @@ function scanWords(text: string): Array<{ start: number; end: number }> {
   return res;
 }
 
-/**
- * Helper "complet" pour les requêtes multi-mots sur la chaîne normalisée.
- * Retourne des paires { start, end } sur la chaîne `norm`.
- */
 function findMatchesInNorm(
   norm: string,
   normQuery: string,
@@ -133,7 +124,6 @@ function findMatchesInNorm(
 
   let i = 0;
   while (i <= nlen - qlen) {
-    // on ne considère que les débuts de mots / expressions
     if (i > 0 && norm[i - 1] !== ' ') {
       i++;
       continue;
@@ -145,7 +135,6 @@ function findMatchesInNorm(
     }
 
     if (endsWithSpace) {
-      // expression exacte : doit se terminer sur une frontière de mot
       const end = i + qlen;
       if (end < nlen && norm[end] !== ' ') {
         i++;
@@ -153,7 +142,6 @@ function findMatchesInNorm(
       }
       matches.push({ start: i, end });
     } else {
-      // préfixe du dernier mot : on étend jusqu'à la fin de ce mot
       let end = i + qlen;
       while (end < nlen && norm[end] !== ' ') end++;
       matches.push({ start: i, end });
@@ -165,14 +153,12 @@ function findMatchesInNorm(
   return matches;
 }
 
-/** Compte le nombre d’occurrences selon la même logique que le surlignage */
 function countMatchesFlexible(text: string, query: string): number {
   const normQuery = normalizeForSearch(query);
   if (!normQuery) return 0;
 
   const endsWithSpace = /\s$/.test(query);
 
-  // 1) CAS SIMPLE : une seule "mot" dans la requête → on travaille mot par mot dans le texte original
   if (!normQuery.includes(' ')) {
     const words = scanWords(text);
     let count = 0;
@@ -183,14 +169,12 @@ function countMatchesFlexible(text: string, query: string): number {
       if (!normWord) continue;
 
       const match = endsWithSpace ? normWord === normQuery : normWord.startsWith(normQuery);
-
       if (match) count++;
     }
 
     return count;
   }
 
-  // 2) CAS COMPLEXE : requête multi-mots → on retombe sur la version "norm + map"
   const { norm } = buildNormalizedWithMap(text);
   if (!norm) return 0;
 
@@ -206,14 +190,12 @@ function escapeHtml(s: string) {
     .replace(/"/g, '&quot;');
 }
 
-/** Surlignage aligné sur countMatchesFlexible */
 function highlightFlexible(text: string, query: string) {
   const normQuery = normalizeForSearch(query);
   if (!normQuery) return escapeHtml(text);
 
   const endsWithSpace = /\s$/.test(query);
 
-  // 1) CAS SIMPLE : requête = un seul mot → surlignage direct sur les "mots" du texte original
   if (!normQuery.includes(' ')) {
     const words = scanWords(text);
     const ranges: Array<{ start: number; end: number }> = [];
@@ -224,13 +206,11 @@ function highlightFlexible(text: string, query: string) {
       if (!normWord) continue;
 
       const match = endsWithSpace ? normWord === normQuery : normWord.startsWith(normQuery);
-
       if (match) ranges.push({ start: w.start, end: w.end });
     }
 
     if (!ranges.length) return escapeHtml(text);
 
-    // Fusion des recouvrements (au cas où)
     ranges.sort((a, b) => a.start - b.start);
     const merged: typeof ranges = [];
     for (const r of ranges) {
@@ -250,23 +230,20 @@ function highlightFlexible(text: string, query: string) {
     return html;
   }
 
-  // 2) CAS COMPLEXE : requête multi-mots → on garde la version "norm + map"
   const { norm, map } = buildNormalizedWithMap(text);
   if (!norm) return escapeHtml(text);
 
   const matchesInNorm = findMatchesInNorm(norm, normQuery, endsWithSpace);
   if (!matchesInNorm.length) return escapeHtml(text);
 
-  // Conversion → indices d’origine
   const ranges = matchesInNorm
     .map(({ start, end }) => {
       const origStart = map[Math.max(0, start)];
-      const origEnd = (map[Math.min(map.length - 1, end - 1)] ?? map[map.length - 1]) + 1; // exclu
+      const origEnd = (map[Math.min(map.length - 1, end - 1)] ?? map[map.length - 1]) + 1;
       return { start: origStart, end: origEnd };
     })
     .sort((a, b) => a.start - b.start);
 
-  // Fusion des recouvrements
   const merged: typeof ranges = [];
   for (const r of ranges) {
     const last = merged[merged.length - 1];
@@ -274,7 +251,6 @@ function highlightFlexible(text: string, query: string) {
     else last.end = Math.max(last.end, r.end);
   }
 
-  // Construction HTML
   let html = '';
   let cursor = 0;
   for (const r of merged) {
@@ -292,12 +268,11 @@ export default function Search() {
   const { state, navigateToVerse } = useApp();
   const { t, language } = useTranslation();
 
-  // ✅ on force le mode sombre
   const isDark = true;
 
   const queryKey = `twog:search:lastQuery:${state.settings.language}`;
 
-  // ✅ clés sessionStorage stables + on associe à la query
+  // clés sessionStorage stables + on associe à la query
   const expandedKey = `twog:search:expanded:${state.settings.language}`;
   const expandedQueryKey = `twog:search:expandedQuery:${state.settings.language}`;
   const scrollKey = `twog:search:scroll:${state.settings.language}`;
@@ -318,12 +293,11 @@ export default function Search() {
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
-  // ✅ dernière requête réellement exécutée (normalisée)
+  // dernière requête exécutée (normalisée)
   const lastExecutedQidRef = useRef<string>('');
   const currentQid = useMemo(() => normalizeForSearch(query.trim()), [query]);
 
-  // ✅ IMPORTANT : au montage (retour depuis Lecture), on considère la query actuelle comme "déjà exécutée"
-  // pour éviter de reset à tort.
+  // au montage (retour depuis Lecture), on évite un reset “fantôme”
   useEffect(() => {
     if (!lastExecutedQidRef.current && currentQid) {
       lastExecutedQidRef.current = currentQid;
@@ -334,7 +308,6 @@ export default function Search() {
   const getBookName = (id: string) => {
     const b = books.find(x => x.name === id);
     if (!b) return id;
-    // Pour l’instant : FR → nameFr, sinon → nameEn
     return state.settings.language === 'fr' ? b.nameFr : b.nameEn;
   };
   const bibleOrder = (id: string) => {
@@ -342,14 +315,31 @@ export default function Search() {
     return idx === -1 ? 9999 : idx;
   };
 
-  // Titre de page (onglet navigateur)
+  // Titre de page
   useEffect(() => {
     document.title = t('searchTitle');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language]);
 
-  // ✅ reset UNIQUEMENT si c’est VRAIMENT une nouvelle query (différente de celle sauvegardée)
-  const resetUiForNewQuery = (qid: string) => {
+  // ✅ helpers de persistance IMMÉDIATE (c’est ça le fix)
+  const persistExpandedNow = (nextExpanded: Record<string, boolean>) => {
+    try {
+      if (!currentQid) return;
+      sessionStorage.setItem(expandedKey, JSON.stringify(nextExpanded));
+      sessionStorage.setItem(expandedQueryKey, currentQid);
+    } catch {}
+  };
+
+  const persistScrollNow = () => {
+    try {
+      if (!currentQid) return;
+      sessionStorage.setItem(scrollKey, String(window.scrollY || 0));
+      sessionStorage.setItem(scrollQueryKey, currentQid);
+    } catch {}
+  };
+
+  // reset quand on change vraiment de recherche
+  const resetUiForNewQuery = () => {
     setExpanded({});
     try {
       sessionStorage.removeItem(expandedKey);
@@ -362,7 +352,7 @@ export default function Search() {
     } catch {}
   };
 
-  // Lancer la recherche (debounce)
+  // Recherche (debounce)
   useEffect(() => {
     const trimmed = query.trim();
 
@@ -381,20 +371,15 @@ export default function Search() {
     }
 
     const handle = setTimeout(async () => {
-      // ✅ Lire la query sauvegardée (celle pour laquelle on doit restaurer expanded/scroll)
-      let savedExpandedQid = '';
-      let savedScrollQid = '';
+      // si nouvelle query → reset (mais pas si c’est la query sauvegardée)
+      let savedQid = '';
       try {
-        savedExpandedQid = sessionStorage.getItem(expandedQueryKey) || '';
-        savedScrollQid = sessionStorage.getItem(scrollQueryKey) || '';
+        savedQid = sessionStorage.getItem(expandedQueryKey) || '';
       } catch {}
+      const isSameAsSaved = !!currentQid && currentQid === savedQid;
 
-      // ✅ Si la query actuelle est la même que celle sauvegardée → surtout NE PAS reset
-      const isSameAsSaved = !!currentQid && (currentQid === savedExpandedQid || currentQid === savedScrollQid);
-
-      // ✅ Si c’est une nouvelle query (différente de la précédente + différente de la sauvegarde) → reset
       if (currentQid && currentQid !== lastExecutedQidRef.current && !isSameAsSaved) {
-        resetUiForNewQuery(currentQid);
+        resetUiForNewQuery();
       }
 
       setLoading(true);
@@ -408,7 +393,6 @@ export default function Search() {
         }
         setResults(enriched);
 
-        // ✅ on marque cette query comme "exécutée"
         lastExecutedQidRef.current = currentQid || '';
       } finally {
         setLoading(false);
@@ -416,17 +400,9 @@ export default function Search() {
     }, 300);
 
     return () => clearTimeout(handle);
-  }, [
-    query,
-    currentQid,
-    state.settings.language,
-    expandedKey,
-    expandedQueryKey,
-    scrollKey,
-    scrollQueryKey,
-  ]);
+  }, [query, currentQid, state.settings.language, expandedKey, expandedQueryKey, scrollKey, scrollQueryKey]);
 
-  // Groupement par livre + somme des occurrences
+  // Groupement par livre
   const grouped: Grouped[] = useMemo(() => {
     const map = new Map<string, ResultItem[]>();
     for (const v of results) {
@@ -445,7 +421,7 @@ export default function Search() {
     return arr;
   }, [results, state.settings.language, books]);
 
-  // ✅ Restauration états d’ouverture — UNIQUEMENT si la query correspond
+  // ✅ Restauration expanded (si même query)
   useEffect(() => {
     if (!grouped.length) {
       setExpanded({});
@@ -476,17 +452,7 @@ export default function Search() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [grouped, state.settings.language, currentQid]);
 
-  // ✅ Sauvegarde expanded + la query associée
-  useEffect(() => {
-    if (!grouped.length) return;
-    if (!currentQid) return;
-    try {
-      sessionStorage.setItem(expandedKey, JSON.stringify(expanded));
-      sessionStorage.setItem(expandedQueryKey, currentQid);
-    } catch {}
-  }, [expanded, grouped, expandedKey, expandedQueryKey, currentQid]);
-
-  // ✅ Restauration du scroll — UNIQUEMENT si la query correspond
+  // ✅ Restauration scroll (si même query)
   useEffect(() => {
     if (!grouped.length || loading) return;
     try {
@@ -502,36 +468,36 @@ export default function Search() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [grouped, loading, state.settings.language, currentQid]);
 
-  // ✅ Sauvegarde du scroll + la query associée
+  // ✅ IMPORTANT : sauvegarde scroll au démontage (navigation interne), pas seulement beforeunload
   useEffect(() => {
-    const save = () => {
-      try {
-        if (!currentQid) return;
-        sessionStorage.setItem(scrollKey, String(window.scrollY || 0));
-        sessionStorage.setItem(scrollQueryKey, currentQid);
-      } catch {}
-    };
-    window.addEventListener('beforeunload', save);
     return () => {
-      save();
-      window.removeEventListener('beforeunload', save);
+      persistScrollNow();
+      // on persiste aussi expanded au démontage
+      persistExpandedNow(expanded);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.settings.language, currentQid]);
+  }, [expanded, currentQid]);
 
+  // ✅ toggle / expand / collapse => persistance IMMÉDIATE
   const toggleGroup = (bookId: string) =>
-    setExpanded(prev => ({ ...prev, [bookId]: !prev[bookId] }));
+    setExpanded(prev => {
+      const next = { ...prev, [bookId]: !prev[bookId] };
+      persistExpandedNow(next);
+      return next;
+    });
 
   const expandAll = () => {
     const next: Record<string, boolean> = {};
     for (const g of grouped) next[g.bookId] = true;
     setExpanded(next);
+    persistExpandedNow(next);
   };
 
   const collapseAll = () => {
     const next: Record<string, boolean> = {};
     for (const g of grouped) next[g.bookId] = false;
     setExpanded(next);
+    persistExpandedNow(next);
   };
 
   const clearQuery = () => {
@@ -552,14 +518,12 @@ export default function Search() {
   };
 
   const openInReading = (v: ResultItem) => {
+    // ✅ Sécurisation : on persiste AVANT de naviguer (sinon tu perds l’état ouvert)
+    persistExpandedNow(expanded);
+    persistScrollNow();
+
     try {
       saveQuickSlot(0, { book: v.book, chapter: v.chapter, verse: v.verse });
-    } catch {}
-    try {
-      if (currentQid) {
-        sessionStorage.setItem(scrollKey, String(window.scrollY || 0));
-        sessionStorage.setItem(scrollQueryKey, currentQid);
-      }
     } catch {}
     navigateToVerse(v.book, v.chapter, v.verse);
   };
@@ -569,15 +533,12 @@ export default function Search() {
   return (
     <div className={`min-h-screen ${isDark ? 'bg-gray-950' : 'bg-gray-50'} transition-colors`}>
       <div className="max-w-4xl mx-auto px-4 py-5">
-        {/* En-tête / titre */}
         <h1 className={`text-xl font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
           {t('searchTitle')}
         </h1>
 
-        {/* Petit masque collant */}
         <div className={`sticky top-0 z-20 ${isDark ? 'bg-gray-950' : 'bg-gray-50'}`} style={{ height: 8 }} aria-hidden />
 
-        {/* Barre de recherche (sticky) */}
         <div
           className={`${isDark ? 'bg-gray-900' : 'bg-white'} rounded-xl shadow border ${
             isDark ? 'border-gray-700' : 'border-gray-200'
@@ -651,7 +612,6 @@ export default function Search() {
           </div>
         </div>
 
-        {/* Résultats */}
         <div className="mt-4">
           {totalOccurrences === 0 && !loading && query.trim().length >= 2 && (
             <div className={`${isDark ? 'text-white' : 'text-gray-600'} text-center py-10`}>
