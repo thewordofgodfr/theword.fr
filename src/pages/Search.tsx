@@ -1,5 +1,5 @@
 // src/pages/Search.tsx
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { getBibleBooks, searchInBible } from '../services/bibleService';
 import type { BibleVerse } from '../types/bible';
@@ -86,27 +86,6 @@ function buildNormalizedWithMap(input: string) {
   const norm = normChars.slice(start, end).join('');
   const map = idxMap.slice(start, end);
   return { norm, map };
-}
-
-/** Match “flexible” (non utilisé directement mais gardé au cas où) :
- *  - si la requête se termine par un espace → expression exacte (mots entiers)
- *  - sinon → dernier mot en *préfixe*
- *  - insensible aux accents/ligatures/casse
- */
-function matchesFlexible(text: string, query: string) {
-  const normText = normalizeForSearch(text);
-  const normQuery = normalizeForSearch(query);
-  if (!normQuery) return false;
-
-  const endsWithSpace = /\s$/.test(query);
-  const paddedText = ` ${normText} `;
-
-  if (endsWithSpace) {
-    // mots entiers
-    return paddedText.includes(` ${normQuery} `);
-  }
-  // préfixe du dernier mot (et plus généralement: début de mot)
-  return paddedText.includes(` ${normQuery}`);
 }
 
 /* ===== Helpers pour la version "simple" (1 seul mot) ===== */
@@ -246,9 +225,7 @@ function highlightFlexible(text: string, query: string) {
 
       const match = endsWithSpace ? normWord === normQuery : normWord.startsWith(normQuery);
 
-      if (match) {
-        ranges.push({ start: w.start, end: w.end });
-      }
+      if (match) ranges.push({ start: w.start, end: w.end });
     }
 
     if (!ranges.length) return escapeHtml(text);
@@ -284,8 +261,7 @@ function highlightFlexible(text: string, query: string) {
   const ranges = matchesInNorm
     .map(({ start, end }) => {
       const origStart = map[Math.max(0, start)];
-      const origEnd =
-        (map[Math.min(map.length - 1, end - 1)] ?? map[map.length - 1]) + 1; // exclu
+      const origEnd = (map[Math.min(map.length - 1, end - 1)] ?? map[map.length - 1]) + 1; // exclu
       return { start: origStart, end: origEnd };
     })
     .sort((a, b) => a.start - b.start);
@@ -321,9 +297,11 @@ export default function Search() {
 
   const queryKey = `twog:search:lastQuery:${state.settings.language}`;
 
-  // ✅ clés sessionStorage stables (PAS par requête) pour éviter d'en créer des centaines
+  // ✅ clés sessionStorage stables (PAS par requête) + on associe à la query
   const expandedKey = `twog:search:expanded:${state.settings.language}`;
+  const expandedQueryKey = `twog:search:expandedQuery:${state.settings.language}`;
   const scrollKey = `twog:search:scroll:${state.settings.language}`;
+  const scrollQueryKey = `twog:search:scrollQuery:${state.settings.language}`;
 
   const [query, setQuery] = useState<string>('');
   useEffect(() => {
@@ -339,6 +317,11 @@ export default function Search() {
   const [results, setResults] = useState<ResultItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  // ✅ dernière requête réellement exécutée (normalisée)
+  const lastExecutedQidRef = useRef<string>('');
+
+  const currentQid = useMemo(() => normalizeForSearch(query.trim()), [query]);
 
   const books = useMemo(() => getBibleBooks(), []);
   const getBookName = (id: string) => {
@@ -358,13 +341,48 @@ export default function Search() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language]);
 
+  // ✅ Reset propre si la query change (nouveau mot) : on ferme tout, MAIS on ne détruit
+  // la restauration que si c’est une query différente de celle sauvegardée.
+  const resetUiForNewQuery = (qid: string) => {
+    setExpanded({});
+    try {
+      // on ne garde PAS l’état "expanded/scroll" d’une autre query
+      sessionStorage.removeItem(expandedKey);
+      sessionStorage.removeItem(expandedQueryKey);
+      sessionStorage.removeItem(scrollKey);
+      sessionStorage.removeItem(scrollQueryKey);
+    } catch {}
+    try {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    } catch {}
+    lastExecutedQidRef.current = qid;
+  };
+
   // Lancer la recherche (debounce)
   useEffect(() => {
-    if (query.trim().length < 2) {
+    const trimmed = query.trim();
+
+    if (trimmed.length < 2) {
       setResults([]);
+      setExpanded({});
+      setLoading(false);
+      try {
+        sessionStorage.removeItem(expandedKey);
+        sessionStorage.removeItem(expandedQueryKey);
+        sessionStorage.removeItem(scrollKey);
+        sessionStorage.removeItem(scrollQueryKey);
+      } catch {}
+      lastExecutedQidRef.current = '';
       return;
     }
+
     const handle = setTimeout(async () => {
+      // ✅ Nouvelle requête exécutée : on ferme tout et on invalide l’état précédent
+      // (MAIS uniquement parce que la query est différente)
+      if (currentQid && currentQid !== lastExecutedQidRef.current) {
+        resetUiForNewQuery(currentQid);
+      }
+
       setLoading(true);
       try {
         const res = await searchInBible(query, state.settings.language);
@@ -380,8 +398,17 @@ export default function Search() {
         setLoading(false);
       }
     }, 300);
+
     return () => clearTimeout(handle);
-  }, [query, state.settings.language]);
+  }, [
+    query,
+    currentQid,
+    state.settings.language,
+    expandedKey,
+    expandedQueryKey,
+    scrollKey,
+    scrollQueryKey,
+  ]);
 
   // Groupement par livre + somme des occurrences
   const grouped: Grouped[] = useMemo(() => {
@@ -402,83 +429,123 @@ export default function Search() {
     return arr;
   }, [results, state.settings.language, books]);
 
-  // Restauration états d’ouverture
+  // ✅ Restauration états d’ouverture — UNIQUEMENT si la query correspond
   useEffect(() => {
     if (!grouped.length) {
       setExpanded({});
       return;
     }
-    let restored: Record<string, boolean> | null = null;
+
+    let restoredExpanded: Record<string, boolean> | null = null;
+    let restoredQid = '';
+
     try {
+      restoredQid = sessionStorage.getItem(expandedQueryKey) || '';
       const raw = sessionStorage.getItem(expandedKey);
-      if (raw) restored = JSON.parse(raw);
+      if (raw) restoredExpanded = JSON.parse(raw);
     } catch {
-      restored = null;
+      restoredExpanded = null;
+      restoredQid = '';
     }
 
-    if (restored && Object.keys(restored).length) {
+    if (restoredExpanded && restoredQid && restoredQid === currentQid) {
       const next: Record<string, boolean> = {};
-      for (const g of grouped) next[g.bookId] = !!restored[g.bookId];
+      for (const g of grouped) next[g.bookId] = !!restoredExpanded[g.bookId];
       setExpanded(next);
     } else {
-      const open = grouped.length <= 2;
+      // par défaut : tout fermé (et c’est l’utilisateur qui ouvre)
       const next: Record<string, boolean> = {};
-      for (const g of grouped) next[g.bookId] = open;
+      for (const g of grouped) next[g.bookId] = false;
       setExpanded(next);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [grouped, state.settings.language]);
+  }, [grouped, state.settings.language, currentQid]);
 
+  // ✅ Sauvegarde expanded + la query associée
   useEffect(() => {
     if (!grouped.length) return;
+    if (!currentQid) return;
     try {
       sessionStorage.setItem(expandedKey, JSON.stringify(expanded));
+      sessionStorage.setItem(expandedQueryKey, currentQid);
     } catch {}
-  }, [expanded, grouped, expandedKey]);
+  }, [expanded, grouped, expandedKey, expandedQueryKey, currentQid]);
 
-  // Restauration du scroll
+  // ✅ Restauration du scroll — UNIQUEMENT si la query correspond
   useEffect(() => {
     if (!grouped.length || loading) return;
-    const raw = sessionStorage.getItem(scrollKey);
-    const y = raw ? parseInt(raw, 10) : 0;
-    if (Number.isFinite(y) && y > 0) {
-      setTimeout(() => window.scrollTo({ top: y, behavior: 'auto' }), 0);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [grouped, loading, state.settings.language]);
+    try {
+      const qid = sessionStorage.getItem(scrollQueryKey) || '';
+      if (!qid || qid !== currentQid) return;
 
+      const raw = sessionStorage.getItem(scrollKey);
+      const y = raw ? parseInt(raw, 10) : 0;
+      if (Number.isFinite(y) && y > 0) {
+        setTimeout(() => window.scrollTo({ top: y, behavior: 'auto' }), 0);
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [grouped, loading, state.settings.language, currentQid]);
+
+  // ✅ Sauvegarde du scroll + la query associée
   useEffect(() => {
-    const save = () => sessionStorage.setItem(scrollKey, String(window.scrollY || 0));
+    const save = () => {
+      try {
+        if (!currentQid) return;
+        sessionStorage.setItem(scrollKey, String(window.scrollY || 0));
+        sessionStorage.setItem(scrollQueryKey, currentQid);
+      } catch {}
+    };
     window.addEventListener('beforeunload', save);
     return () => {
       save();
       window.removeEventListener('beforeunload', save);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.settings.language]);
+  }, [state.settings.language, currentQid]);
 
-  const toggleGroup = (bookId: string) => setExpanded(prev => ({ ...prev, [bookId]: !prev[bookId] }));
+  const toggleGroup = (bookId: string) =>
+    setExpanded(prev => ({ ...prev, [bookId]: !prev[bookId] }));
+
   const expandAll = () => {
     const next: Record<string, boolean> = {};
     for (const g of grouped) next[g.bookId] = true;
     setExpanded(next);
   };
+
   const collapseAll = () => {
     const next: Record<string, boolean> = {};
     for (const g of grouped) next[g.bookId] = false;
     setExpanded(next);
   };
+
   const clearQuery = () => {
     setQuery('');
     setResults([]);
-    sessionStorage.removeItem(scrollKey);
+    setExpanded({});
+    setLoading(false);
+    try {
+      sessionStorage.removeItem(scrollKey);
+      sessionStorage.removeItem(scrollQueryKey);
+      sessionStorage.removeItem(expandedKey);
+      sessionStorage.removeItem(expandedQueryKey);
+    } catch {}
+    lastExecutedQidRef.current = '';
+    try {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    } catch {}
   };
 
   const openInReading = (v: ResultItem) => {
     try {
       saveQuickSlot(0, { book: v.book, chapter: v.chapter, verse: v.verse });
     } catch {}
-    sessionStorage.setItem(scrollKey, String(window.scrollY || 0));
+    try {
+      if (currentQid) {
+        sessionStorage.setItem(scrollKey, String(window.scrollY || 0));
+        sessionStorage.setItem(scrollQueryKey, currentQid);
+      }
+    } catch {}
     navigateToVerse(v.book, v.chapter, v.verse);
   };
 
@@ -532,7 +599,6 @@ export default function Search() {
             </div>
           </form>
 
-          {/* ✅ Android: si le texte est long, on met les boutons sur une ligne dessous */}
           <div className="mt-2 text-sm">
             <div className={`${isDark ? 'text-white' : 'text-gray-600'} break-words`}>
               {loading ? (
