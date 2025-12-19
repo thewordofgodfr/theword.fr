@@ -83,7 +83,7 @@ function buildNormalizedWithMap(input: string) {
   return { norm, map };
 }
 
-/* ===== Helpers pour la version "simple" (1 seul mot) ===== */
+/* ===== Helpers ===== */
 
 function isLetterOrDigit(ch: string) {
   return /[\p{L}\p{N}]/u.test(ch);
@@ -267,13 +267,7 @@ export default function Search() {
 
   const queryKey = `twog:search:lastQuery:${state.settings.language}`;
 
-  const expandedKey = `twog:search:expanded:${state.settings.language}`;
-  const expandedQueryKey = `twog:search:expandedQuery:${state.settings.language}`;
-  const scrollKey = `twog:search:scroll:${state.settings.language}`;
-  const scrollQueryKey = `twog:search:scrollQuery:${state.settings.language}`;
-  const activeQidKey = `twog:search:activeQid:${state.settings.language}`;
-
-  // ✅ FIX IMPORTANT : init synchro depuis sessionStorage (sinon race condition au retour)
+  // ✅ init query synchro
   const [query, setQuery] = useState<string>(() => {
     try {
       return sessionStorage.getItem(queryKey) || '';
@@ -282,7 +276,7 @@ export default function Search() {
     }
   });
 
-  // si langue change -> recharger query depuis storage (comme avant)
+  // si langue change -> recharger query
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem(queryKey);
@@ -297,20 +291,20 @@ export default function Search() {
     } catch {}
   }, [query, queryKey]);
 
+  const currentQid = useMemo(() => normalizeForSearch(query.trim()), [query]);
+
+  // ✅ clés PAR REQUÊTE (le vrai fix)
+  const expandedKey = useMemo(() => {
+    return currentQid ? `twog:search:expanded:${state.settings.language}:${currentQid}` : '';
+  }, [state.settings.language, currentQid]);
+
+  const scrollKey = useMemo(() => {
+    return currentQid ? `twog:search:scroll:${state.settings.language}:${currentQid}` : '';
+  }, [state.settings.language, currentQid]);
+
   const [results, setResults] = useState<ResultItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-
-  const currentQid = useMemo(() => normalizeForSearch(query.trim()), [query]);
-
-  // ✅ FIX IMPORTANT : activeQid init synchro
-  const [activeQid, setActiveQid] = useState<string>(() => {
-    try {
-      return sessionStorage.getItem(activeQidKey) || '';
-    } catch {
-      return '';
-    }
-  });
 
   const lastExecutedQidRef = useRef<string>('');
 
@@ -332,21 +326,19 @@ export default function Search() {
 
   const persistExpandedNow = (nextExpanded: Record<string, boolean>) => {
     try {
-      if (!currentQid) return;
+      if (!expandedKey) return;
       sessionStorage.setItem(expandedKey, JSON.stringify(nextExpanded));
-      sessionStorage.setItem(expandedQueryKey, currentQid);
     } catch {}
   };
 
   const persistScrollNow = () => {
     try {
-      if (!currentQid) return;
+      if (!scrollKey) return;
       sessionStorage.setItem(scrollKey, String(window.scrollY || 0));
-      sessionStorage.setItem(scrollQueryKey, currentQid);
     } catch {}
   };
 
-  // Recherche (debounce)
+  // Recherche (debounce) + reset si nouveau mot
   useEffect(() => {
     const trimmed = query.trim();
 
@@ -354,21 +346,13 @@ export default function Search() {
       setResults([]);
       setExpanded({});
       setLoading(false);
-      setActiveQid('');
-      try {
-        sessionStorage.removeItem(expandedKey);
-        sessionStorage.removeItem(expandedQueryKey);
-        sessionStorage.removeItem(scrollKey);
-        sessionStorage.removeItem(scrollQueryKey);
-        sessionStorage.removeItem(activeQidKey);
-      } catch {}
       lastExecutedQidRef.current = '';
       return;
     }
 
     const handle = setTimeout(async () => {
-      // ✅ si nouvelle recherche (différente des résultats actifs) => fermer, scrollTop
-      if (currentQid && activeQid && currentQid !== activeQid) {
+      // ✅ Nouveau mot = nouveau qid -> on repart fermé + top (car aucune clé n’existe)
+      if (currentQid && lastExecutedQidRef.current && currentQid !== lastExecutedQidRef.current) {
         setExpanded({});
         try {
           window.scrollTo({ top: 0, behavior: 'auto' });
@@ -386,30 +370,14 @@ export default function Search() {
         }
         setResults(enriched);
 
-        const qid = currentQid || '';
-        setActiveQid(qid);
-        try {
-          if (qid) sessionStorage.setItem(activeQidKey, qid);
-        } catch {}
-
-        lastExecutedQidRef.current = qid;
+        lastExecutedQidRef.current = currentQid || '';
       } finally {
         setLoading(false);
       }
     }, 300);
 
     return () => clearTimeout(handle);
-  }, [
-    query,
-    currentQid,
-    activeQid,
-    state.settings.language,
-    expandedKey,
-    expandedQueryKey,
-    scrollKey,
-    scrollQueryKey,
-    activeQidKey,
-  ]);
+  }, [query, currentQid, state.settings.language]);
 
   // Groupement par livre
   const grouped: Grouped[] = useMemo(() => {
@@ -430,52 +398,49 @@ export default function Search() {
     return arr;
   }, [results, state.settings.language, books]);
 
-  // ✅ Restore expanded (si query correspond) — avec currentQid correct dès le 1er render
+  // ✅ Restore expanded (via clé par qid)
   useEffect(() => {
     if (!grouped.length) {
       setExpanded({});
       return;
     }
-
-    let restoredExpanded: Record<string, boolean> | null = null;
-    let restoredQid = '';
-
-    try {
-      restoredQid = sessionStorage.getItem(expandedQueryKey) || '';
-      const raw = sessionStorage.getItem(expandedKey);
-      if (raw) restoredExpanded = JSON.parse(raw);
-    } catch {
-      restoredExpanded = null;
-      restoredQid = '';
-    }
-
-    if (restoredExpanded && restoredQid && restoredQid === currentQid) {
-      const next: Record<string, boolean> = {};
-      for (const g of grouped) next[g.bookId] = !!restoredExpanded[g.bookId];
-      setExpanded(next);
-    } else {
+    if (!expandedKey) {
       const next: Record<string, boolean> = {};
       for (const g of grouped) next[g.bookId] = false;
       setExpanded(next);
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [grouped, currentQid]);
 
-  // ✅ Restore scroll (si query correspond)
+    try {
+      const raw = sessionStorage.getItem(expandedKey);
+      if (raw) {
+        const restored = JSON.parse(raw) as Record<string, boolean>;
+        const next: Record<string, boolean> = {};
+        for (const g of grouped) next[g.bookId] = !!restored[g.bookId];
+        setExpanded(next);
+        return;
+      }
+    } catch {}
+
+    // défaut: tout fermé
+    const next: Record<string, boolean> = {};
+    for (const g of grouped) next[g.bookId] = false;
+    setExpanded(next);
+  }, [grouped, expandedKey]);
+
+  // ✅ Restore scroll (via clé par qid)
   useEffect(() => {
     if (!grouped.length || loading) return;
-    try {
-      const qid = sessionStorage.getItem(scrollQueryKey) || '';
-      if (!qid || qid !== currentQid) return;
+    if (!scrollKey) return;
 
+    try {
       const raw = sessionStorage.getItem(scrollKey);
       const y = raw ? parseInt(raw, 10) : 0;
       if (Number.isFinite(y) && y > 0) {
         setTimeout(() => window.scrollTo({ top: y, behavior: 'auto' }), 0);
       }
     } catch {}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [grouped, loading, currentQid]);
+  }, [grouped, loading, scrollKey]);
 
   // ✅ Sauvegarde au démontage (navigation interne)
   useEffect(() => {
@@ -484,7 +449,7 @@ export default function Search() {
       persistExpandedNow(expanded);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expanded, currentQid]);
+  }, [expandedKey, scrollKey, expanded]);
 
   const toggleGroup = (bookId: string) =>
     setExpanded(prev => {
@@ -512,14 +477,6 @@ export default function Search() {
     setResults([]);
     setExpanded({});
     setLoading(false);
-    setActiveQid('');
-    try {
-      sessionStorage.removeItem(scrollKey);
-      sessionStorage.removeItem(scrollQueryKey);
-      sessionStorage.removeItem(expandedKey);
-      sessionStorage.removeItem(expandedQueryKey);
-      sessionStorage.removeItem(activeQidKey);
-    } catch {}
     lastExecutedQidRef.current = '';
     try {
       window.scrollTo({ top: 0, behavior: 'auto' });
@@ -527,6 +484,7 @@ export default function Search() {
   };
 
   const openInReading = (v: ResultItem) => {
+    // ✅ persister AVANT navigation
     persistExpandedNow(expanded);
     persistScrollNow();
 
