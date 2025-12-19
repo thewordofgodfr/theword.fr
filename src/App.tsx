@@ -7,7 +7,7 @@ import Search from './pages/Search';
 import Settings from './pages/Settings';
 import About from './pages/About';
 import Notes from './pages/Notes';
-import Principes from './pages/Principes'; // <- NOUVEAU
+import Principes from './pages/Principes';
 import { warmBibleCache, pauseWarmup, resumeWarmup } from './services/bibleService';
 
 function AppContent() {
@@ -44,7 +44,7 @@ function AppContent() {
         settings: 'Réglages',
         about: 'À propos',
         notes: 'Notes',
-        principes: 'Principes fondamentaux', // <- NOUVEAU
+        principes: 'Principes fondamentaux',
         fallback: 'TheWord.fr',
       },
       en: {
@@ -54,7 +54,7 @@ function AppContent() {
         settings: 'Settings',
         about: 'About',
         notes: 'Notes',
-        principes: 'Core Studies', // <- NEW
+        principes: 'Core Studies',
         fallback: 'TheWord.fr',
       },
     } as const;
@@ -63,7 +63,6 @@ function AppContent() {
     const pageKey = (state.currentPage as keyof typeof dict) || 'fallback';
     document.title = dict[pageKey] ?? dict.fallback;
 
-    // IMPORTANT : on met directement le code langue (fr, en, es, ru, pt, etc.)
     document.documentElement.setAttribute('lang', language);
   }, [state.currentPage, state.settings.language]);
 
@@ -75,7 +74,10 @@ function AppContent() {
     }
   }, []);
 
+  // ✅ IMPORTANT : on ne force PAS scrollTop quand on revient sur Search
   useEffect(() => {
+    if (state.currentPage === 'search') return;
+
     const raf = requestAnimationFrame(() => {
       window.scrollTo({ top: 0, left: 0 });
     });
@@ -97,7 +99,7 @@ function AppContent() {
       case 'notes':
         return <Notes />;
       case 'principes':
-        return <Principes />; // <- NOUVELLE ROUTE
+        return <Principes />;
       default:
         return <Home />;
     }
