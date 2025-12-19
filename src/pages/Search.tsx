@@ -271,41 +271,47 @@ export default function Search() {
   const expandedQueryKey = `twog:search:expandedQuery:${state.settings.language}`;
   const scrollKey = `twog:search:scroll:${state.settings.language}`;
   const scrollQueryKey = `twog:search:scrollQuery:${state.settings.language}`;
-
-  // ✅ nouvelle clé : query réellement “active” (celle qui a produit les résultats affichés)
   const activeQidKey = `twog:search:activeQid:${state.settings.language}`;
 
-  const [query, setQuery] = useState<string>('');
+  // ✅ FIX IMPORTANT : init synchro depuis sessionStorage (sinon race condition au retour)
+  const [query, setQuery] = useState<string>(() => {
+    try {
+      return sessionStorage.getItem(queryKey) || '';
+    } catch {
+      return '';
+    }
+  });
+
+  // si langue change -> recharger query depuis storage (comme avant)
   useEffect(() => {
-    const saved = sessionStorage.getItem(queryKey);
-    if (saved) setQuery(saved);
+    try {
+      const saved = sessionStorage.getItem(queryKey);
+      if (typeof saved === 'string') setQuery(saved);
+    } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.settings.language]);
 
   useEffect(() => {
-    sessionStorage.setItem(queryKey, query);
+    try {
+      sessionStorage.setItem(queryKey, query);
+    } catch {}
   }, [query, queryKey]);
 
   const [results, setResults] = useState<ResultItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
-  // ✅ qid courant (normalisé)
   const currentQid = useMemo(() => normalizeForSearch(query.trim()), [query]);
 
-  // ✅ qid des résultats affichés
-  const [activeQid, setActiveQid] = useState<string>('');
-
-  // charger activeQid au montage (retour depuis Reading)
-  useEffect(() => {
+  // ✅ FIX IMPORTANT : activeQid init synchro
+  const [activeQid, setActiveQid] = useState<string>(() => {
     try {
-      const saved = sessionStorage.getItem(activeQidKey) || '';
-      if (saved) setActiveQid(saved);
-    } catch {}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.settings.language]);
+      return sessionStorage.getItem(activeQidKey) || '';
+    } catch {
+      return '';
+    }
+  });
 
-  // dernière requête exécutée (debounce)
   const lastExecutedQidRef = useRef<string>('');
 
   const books = useMemo(() => getBibleBooks(), []);
@@ -361,8 +367,7 @@ export default function Search() {
     }
 
     const handle = setTimeout(async () => {
-      // ✅ Si on tape une nouvelle recherche (qid différent de la recherche active affichée)
-      // => on ferme tout + scrollTop, mais on ne wipe pas le storage ici.
+      // ✅ si nouvelle recherche (différente des résultats actifs) => fermer, scrollTop
       if (currentQid && activeQid && currentQid !== activeQid) {
         setExpanded({});
         try {
@@ -381,7 +386,6 @@ export default function Search() {
         }
         setResults(enriched);
 
-        // ✅ on marque cette query comme active (résultats affichés)
         const qid = currentQid || '';
         setActiveQid(qid);
         try {
@@ -395,7 +399,17 @@ export default function Search() {
     }, 300);
 
     return () => clearTimeout(handle);
-  }, [query, currentQid, activeQid, state.settings.language, expandedKey, expandedQueryKey, scrollKey, scrollQueryKey, activeQidKey]);
+  }, [
+    query,
+    currentQid,
+    activeQid,
+    state.settings.language,
+    expandedKey,
+    expandedQueryKey,
+    scrollKey,
+    scrollQueryKey,
+    activeQidKey,
+  ]);
 
   // Groupement par livre
   const grouped: Grouped[] = useMemo(() => {
@@ -416,7 +430,7 @@ export default function Search() {
     return arr;
   }, [results, state.settings.language, books]);
 
-  // ✅ Restauration expanded (si query correspond)
+  // ✅ Restore expanded (si query correspond) — avec currentQid correct dès le 1er render
   useEffect(() => {
     if (!grouped.length) {
       setExpanded({});
@@ -447,7 +461,7 @@ export default function Search() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [grouped, currentQid]);
 
-  // ✅ Restauration scroll (si query correspond)
+  // ✅ Restore scroll (si query correspond)
   useEffect(() => {
     if (!grouped.length || loading) return;
     try {
@@ -513,7 +527,6 @@ export default function Search() {
   };
 
   const openInReading = (v: ResultItem) => {
-    // ✅ on persiste AVANT de naviguer
     persistExpandedNow(expanded);
     persistScrollNow();
 
