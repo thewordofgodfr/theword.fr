@@ -267,11 +267,13 @@ export default function Search() {
 
   const queryKey = `twog:search:lastQuery:${state.settings.language}`;
 
-  // clés sessionStorage stables (1 seul état conservé = la DERNIÈRE recherche)
   const expandedKey = `twog:search:expanded:${state.settings.language}`;
   const expandedQueryKey = `twog:search:expandedQuery:${state.settings.language}`;
   const scrollKey = `twog:search:scroll:${state.settings.language}`;
   const scrollQueryKey = `twog:search:scrollQuery:${state.settings.language}`;
+
+  // ✅ nouvelle clé : query réellement “active” (celle qui a produit les résultats affichés)
+  const activeQidKey = `twog:search:activeQid:${state.settings.language}`;
 
   const [query, setQuery] = useState<string>('');
   useEffect(() => {
@@ -288,10 +290,22 @@ export default function Search() {
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
-  // ✅ IMPORTANT : on compare les recherches sur un QID calculé “au moment”
-  const getQidNow = () => normalizeForSearch(query.trim());
+  // ✅ qid courant (normalisé)
+  const currentQid = useMemo(() => normalizeForSearch(query.trim()), [query]);
 
-  // ✅ dernière recherche exécutée (pour détecter une “nouvelle recherche”)
+  // ✅ qid des résultats affichés
+  const [activeQid, setActiveQid] = useState<string>('');
+
+  // charger activeQid au montage (retour depuis Reading)
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(activeQidKey) || '';
+      if (saved) setActiveQid(saved);
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.settings.language]);
+
+  // dernière requête exécutée (debounce)
   const lastExecutedQidRef = useRef<string>('');
 
   const books = useMemo(() => getBibleBooks(), []);
@@ -305,55 +319,51 @@ export default function Search() {
     return idx === -1 ? 9999 : idx;
   };
 
-  // Titre de page
   useEffect(() => {
     document.title = t('searchTitle');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language]);
 
-  // ✅ Persistance immédiate (sans dépendre d’un state dérivé)
   const persistExpandedNow = (nextExpanded: Record<string, boolean>) => {
     try {
-      const qid = getQidNow();
-      if (!qid) return;
+      if (!currentQid) return;
       sessionStorage.setItem(expandedKey, JSON.stringify(nextExpanded));
-      sessionStorage.setItem(expandedQueryKey, qid);
+      sessionStorage.setItem(expandedQueryKey, currentQid);
     } catch {}
   };
 
   const persistScrollNow = () => {
     try {
-      const qid = getQidNow();
-      if (!qid) return;
+      if (!currentQid) return;
       sessionStorage.setItem(scrollKey, String(window.scrollY || 0));
-      sessionStorage.setItem(scrollQueryKey, qid);
+      sessionStorage.setItem(scrollQueryKey, currentQid);
     } catch {}
   };
 
   // Recherche (debounce)
   useEffect(() => {
     const trimmed = query.trim();
-    const qid = getQidNow();
 
     if (trimmed.length < 2) {
       setResults([]);
       setExpanded({});
       setLoading(false);
-      // ⚠️ ici seulement on nettoie (car “pas de recherche”)
+      setActiveQid('');
       try {
         sessionStorage.removeItem(expandedKey);
         sessionStorage.removeItem(expandedQueryKey);
         sessionStorage.removeItem(scrollKey);
         sessionStorage.removeItem(scrollQueryKey);
+        sessionStorage.removeItem(activeQidKey);
       } catch {}
       lastExecutedQidRef.current = '';
       return;
     }
 
     const handle = setTimeout(async () => {
-      // ✅ Si l’utilisateur tape une NOUVELLE recherche :
-      // on ferme tout + scroll top, MAIS on ne supprime PAS le storage ici (sinon on perd l’état au retour).
-      if (qid && qid !== lastExecutedQidRef.current) {
+      // ✅ Si on tape une nouvelle recherche (qid différent de la recherche active affichée)
+      // => on ferme tout + scrollTop, mais on ne wipe pas le storage ici.
+      if (currentQid && activeQid && currentQid !== activeQid) {
         setExpanded({});
         try {
           window.scrollTo({ top: 0, behavior: 'auto' });
@@ -371,15 +381,21 @@ export default function Search() {
         }
         setResults(enriched);
 
-        lastExecutedQidRef.current = qid || '';
+        // ✅ on marque cette query comme active (résultats affichés)
+        const qid = currentQid || '';
+        setActiveQid(qid);
+        try {
+          if (qid) sessionStorage.setItem(activeQidKey, qid);
+        } catch {}
+
+        lastExecutedQidRef.current = qid;
       } finally {
         setLoading(false);
       }
     }, 300);
 
     return () => clearTimeout(handle);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, state.settings.language]);
+  }, [query, currentQid, activeQid, state.settings.language, expandedKey, expandedQueryKey, scrollKey, scrollQueryKey, activeQidKey]);
 
   // Groupement par livre
   const grouped: Grouped[] = useMemo(() => {
@@ -398,16 +414,14 @@ export default function Search() {
     }));
     arr.sort((a, b) => bibleOrder(a.bookId) - bibleOrder(b.bookId));
     return arr;
-  }, [results, books, state.settings.language]);
+  }, [results, state.settings.language, books]);
 
-  // ✅ Restauration expanded (si la query correspond à celle sauvegardée)
+  // ✅ Restauration expanded (si query correspond)
   useEffect(() => {
     if (!grouped.length) {
       setExpanded({});
       return;
     }
-
-    const qid = getQidNow();
 
     let restoredExpanded: Record<string, boolean> | null = null;
     let restoredQid = '';
@@ -421,7 +435,7 @@ export default function Search() {
       restoredQid = '';
     }
 
-    if (restoredExpanded && restoredQid && restoredQid === qid) {
+    if (restoredExpanded && restoredQid && restoredQid === currentQid) {
       const next: Record<string, boolean> = {};
       for (const g of grouped) next[g.bookId] = !!restoredExpanded[g.bookId];
       setExpanded(next);
@@ -431,17 +445,14 @@ export default function Search() {
       setExpanded(next);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [grouped]);
+  }, [grouped, currentQid]);
 
-  // ✅ Restauration scroll (si la query correspond)
+  // ✅ Restauration scroll (si query correspond)
   useEffect(() => {
     if (!grouped.length || loading) return;
-
-    const qid = getQidNow();
-
     try {
-      const savedQid = sessionStorage.getItem(scrollQueryKey) || '';
-      if (!savedQid || savedQid !== qid) return;
+      const qid = sessionStorage.getItem(scrollQueryKey) || '';
+      if (!qid || qid !== currentQid) return;
 
       const raw = sessionStorage.getItem(scrollKey);
       const y = raw ? parseInt(raw, 10) : 0;
@@ -450,7 +461,7 @@ export default function Search() {
       }
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [grouped, loading]);
+  }, [grouped, loading, currentQid]);
 
   // ✅ Sauvegarde au démontage (navigation interne)
   useEffect(() => {
@@ -459,9 +470,8 @@ export default function Search() {
       persistExpandedNow(expanded);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expanded]);
+  }, [expanded, currentQid]);
 
-  // ✅ toggle / expand / collapse : persistance immédiate
   const toggleGroup = (bookId: string) =>
     setExpanded(prev => {
       const next = { ...prev, [bookId]: !prev[bookId] };
@@ -488,11 +498,13 @@ export default function Search() {
     setResults([]);
     setExpanded({});
     setLoading(false);
+    setActiveQid('');
     try {
       sessionStorage.removeItem(scrollKey);
       sessionStorage.removeItem(scrollQueryKey);
       sessionStorage.removeItem(expandedKey);
       sessionStorage.removeItem(expandedQueryKey);
+      sessionStorage.removeItem(activeQidKey);
     } catch {}
     lastExecutedQidRef.current = '';
     try {
@@ -501,7 +513,7 @@ export default function Search() {
   };
 
   const openInReading = (v: ResultItem) => {
-    // ✅ on persiste AVANT de naviguer (état ouvert + scroll)
+    // ✅ on persiste AVANT de naviguer
     persistExpandedNow(expanded);
     persistScrollNow();
 
