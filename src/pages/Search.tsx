@@ -29,9 +29,6 @@ const ALNUM = /[A-Za-z0-9\u0370-\u03FF\u1F00-\u1FFF\u0590-\u05FF]/;
 
 function normalizeForSearch(s: string) {
   const noLig = normalizeLigatures(s);
-  // NFD pour séparer les diacritiques, puis on supprime :
-  // - accents latins (0300–036F)
-  // - niqqud/te'amim hébreux (0591–05C7)
   const deAccented = noLig
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -39,7 +36,6 @@ function normalizeForSearch(s: string) {
 
   return deAccented
     .toLowerCase()
-    // on garde latin + grec + hébreu
     .replace(/[^A-Za-z0-9\u0370-\u03FF\u1F00-\u1FFF\u0590-\u05FF]+/g, ' ')
     .trim()
     .replace(/\s+/g, ' ');
@@ -53,7 +49,6 @@ function buildNormalizedWithMap(input: string) {
 
   for (let i = 0; i < src.length; i++) {
     const ch = src[i];
-    // retire diacritiques latins + niqqud hébreux
     const base = ch
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
@@ -272,7 +267,7 @@ export default function Search() {
 
   const queryKey = `twog:search:lastQuery:${state.settings.language}`;
 
-  // clés sessionStorage stables + on associe à la query
+  // clés sessionStorage stables (1 seul état conservé = la DERNIÈRE recherche)
   const expandedKey = `twog:search:expanded:${state.settings.language}`;
   const expandedQueryKey = `twog:search:expandedQuery:${state.settings.language}`;
   const scrollKey = `twog:search:scroll:${state.settings.language}`;
@@ -293,16 +288,11 @@ export default function Search() {
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
-  // dernière requête exécutée (normalisée)
-  const lastExecutedQidRef = useRef<string>('');
-  const currentQid = useMemo(() => normalizeForSearch(query.trim()), [query]);
+  // ✅ IMPORTANT : on compare les recherches sur un QID calculé “au moment”
+  const getQidNow = () => normalizeForSearch(query.trim());
 
-  // au montage (retour depuis Lecture), on évite un reset “fantôme”
-  useEffect(() => {
-    if (!lastExecutedQidRef.current && currentQid) {
-      lastExecutedQidRef.current = currentQid;
-    }
-  }, [currentQid]);
+  // ✅ dernière recherche exécutée (pour détecter une “nouvelle recherche”)
+  const lastExecutedQidRef = useRef<string>('');
 
   const books = useMemo(() => getBibleBooks(), []);
   const getBookName = (id: string) => {
@@ -321,45 +311,35 @@ export default function Search() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language]);
 
-  // ✅ helpers de persistance IMMÉDIATE (c’est ça le fix)
+  // ✅ Persistance immédiate (sans dépendre d’un state dérivé)
   const persistExpandedNow = (nextExpanded: Record<string, boolean>) => {
     try {
-      if (!currentQid) return;
+      const qid = getQidNow();
+      if (!qid) return;
       sessionStorage.setItem(expandedKey, JSON.stringify(nextExpanded));
-      sessionStorage.setItem(expandedQueryKey, currentQid);
+      sessionStorage.setItem(expandedQueryKey, qid);
     } catch {}
   };
 
   const persistScrollNow = () => {
     try {
-      if (!currentQid) return;
+      const qid = getQidNow();
+      if (!qid) return;
       sessionStorage.setItem(scrollKey, String(window.scrollY || 0));
-      sessionStorage.setItem(scrollQueryKey, currentQid);
-    } catch {}
-  };
-
-  // reset quand on change vraiment de recherche
-  const resetUiForNewQuery = () => {
-    setExpanded({});
-    try {
-      sessionStorage.removeItem(expandedKey);
-      sessionStorage.removeItem(expandedQueryKey);
-      sessionStorage.removeItem(scrollKey);
-      sessionStorage.removeItem(scrollQueryKey);
-    } catch {}
-    try {
-      window.scrollTo({ top: 0, behavior: 'auto' });
+      sessionStorage.setItem(scrollQueryKey, qid);
     } catch {}
   };
 
   // Recherche (debounce)
   useEffect(() => {
     const trimmed = query.trim();
+    const qid = getQidNow();
 
     if (trimmed.length < 2) {
       setResults([]);
       setExpanded({});
       setLoading(false);
+      // ⚠️ ici seulement on nettoie (car “pas de recherche”)
       try {
         sessionStorage.removeItem(expandedKey);
         sessionStorage.removeItem(expandedQueryKey);
@@ -371,15 +351,13 @@ export default function Search() {
     }
 
     const handle = setTimeout(async () => {
-      // si nouvelle query → reset (mais pas si c’est la query sauvegardée)
-      let savedQid = '';
-      try {
-        savedQid = sessionStorage.getItem(expandedQueryKey) || '';
-      } catch {}
-      const isSameAsSaved = !!currentQid && currentQid === savedQid;
-
-      if (currentQid && currentQid !== lastExecutedQidRef.current && !isSameAsSaved) {
-        resetUiForNewQuery();
+      // ✅ Si l’utilisateur tape une NOUVELLE recherche :
+      // on ferme tout + scroll top, MAIS on ne supprime PAS le storage ici (sinon on perd l’état au retour).
+      if (qid && qid !== lastExecutedQidRef.current) {
+        setExpanded({});
+        try {
+          window.scrollTo({ top: 0, behavior: 'auto' });
+        } catch {}
       }
 
       setLoading(true);
@@ -393,14 +371,15 @@ export default function Search() {
         }
         setResults(enriched);
 
-        lastExecutedQidRef.current = currentQid || '';
+        lastExecutedQidRef.current = qid || '';
       } finally {
         setLoading(false);
       }
     }, 300);
 
     return () => clearTimeout(handle);
-  }, [query, currentQid, state.settings.language, expandedKey, expandedQueryKey, scrollKey, scrollQueryKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, state.settings.language]);
 
   // Groupement par livre
   const grouped: Grouped[] = useMemo(() => {
@@ -419,14 +398,16 @@ export default function Search() {
     }));
     arr.sort((a, b) => bibleOrder(a.bookId) - bibleOrder(b.bookId));
     return arr;
-  }, [results, state.settings.language, books]);
+  }, [results, books, state.settings.language]);
 
-  // ✅ Restauration expanded (si même query)
+  // ✅ Restauration expanded (si la query correspond à celle sauvegardée)
   useEffect(() => {
     if (!grouped.length) {
       setExpanded({});
       return;
     }
+
+    const qid = getQidNow();
 
     let restoredExpanded: Record<string, boolean> | null = null;
     let restoredQid = '';
@@ -440,7 +421,7 @@ export default function Search() {
       restoredQid = '';
     }
 
-    if (restoredExpanded && restoredQid && restoredQid === currentQid) {
+    if (restoredExpanded && restoredQid && restoredQid === qid) {
       const next: Record<string, boolean> = {};
       for (const g of grouped) next[g.bookId] = !!restoredExpanded[g.bookId];
       setExpanded(next);
@@ -450,14 +431,17 @@ export default function Search() {
       setExpanded(next);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [grouped, state.settings.language, currentQid]);
+  }, [grouped]);
 
-  // ✅ Restauration scroll (si même query)
+  // ✅ Restauration scroll (si la query correspond)
   useEffect(() => {
     if (!grouped.length || loading) return;
+
+    const qid = getQidNow();
+
     try {
-      const qid = sessionStorage.getItem(scrollQueryKey) || '';
-      if (!qid || qid !== currentQid) return;
+      const savedQid = sessionStorage.getItem(scrollQueryKey) || '';
+      if (!savedQid || savedQid !== qid) return;
 
       const raw = sessionStorage.getItem(scrollKey);
       const y = raw ? parseInt(raw, 10) : 0;
@@ -466,19 +450,18 @@ export default function Search() {
       }
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [grouped, loading, state.settings.language, currentQid]);
+  }, [grouped, loading]);
 
-  // ✅ IMPORTANT : sauvegarde scroll au démontage (navigation interne), pas seulement beforeunload
+  // ✅ Sauvegarde au démontage (navigation interne)
   useEffect(() => {
     return () => {
       persistScrollNow();
-      // on persiste aussi expanded au démontage
       persistExpandedNow(expanded);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expanded, currentQid]);
+  }, [expanded]);
 
-  // ✅ toggle / expand / collapse => persistance IMMÉDIATE
+  // ✅ toggle / expand / collapse : persistance immédiate
   const toggleGroup = (bookId: string) =>
     setExpanded(prev => {
       const next = { ...prev, [bookId]: !prev[bookId] };
@@ -518,7 +501,7 @@ export default function Search() {
   };
 
   const openInReading = (v: ResultItem) => {
-    // ✅ Sécurisation : on persiste AVANT de naviguer (sinon tu perds l’état ouvert)
+    // ✅ on persiste AVANT de naviguer (état ouvert + scroll)
     persistExpandedNow(expanded);
     persistScrollNow();
 
