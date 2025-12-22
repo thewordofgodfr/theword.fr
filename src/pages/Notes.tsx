@@ -24,15 +24,11 @@ import {
   Edit2 as EditTextIcon,
   HelpCircle,
 } from 'lucide-react';
-import {
-  encodeSharedList,
-  decodeSharedList,
-} from '../services/shareCodec';
+import { encodeSharedList, decodeSharedList } from '../services/shareCodec';
 
 /** Sentinelle pour distinguer un bloc de texte libre d'un verset */
 const TEXT_SENTINEL = '__TEXT__';
 const LAST_LIST_STORAGE_KEY = 'theword:lastNotesListId';
-const LIST_ORDER_STORAGE_KEY = 'theword:notesListOrder';
 
 type AnyItem = VerseRef & {
   kind?: 'text' | 'verse';
@@ -110,7 +106,7 @@ export default function Notes() {
   const [importSplitBlocks, setImportSplitBlocks] = useState(true);
 
   // --- Édition multi-lignes d'un bloc texte (création + édition) ---
-    const [editingTextBlock, setEditingTextBlock] = useState<{
+  const [editingTextBlock, setEditingTextBlock] = useState<{
     listId: string;
     idx: number | null; // null = nouveau bloc
     initialValue: string;
@@ -190,43 +186,19 @@ export default function Notes() {
     [t, language]
   );
 
+  // ✅ Ordre alphabétique (par titre), et suppression du tri manuel
   const refresh = () => {
     const all = getAllLists();
 
-    if (typeof window === 'undefined') {
-      setLists(all);
-      return;
-    }
-
-    let storedOrder: string[] = [];
-    try {
-      const raw = window.localStorage.getItem(LIST_ORDER_STORAGE_KEY);
-      if (raw) {
-        storedOrder = JSON.parse(raw);
-      }
-    } catch {
-      storedOrder = [];
-    }
-
-    // Ne garder que les ids encore existants
-    const validStored = storedOrder.filter((id) => all.some((l) => l.id === id));
-    // Ajouter les nouvelles listes en fin
-    const missingIds = all
-      .filter((l) => !validStored.includes(l.id))
-      .map((l) => l.id);
-    const finalOrder = [...validStored, ...missingIds];
-
-    const sorted = [...all].sort(
-      (a, b) => finalOrder.indexOf(a.id) - finalOrder.indexOf(b.id)
-    );
+    const sorted = [...all].sort((a, b) => {
+      const ta = (a.title || '').trim();
+      const tb = (b.title || '').trim();
+      const cmp = ta.localeCompare(tb, undefined, { sensitivity: 'base' });
+      if (cmp !== 0) return cmp;
+      return String(a.id).localeCompare(String(b.id));
+    });
 
     setLists(sorted);
-
-    try {
-      window.localStorage.setItem(LIST_ORDER_STORAGE_KEY, JSON.stringify(finalOrder));
-    } catch {
-      // ignore
-    }
   };
 
   useEffect(() => {
@@ -332,33 +304,7 @@ export default function Notes() {
     if (expandedId === id) setExpandedId(null);
   };
 
-  // Réordonner les LISTES (monter / descendre)
-  const moveList = (id: string, dir: -1 | 1) => {
-    setLists((current) => {
-      const arr = [...current];
-      const index = arr.findIndex((l) => l.id === id);
-      if (index === -1) return current;
-
-      const target = index + dir;
-      if (target < 0 || target >= arr.length) return current;
-
-      const [moved] = arr.splice(index, 1);
-      arr.splice(target, 0, moved);
-
-      try {
-        if (typeof window !== 'undefined') {
-          const order = arr.map((l) => l.id);
-          window.localStorage.setItem(LIST_ORDER_STORAGE_KEY, JSON.stringify(order));
-        }
-      } catch {
-        // ignore
-      }
-
-      return arr;
-    });
-  };
-
-    // Partage au même format que "Copier", avec lien en plus
+  // Partage au même format que "Copier", avec lien en plus
   const doShare = async (id: string) => {
     const list = getListById(id);
     if (!list) return;
@@ -378,7 +324,6 @@ https://www.theword.fr/#about`;
       }
     } catch {}
   };
-
 
   const copyListText = async (id: string) => {
     const list = getListById(id);
@@ -435,8 +380,7 @@ https://www.theword.fr/#about`;
   };
 
   const handleCreateFromText = () => {
-    const title =
-      (importTextTitle || '').trim() || label.importTextDefaultTitle;
+    const title = (importTextTitle || '').trim() || label.importTextDefaultTitle;
     const raw = (importTextBody || '').trim();
 
     if (!raw) {
@@ -471,31 +415,31 @@ https://www.theword.fr/#about`;
   };
 
   // --- opérations de copie/partage pour UN élément ---
-const copyItemText = async (it: AnyItem) => {
-  const txt = buildItemPlainText(it);
-  if (!txt) return;
-  try {
-    await navigator.clipboard.writeText(txt);
-    alert(label.copied + ' ✅');
-  } catch {}
-};
+  const copyItemText = async (it: AnyItem) => {
+    const txt = buildItemPlainText(it);
+    if (!txt) return;
+    try {
+      await navigator.clipboard.writeText(txt);
+      alert(label.copied + ' ✅');
+    } catch {}
+  };
 
-const shareItem = async (it: AnyItem) => {
-  const payload = `${buildItemPlainText(it)}
+  const shareItem = async (it: AnyItem) => {
+    const payload = `${buildItemPlainText(it)}
 
 Découvrir l’application The Word :
 https://www.theword.fr/#about`;
 
-  try {
-    const nav: any = navigator;
-    if (nav?.share) {
-      await nav.share({ title: t('verseWord'), text: payload });
-    } else {
-      await navigator.clipboard.writeText(payload);
-      alert(t('textReadyToShare') + ' ✅');
-    }
-  } catch {}
-};
+    try {
+      const nav: any = navigator;
+      if (nav?.share) {
+        await nav.share({ title: t('verseWord'), text: payload });
+      } else {
+        await navigator.clipboard.writeText(payload);
+        alert(t('textReadyToShare') + ' ✅');
+      }
+    } catch {}
+  };
 
   // ---------- opérations sur items ----------
   const updateItems = (listId: string, updater: (items: AnyItem[]) => AnyItem[]) => {
@@ -530,13 +474,13 @@ https://www.theword.fr/#about`;
       return arr;
     });
     setOpenItemMenu((prev) => {
-  if (!prev) return null;
-  if (prev.listId !== listId) return prev;
-  return { listId, idx: Math.max(0, prev.idx + dir) };
-});
+      if (!prev) return null;
+      if (prev.listId !== listId) return prev;
+      return { listId, idx: Math.max(0, prev.idx + dir) };
+    });
   };
 
-    // Ouverture d'un nouveau bloc texte (par défaut : en fin de liste)
+  // Ouverture d'un nouveau bloc texte (par défaut : en fin de liste)
   const addTextBlock = (listId: string) => {
     setEditingTextBlock({
       listId,
@@ -573,7 +517,7 @@ https://www.theword.fr/#about`;
       return;
     }
 
-        if (editingTextBlock.idx === null) {
+    if (editingTextBlock.idx === null) {
       updateItems(editingTextBlock.listId, (items) => {
         const arr = [...items];
         const newItem: AnyItem = {
@@ -719,9 +663,6 @@ https://www.theword.fr/#about`;
           <div className="space-y-4">
             {shownLists.map((list) => {
               const isOpen = expandedId === list.id;
-              const listIndex = lists.findIndex((l) => l.id === list.id);
-              const canMoveUp = listIndex > 0;
-              const canMoveDown = listIndex !== -1 && listIndex < lists.length - 1;
 
               return (
                 <div
@@ -744,58 +685,16 @@ https://www.theword.fr/#about`;
                   aria-expanded={isOpen}
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
-                  {/* Titre + infos + (optionnel) boutons de réorganisation de liste */}
+                  {/* Titre + infos (sans flèches de réorganisation) */}
                   <div className="min-w-0 flex items-start justify-between gap-3">
                     <div>
                       <div className="text-xl md:text-xl font-semibold leading-snug whitespace-normal break-words">
                         {list.title}
                       </div>
-                      <div
-                        className={`mt-1 text-xs ${
-                          isDark ? 'text-white/60' : 'text-gray-500'
-                        }`}
-                      >
+                      <div className={`mt-1 text-xs ${isDark ? 'text-white/60' : 'text-gray-500'}`}>
                         {list.items.length} {label.verses} • {formatDate(list.updatedAt)}
                       </div>
                     </div>
-
-                    {!isOpen && (
-                      <div className="flex flex-col items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (canMoveUp) moveList(list.id, -1);
-                          }}
-                          disabled={!canMoveUp}
-                          title={label.moveUp}
-                          className={`inline-flex items-center justify-center rounded-full p-1 border text-xs ${
-                            isDark
-                              ? 'border-gray-600 text-gray-200 bg-gray-900'
-                              : 'border-gray-300 text-gray-700 bg-gray-50'
-                          } ${!canMoveUp ? 'opacity-40 cursor-default' : 'active:scale-95'}`}
-                        >
-                          <ArrowUp size={14} />
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (canMoveDown) moveList(list.id, 1);
-                          }}
-                          disabled={!canMoveDown}
-                          title={label.moveDown}
-                          className={`inline-flex items-center justify-center rounded-full p-1 border text-xs ${
-                            isDark
-                              ? 'border-gray-600 text-gray-200 bg-gray-900'
-                              : 'border-gray-300 text-gray-700 bg-gray-50'
-                          } ${!canMoveDown ? 'opacity-40 cursor-default' : 'active:scale-95'}`}
-                        >
-                          <ArrowDown size={14} />
-                        </button>
-                      </div>
-                    )}
                   </div>
 
                   {/* Actions de la liste ouverte */}
@@ -905,9 +804,7 @@ https://www.theword.fr/#about`;
                                   <button
                                     className="w-full text-left"
                                     onClick={() =>
-                                      setOpenItemMenu(
-                                        menuOpen ? null : { listId: list.id, idx }
-                                      )
+                                      setOpenItemMenu(menuOpen ? null : { listId: list.id, idx })
                                     }
                                   >
                                     {!isText ? (
@@ -968,58 +865,55 @@ https://www.theword.fr/#about`;
                                         </>
                                       )}
 
-{isText && (
-  <button
-    onClick={() => editTextBlock(list.id, idx, String(it.text || ''))}
-    className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500"
-    title={label.editTextBlock}
-  >
-    <EditTextIcon size={16} />
-    {label.editTextBlock}
-  </button>
-)}
+                                      {isText && (
+                                        <button
+                                          onClick={() => editTextBlock(list.id, idx, String(it.text || ''))}
+                                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500"
+                                          title={label.editTextBlock}
+                                        >
+                                          <EditTextIcon size={16} />
+                                          {label.editTextBlock}
+                                        </button>
+                                      )}
 
-{/* ✅ Forcer Monter + Descendre à rester ensemble (et donc sous "Modifier" sur Android) */}
-<div className="flex flex-wrap items-center gap-2 w-full">
-  <button
-    onClick={() => moveItem(list.id, idx, -1)}
-    className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-      isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
-    }`}
-    disabled={idx === 0}
-    title={label.moveUp}
-  >
-    <ArrowUp size={16} />
-    {label.moveUp}
-  </button>
+                                      {/* ✅ Forcer Monter + Descendre à rester ensemble (et donc sous "Modifier" sur Android) */}
+                                      <div className="flex flex-wrap items-center gap-2 w-full">
+                                        <button
+                                          onClick={() => moveItem(list.id, idx, -1)}
+                                          className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
+                                            isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
+                                          }`}
+                                          disabled={idx === 0}
+                                          title={label.moveUp}
+                                        >
+                                          <ArrowUp size={16} />
+                                          {label.moveUp}
+                                        </button>
 
-  <button
-    onClick={() => moveItem(list.id, idx, 1)}
-    className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-      isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
-    }`}
-    disabled={idx === list.items.length - 1}
-    title={label.moveDown}
-  >
-    <ArrowDown size={16} />
-    {label.moveDown}
-  </button>
-</div>
+                                        <button
+                                          onClick={() => moveItem(list.id, idx, 1)}
+                                          className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
+                                            isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
+                                          }`}
+                                          disabled={idx === list.items.length - 1}
+                                          title={label.moveDown}
+                                        >
+                                          <ArrowDown size={16} />
+                                          {label.moveDown}
+                                        </button>
+                                      </div>
 
-                                      
                                       <button
                                         onClick={() => insertTextBlockAt(list.id, idx + 1)}
                                         className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                          isDark
-                                            ? 'bg-gray-700 text-white'
-                                            : 'bg-white text-gray-800'
+                                          isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
                                         }`}
                                         title={label.addTextBlock}
                                       >
                                         <TextIcon size={16} />
                                         {label.addTextBlock}
                                       </button>
-                                      
+
                                       <button
                                         onClick={() => removeItem(list.id, idx)}
                                         className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-red-600 text-white hover:bg-red-500"
@@ -1032,9 +926,7 @@ https://www.theword.fr/#about`;
                                       <button
                                         onClick={() => setOpenItemMenu(null)}
                                         className={`px-2 py-1.5 rounded ${
-                                          isDark
-                                            ? 'bg-gray-700 text-white'
-                                            : 'bg-white text-gray-800'
+                                          isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
                                         }`}
                                       >
                                         {label.cancel}
@@ -1087,14 +979,10 @@ https://www.theword.fr/#about`;
               isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
             }`}
           >
-            <h2 className="text-lg font-semibold mb-2">
-              {label.importFromTextTitle}
-            </h2>
+            <h2 className="text-lg font-semibold mb-2">{label.importFromTextTitle}</h2>
 
             <div className="mb-3">
-              <label className="block text-sm mb-1">
-                {label.importTextTitlePlaceholder}
-              </label>
+              <label className="block text-sm mb-1">{label.importTextTitlePlaceholder}</label>
               <input
                 type="text"
                 className={`w-full rounded-md px-2 py-1.5 text-sm border ${
@@ -1109,9 +997,7 @@ https://www.theword.fr/#about`;
             </div>
 
             <div className="mb-3">
-              <label className="block text-sm mb-1">
-                {label.documentContent}
-              </label>
+              <label className="block text-sm mb-1">{label.documentContent}</label>
               <textarea
                 className={`w-full rounded-md px-2 py-1.5 text-sm min-h-[160px] border resize-vertical ${
                   isDark
@@ -1122,9 +1008,7 @@ https://www.theword.fr/#about`;
                 onChange={(e) => setImportTextBody(e.target.value)}
                 placeholder={label.importTextBodyPlaceholder}
               />
-              <div className="mt-1 text-xs opacity-75">
-                {label.importTextInfo}
-              </div>
+              <div className="mt-1 text-xs opacity-75">{label.importTextInfo}</div>
             </div>
 
             <label className="flex items-center gap-2 text-sm mb-4">
@@ -1140,9 +1024,7 @@ https://www.theword.fr/#about`;
               <button
                 onClick={() => setShowImportFromText(false)}
                 className={`px-3 py-1.5 rounded text-sm ${
-                  isDark
-                    ? 'bg-gray-700 text-white'
-                    : 'bg-gray-200 text-gray-800'
+                  isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
                 }`}
               >
                 {label.cancel}
@@ -1192,9 +1074,7 @@ https://www.theword.fr/#about`;
               <button
                 onClick={() => setEditingTextBlock(null)}
                 className={`px-3 py-1.5 rounded text-base ${
-                  isDark
-                    ? 'bg-gray-700 text-white'
-                    : 'bg-gray-200 text-gray-800'
+                  isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
                 }`}
               >
                 {label.cancel}
@@ -1223,9 +1103,7 @@ https://www.theword.fr/#about`;
               isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
             }`}
           >
-            <h2 className="text-xl font-semibold mb-3">
-              {label.helpTitle}
-            </h2>
+            <h2 className="text-xl font-semibold mb-3">{label.helpTitle}</h2>
 
             <div
               className="space-y-3 leading-relaxed text-left"
@@ -1301,9 +1179,7 @@ https://www.theword.fr/#about`;
               <button
                 onClick={() => setShowHelp(false)}
                 className={`px-3 py-1.5 rounded text-sm ${
-                  isDark
-                    ? 'bg-gray-700 text-white'
-                    : 'bg-gray-200 text-gray-800'
+                  isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
                 }`}
               >
                 OK
@@ -1315,5 +1191,4 @@ https://www.theword.fr/#about`;
     </div>
   );
 }
-
 
