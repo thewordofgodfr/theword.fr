@@ -107,31 +107,6 @@ export default function About() {
             The Word
           </h1>
 
-          {/* Encart temporaire pour les premiers testeurs Android (FR uniquement) */}
-          {state.settings.language === 'fr' && (
-            <div
-              className={`mt-3 inline-block rounded-2xl px-4 py-2 border font-semibold ${
-                isDark
-                  ? 'bg-blue-900 text-blue-100 border-blue-500/70'
-                  : 'bg-blue-50 text-blue-900 border-blue-300'
-              }`}
-              style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.5 }}
-            >
-              Pour faire partie des premiers testeurs de l’application Android The Word,
-              demandez le lien d’installation à&nbsp;
-              <a
-                href={`mailto:contact@theword.fr?subject=${encodeURIComponent(
-                  "Demande pour tester l'application Android The Word"
-                )}&body=${encodeURIComponent(
-                  "Bonjour,\n\nJe souhaite faire partie des premiers testeurs de l'application Android The Word.\n\nMerci d'avance,\n"
-                )}`}
-                className="underline"
-              >
-                contact@theword.fr
-              </a>
-            </div>
-          )}
-
           <p
             className={`${isDark ? 'text-white/90' : 'text-gray-700'} mt-3 leading-relaxed`}
             style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
