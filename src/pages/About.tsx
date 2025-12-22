@@ -2,7 +2,7 @@
 import React from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
-import { Heart, Shuffle, List as ListIcon, Search as SearchIcon } from 'lucide-react';
+import { Shuffle, Search as SearchIcon } from 'lucide-react';
 
 /** Tailles fixes (non dynamiques) */
 const TITLE_PX = 21; // Titre principal
@@ -54,18 +54,12 @@ const QuickSlotsHelpInline: React.FC = () => {
         </span>
 
         {/* 2 */}
-        <span
-          className={`${CHIP_BASE} ${SLOT2}`}
-          title={t('quickSlot2Tooltip')}
-        >
+        <span className={`${CHIP_BASE} ${SLOT2}`} title={t('quickSlot2Tooltip')}>
           2
         </span>
 
         {/* 3 */}
-        <span
-          className={`${CHIP_BASE} ${SLOT3}`}
-          title={t('quickSlot3Tooltip')}
-        >
+        <span className={`${CHIP_BASE} ${SLOT3}`} title={t('quickSlot3Tooltip')}>
           3
         </span>
       </div>
@@ -84,10 +78,7 @@ const QuickSlotsHelpInline: React.FC = () => {
 export default function About() {
   const { state } = useApp();
   const { t } = useTranslation();
-
   const isDark = state.settings.theme === 'dark';
-
-  const notesPoints = [t('notesPoint1'), t('notesPoint2'), t('notesPoint3')];
 
   return (
     <div
@@ -108,7 +99,9 @@ export default function About() {
           </h1>
 
           <p
-            className={`${isDark ? 'text-white/90' : 'text-gray-700'} mt-3 leading-relaxed`}
+            className={`${
+              isDark ? 'text-white/90' : 'text-gray-700'
+            } mt-3 leading-relaxed`}
             style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
           >
             {t('aboutIntro')}
@@ -116,7 +109,35 @@ export default function About() {
         </header>
 
         <div className="flex flex-col gap-5">
-          {/* ====== 2) FONCTIONNALITÉ ALÉATOIRE ====== */}
+          {/* ====== 2) RECHERCHE ====== */}
+          <section
+            className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-md p-4`}
+          >
+            <h2
+              className={`mb-4 font-bold flex items-center ${
+                isDark ? 'text-white' : 'text-gray-900'
+              }`}
+              style={{ fontSize: `${H2_PX}px` }}
+            >
+              <SearchIcon size={22} className="mr-2 opacity-90" />
+              {t('searchTitle')}
+            </h2>
+
+            <div
+              className={`rounded-xl p-4 ${
+                isDark ? 'bg-gray-700/70' : 'bg-gradient-to-br from-blue-50 to-slate-50'
+              }`}
+            >
+              <p
+                className={`${isDark ? 'text-white' : 'text-gray-700'} leading-relaxed`}
+                style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
+              >
+                {t('aboutDescription')}
+              </p>
+            </div>
+          </section>
+
+          {/* ====== 3) FONCTIONNALITÉ ALÉATOIRE ====== */}
           <section
             className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-md p-4`}
           >
@@ -136,9 +157,7 @@ export default function About() {
               }`}
             >
               <p
-                className={`${
-                  isDark ? 'text-white' : 'text-gray-700'
-                } leading-relaxed`}
+                className={`${isDark ? 'text-white' : 'text-gray-700'} leading-relaxed`}
                 style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
               >
                 {t('randomFeatureDesc')}
@@ -181,7 +200,7 @@ export default function About() {
             </div>
           </section>
 
-          {/* ====== 3) RACCOURCIS DE LECTURE ====== */}
+          {/* ====== 4) RACCOURCIS DE LECTURE ====== */}
           <section
             className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-md p-4`}
           >
@@ -202,56 +221,68 @@ export default function About() {
             </div>
           </section>
 
-          {/* ====== 4) NOTES ====== */}
+          {/* ====== 5) VERSIONS DE LA BIBLE ====== */}
           <section
             className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-md p-4`}
           >
             <h2
-              className={`mb-3 font-bold flex items-center ${
+              className={`mb-4 font-bold ${
                 isDark ? 'text-white' : 'text-gray-900'
               }`}
               style={{ fontSize: `${H2_PX}px` }}
             >
-              <ListIcon size={20} className="mr-2 opacity-90" />
-              {t('notes')}
+              {t('bibleVersions')}
             </h2>
 
             <div
-              className={`${
-                isDark ? 'text-white' : 'text-gray-700'
-              } leading-relaxed`}
-              style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
+              className={`rounded-xl p-4 ${
+                isDark ? 'bg-gray-700/70' : 'bg-gray-50 border border-gray-200'
+              }`}
             >
-              <p className="mb-3">{t('notesIntro')}</p>
-              <ul className="list-disc pl-5 space-y-1.5">
-                {notesPoints.map((li, i) => (
-                  <li key={i}>{li}</li>
-                ))}
-              </ul>
+              <div className="space-y-3">
+                <div>
+                  <div
+                    className={`${isDark ? 'text-white' : 'text-gray-900'} font-semibold`}
+                    style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.5 }}
+                  >
+                    {t('frenchVersion')}
+                  </div>
+                  <p
+                    className={`${isDark ? 'text-white/90' : 'text-gray-700'} mt-1`}
+                    style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
+                  >
+                    {t('frenchVersionDetails')}
+                  </p>
+                </div>
+
+                <div className={`${isDark ? 'border-gray-600' : 'border-gray-200'} border-t pt-3`}>
+                  <div
+                    className={`${isDark ? 'text-white' : 'text-gray-900'} font-semibold`}
+                    style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.5 }}
+                  >
+                    {t('englishVersion')}
+                  </div>
+                  <p
+                    className={`${isDark ? 'text-white/90' : 'text-gray-700'} mt-1`}
+                    style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
+                  >
+                    {t('englishVersionDetails')}
+                  </p>
+                </div>
+
+                <div className={`${isDark ? 'border-gray-600' : 'border-gray-200'} border-t pt-3`}>
+                  <p
+                    className={`${isDark ? 'text-white/90' : 'text-gray-700'}`}
+                    style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
+                  >
+                    {t('otherLanguagesNote')}
+                  </p>
+                </div>
+              </div>
             </div>
           </section>
 
-          {/* ====== 5) CRÉÉ AVEC AMOUR ====== */}
-          <section
-            className={`rounded-2xl p-4 text-center shadow-md ${
-              isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'
-            }`}
-          >
-            <div className="flex items-center justify-center gap-3">
-              <Heart
-                className={`${isDark ? 'text-rose-300' : 'text-rose-500'}`}
-                size={24}
-              />
-              <span
-                className="font-semibold"
-                style={{ fontSize: `${TEXT_PX}px` }}
-              >
-                {t('createdWithLove')}
-              </span>
-            </div>
-          </section>
-
-          {/* ====== 6) COMMENTAIRE DE FIN SUR LES VERSIONS + LIEN CONFIDENTIALITÉ ====== */}
+          {/* ====== 6) NOTE LÉGALE + LIEN CONFIDENTIALITÉ ====== */}
           <footer className="px-1 pb-2">
             <p
               className={`${
@@ -272,10 +303,7 @@ export default function About() {
               {state.settings.language === 'fr' ? (
                 <>
                   Pour consulter la politique de confidentialité,&nbsp;
-                  <a
-                    href="https://theword.fr/privacy.html"
-                    className="underline"
-                  >
+                  <a href="https://theword.fr/privacy.html" className="underline">
                     cliquez ici
                   </a>
                   .
@@ -283,10 +311,7 @@ export default function About() {
               ) : (
                 <>
                   To read the privacy policy,&nbsp;
-                  <a
-                    href="https://theword.fr/privacy.html"
-                    className="underline"
-                  >
+                  <a href="https://theword.fr/privacy.html" className="underline">
                     click here
                   </a>
                   .
@@ -299,4 +324,3 @@ export default function About() {
     </div>
   );
 }
-
