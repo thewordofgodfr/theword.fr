@@ -277,28 +277,21 @@ export default function Principes() {
     let storedOrder: string[] = [];
     try {
       const raw = window.localStorage.getItem(LIST_ORDER_STORAGE_KEY);
-      if (raw) {
-        storedOrder = JSON.parse(raw);
-      }
+      if (raw) storedOrder = JSON.parse(raw);
     } catch {
       storedOrder = [];
     }
 
     const validStored = storedOrder.filter((id) => all.some((l) => l.id === id));
-    const missingIds = all
-      .filter((l) => !validStored.includes(l.id))
-      .map((l) => l.id);
+    const missingIds = all.filter((l) => !validStored.includes(l.id)).map((l) => l.id);
     const finalOrder = [...validStored, ...missingIds];
 
     const sorted = [...all].sort((a, b) => finalOrder.indexOf(a.id) - finalOrder.indexOf(b.id));
-
     setLists(sorted);
 
     try {
       window.localStorage.setItem(LIST_ORDER_STORAGE_KEY, JSON.stringify(finalOrder));
-    } catch {
-      // ignore
-    }
+    } catch {}
   };
 
   useEffect(() => {
@@ -306,32 +299,23 @@ export default function Principes() {
   }, []);
 
   useEffect(() => {
-    if (expandedId) {
-      setShouldScrollToLast(true);
-    }
+    if (expandedId) setShouldScrollToLast(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // mémoriser / nettoyer la dernière étude ouverte (Lecture ↔ Études)
   useEffect(() => {
     try {
-      if (expandedId) {
-        window.localStorage.setItem(LAST_LIST_STORAGE_KEY, expandedId);
-      } else {
-        window.localStorage.removeItem(LAST_LIST_STORAGE_KEY);
-      }
-    } catch {
-      // ignore
-    }
+      if (expandedId) window.localStorage.setItem(LAST_LIST_STORAGE_KEY, expandedId);
+      else window.localStorage.removeItem(LAST_LIST_STORAGE_KEY);
+    } catch {}
   }, [expandedId]);
 
   // si la liste mémorisée n'existe plus (supprimée), on nettoie l'état
   useEffect(() => {
     if (!expandedId) return;
     if (!lists.length) return;
-    if (!lists.some((l) => l.id === expandedId)) {
-      setExpandedId(null);
-    }
+    if (!lists.some((l) => l.id === expandedId)) setExpandedId(null);
   }, [lists, expandedId]);
 
   // quand une liste restaurée est ouverte, descendre automatiquement sur le dernier élément
@@ -345,19 +329,14 @@ export default function Principes() {
 
     const lastIdx = list.items.length - 1;
     const el = document.getElementById(`principle-item-${expandedId}-${lastIdx}`);
-    if (el && 'scrollIntoView' in el) {
-      (el as HTMLElement).scrollIntoView({ block: 'center', behavior: 'auto' });
-    }
+    if (el && 'scrollIntoView' in el) (el as HTMLElement).scrollIntoView({ block: 'center', behavior: 'auto' });
     setShouldScrollToLast(false);
   }, [lists, expandedId, shouldScrollToLast]);
 
   // synchroniser la valeur de la modale d'édition avec le bloc courant
   useEffect(() => {
-    if (editingTextBlock) {
-      setEditingTextValue(editingTextBlock.initialValue ?? '');
-    } else {
-      setEditingTextValue('');
-    }
+    if (editingTextBlock) setEditingTextValue(editingTextBlock.initialValue ?? '');
+    else setEditingTextValue('');
   }, [editingTextBlock]);
 
   const doCreate = () => {
@@ -365,9 +344,7 @@ export default function Principes() {
     const trimmed = title.trim();
     if (!trimmed) return;
 
-    const exists = p_getAllLists().find(
-      (l) => (l.title || '').trim().toLowerCase() === trimmed.toLowerCase()
-    );
+    const exists = p_getAllLists().find((l) => (l.title || '').trim().toLowerCase() === trimmed.toLowerCase());
     if (exists) {
       alert(label.duplicateTitle);
       setExpandedId(exists.id);
@@ -421,9 +398,7 @@ export default function Principes() {
           const order = arr.map((l) => l.id);
           window.localStorage.setItem(LIST_ORDER_STORAGE_KEY, JSON.stringify(order));
         }
-      } catch {
-        // ignore
-      }
+      } catch {}
 
       return arr;
     });
@@ -441,9 +416,8 @@ https://www.theword.fr/#about`;
 
     try {
       const nav: any = navigator;
-      if (nav?.share) {
-        await nav.share({ title: list.title || label.title, text: payload });
-      } else {
+      if (nav?.share) await nav.share({ title: list.title || label.title, text: payload });
+      else {
         await navigator.clipboard.writeText(payload);
         alert(t('textReadyToShare') + ' ✅');
       }
@@ -557,9 +531,8 @@ https://www.theword.fr/#about`;
 
     try {
       const nav: any = navigator;
-      if (nav?.share) {
-        await nav.share({ title: t('verseWord'), text: payload });
-      } else {
+      if (nav?.share) await nav.share({ title: t('verseWord'), text: payload });
+      else {
         await navigator.clipboard.writeText(payload);
         alert(t('textReadyToShare') + ' ✅');
       }
@@ -660,11 +633,8 @@ https://www.theword.fr/#about`;
             ? Math.max(0, Math.min(arr.length, editingTextBlock.insertAt))
             : null;
 
-        if (insertAt === null) {
-          arr.push(newItem); // comportement actuel : ajouter en fin
-        } else {
-          arr.splice(insertAt, 0, newItem); // ✅ insertion entre 2 items
-        }
+        if (insertAt === null) arr.push(newItem);
+        else arr.splice(insertAt, 0, newItem);
 
         return arr;
       });
@@ -687,11 +657,7 @@ https://www.theword.fr/#about`;
 
   // format date simple
   const formatDate = (d: string | number | Date) =>
-    new Date(d).toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
+    new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' });
 
   return (
     <div className={`min-h-[100svh] ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -740,9 +706,7 @@ https://www.theword.fr/#about`;
                 <button
                   onClick={openImportFromText}
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
-                    isDark
-                      ? 'border-gray-500 text-gray-100 bg-gray-900'
-                      : 'border-gray-300 text-gray-800 bg-white'
+                    isDark ? 'border-gray-500 text-gray-100 bg-gray-900' : 'border-gray-300 text-gray-800 bg-white'
                   }`}
                 >
                   <TextIcon size={14} />
@@ -752,9 +716,7 @@ https://www.theword.fr/#about`;
                 <button
                   onClick={doImportFromCode}
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
-                    isDark
-                      ? 'border-gray-500 text-gray-100 bg-gray-900'
-                      : 'border-gray-300 text-gray-800 bg-white'
+                    isDark ? 'border-gray-500 text-gray-100 bg-gray-900' : 'border-gray-300 text-gray-800 bg-white'
                   }`}
                 >
                   <Copy size={14} />
@@ -787,9 +749,7 @@ https://www.theword.fr/#about`;
         )}
 
         {shownLists.length === 0 ? (
-          <div className={`${isDark ? 'text-white/80' : 'text-gray-600'} text-center py-16`}>
-            {label.empty}
-          </div>
+          <div className={`${isDark ? 'text-white/80' : 'text-gray-600'} text-center py-16`}>{label.empty}</div>
         ) : (
           <div className="space-y-4">
             {shownLists.map((list) => {
@@ -841,9 +801,7 @@ https://www.theword.fr/#about`;
                           disabled={!canMoveUp}
                           title={label.moveUp}
                           className={`inline-flex items-center justify-center rounded-full p-1 border text-xs ${
-                            isDark
-                              ? 'border-gray-600 text-gray-200 bg-gray-900'
-                              : 'border-gray-300 text-gray-700 bg-gray-50'
+                            isDark ? 'border-gray-600 text-gray-200 bg-gray-900' : 'border-gray-300 text-gray-700 bg-gray-50'
                           } ${!canMoveUp ? 'opacity-40 cursor-default' : 'active:scale-95'}`}
                         >
                           <ArrowUp size={14} />
@@ -858,9 +816,7 @@ https://www.theword.fr/#about`;
                           disabled={!canMoveDown}
                           title={label.moveDown}
                           className={`inline-flex items-center justify-center rounded-full p-1 border text-xs ${
-                            isDark
-                              ? 'border-gray-600 text-gray-200 bg-gray-900'
-                              : 'border-gray-300 text-gray-700 bg-gray-50'
+                            isDark ? 'border-gray-600 text-gray-200 bg-gray-900' : 'border-gray-300 text-gray-700 bg-gray-50'
                           } ${!canMoveDown ? 'opacity-40 cursor-default' : 'active:scale-95'}`}
                         >
                           <ArrowDown size={14} />
@@ -874,9 +830,7 @@ https://www.theword.fr/#about`;
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       <button
                         onClick={() => doRename(list.id, list.title)}
-                        className={`${
-                          isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-                        } px-3 py-2 rounded inline-flex items-center gap-2`}
+                        className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
                         title={t('principlesPage.renameList')}
                       >
                         <Edit3 size={16} />
@@ -894,9 +848,7 @@ https://www.theword.fr/#about`;
 
                       <button
                         onClick={() => copyListText(list.id)}
-                        className={`${
-                          isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-                        } px-3 py-2 rounded inline-flex items-center gap-2`}
+                        className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
                         title={t('copyLabel')}
                       >
                         <Copy size={16} />
@@ -905,9 +857,7 @@ https://www.theword.fr/#about`;
 
                       <button
                         onClick={() => doShareCode(list.id)}
-                        className={`${
-                          isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'
-                        } px-3 py-2 rounded inline-flex items-center gap-2`}
+                        className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
                         title={label.shareCode}
                       >
                         <Copy size={16} />
@@ -929,16 +879,13 @@ https://www.theword.fr/#about`;
                   {isOpen && (
                     <div className="mt-4">
                       {list.items.length === 0 ? (
-                        <div className={`${isDark ? 'text-white/70' : 'text-gray-600'} text-sm`}>
-                          {label.emptyList}
-                        </div>
+                        <div className={`${isDark ? 'text-white/70' : 'text-gray-600'} text-sm`}>{label.emptyList}</div>
                       ) : (
                         <>
                           <ul className="space-y-3">
                             {(list.items as AnyItem[]).map((it, idx) => {
                               const isText = it.bookId === TEXT_SENTINEL;
-                              const menuOpen =
-                                openItemMenu?.listId === list.id && openItemMenu?.idx === idx;
+                              const menuOpen = openItemMenu?.listId === list.id && openItemMenu?.idx === idx;
 
                               const baseItemBg = isText
                                 ? isDark
@@ -958,24 +905,18 @@ https://www.theword.fr/#about`;
                                 setPage('reading');
                               };
 
-                              const textBaseClass = isDark
-                                ? 'text-white mt-1 whitespace-pre-wrap'
-                                : 'text-gray-800 mt-1 whitespace-pre-wrap';
+                              const textBaseClass = isDark ? 'text-white mt-1 whitespace-pre-wrap' : 'text-gray-800 mt-1 whitespace-pre-wrap';
                               const textClass = isText ? `${textBaseClass} font-serif` : textBaseClass;
 
                               return (
                                 <li
                                   key={idx}
                                   id={`principle-item-${list.id}-${idx}`}
-                                  className={`${baseItemBg} rounded-md p-3 transition ${
-                                    isText ? 'border-l-4 border-indigo-400' : ''
-                                  }`}
+                                  className={`${baseItemBg} rounded-md p-3 transition ${isText ? 'border-l-4 border-indigo-400' : ''}`}
                                 >
                                   <button
                                     className="w-full text-left"
-                                    onClick={() =>
-                                      setOpenItemMenu(menuOpen ? null : { listId: list.id, idx })
-                                    }
+                                    onClick={() => setOpenItemMenu(menuOpen ? null : { listId: list.id, idx })}
                                   >
                                     {!isText ? (
                                       <div className="font-semibold">
@@ -985,10 +926,7 @@ https://www.theword.fr/#about`;
 
                                     {it.text ? (
                                       <div
-                                        style={{
-                                          fontSize: `${state.settings.fontSize}px`,
-                                          lineHeight: '1.55',
-                                        }}
+                                        style={{ fontSize: `${state.settings.fontSize}px`, lineHeight: '1.55' }}
                                         className={textClass}
                                       >
                                         {it.text}
@@ -1005,14 +943,20 @@ https://www.theword.fr/#about`;
                                       {!isText && (
                                         <>
                                           <button
-                                            onClick={openInReading}
+                                            onClick={() => {
+                                              openInReading();
+                                              setOpenItemMenu(null);
+                                            }}
                                             className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-500"
                                           >
                                             {label.open}
                                           </button>
 
                                           <button
-                                            onClick={() => copyItemText(it)}
+                                            onClick={async () => {
+                                              await copyItemText(it);
+                                              setOpenItemMenu(null);
+                                            }}
                                             className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
                                               isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
                                             }`}
@@ -1023,7 +967,10 @@ https://www.theword.fr/#about`;
                                           </button>
 
                                           <button
-                                            onClick={() => shareItem(it)}
+                                            onClick={async () => {
+                                              await shareItem(it);
+                                              setOpenItemMenu(null);
+                                            }}
                                             className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500"
                                             title={t('shareLabel')}
                                           >
@@ -1035,7 +982,10 @@ https://www.theword.fr/#about`;
 
                                       {isText && (
                                         <button
-                                          onClick={() => editTextBlock(list.id, idx, String(it.text || ''))}
+                                          onClick={() => {
+                                            editTextBlock(list.id, idx, String(it.text || ''));
+                                            setOpenItemMenu(null);
+                                          }}
                                           className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500"
                                           title={label.editTextBlock}
                                         >
@@ -1044,7 +994,7 @@ https://www.theword.fr/#about`;
                                         </button>
                                       )}
 
-                                      {/* ✅ Forcer Monter + Descendre à rester ensemble (et donc sous "Modifier" sur Android) */}
+                                      {/* ✅ Forcer Monter + Descendre à rester ensemble */}
                                       <div className="flex flex-wrap items-center gap-2 w-full">
                                         <button
                                           onClick={() => moveItem(list.id, idx, -1)}
@@ -1073,7 +1023,10 @@ https://www.theword.fr/#about`;
 
                                       {/* ✅ Insérer un bloc texte juste après cet item */}
                                       <button
-                                        onClick={() => insertTextBlockAt(list.id, idx + 1)}
+                                        onClick={() => {
+                                          insertTextBlockAt(list.id, idx + 1);
+                                          setOpenItemMenu(null);
+                                        }}
                                         className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
                                           isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
                                         }`}
@@ -1133,16 +1086,8 @@ https://www.theword.fr/#about`;
       {/* MODALE : importer depuis un TEXTE */}
       {showImportFromText && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-black/60"
-            onClick={() => setShowImportFromText(false)}
-            aria-hidden="true"
-          />
-          <div
-            className={`relative w-full max-w-lg mx-4 rounded-2xl p-4 ${
-              isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
-            }`}
-          >
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowImportFromText(false)} aria-hidden="true" />
+          <div className={`relative w-full max-w-lg mx-4 rounded-2xl p-4 ${isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
             <h2 className="text-lg font-semibold mb-2">{label.importFromTextTitle}</h2>
 
             <div className="mb-3">
@@ -1150,9 +1095,7 @@ https://www.theword.fr/#about`;
               <input
                 type="text"
                 className={`w-full rounded-md px-2 py-1.5 text-sm border ${
-                  isDark
-                    ? 'bg-gray-800 border-gray-600 text-white'
-                    : 'bg-gray-50 border-gray-300 text-gray-900'
+                  isDark ? 'bg-gray-800 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
                 }`}
                 value={importTextTitle}
                 onChange={(e) => setImportTextTitle(e.target.value)}
@@ -1164,9 +1107,7 @@ https://www.theword.fr/#about`;
               <label className="block text-sm mb-1">{label.documentContent}</label>
               <textarea
                 className={`w-full rounded-md px-2 py-1.5 text-sm min-h-[160px] border resize-vertical ${
-                  isDark
-                    ? 'bg-gray-800 border-gray-600 text-white'
-                    : 'bg-gray-50 border-gray-300 text-gray-900'
+                  isDark ? 'bg-gray-800 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
                 }`}
                 value={importTextBody}
                 onChange={(e) => setImportTextBody(e.target.value)}
@@ -1176,27 +1117,18 @@ https://www.theword.fr/#about`;
             </div>
 
             <label className="flex items-center gap-2 text-sm mb-4">
-              <input
-                type="checkbox"
-                checked={importSplitBlocks}
-                onChange={(e) => setImportSplitBlocks(e.target.checked)}
-              />
+              <input type="checkbox" checked={importSplitBlocks} onChange={(e) => setImportSplitBlocks(e.target.checked)} />
               <span>{label.importTextSplitLabel}</span>
             </label>
 
             <div className="flex justify-end gap-2 mt-2">
               <button
                 onClick={() => setShowImportFromText(false)}
-                className={`px-3 py-1.5 rounded text-sm ${
-                  isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
-                }`}
+                className={`px-3 py-1.5 rounded text-sm ${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'}`}
               >
                 {label.cancel}
               </button>
-              <button
-                onClick={handleCreateFromText}
-                className="px-3 py-1.5 rounded text-sm bg-blue-600 text-white hover:bg-blue-500"
-              >
+              <button onClick={handleCreateFromText} className="px-3 py-1.5 rounded text-sm bg-blue-600 text-white hover:bg-blue-500">
                 {label.importTextCreate}
               </button>
             </div>
@@ -1207,29 +1139,16 @@ https://www.theword.fr/#about`;
       {/* MODALE : édition / création d'un bloc de texte */}
       {editingTextBlock && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-black/60"
-            onClick={() => setEditingTextBlock(null)}
-            aria-hidden="true"
-          />
-          <div
-            className={`relative w-full max-w-lg mx-4 rounded-2xl p-5 ${
-              isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
-            }`}
-          >
+          <div className="absolute inset-0 bg-black/60" onClick={() => setEditingTextBlock(null)} aria-hidden="true" />
+          <div className={`relative w-full max-w-lg mx-4 rounded-2xl p-5 ${isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
             <h2 className="text-xl font-semibold mb-3">
               {editingTextBlock.idx === null ? label.addTextBlock : label.editTextBlock}
             </h2>
             <textarea
               className={`w-full rounded-md px-3 py-2 text-base min-h-[220px] border resize-vertical ${
-                isDark
-                  ? 'bg-gray-800 border-gray-600 text-white'
-                  : 'bg-gray-50 border-gray-300 text-gray-900'
+                isDark ? 'bg-gray-800 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
               }`}
-              style={{
-                fontSize: `${state.settings.fontSize}px`,
-                lineHeight: '1.6',
-              }}
+              style={{ fontSize: `${state.settings.fontSize}px`, lineHeight: '1.6' }}
               value={editingTextValue}
               onChange={(e) => setEditingTextValue(e.target.value)}
               placeholder={label.newTextPlaceholder}
@@ -1237,16 +1156,11 @@ https://www.theword.fr/#about`;
             <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => setEditingTextBlock(null)}
-                className={`px-3 py-1.5 rounded text-base ${
-                  isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
-                }`}
+                className={`px-3 py-1.5 rounded text-base ${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'}`}
               >
                 {label.cancel}
               </button>
-              <button
-                onClick={handleSaveTextBlock}
-                className="px-3 py-1.5 rounded text-base bg-green-600 text-white hover:bg-green-500"
-              >
+              <button onClick={handleSaveTextBlock} className="px-3 py-1.5 rounded text-base bg-green-600 text-white hover:bg-green-500">
                 OK
               </button>
             </div>
@@ -1258,89 +1172,28 @@ https://www.theword.fr/#about`;
       {showHelp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60" onClick={() => setShowHelp(false)} aria-hidden="true" />
-          <div
-            className={`relative w-full max-w-lg mx-4 rounded-2xl p-5 max-h-[90vh] overflow-y-auto ${
-              isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
-            }`}
-          >
+          <div className={`relative w-full max-w-lg mx-4 rounded-2xl p-5 max-h-[90vh] overflow-y-auto ${isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
             <h2 className="text-xl font-semibold mb-3">{label.helpTitle}</h2>
 
-            <div
-              className="space-y-3 leading-relaxed text-left"
-              style={{
-                fontSize: `${state.settings.fontSize}px`,
-                lineHeight: 1.6,
-              }}
-            >
+            <div className="space-y-3 leading-relaxed text-left" style={{ fontSize: `${state.settings.fontSize}px`, lineHeight: 1.6 }}>
               <p>{label.helpIntro}</p>
 
-              <p>
-                <strong>{label.help1Title}</strong>
-                <br />
-                {label.help1Body}
-              </p>
-
-              <p>
-                <strong>{label.help2Title}</strong>
-                <br />
-                {label.help2Body}
-              </p>
-
-              <p>
-                <strong>{label.help3Title}</strong>
-                <br />
-                {label.help3Body}
-              </p>
-
-              <p>
-                <strong>{label.help4Title}</strong>
-                <br />
-                {label.help4Body}
-              </p>
-
-              <p>
-                <strong>{label.help5Title}</strong>
-                <br />
-                {label.help5Body}
-              </p>
-
-              <p>
-                <strong>{label.help6Title}</strong>
-                <br />
-                {label.help6Body}
-              </p>
-
-              <p>
-                <strong>{label.help7Title}</strong>
-                <br />
-                {label.help7Body}
-              </p>
-
-              <p>
-                <strong>{label.help8Title}</strong>
-                <br />
-                {label.help8Body}
-              </p>
-
-              <p>
-                <strong>{label.help9Title}</strong>
-                <br />
-                {label.help9Body}
-              </p>
-
-              <p>
-                <strong>{label.help10Title}</strong>
-                <br />
-                {label.help10Body}
-              </p>
+              <p><strong>{label.help1Title}</strong><br />{label.help1Body}</p>
+              <p><strong>{label.help2Title}</strong><br />{label.help2Body}</p>
+              <p><strong>{label.help3Title}</strong><br />{label.help3Body}</p>
+              <p><strong>{label.help4Title}</strong><br />{label.help4Body}</p>
+              <p><strong>{label.help5Title}</strong><br />{label.help5Body}</p>
+              <p><strong>{label.help6Title}</strong><br />{label.help6Body}</p>
+              <p><strong>{label.help7Title}</strong><br />{label.help7Body}</p>
+              <p><strong>{label.help8Title}</strong><br />{label.help8Body}</p>
+              <p><strong>{label.help9Title}</strong><br />{label.help9Body}</p>
+              <p><strong>{label.help10Title}</strong><br />{label.help10Body}</p>
             </div>
 
             <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => setShowHelp(false)}
-                className={`px-3 py-1.5 rounded text-sm ${
-                  isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'
-                }`}
+                className={`px-3 py-1.5 rounded text-sm ${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'}`}
               >
                 OK
               </button>
