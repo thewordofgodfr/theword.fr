@@ -120,6 +120,14 @@ export default function Notes() {
   // Aide / mode d'emploi
   const [showHelp, setShowHelp] = useState(false);
 
+  // ✅ Toast (notification non-bloquante) pour éviter les alert() "OK"
+  const [toast, setToast] = useState<string | null>(null);
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(null), 1600);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
+
   const label = useMemo(
     () => ({
       title: t('notes'),
@@ -325,13 +333,14 @@ https://www.theword.fr/#about`;
     } catch {}
   };
 
+  // ✅ COPIE LISTE : toast (pas d'alert OK)
   const copyListText = async (id: string) => {
     const list = getListById(id);
     if (!list) return;
     const txt = buildPlainListText(list);
     try {
       await navigator.clipboard.writeText(txt);
-      alert(label.copied + ' ✅');
+      setToast(label.copied + ' ✅');
     } catch {}
   };
 
@@ -390,7 +399,7 @@ https://www.theword.fr/#about`;
 
     const blocks = importSplitBlocks ? splitIntoBlocks(raw) : [raw];
     if (blocks.length === 0) {
-      setToast(label.importTextNoBlock);
+      alert(label.importTextNoBlock);
       return;
     }
 
@@ -415,12 +424,13 @@ https://www.theword.fr/#about`;
   };
 
   // --- opérations de copie/partage pour UN élément ---
+  // ✅ COPIE VERSET : toast (pas d'alert OK)
   const copyItemText = async (it: AnyItem) => {
     const txt = buildItemPlainText(it);
     if (!txt) return;
     try {
       await navigator.clipboard.writeText(txt);
-      alert(label.copied + ' ✅');
+      setToast(label.copied + ' ✅');
     } catch {}
   };
 
@@ -881,7 +891,9 @@ https://www.theword.fr/#about`;
                                         <button
                                           onClick={() => moveItem(list.id, idx, -1)}
                                           className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                            isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
+                                            isDark
+                                              ? 'bg-gray-700 text-white'
+                                              : 'bg-white text-gray-800'
                                           }`}
                                           disabled={idx === 0}
                                           title={label.moveUp}
@@ -893,7 +905,9 @@ https://www.theword.fr/#about`;
                                         <button
                                           onClick={() => moveItem(list.id, idx, 1)}
                                           className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                            isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
+                                            isDark
+                                              ? 'bg-gray-700 text-white'
+                                              : 'bg-white text-gray-800'
                                           }`}
                                           disabled={idx === list.items.length - 1}
                                           title={label.moveDown}
@@ -1186,6 +1200,13 @@ https://www.theword.fr/#about`;
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ✅ TOAST global (copie verset / copie liste) */}
+      {toast && (
+        <div className="fixed left-1/2 -translate-x-1/2 bottom-6 z-[9999] px-4 py-2 rounded-full text-sm shadow bg-black/80 text-white">
+          {toast}
         </div>
       )}
     </div>
