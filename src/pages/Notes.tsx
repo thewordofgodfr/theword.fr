@@ -390,7 +390,7 @@ https://www.theword.fr/#about`;
 
     const blocks = importSplitBlocks ? splitIntoBlocks(raw) : [raw];
     if (blocks.length === 0) {
-      alert(label.importTextNoBlock);
+      setToast(label.importTextNoBlock);
       return;
     }
 
