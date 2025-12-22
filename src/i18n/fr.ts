@@ -199,22 +199,22 @@ const fr: TranslationDict = {
   // About / versions
   aboutTitle: '',
   aboutDescription:
-    'The Word vous permet de découvrir la parole de Dieu à travers des versets aléatoires et une lecture complète de la Bible.',
+    'Recherchez instantanément des mots ou expressions dans toute la Bible, ouvrez les résultats en Lecture, et copiez/partagez un verset en un geste.',
   aboutIntro:
-    'TheWord : Lecture de la Bible hors-ligne, recherche instantanée, notes thématiques, partage en un geste. Retrouvez aussi TheWord sur le web : www.theword.fr',
+    'The Word est une application (et un site web) pour lire la Bible facilement : hors-ligne, rapide, et pensée pour la lecture quotidienne. Vous pouvez lire livre par livre, retrouver un passage en quelques secondes grâce à la recherche, afficher un verset dans les autres langues disponibles, et copier/partager vos versets simplement. Version web : www.theword.fr',
   bibleVersions: 'Versions de la Bible',
   frenchVersion:
-    'Français : Louis Segond 1910 (LSG)- Révision 2025 - Libre de droit',
-  englishVersion: 'Anglais : King James Version (KJV) - Libre de droit',
+    'Français : Louis Segond 1910 (LSG) — modernisation 2025 (vocabulaire/orthographe)',
+  englishVersion: 'Anglais : King James Version (KJV)',
   frenchVersionDetails:
-    'Version de référence pour la Bible en français, traduite par Louis Segond en 1910 et révisée en 2025 (modernisation du vocabulaire/grammaire, fidélité aux manuscrits).',
+    'Texte Louis Segond 1910. La version intégrée a été modernisée en 2025 (vocabulaire, orthographe, grammaire) pour une lecture plus fluide, sans changer le sens.',
   englishVersionDetails:
-    'Version classique en anglais (KJV), publiée en 1611, révisée en 1769 et modernisation limitée en 2025.',
+    'Version classique en anglais (KJV), largement utilisée pour l’étude et la lecture.',
   otherLanguagesNote:
-    "D'autres langues (Allemand, Portugais, etc.) sont en préparation. En attendant, l'interface utilise l'anglais si la traduction n'est pas encore disponible.",
+    'Plusieurs langues sont disponibles dans l’application (dont grec et hébreu). Vous pouvez afficher un verset dans les autres langues via le bouton « Autres langues » sur la page Lecture.',
   randomFeature: 'Fonctionnalité Aléatoire',
   randomFeatureDesc:
-    'Notre générateur de versets aléatoires sélectionne parmi plus de 31,000 versets bibliques pour vous offrir une inspiration quotidienne.',
+    'Un verset peut être tiré au hasard parmi plus de 31 000 versets, pour encourager une lecture régulière et une méditation quotidienne.',
   musicLink: 'Musique du Créateur',
   versesLabel: 'Versets',
   booksLabel: 'Livres',
@@ -227,7 +227,7 @@ const fr: TranslationDict = {
   notesPoint3: 'Renommez vos listes, copiez/partagez.',
   createdWithLove: 'Créé avec amour pour répandre la Parole de Dieu',
   versionsFootnote:
-    'Toutes les versions bibliques utilisées sont dans le domaine public. Certaines ont été partiellement modernisées (vocabulaire, grammaire) tout en restant strictement fidèles aux manuscrits originaux.',
+    'À propos des textes : les Bibles intégrées sont utilisées selon leurs licences respectives (elles ne sont pas forcément dans le domaine public). Seule la LSG 1910 a été modernisée en 2025 (vocabulaire/orthographe) pour faciliter la lecture.',
 
   // Quick slots
   quickSlotsIntro:
@@ -238,7 +238,7 @@ const fr: TranslationDict = {
   quickSlot2Tooltip: 'Raccourci 2',
   quickSlot3Tooltip: 'Raccourci 3',
 
-    // Aide Notes + Études (mode d'emploi commun)
+  // Aide Notes + Études (mode d'emploi commun)
   notesHelpTitle: 'Notes & Études — mode d’emploi',
   notesHelpIntro:
     'Les pages Notes et Études vous permettent de mémoriser vos versets, de créer des listes par thème et de construire de vraies études en combinant versets et blocs de texte. Tout est stocké localement sur votre appareil, 100 % hors ligne, sans compte et sans connexion internet.',
@@ -279,6 +279,5 @@ const fr: TranslationDict = {
 };
 
 export default fr;
-
 
 
