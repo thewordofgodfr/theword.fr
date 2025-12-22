@@ -214,7 +214,7 @@ const fr: TranslationDict = {
     'Plusieurs langues sont disponibles dans l’application (dont grec et hébreu). Vous pouvez afficher un verset dans les autres langues via le bouton « Autres langues » sur la page Lecture.',
   randomFeature: 'Fonctionnalité Aléatoire',
   randomFeatureDesc:
-    'Un verset peut être tiré au hasard parmi plus de 31 000 versets, pour encourager une lecture régulière et une méditation quotidienne.',
+    'Un verset est tiré au hasard parmi plus de 31 000 versets, pour encourager une lecture régulière et une méditation quotidienne.',
   musicLink: 'Musique du Créateur',
   versesLabel: 'Versets',
   booksLabel: 'Livres',
