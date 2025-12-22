@@ -207,7 +207,7 @@ const fr: TranslationDict = {
     'Français : Louis Segond 1910 (LSG) — modernisation 2025 (vocabulaire/orthographe)',
   englishVersion: 'Anglais : King James Version (KJV)',
   frenchVersionDetails:
-    'Texte Louis Segond 1910. La version intégrée a été modernisée en 2025 (vocabulaire, orthographe, grammaire) pour une lecture plus fluide, sans changer le sens.',
+    'Modernisation 2025 (vocabulaire, orthographe, grammaire) pour une lecture plus fluide, sans changer le sens, et conforme aux manuscrits originaux.',
   englishVersionDetails:
     'Version classique en anglais (KJV), largement utilisée pour l’étude et la lecture.',
   otherLanguagesNote:
@@ -227,7 +227,7 @@ const fr: TranslationDict = {
   notesPoint3: 'Renommez vos listes, copiez/partagez.',
   createdWithLove: 'Créé avec amour pour répandre la Parole de Dieu',
   versionsFootnote:
-    'À propos des textes : les Bibles intégrées sont utilisées selon leurs licences respectives (elles ne sont pas forcément dans le domaine public). Seule la LSG 1910 a été modernisée en 2025 (vocabulaire/orthographe) pour faciliter la lecture.',
+    'À propos des textes : les Bibles intégrées sont utilisées selon leurs licences respectives. Seule la LSG 1910 a été modernisée en 2025 (vocabulaire/orthographe) pour faciliter la lecture.',
 
   // Quick slots
   quickSlotsIntro:
@@ -279,5 +279,4 @@ const fr: TranslationDict = {
 };
 
 export default fr;
-
 
