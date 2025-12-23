@@ -1506,7 +1506,7 @@ ${shareUrl}`;
 
                   {/* Nouveau Testament */}
                   <div>
-                    <div className="text-lg font-extrabold text-white/90 mb-3 tracking-wide">
+                    <div className="text-lg font-normal text-white/90 mb-3 tracking-wide">
                       {t('newTestament')}
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
