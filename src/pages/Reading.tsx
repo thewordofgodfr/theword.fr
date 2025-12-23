@@ -1493,7 +1493,7 @@ ${shareUrl}`;
                                 : 'border-gray-700 bg-white/5 hover:bg-white/10'
                             }`}
                           >
-                            <div className="font-extrabold text-lg sm:text-xl leading-tight">{getBookName(b)}</div>
+                            <div className="font-normal text-lg sm:text-xl leading-tight">{getBookName(b)}</div>
                             <div className="text-base sm:text-lg text-white/70">
                               {b.chapters} {t('chapter')}
                               {b.chapters > 1 ? 's' : ''}
