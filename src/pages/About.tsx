@@ -111,8 +111,7 @@ export default function About() {
               {t('bibleVersions')}
             </h2>
             <p className={`${isDark ? 'text-white/90' : 'text-gray-700'}`} style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}>
-              {t('bibleVersionsDesc')}
-            </p>
+              </p>
           </section>
 
           <footer className="text-center">
