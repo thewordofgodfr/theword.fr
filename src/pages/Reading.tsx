@@ -1477,58 +1477,58 @@ ${shareUrl}`;
                   {/* Ancien Testament */}
                   <div>
                     <div className="text-lg font-extrabold text-white/90 mb-3 tracking-wide">
-                      {t('oldTestament')}
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {oldTestamentBooks.map(b => {
-                        const isCurrent = selectedBook?.name === b.name;
-                        return (
-                          <button
-                            key={b.name}
-                            type="button"
-                            onClick={() => handleBookSelect(b)}
-                            className={`text-left px-3 py-2 rounded-md border transition-colors ${
-                              isCurrent
-                                ? 'border-blue-400 bg-blue-600/30'
-                                : 'border-gray-700 bg-white/5 hover:bg-white/10'
-                            }`}
-                          >
-                            <div className="font-normal text-lg sm:text-xl leading-tight">{getBookName(b)}</div>
-                            <div className="text-base sm:text-lg text-white/70">
-                              {b.chapters} {t('chapter')}
-                              {b.chapters > 1 ? 's' : ''}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
+    {t('oldTestament')}
+  </div>
+  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+    {oldTestamentBooks.map(b => {
+      const isCurrent = selectedBook?.name === b.name;
+      return (
+        <button
+          key={b.name}
+          type="button"
+          onClick={() => handleBookSelect(b)}
+          className={`text-left px-3 py-2 rounded-md border transition-colors ${
+            isCurrent
+              ? 'border-blue-400 bg-blue-600/30'
+              : 'border-gray-700 bg-white/5 hover:bg-white/10'
+          }`}
+        >
+          <div className="font-normal text-lg sm:text-xl leading-tight">{getBookName(b)}</div>
+          <div className="text-base sm:text-lg text-white/70">
+            {b.chapters} {t('chapter')}
+            {b.chapters > 1 ? 's' : ''}
+          </div>
+        </button>
+      );
+    })}
+  </div>
+</div>
 
-                  {/* Nouveau Testament */}
-                  <div>
-                    <div className="text-lg font-normal text-white/90 mb-3 tracking-wide">
-                      {t('newTestament')}
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {newTestamentBooks.map(b => {
-                        const isCurrent = selectedBook?.name === b.name;
-                        return (
-                          <button
-                            key={b.name}
-                            type="button"
-                            onClick={() => handleBookSelect(b)}
-                            className={`text-left px-3 py-2 rounded-md border transition-colors ${
-                              isCurrent
-                                ? 'border-blue-400 bg-blue-600/30'
-                                : 'border-gray-700 bg-white/5 hover:bg-white/10'
-                            }`}
-                          >
-                            <div className="font-extrabold text-lg sm:text-xl leading-tight">{getBookName(b)}</div>
-                            <div className="text-base sm:text-lg text-white/70">
-                              {b.chapters} {t('chapter')}
-                              {b.chapters > 1 ? 's' : ''}
-                            </div>
-                          </button>
+{/* Nouveau Testament */}
+<div>
+  <div className="text-lg font-extrabold text-white/90 mb-3 tracking-wide">
+    {t('newTestament')}
+  </div>
+  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+    {newTestamentBooks.map(b => {
+      const isCurrent = selectedBook?.name === b.name;
+      return (
+        <button
+          key={b.name}
+          type="button"
+          onClick={() => handleBookSelect(b)}
+          className={`text-left px-3 py-2 rounded-md border transition-colors ${
+            isCurrent
+              ? 'border-blue-400 bg-blue-600/30'
+              : 'border-gray-700 bg-white/5 hover:bg-white/10'
+          }`}
+        >
+          <div className="font-normal text-lg sm:text-xl leading-tight">{getBookName(b)}</div>
+          <div className="text-base sm:text-lg text-white/70">
+            {b.chapters} {t('chapter')}
+            {b.chapters > 1 ? 's' : ''}
+          </div>
+        </button>
                         );
                       })}
                     </div>
