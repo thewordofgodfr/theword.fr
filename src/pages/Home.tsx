@@ -66,7 +66,6 @@ export default function Home() {
 
   // Au montage ET à chaque changement de langue :
   useEffect(() => {
-    // Pré-chauffage (idempotent)
     warmBibleCache(lang);
 
     const saved = loadVerseFromSessionForLang(lang);
@@ -89,17 +88,17 @@ export default function Home() {
 
   return (
     <div
-      className={`min-h-screen flex flex-col ${
+      className={`min-h-[100dvh] flex flex-col ${
         isDark ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-indigo-100'
       } transition-colors duration-200`}
     >
-      {/* ✅ Contenu principal prend l'espace dispo */}
-      <div className="flex-1">
-        <div className="container mx-auto px-4 py-8 md:py-10">
+      {/* ✅ Zone scrollable : si contenu court => pas de scroll, si long => scroll normal */}
+      <div className="flex-1 overflow-auto">
+        <div className="container mx-auto px-4 py-6 md:py-10">
           <div className="max-w-4xl mx-auto">
             {/* Titre */}
             <h1
-              className={`text-center font-extrabold tracking-tight mb-6 ${
+              className={`text-center font-extrabold tracking-tight mb-5 md:mb-6 ${
                 isDark ? 'text-white' : 'text-gray-900'
               } text-3xl md:text-4xl`}
             >
@@ -185,15 +184,25 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ✅ Footer copyright collé en bas */}
-      <footer className="pb-5">
-        <p className={`text-center ${isDark ? 'text-white/50' : 'text-gray-500'}`} style={{ fontSize: 13 }}>
+        {/* ✅ Footer "intelligent" : visible sans scroll si court, collé en bas en scroll si long */}
+        <footer
+          className={`sticky bottom-0 z-10 text-center py-2 ${
+            isDark ? 'text-white/45' : 'text-gray-500'
+          }`}
+          style={{
+            fontSize: 12.5,
+            paddingBottom: 'calc(env(safe-area-inset-bottom) + 6px)',
+            background: isDark
+              ? 'linear-gradient(to top, rgba(17,24,39,0.92), rgba(17,24,39,0.0))'
+              : 'linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.0))',
+          }}
+        >
           Copyright {year}
-        </p>
-      </footer>
+        </footer>
+      </div>
     </div>
   );
 }
+
 
