@@ -19,6 +19,9 @@ export default function Home() {
   const isDark = state.settings.theme === 'dark';
   const lang = state.settings.language;
 
+  // ✅ Copyright auto
+  const year = new Date().getFullYear();
+
   const saveVerseToSession = (v: BibleVerse, l: string) => {
     try {
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(v));
@@ -86,100 +89,110 @@ export default function Home() {
 
   return (
     <div
-      className={`min-h-screen ${
+      className={`min-h-screen flex flex-col ${
         isDark ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-indigo-100'
       } transition-colors duration-200`}
     >
-      <div className="container mx-auto px-4 py-8 md:py-10">
-        <div className="max-w-4xl mx-auto">
-          {/* Titre */}
-          <h1
-            className={`text-center font-extrabold tracking-tight mb-6 ${
-              isDark ? 'text-white' : 'text-gray-900'
-            } text-3xl md:text-4xl`}
-          >
-            The Word
-          </h1>
+      {/* ✅ Contenu principal prend l'espace dispo */}
+      <div className="flex-1">
+        <div className="container mx-auto px-4 py-8 md:py-10">
+          <div className="max-w-4xl mx-auto">
+            {/* Titre */}
+            <h1
+              className={`text-center font-extrabold tracking-tight mb-6 ${
+                isDark ? 'text-white' : 'text-gray-900'
+              } text-3xl md:text-4xl`}
+            >
+              The Word
+            </h1>
 
-          {/* Carte du verset */}
-          <div
-            className={`${
-              isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-            } rounded-2xl shadow-2xl border p-6 md:p-10 transition-all duration-300 hover:shadow-3xl`}
-          >
-            {loading ? (
-              <div className="flex items-center justify-center py-16">
-                <div
-                  className={`animate-spin rounded-full h-12 w-12 border-b-2 ${
-                    isDark ? 'border-blue-400' : 'border-blue-600'
-                  }`}
-                />
-                <span className={`ml-4 text-lg ${isDark ? 'text-white' : 'text-gray-600'}`}>
-                  {t('loading')}
-                </span>
-              </div>
-            ) : verse ? (
-              <div className="text-center">
-                <blockquote
-                  onClick={handleVerseClick}
-                  className={`text-lg md:text-xl leading-relaxed mb-8 italic cursor-pointer transition-all duration-200 hover:scale-105 ${
-                    isDark ? 'text-white hover:text-blue-300' : 'text-gray-700 hover:text-blue-600'
-                  }`}
-                  style={{ fontSize: `${state.settings.fontSize}px`, lineHeight: '1.8' }}
-                >
-                  “{verse.text}”
-                </blockquote>
-                <cite
-                  onClick={handleVerseClick}
-                  className={`text-base font-medium cursor-pointer transition-all duration-200 hover:underline ${
-                    isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'
-                  }`}
-                >
-                  {verse.reference}
-                </cite>
-              </div>
-            ) : (
-              <div className={`text-center py-16 ${isDark ? 'text-white/80' : 'text-gray-500'}`}>
-                {t('error')}
-              </div>
-            )}
+            {/* Carte du verset */}
+            <div
+              className={`${
+                isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+              } rounded-2xl shadow-2xl border p-6 md:p-10 transition-all duration-300 hover:shadow-3xl`}
+            >
+              {loading ? (
+                <div className="flex items-center justify-center py-16">
+                  <div
+                    className={`animate-spin rounded-full h-12 w-12 border-b-2 ${
+                      isDark ? 'border-blue-400' : 'border-blue-600'
+                    }`}
+                  />
+                  <span className={`ml-4 text-lg ${isDark ? 'text-white' : 'text-gray-600'}`}>
+                    {t('loading')}
+                  </span>
+                </div>
+              ) : verse ? (
+                <div className="text-center">
+                  <blockquote
+                    onClick={handleVerseClick}
+                    className={`text-lg md:text-xl leading-relaxed mb-8 italic cursor-pointer transition-all duration-200 hover:scale-105 ${
+                      isDark ? 'text-white hover:text-blue-300' : 'text-gray-700 hover:text-blue-600'
+                    }`}
+                    style={{ fontSize: `${state.settings.fontSize}px`, lineHeight: '1.8' }}
+                  >
+                    “{verse.text}”
+                  </blockquote>
+                  <cite
+                    onClick={handleVerseClick}
+                    className={`text-base font-medium cursor-pointer transition-all duration-200 hover:underline ${
+                      isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'
+                    }`}
+                  >
+                    {verse.reference}
+                  </cite>
+                </div>
+              ) : (
+                <div className={`text-center py-16 ${isDark ? 'text-white/80' : 'text-gray-500'}`}>
+                  {t('error')}
+                </div>
+              )}
 
-            {/* Bouton d'action */}
-            <div className="flex justify-center mt-12">
+              {/* Bouton d'action */}
+              <div className="flex justify-center mt-12">
+                <button
+                  onClick={fetchRandomVerse}
+                  disabled={loading}
+                  className={`flex items-center justify-center space-x-3 px-8 py-4 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 ${
+                    isDark
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
+                  <span>{t('newVerse')}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Citation fixe (cliquable) */}
+            <div className="text-center mt-12">
               <button
-                onClick={fetchRandomVerse}
-                disabled={loading}
-                className={`flex items-center justify-center space-x-3 px-8 py-4 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 ${
-                  isDark
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
-                } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={openJeremiah23}
+                className="mx-auto block focus:outline-none"
+                aria-label={t('openJeremiah')}
+                title={t('openJeremiah')}
               >
-                <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
-                <span>{t('newVerse')}</span>
+                <p
+                  className={`italic hover:underline ${
+                    isDark ? 'text-white' : 'text-gray-700'
+                  } text-base md:text-lg`}
+                >
+                  {t('jeremiah23Quote')}
+                </p>
               </button>
             </div>
           </div>
-
-          {/* Citation fixe (cliquable) */}
-          <div className="text-center mt-12">
-            <button
-              onClick={openJeremiah23}
-              className="mx-auto block focus:outline-none"
-              aria-label={t('openJeremiah')}
-              title={t('openJeremiah')}
-            >
-              <p
-                className={`italic hover:underline ${
-                  isDark ? 'text-white' : 'text-gray-700'
-                } text-base md:text-lg`}
-              >
-                {t('jeremiah23Quote')}
-              </p>
-            </button>
-          </div>
         </div>
       </div>
+
+      {/* ✅ Footer copyright collé en bas */}
+      <footer className="pb-5">
+        <p className={`text-center ${isDark ? 'text-white/50' : 'text-gray-500'}`} style={{ fontSize: 13 }}>
+          Copyright {year}
+        </p>
+      </footer>
     </div>
   );
 }
