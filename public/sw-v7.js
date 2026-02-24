@@ -1,7 +1,7 @@
 // sw-v7.js — prod: https + cache propre + MAJ immédiate
 // ✅ 3 caches : APP (shell+assets) / DATA_CORE (langue user + fr/en/el/he) / DATA_EXTRA (autres langues)
-// ✅ Purge automatique du cache EXTRA en priorité (évite écran noir Android)
-// ✅ Precache assets Vite + precache bibles CORE
+// ✅ Offline-first réel : navigation = cache-first (zéro écran blanc)
+// ✅ Timeout réseau pour éviter les fetch "pending" quand le réseau tombe
 // ✅ Runtime cache data en CORE/EXTRA selon langue
 
 const CACHE_VERSION = 'v401'; // ← bump obligatoire
@@ -17,14 +17,15 @@ const BIBLES_INDEX_URL = '/data/bible/bibles-index.json';
 const FIXED_CORE_LANGS = ['fr', 'en', 'el', 'he'];
 
 // EXTRA : on limite pour éviter de remplir le stockage Android
-// (Chaque langue = 1 fichier jsonl actuellement)
 const EXTRA_MAX_LANGS = 4; // ← ajuste si tu veux (2-6 recommandé Android)
 const PRECACHE_CHUNK = 15;
 
 const ORIGIN = self.location.origin;
 
-/* -------------------------------------------------- */
-/* Utils URL */
+// Timeouts (important pour éviter écran blanc sur réseau instable)
+const NAV_FETCH_TIMEOUT_MS = 2500;     // navigation/doc
+const SMALL_FETCH_TIMEOUT_MS = 2500;   // json, index, version, etc.
+
 const toHttps = (u) => (typeof u === 'string' && u.startsWith('http://')) ? ('https://' + u.slice(7)) : u;
 
 const normalizeUrl = (u) => {
@@ -39,8 +40,6 @@ const normalizeUrl = (u) => {
   } catch { return u; }
 };
 
-/* -------------------------------------------------- */
-/* Helpers fetch */
 const isStaticAsset = (url) =>
   url.pathname.startsWith('/assets/') ||
   /\.(js|css|png|jpe?g|svg|webp|woff2?|ttf|eot)$/.test(url.pathname);
@@ -50,9 +49,20 @@ const isBibleJson = (url) =>
   /\.(json|jsonl)$/.test(url.pathname);
 
 function getLangFromBiblePath(pathname) {
-  // /data/bible/<lang>/verses.jsonl
   const m = pathname.match(/^\/data\/bible\/([^/]+)\//);
   return m ? m[1] : null;
+}
+
+/* -------------------------------------------------- */
+/* Fetch with timeout (évite les requêtes "pending") */
+async function fetchWithTimeout(request, timeoutMs) {
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(request, { cache: 'no-store', signal: controller.signal });
+  } finally {
+    clearTimeout(t);
+  }
 }
 
 /* -------------------------------------------------- */
@@ -107,12 +117,10 @@ self.addEventListener('message', (e) => {
   const data = e.data || {};
   if (data.type === 'SKIP_WAITING') self.skipWaiting();
 
-  // Définir la langue core utilisateur (une fois)
   if (data.type === 'SET_CORE_LANG' && typeof data.lang === 'string') {
     const lang = data.lang.trim();
     e.waitUntil((async () => {
       const current = await idbGet(IDB_KEY_USER_LANG);
-      // On fixe uniquement si pas déjà fixé (langue du "premier vrai démarrage")
       if (!current && lang) await idbSet(IDB_KEY_USER_LANG, lang);
     })());
   }
@@ -127,7 +135,6 @@ self.addEventListener('message', (e) => {
     })());
   }
 
-  // Purge EXTRA manuelle (optionnel)
   if (data.type === 'PURGE_EXTRA') {
     e.waitUntil((async () => {
       await caches.delete(CACHE_DATA_EXTRA);
@@ -180,7 +187,8 @@ async function precacheAppShellAssets(cache) {
 /* Lire bibles-index et obtenir URL(s) pour une liste de langues */
 async function getBibleUrlsForLangs(langs) {
   try {
-    const res = await fetch(BIBLES_INDEX_URL, { cache: 'no-store' });
+    // Petite requête, mais réseau instable => timeout => pas bloquant
+    const res = await fetchWithTimeout(BIBLES_INDEX_URL, SMALL_FETCH_TIMEOUT_MS);
     if (!res.ok) return [];
     const idx = await res.json();
 
@@ -221,7 +229,6 @@ async function enforceExtraLimit(cacheExtra) {
     const keys = await cacheExtra.keys();
     const langs = new Set();
 
-    // On détecte les langues présentes dans le cache EXTRA
     for (const req of keys) {
       const u = new URL(req.url);
       if (isBibleJson(u)) {
@@ -230,8 +237,6 @@ async function enforceExtraLimit(cacheExtra) {
       }
     }
 
-    // Si on dépasse, on purge tout EXTRA (simple & efficace)
-    // (LRU précis = plus lourd; purge total garde l'app stable)
     if (langs.size > EXTRA_MAX_LANGS) {
       await caches.delete(CACHE_DATA_EXTRA);
     }
@@ -276,19 +281,37 @@ self.addEventListener('fetch', (event) => {
     if (req.method !== 'GET') return;
     const url = new URL(req.url);
 
-    // NAVIGATION (documents)
+    // ✅ NAVIGATION (documents) — OFFLINE-FIRST (zéro écran blanc)
     if (req.mode === 'navigate' || req.destination === 'document') {
       event.respondWith((async () => {
+        const cacheApp = await caches.open(CACHE_APP);
+
+        // 1) Répondre immédiatement depuis le cache (si dispo)
+        const shell = await getAppShellFromCache(cacheApp);
+        if (shell) {
+          // 2) Tenter une MAJ réseau en arrière-plan (sans bloquer)
+          event.waitUntil((async () => {
+            try {
+              const preload = await event.preloadResponse;
+              const res = preload || await fetchWithTimeout(req, NAV_FETCH_TIMEOUT_MS);
+              if (res && res.ok) {
+                // On met à jour index.html si c'est lui
+                if (req.url.endsWith('/') || req.url.endsWith('/index.html')) {
+                  await cacheApp.put('/index.html', res.clone());
+                }
+              }
+            } catch {}
+          })());
+          return shell;
+        }
+
+        // 3) Si pas de shell en cache (1er chargement)
         try {
           const preload = await event.preloadResponse;
-          if (preload) return preload;
-
-          // online = réseau
-          return await fetch(req);
+          const res = preload || await fetchWithTimeout(req, NAV_FETCH_TIMEOUT_MS);
+          return res;
         } catch {
-          // offline = app shell depuis cache APP
-          const cacheApp = await caches.open(CACHE_APP);
-          return (await getAppShellFromCache(cacheApp)) || new Response('Offline', { status: 503 });
+          return new Response('', { status: 204 }); // silencieux
         }
       })());
       return;
@@ -307,17 +330,17 @@ self.addEventListener('fetch', (event) => {
         if (cached) return cached;
 
         try {
-          const res = await fetch(normReq, { cache: 'no-store' });
+          const res = await fetchWithTimeout(normReq, SMALL_FETCH_TIMEOUT_MS);
           if (res && (res.ok || res.type === 'opaque')) cacheApp.put(normReq, res.clone());
           return res;
         } catch {
-          return new Response('Offline asset', { status: 503 });
+          return new Response('', { status: 204 });
         }
       })());
       return;
     }
 
-    // BIBLES → stale-while-revalidate, dans CORE ou EXTRA selon langue
+    // BIBLES → cache-first + refresh en arrière-plan (silencieux)
     if (isBibleJson(url)) {
       event.respondWith((async () => {
         const lang = getLangFromBiblePath(url.pathname) || '';
@@ -327,48 +350,60 @@ self.addEventListener('fetch', (event) => {
         const cache = await caches.open(isCoreLang ? CACHE_DATA_CORE : CACHE_DATA_EXTRA);
         const cached = await cache.match(normReq);
 
-        const net = fetch(normReq, { cache: 'no-store' })
-          .then(async (res) => {
-            if (res && (res.ok || res.type === 'opaque')) {
-              await cache.put(normReq, res.clone());
-              // Après ajout dans EXTRA → enforce limite
-              if (!isCoreLang) {
-                const cacheExtra = await caches.open(CACHE_DATA_EXTRA);
-                await enforceExtraLimit(cacheExtra);
+        if (cached) {
+          // refresh silencieux
+          event.waitUntil((async () => {
+            try {
+              const res = await fetchWithTimeout(normReq, SMALL_FETCH_TIMEOUT_MS);
+              if (res && (res.ok || res.type === 'opaque')) {
+                await cache.put(normReq, res.clone());
+                if (!isCoreLang) {
+                  const cacheExtra = await caches.open(CACHE_DATA_EXTRA);
+                  await enforceExtraLimit(cacheExtra);
+                }
               }
-            }
-            return res;
-          })
-          .catch(() => null);
+            } catch {}
+          })());
+          return cached;
+        }
 
-        return cached || (await net) || new Response('Offline', { status: 503 });
+        // si pas en cache : tenter réseau mais ne jamais bloquer longtemps
+        try {
+          const res = await fetchWithTimeout(normReq, SMALL_FETCH_TIMEOUT_MS);
+          if (res && (res.ok || res.type === 'opaque')) {
+            await cache.put(normReq, res.clone());
+            if (!isCoreLang) {
+              const cacheExtra = await caches.open(CACHE_DATA_EXTRA);
+              await enforceExtraLimit(cacheExtra);
+            }
+          }
+          return res;
+        } catch {
+          return new Response('', { status: 204 });
+        }
       })());
       return;
     }
 
-    // DEFAULT → network-first, fallback cache APP shell si même origine
+    // DEFAULT → cache-match simple puis réseau court (silencieux)
     event.respondWith((async () => {
+      // On tente d'abord cache APP (pour éviter blocage)
       const cacheApp = await caches.open(CACHE_APP);
-      try {
-        const res = await fetch(normReq, { cache: 'no-store' });
-        // On évite de remplir le cache APP avec tout et n'importe quoi.
-        return res;
-      } catch {
-        const cached = await cacheApp.match(normReq);
-        if (cached) return cached;
+      const cached = await cacheApp.match(normReq);
+      if (cached) return cached;
 
+      try {
+        return await fetchWithTimeout(normReq, SMALL_FETCH_TIMEOUT_MS);
+      } catch {
+        // si même origine : au moins renvoyer le shell si présent
         if (url.origin === ORIGIN) {
           const shell = await getAppShellFromCache(cacheApp);
           if (shell) return shell;
         }
-        return new Response('Offline', { status: 503 });
+        return new Response('', { status: 204 });
       }
     })());
   } catch {
-    event.respondWith((async () => {
-      const cacheApp = await caches.open(CACHE_APP);
-      return (await getAppShellFromCache(cacheApp)) || new Response('Offline', { status: 503 });
-    })());
+    event.respondWith((async () => new Response('', { status: 204 }))());
   }
 });
-
