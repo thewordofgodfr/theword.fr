@@ -2,19 +2,14 @@
 import { BibleVerse, BibleChapter, Language } from '../types/bible';
 import { bibleBooks } from '../data/bibleBooks';
 
-/** Structure d'une ligne JSONL */
 type VerseRow = { id: string; b: string; c: number; v: number; t: string };
 
-/** Cache du corpus par langue */
 const versesCache = new Map<Language, VerseRow[]>();
 
-/** Index chapitres: lang -> codeLivre -> chapitre -> [start,end[ dans versesCache */
 type ChapIndex = Map<string, Map<number, [number, number]>>;
 const indexCache = new Map<Language, ChapIndex>();
 
-/** Mapping codes VPL <-> noms internes (bibleBooks.name) */
 const codeToName: Record<string, string> = {
-  // AT
   GEN: 'Genesis',
   EXO: 'Exodus',
   LEV: 'Leviticus',
@@ -36,7 +31,7 @@ const codeToName: Record<string, string> = {
   PSA: 'Psalms',
   PRO: 'Proverbs',
   ECC: 'Ecclesiastes',
-  'SOL': 'Song of songs',
+  SOL: 'Song of songs',
   ISA: 'Isaiah',
   JER: 'Jeremiah',
   LAM: 'Lamentations',
@@ -54,7 +49,6 @@ const codeToName: Record<string, string> = {
   HAG: 'Haggai',
   ZEC: 'Zechariah',
   MAL: 'Malachi',
-  // NT
   MAT: 'Matthew',
   MAR: 'Mark',
   LUK: 'Luke',
@@ -87,32 +81,16 @@ const codeToName: Record<string, string> = {
 const nameToCode: Record<string, string> =
   Object.fromEntries(Object.entries(codeToName).map(([k, v]) => [v, k]));
 
-/** Nom d'affichage (FR/EN/…) */
 function getBookReference(bookName: string, language: Language): string {
   const meta = bibleBooks.find(b => b.name === bookName);
   if (!meta) return bookName;
-  // Pour l’instant : FR → nameFr, sinon nameEn (anglais + autres langues pour le nom de livre)
   return language === 'fr' ? meta.nameFr : meta.nameEn;
 }
 
-/* ======================= Normalisation recherche ======================= */
-
-/** Normalise quelques ligatures latines (utile FR/EN, inoffensif pour les autres langues) */
 function normalizeLigatures(s: string) {
-  return s
-    .replace(/œ/g, 'oe')
-    .replace(/Œ/g, 'oe')
-    .replace(/æ/g, 'ae')
-    .replace(/Æ/g, 'ae');
+  return s.replace(/œ/g, 'oe').replace(/Œ/g, 'oe').replace(/æ/g, 'ae').replace(/Æ/g, 'ae');
 }
 
-/**
- * Normalisation pour la recherche (multi-langue) :
- *  - enlève les accents
- *  - conserve toutes les lettres/chiffres Unicode (\p{L} / \p{N})
- *  - minuscule
- *  - compresse les espaces
- */
 function normalizeForSearch(s: string) {
   const noLig = normalizeLigatures(s);
   const deAccented = noLig.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -123,59 +101,52 @@ function normalizeForSearch(s: string) {
     .replace(/\s+/g, ' ');
 }
 
-/* ==================== Chargement & indexation corpus ==================== */
-
-/** Charge / indexe le fichier unique d'une langue (si pas déjà fait) */
-async function ensureLoaded(language: Language): Promise<void> {
-  if (versesCache.has(language) && indexCache.has(language)) return;
+/** Charge / indexe le fichier unique d'une langue (si pas déjà fait)
+ *  IMPORTANT: ne doit pas "planter" l'app si réseau instable. */
+async function ensureLoaded(language: Language): Promise<boolean> {
+  if (versesCache.has(language) && indexCache.has(language)) return true;
 
   const url = `/data/bible/${language}/verses.jsonl`;
-  const res = await fetch(url, { cache: 'force-cache' });
-  if (!res.ok) throw new Error(`Fichier manquant: ${url}`);
-  const txt = await res.text();
 
-  const rows: VerseRow[] = txt
-    .split(/\r?\n/)
-    .filter(Boolean)
-    .map(l => JSON.parse(l));
-  versesCache.set(language, rows);
+  try {
+    // laisse le SW gérer (cache-first côté SW)
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) return false;
 
-  // Construit index: pour chaque (code, chapitre), repère la plage contiguë
-  const idx: ChapIndex = new Map();
-  rows.forEach((r, i) => {
-    let bookMap = idx.get(r.b);
-    if (!bookMap) {
-      bookMap = new Map();
-      idx.set(r.b, bookMap);
-    }
-    const cur = bookMap.get(r.c);
-    if (!cur) bookMap.set(r.c, [i, i + 1]);
-    else cur[1] = i + 1;
-  });
-  indexCache.set(language, idx);
+    const txt = await res.text();
+    const rows: VerseRow[] = txt
+      .split(/\r?\n/)
+      .filter(Boolean)
+      .map(l => JSON.parse(l));
+
+    versesCache.set(language, rows);
+
+    const idx: ChapIndex = new Map();
+    rows.forEach((r, i) => {
+      let bookMap = idx.get(r.b);
+      if (!bookMap) {
+        bookMap = new Map();
+        idx.set(r.b, bookMap);
+      }
+      const cur = bookMap.get(r.c);
+      if (!cur) bookMap.set(r.c, [i, i + 1]);
+      else cur[1] = i + 1;
+    });
+    indexCache.set(language, idx);
+
+    return true;
+  } catch {
+    return false;
+  }
 }
 
-/* =========================== Verset aléatoire =========================== */
-
 export async function getRandomVerse(language: Language): Promise<BibleVerse> {
-  try {
-    await ensureLoaded(language);
-    const rows = versesCache.get(language)!;
-    const r = rows[Math.floor(Math.random() * rows.length)];
-    const bookName = codeToName[r.b] ?? 'John';
-    return {
-      book: bookName,
-      chapter: r.c,
-      verse: r.v,
-      text: r.t,
-      reference: `${getBookReference(bookName, language)} ${r.c}:${r.v}`,
-    };
-  } catch (e) {
-    console.error('Error fetching random verse:', e);
-    // Fallback simple (FR / EN pour l’instant ; autres langues → EN)
+  const ok = await ensureLoaded(language);
+  if (!ok) {
+    // Fallback neutre, sans message d'erreur
     const isFr = language === 'fr';
     return {
-      book: isFr ? 'John' : 'John',
+      book: 'John',
       chapter: 3,
       verse: 16,
       text: isFr
@@ -184,27 +155,42 @@ export async function getRandomVerse(language: Language): Promise<BibleVerse> {
       reference: isFr ? 'Jean 3:16' : 'John 3:16',
     };
   }
-}
 
-/* ============================ Lecture chapitre ========================== */
+  const rows = versesCache.get(language)!;
+  const r = rows[Math.floor(Math.random() * rows.length)];
+  const bookName = codeToName[r.b] ?? 'John';
+  return {
+    book: bookName,
+    chapter: r.c,
+    verse: r.v,
+    text: r.t,
+    reference: `${getBookReference(bookName, language)} ${r.c}:${r.v}`,
+  };
+}
 
 export async function getChapter(
   bookName: string,
   chapter: number,
   language: Language
 ): Promise<BibleChapter> {
+  const ok = await ensureLoaded(language);
+  if (!ok) {
+    // Silencieux : pas de "❌"
+    return { book: bookName, chapter, verses: [] };
+  }
+
   try {
-    await ensureLoaded(language);
     const rows = versesCache.get(language)!;
     const idx = indexCache.get(language)!;
 
     const code = nameToCode[bookName];
-    if (!code) throw new Error(`Livre inconnu: ${bookName}`);
+    if (!code) return { book: bookName, chapter, verses: [] };
 
     const bookMap = idx.get(code);
-    if (!bookMap) throw new Error(`Index absent pour ${code}`);
+    if (!bookMap) return { book: bookName, chapter, verses: [] };
+
     const span = bookMap.get(chapter);
-    if (!span) throw new Error(`Chapitre ${chapter} introuvable dans ${bookName}`);
+    if (!span) return { book: bookName, chapter, verses: [] };
 
     const [start, end] = span;
     const verses: BibleVerse[] = [];
@@ -220,32 +206,11 @@ export async function getChapter(
       });
     }
     return { book: bookName, chapter, verses };
-  } catch (error) {
-    console.error(`Error loading chapter ${bookName} ${chapter} in ${language}:`, error);
-    const verses: BibleVerse[] = [];
-    for (let i = 1; i <= 10; i++) {
-      verses.push({
-        book: bookName,
-        chapter,
-        verse: i,
-        text:
-          language === 'fr'
-            ? `❌ Erreur: Données manquantes pour ${bookName}`
-            : `❌ Error: Missing data for ${bookName}`,
-        reference: `${getBookReference(bookName, language)} ${chapter}:${i}`,
-      });
-    }
-    return { book: bookName, chapter, verses };
+  } catch {
+    return { book: bookName, chapter, verses: [] };
   }
 }
 
-/* =============================== Recherche =============================== */
-
-/**
- * Recherche accent-insensible, multi-langue, sur tout le corpus.
- * Le service renvoie un sur-ensemble de résultats, raffiné ensuite par Search.tsx
- * (compte d’occurrences + logique de préfixe / mots entiers).
- */
 export async function searchInBible(
   searchTerm: string,
   language: Language
@@ -254,9 +219,9 @@ export async function searchInBible(
   const fq = normalizeForSearch(raw);
   if (!fq) return [];
 
-  await ensureLoaded(language);
+  const ok = await ensureLoaded(language);
+  if (!ok) return [];
 
-  // Cache session simple (clé normalisée)
   const key = `twog:search:cache:${language}:${fq}`;
   try {
     const cached =
@@ -288,14 +253,10 @@ export async function searchInBible(
   return out;
 }
 
-/* ========================== Métadonnées / util ========================== */
-
-/** Métadonnées livres (inchangé) */
 export function getBibleBooks() {
   return bibleBooks;
 }
 
-/** Presse-papiers */
 export async function copyToClipboard(text: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text);
@@ -318,7 +279,6 @@ const idle = (cb: IdleCb) => {
   }
 };
 
-/** Anciens drapeaux, mais rendus génériques pour toutes les langues */
 let warmed: Partial<Record<Language, boolean>> = {};
 let warmupEnabled = true;
 
@@ -329,7 +289,6 @@ export function resumeWarmup() {
   warmupEnabled = true;
 }
 
-/** Précharge le JSONL en arrière-plan si autorisé */
 export function warmBibleCache(language: Language) {
   if (warmed[language]) return;
   warmed[language] = true;
@@ -338,4 +297,3 @@ export function warmBibleCache(language: Language) {
     ensureLoaded(language).catch(() => {});
   });
 }
-
