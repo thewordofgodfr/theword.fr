@@ -91,11 +91,13 @@ const nameToCode: Record<string, string> =
 function getBookReference(bookName: string, language: Language): string {
   const meta = bibleBooks.find(b => b.name === bookName);
   if (!meta) return bookName;
+  // Pour l’instant : FR → nameFr, sinon nameEn (anglais + autres langues pour le nom de livre)
   return language === 'fr' ? meta.nameFr : meta.nameEn;
 }
 
 /* ======================= Normalisation recherche ======================= */
 
+/** Normalise quelques ligatures latines (utile FR/EN, inoffensif pour les autres langues) */
 function normalizeLigatures(s: string) {
   return s
     .replace(/œ/g, 'oe')
@@ -104,6 +106,13 @@ function normalizeLigatures(s: string) {
     .replace(/Æ/g, 'ae');
 }
 
+/**
+ * Normalisation pour la recherche (multi-langue) :
+ *  - enlève les accents
+ *  - conserve toutes les lettres/chiffres Unicode (\p{L} / \p{N})
+ *  - minuscule
+ *  - compresse les espaces
+ */
 function normalizeForSearch(s: string) {
   const noLig = normalizeLigatures(s);
   const deAccented = noLig.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -116,37 +125,22 @@ function normalizeForSearch(s: string) {
 
 /* ==================== Chargement & indexation corpus ==================== */
 
-const FETCH_TIMEOUT_MS = 3500;
-
-async function fetchTextWithTimeout(url: string): Promise<string> {
-  const controller = new AbortController();
-  const t = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-  try {
-    // IMPORTANT: on laisse le SW répondre depuis le cache.
-    // "force-cache" aide quand le navigateur peut servir sans réseau.
-    const res = await fetch(url, { cache: 'force-cache', signal: controller.signal });
-    if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
-    return await res.text();
-  } finally {
-    clearTimeout(t);
-  }
-}
-
 /** Charge / indexe le fichier unique d'une langue (si pas déjà fait) */
 async function ensureLoaded(language: Language): Promise<void> {
   if (versesCache.has(language) && indexCache.has(language)) return;
 
   const url = `/data/bible/${language}/verses.jsonl`;
-
-  const txt = await fetchTextWithTimeout(url);
+  const res = await fetch(url, { cache: 'force-cache' });
+  if (!res.ok) throw new Error(`Fichier manquant: ${url}`);
+  const txt = await res.text();
 
   const rows: VerseRow[] = txt
     .split(/\r?\n/)
     .filter(Boolean)
     .map(l => JSON.parse(l));
-
   versesCache.set(language, rows);
 
+  // Construit index: pour chaque (code, chapitre), repère la plage contiguë
   const idx: ChapIndex = new Map();
   rows.forEach((r, i) => {
     let bookMap = idx.get(r.b);
@@ -159,18 +153,6 @@ async function ensureLoaded(language: Language): Promise<void> {
     else cur[1] = i + 1;
   });
   indexCache.set(language, idx);
-}
-
-/* =========================== Fallback silencieux =========================== */
-/** Toujours renvoyer au moins 1 verset (évite crash UI), sans message. */
-function silentPlaceholderVerse(bookName: string, chapter: number, verse: number, language: Language): BibleVerse {
-  return {
-    book: bookName,
-    chapter,
-    verse,
-    text: '', // silencieux
-    reference: `${getBookReference(bookName, language)} ${chapter}:${verse}`,
-  };
 }
 
 /* =========================== Verset aléatoire =========================== */
@@ -188,11 +170,12 @@ export async function getRandomVerse(language: Language): Promise<BibleVerse> {
       text: r.t,
       reference: `${getBookReference(bookName, language)} ${r.c}:${r.v}`,
     };
-  } catch {
-    // Fallback neutre (comme avant), sans log et sans message d'erreur
+  } catch (e) {
+    console.error('Error fetching random verse:', e);
+    // Fallback simple (FR / EN pour l’instant ; autres langues → EN)
     const isFr = language === 'fr';
     return {
-      book: 'John',
+      book: isFr ? 'John' : 'John',
       chapter: 3,
       verse: 16,
       text: isFr
@@ -216,13 +199,12 @@ export async function getChapter(
     const idx = indexCache.get(language)!;
 
     const code = nameToCode[bookName];
-    if (!code) return { book: bookName, chapter, verses: [silentPlaceholderVerse(bookName, chapter, 1, language)] };
+    if (!code) throw new Error(`Livre inconnu: ${bookName}`);
 
     const bookMap = idx.get(code);
-    if (!bookMap) return { book: bookName, chapter, verses: [silentPlaceholderVerse(bookName, chapter, 1, language)] };
-
+    if (!bookMap) throw new Error(`Index absent pour ${code}`);
     const span = bookMap.get(chapter);
-    if (!span) return { book: bookName, chapter, verses: [silentPlaceholderVerse(bookName, chapter, 1, language)] };
+    if (!span) throw new Error(`Chapitre ${chapter} introuvable dans ${bookName}`);
 
     const [start, end] = span;
     const verses: BibleVerse[] = [];
@@ -237,18 +219,33 @@ export async function getChapter(
         reference: `${getBookReference(bookName, language)} ${chapter}:${r.v}`,
       });
     }
-
-    // Sécurité: jamais vide
-    if (verses.length === 0) verses.push(silentPlaceholderVerse(bookName, chapter, 1, language));
     return { book: bookName, chapter, verses };
-  } catch {
-    // Silencieux + anti-crash UI
-    return { book: bookName, chapter, verses: [silentPlaceholderVerse(bookName, chapter, 1, language)] };
+  } catch (error) {
+    console.error(`Error loading chapter ${bookName} ${chapter} in ${language}:`, error);
+    const verses: BibleVerse[] = [];
+    for (let i = 1; i <= 10; i++) {
+      verses.push({
+        book: bookName,
+        chapter,
+        verse: i,
+        text:
+          language === 'fr'
+            ? `❌ Erreur: Données manquantes pour ${bookName}`
+            : `❌ Error: Missing data for ${bookName}`,
+        reference: `${getBookReference(bookName, language)} ${chapter}:${i}`,
+      });
+    }
+    return { book: bookName, chapter, verses };
   }
 }
 
 /* =============================== Recherche =============================== */
 
+/**
+ * Recherche accent-insensible, multi-langue, sur tout le corpus.
+ * Le service renvoie un sur-ensemble de résultats, raffiné ensuite par Search.tsx
+ * (compte d’occurrences + logique de préfixe / mots entiers).
+ */
 export async function searchInBible(
   searchTerm: string,
   language: Language
@@ -257,12 +254,9 @@ export async function searchInBible(
   const fq = normalizeForSearch(raw);
   if (!fq) return [];
 
-  try {
-    await ensureLoaded(language);
-  } catch {
-    return [];
-  }
+  await ensureLoaded(language);
 
+  // Cache session simple (clé normalisée)
   const key = `twog:search:cache:${language}:${fq}`;
   try {
     const cached =
@@ -296,10 +290,12 @@ export async function searchInBible(
 
 /* ========================== Métadonnées / util ========================== */
 
+/** Métadonnées livres (inchangé) */
 export function getBibleBooks() {
   return bibleBooks;
 }
 
+/** Presse-papiers */
 export async function copyToClipboard(text: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text);
@@ -322,6 +318,7 @@ const idle = (cb: IdleCb) => {
   }
 };
 
+/** Anciens drapeaux, mais rendus génériques pour toutes les langues */
 let warmed: Partial<Record<Language, boolean>> = {};
 let warmupEnabled = true;
 
@@ -332,6 +329,7 @@ export function resumeWarmup() {
   warmupEnabled = true;
 }
 
+/** Précharge le JSONL en arrière-plan si autorisé */
 export function warmBibleCache(language: Language) {
   if (warmed[language]) return;
   warmed[language] = true;
@@ -340,3 +338,5 @@ export function warmBibleCache(language: Language) {
     ensureLoaded(language).catch(() => {});
   });
 }
+
+
