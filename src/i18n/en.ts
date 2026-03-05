@@ -197,8 +197,69 @@ const en: TranslationDict = {
   aboutTitle: '',
   aboutDescription:
     "The Word allows you to discover God's word through random verses and complete Bible reading.",
-  aboutIntro:
-    'TheWord: offline reading, instant search, thematic notes, one-tap sharing. You can also use TheWord on the web: www.theword.fr',
+  aboutIntro: `Why I created The Word
+
+At first, I created this app for one very simple reason: to read several books of the Bible at the same time, without losing track from one day to the next, thanks to tabs 1 / 2 / 3 on the Reading page.
+
+Over time, I added other features, always with the same goal: to help you read, meditate, remember, and put into practice the Word of God.
+
+My prayer for you
+
+My prayer is that you would be touched by the Word of God, that you would understand the love God has for you, and the love of Jesus Christ, His Son, as well as the price He paid so that we might be reconciled to God and walk with Him in His love.
+
+God’s love and the call to believe are especially visible in the Gospel of John (e.g., John 3:16).
+
+The key to entering the Kingdom, and the clear call to respond to God, appear clearly in the book of Acts (e.g., Acts 2:38; Acts 4:12).
+
+The Bible: God speaks to us
+
+We must never forget that the whole Bible is inspired by God: it is God speaking to us, and we must fear Him and obey Him.
+
+2 Timothy 3:16–17  “All Scripture is inspired by God…”
+Proverbs 9:10  “The fear of the LORD is the beginning of wisdom…”
+John 13:34–35  “Love one another, as I have loved you…”
+
+Time is short: respond to God’s call
+
+I believe time is short, and that God deeply desires each person to respond to His call: to repent, believe, and be baptized for the forgiveness of sins. This is an immense opportunity: to be with God forever. Let us not delay, for God will carry out His justice on the day He has appointed, and Jesus often called us to watch and be ready.
+
+1 Corinthians 7:29  “The time is short…”
+Acts 17:30–31  God calls all people to repentance… “He has appointed a day…”
+Acts 2:38  “Repent, and let each of you be baptized… for the forgiveness of your sins…”
+Mark 1:15  “Repent, and believe the good news.”
+Matthew 24:42–44  “Therefore keep watch… be ready…”
+Luke 12:35–40  “Let your waist be girded and your lamps burning…”
+
+Sadly, many have turned away from the Scriptures. The Bible warns that a time will come when some will look for messages that please them and will gather “a great number of teachers” around them.
+
+That is why we are called to remain in the Word, to obey God, and to live in a manner worthy of the Gospel—also seeking to persuade those around us.
+
+2 Timothy 4:3–4  “they will gather around them a great number of teachers…”
+John 8:31–32  “If you remain in my word…”
+Colossians 1:23  “continue in the faith, established and firm…”
+Philippians 1:27  “conduct yourselves in a manner worthy of the gospel…”
+2 Corinthians 5:20  “We are therefore ambassadors…”
+
+And sometimes, a “church” can begin very humbly: two people seeking God together.
+
+Matthew 18:20  “Where two or three are gathered in my name…”
+
+The gate is narrow: walk humbly with God
+
+Jesus said the gate is narrow, and the road that leads to destruction is broad. Let us not allow our sins to turn us away from God. Let us obey His Word with humility, with a childlike heart: simple, without hypocrisy, but also clear-minded and wise.
+
+Matthew 7:13–14  “Enter through the narrow gate…”
+Hebrews 12:1–2  “let us throw off every weight and the sin…”
+Matthew 18:3  “unless you become like little children…”
+Matthew 10:16  “as innocent as doves and as wise as serpents…”
+
+Pray, persevere, do not give up
+
+Pray to God that He would guide you by His Word and by His Holy Spirit. Ask earnestly. Do not be discouraged. Do not give up. Even if the righteous goes through suffering, God remains faithful and delivers.
+
+Luke 18:1  “they should always pray and not give up”
+James 1:5  “If any of you lacks wisdom, let him ask God…”
+Psalm 34:19  “Many are the afflictions of the righteous, but the LORD delivers him out of them all.”`,
   bibleVersions: 'Bible Versions',
   frenchVersion: 'French: Louis Segond 1910 (LSG) - Public Domain',
   englishVersion: 'English: King James Version (KJV) - Public Domain',
@@ -223,7 +284,7 @@ const en: TranslationDict = {
   notesPoint3: 'Rename lists, copy/share.',
   createdWithLove: "Created with love to spread God's Word",
   versionsFootnote:
-    'All Bible versions used are in the public domain. Some have been partially modernized (vocabulary, grammar) while remaining strictly faithful to the original manuscripts.',
+    'All Bible versions used are in the public domain. Some have been partially modernized (vocabulary, grammar) while remaining strictly faithful to the original manuscripts. If you would like the Android app, please send me a request by email and I will send you a link (test version).',
 
   // Quick slots
   quickSlotsIntro:
