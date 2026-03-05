@@ -200,18 +200,11 @@ const fr: TranslationDict = {
   aboutTitle: '',
   aboutDescription:
     'Recherchez instantanément des mots ou expressions dans toute la Bible, ouvrez les résultats en Lecture, et copiez/partagez un verset en un geste.',
- aboutIntro: `Pourquoi j’ai créé The Word
+  aboutIntro: `Pourquoi j’ai créé The Word
 
 Au départ, j’ai créé cette application pour une chose très simple : lire plusieurs livres de la Bible en même temps, sans perdre le fil d’un jour à l’autre, grâce aux onglets 1 / 2 / 3 de la page Lecture.
 
 Avec le temps, j’ai ajouté d’autres fonctions, toujours avec la même intention : aider à lire, méditer, retenir, et mettre en pratique la Parole de Dieu.
-
-Ce que l’application permet
-
-• Lecture parallèle (onglets 1/2/3) : garder le fil sur plusieurs livres.
-• Verset aléatoire : pour laisser Dieu me conduire vers des passages que je ne connais pas, mais dont j’ai besoin.
-• Notes & Études : créer des listes par thèmes, versets + prises de notes.
-• Partage & import : partager des listes entre utilisateurs, créer une liste à partir d’un texte, ou mixer versets et notes (par exemple lors d’un culte, d’une étude biblique, ou d’un enseignement).
 
 Ma prière pour vous
 
@@ -240,9 +233,7 @@ Marc 1:15  “Repentez-vous, et croyez à la bonne nouvelle.”
 Matthieu 24:42-44  “Veillez donc… tenez-vous prêts…”
 Luc 12:35-40  “Que vos reins soient ceints, et vos lampes allumées…”
 
-À propos des Églises et de la fidélité aux Écritures
-
-Il m’est difficile de vous conseiller une église en particulier. Malheureusement, beaucoup se sont éloignés des Écritures. La Bible avertit qu’un temps viendra où certains chercheront des messages qui leur plaisent et se donneront “une foule de maîtres”.
+Malheureusement, beaucoup se sont éloignés des Écritures. La Bible avertit qu’un temps viendra où certains chercheront des messages qui leur plaisent et se donneront “une foule de maîtres”.
 
 C’est pourquoi nous sommes appelés à demeurer dans la Parole, à obéir à Dieu, et à marcher d’une manière digne de l’Évangile, en cherchant aussi à convaincre ceux qui nous entourent.
 
@@ -271,7 +262,7 @@ Priez Dieu pour qu’il vous guide par sa Parole et par son Saint-Esprit. Suppli
 
 Luc 18:1  “il faut toujours prier, et ne point se relâcher”
 Jacques 1:5  “Si quelqu’un manque de sagesse, qu’il la demande à Dieu…”
-Psaume 34:20  “Le malheur atteint souvent le juste; mais l’Éternel l’en délivre toujours.”`,
+Psaume 34:20  “Le malheur atteint souvent le juste; mais l’Éternel l’en délivre toujours.”',
   bibleVersions: 'Versions de la Bible',
   frenchVersion:
     'Français : Louis Segond 1910 (LSG) — modernisation 2025 (vocabulaire/orthographe)',
