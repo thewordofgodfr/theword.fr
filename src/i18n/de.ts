@@ -202,8 +202,69 @@ const de: TranslationDict = {
   aboutTitle: "",
   aboutDescription:
     "The Word hilft dir, Gottes Wort durch Zufallsverse und vollständiges Bibellesen zu entdecken.",
-  aboutIntro:
-    "TheWord: Offline-Bibellesung, Sofortsuche, thematische Notizen, Teilen mit einem Tipp. Nutze TheWord auch im Web: www.theword.fr",
+  aboutIntro: `Warum ich The Word erstellt habe
+
+Am Anfang habe ich diese App aus einem ganz einfachen Grund erstellt: mehrere Bücher der Bibel gleichzeitig zu lesen, ohne von einem Tag zum nächsten den Faden zu verlieren – dank der Tabs 1 / 2 / 3 auf der Seite „Lesen“.
+
+Mit der Zeit habe ich weitere Funktionen hinzugefügt, immer mit derselben Absicht: beim Lesen, Nachsinnen, Behalten und Umsetzen des Wortes Gottes zu helfen.
+
+Mein Gebet für dich
+
+Mein Gebet ist, dass dich das Wort Gottes berührt, dass du die Liebe Gottes zu dir und die Liebe Jesu Christi, seines Sohnes, verstehst – ebenso den Preis, den er bezahlt hat, damit wir mit Gott versöhnt werden und in seiner Liebe mit ihm gehen.
+
+Gottes Liebe und der Ruf zum Glauben sind besonders im Evangelium nach Johannes sichtbar (z. B. Johannes 3:16).
+
+Der Schlüssel zum Eintritt in das Reich und der klare Ruf, auf Gott zu antworten, werden besonders deutlich im Buch der Apostelgeschichte (z. B. Apostelgeschichte 2:38; Apostelgeschichte 4:12).
+
+Die Bibel: Gott spricht zu uns
+
+Wir dürfen nie vergessen, dass die ganze Bibel von Gott inspiriert ist: Gott spricht zu uns, und wir sollen ihn fürchten und ihm gehorchen.
+
+2 Timotheus 3:16-17  “Alle Schrift ist von Gott eingegeben…”
+Sprüche 9:10  “Die Furcht des HERRN ist der Anfang der Weisheit…”
+Johannes 13:34-35  “Liebt einander, wie ich euch geliebt habe…”
+
+Die Zeit ist kurz: Antworte auf Gottes Ruf
+
+Ich glaube, dass die Zeit kurz ist und dass Gott von Herzen wünscht, dass jeder Mensch auf seinen Ruf antwortet: umkehren, glauben und sich zur Vergebung der Sünden taufen lassen. Das ist eine enorme Gelegenheit: für immer bei Gott zu sein. Lasst uns nicht zögern, denn Gott wird seine Gerechtigkeit an dem Tag vollziehen, den er festgesetzt hat, und Jesus hat uns oft aufgerufen, wachsam und bereit zu sein.
+
+1 Korinther 7:29  “Die Zeit ist kurz…”
+Apostelgeschichte 17:30-31  Gott ruft alle Menschen zur Umkehr… “Er hat einen Tag festgesetzt…”
+Apostelgeschichte 2:38  “Tut Buße… zur Vergebung eurer Sünden…”
+Markus 1:15  “Tut Buße und glaubt an das Evangelium.”
+Matthäus 24:42-44  “Wacht… seid bereit…”
+Lukas 12:35-40  “Eure Lenden seien umgürtet und eure Lampen brennend…”
+
+Leider haben sich viele von der Schrift entfernt. Die Bibel warnt, dass eine Zeit kommen wird, in der manche Botschaften suchen, die ihnen gefallen, und sich “eine Menge Lehrer” anschaffen.
+
+Darum sind wir aufgerufen, im Wort zu bleiben, Gott zu gehorchen und würdig des Evangeliums zu leben – und auch die Menschen um uns herum zu überzeugen.
+
+2 Timotheus 4:3-4  “sie werden sich eine Menge Lehrer aufhäufen…”
+Johannes 8:31-32  “Wenn ihr in meinem Wort bleibt…”
+Kolosser 1:23  “bleibt gegründet und standhaft…”
+Philipper 1:27  “lebt würdig des Evangeliums…”
+2 Korinther 5:20  “Wir sind Botschafter…”
+
+Und manchmal kann eine “Gemeinde” ganz bescheiden beginnen: zwei Menschen, die gemeinsam Gott suchen.
+
+Matthäus 18:20  “Wo zwei oder drei in meinem Namen versammelt sind…”
+
+Die Pforte ist eng: Demütig mit Gott gehen
+
+Jesus sagte, dass die Pforte eng ist und der Weg ins Verderben breit. Lassen wir nicht zu, dass unsere Sünden uns von Gott wegziehen. Gehorchen wir seinem Wort in Demut, mit einem kindlichen Herzen: schlicht, ohne Heuchelei, aber auch klar und umsichtig.
+
+Matthäus 7:13-14  “Geht ein durch die enge Pforte…”
+Hebräer 12:1-2  “legt jede Last und die Sünde ab…”
+Matthäus 18:3  “wenn ihr nicht werdet wie die Kinder…”
+Matthäus 10:16  “ohne Falsch wie die Tauben und klug wie die Schlangen…”
+
+Beten, ausharren, nicht aufgeben
+
+Bete zu Gott, dass er dich durch sein Wort und durch seinen Heiligen Geist führt. Bitte inständig. Lass dich nicht entmutigen. Gib nicht auf. Auch wenn der Gerechte durch Leiden geht, bleibt Gott treu und rettet.
+
+Lukas 18:1  “man soll allezeit beten und nicht nachlassen”
+Jakobus 1:5  “Wenn es jemandem an Weisheit mangelt, bitte er Gott…”
+Psalm 34:19  “Viele Leiden hat der Gerechte; aber aus allen rettet ihn der HERR.”`,
   bibleVersions: "Bibelübersetzungen",
   frenchVersion:
     "Französisch: Louis Segond 1910 (LSG) – Überarbeitung 2025 – gemeinfrei",
@@ -231,7 +292,7 @@ const de: TranslationDict = {
   createdWithLove:
     "Mit Liebe erstellt, um Gottes Wort zu verbreiten",
   versionsFootnote:
-    "Alle verwendeten Bibelübersetzungen sind gemeinfrei. Einige wurden sprachlich leicht modernisiert, bleiben aber streng den ursprünglichen Handschriften treu.",
+    "Alle verwendeten Bibelübersetzungen sind gemeinfrei. Einige wurden sprachlich leicht modernisiert, bleiben aber streng den ursprünglichen Handschriften treu. Wenn du die Android-App möchtest, sende mir bitte eine Anfrage per E-Mail, und ich schicke dir einen Link (Testversion).",
 
   // Quick slots
   quickSlotsIntro:
