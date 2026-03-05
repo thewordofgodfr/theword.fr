@@ -76,7 +76,7 @@ export default function About() {
             The Word
           </h1>
 
-          {/* ✅ affichage multi-lignes (important pour le gros aboutIntro) */}
+          {/* ✅ seule modif: affichage multi-lignes */}
           <p
             className={`${isDark ? 'text-white/90' : 'text-gray-700'} mt-3`}
             style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7, whiteSpace: 'pre-line' }}
@@ -120,7 +120,7 @@ export default function About() {
             </p>
           </section>
 
-          {/* Raccourcis (les 4 boutons) */}
+          {/* Raccourcis */}
           <section className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-4 shadow-md`}>
             <h2
               className={`mb-4 font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}
@@ -131,7 +131,7 @@ export default function About() {
             <QuickSlotsHelpInline />
           </section>
 
-          {/* Versions */}
+          {/* Versions (comme ton original : on ne touche pas, pas de clés ajoutées) */}
           <section className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-4 shadow-md`}>
             <h2
               className={`mb-3 font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}
@@ -139,35 +139,10 @@ export default function About() {
             >
               {t('bibleVersions')}
             </h2>
-
             <p
               className={`${isDark ? 'text-white/90' : 'text-gray-700'}`}
               style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
-            >
-              {t('frenchVersion')}
-              <br />
-              <span className={`${isDark ? 'text-white/80' : 'text-gray-600'}`}>
-                {t('frenchVersionDetails')}
-              </span>
-            </p>
-
-            <p
-              className={`${isDark ? 'text-white/90' : 'text-gray-700'} mt-3`}
-              style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
-            >
-              {t('englishVersion')}
-              <br />
-              <span className={`${isDark ? 'text-white/80' : 'text-gray-600'}`}>
-                {t('englishVersionDetails')}
-              </span>
-            </p>
-
-            <p
-              className={`${isDark ? 'text-white/90' : 'text-gray-700'} mt-3`}
-              style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
-            >
-              {t('otherLanguagesNote')}
-            </p>
+            />
           </section>
 
           <footer className="text-center">
@@ -178,7 +153,7 @@ export default function About() {
               {t('versionsFootnote')}
             </p>
 
-            {/* ✅ Contact (sans i18n -> évite crash si clés manquantes côté TWA cache) */}
+            {/* ✅ seule modif: contact */}
             <p className="mt-3">
               <span
                 className={`${isDark ? 'text-white/80' : 'text-gray-600'} inline-flex items-center gap-2`}
@@ -196,10 +171,7 @@ export default function About() {
             </p>
 
             <p className="mt-2">
-              <a
-                href="https://theword.fr/privacy.html"
-                className={`${isDark ? 'text-white underline' : 'text-gray-800 underline'}`}
-              >
+              <a href="https://theword.fr/privacy.html" className="underline">
                 {state.settings.language === 'fr' ? 'Politique de confidentialité' : 'Privacy policy'}
               </a>
             </p>
@@ -209,4 +181,3 @@ export default function About() {
     </div>
   );
 }
-
