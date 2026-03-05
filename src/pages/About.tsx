@@ -33,12 +33,21 @@ const QuickSlotsHelpInline: React.FC = () => {
         ${isDark ? 'bg-gray-900/40 border border-gray-700' : 'bg-gray-50 border border-gray-200'}`}
         aria-label={t('quickSlotsIllustrationLabel')}
       >
-        <span className={`${CHIP_BASE} ${SEARCH_FILLED}`} title={t('quickSlotLastPassageTooltip')}>
+        <span
+          className={`${CHIP_BASE} ${SEARCH_FILLED}`}
+          title={t('quickSlotLastPassageTooltip')}
+        >
           <SearchIcon className="w-4 h-4" />
         </span>
-        <span className={`${CHIP_BASE} ${SLOT1}`} title={t('quickSlot1ActiveTooltip')}>1</span>
-        <span className={`${CHIP_BASE} ${SLOT2}`} title={t('quickSlot2Tooltip')}>2</span>
-        <span className={`${CHIP_BASE} ${SLOT3}`} title={t('quickSlot3Tooltip')}>3</span>
+        <span className={`${CHIP_BASE} ${SLOT1}`} title={t('quickSlot1ActiveTooltip')}>
+          1
+        </span>
+        <span className={`${CHIP_BASE} ${SLOT2}`} title={t('quickSlot2Tooltip')}>
+          2
+        </span>
+        <span className={`${CHIP_BASE} ${SLOT3}`} title={t('quickSlot3Tooltip')}>
+          3
+        </span>
       </div>
 
       <p
@@ -66,6 +75,8 @@ export default function About() {
           >
             The Word
           </h1>
+
+          {/* ✅ affichage multi-lignes (important pour le gros aboutIntro) */}
           <p
             className={`${isDark ? 'text-white/90' : 'text-gray-700'} mt-3`}
             style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7, whiteSpace: 'pre-line' }}
@@ -77,29 +88,44 @@ export default function About() {
         <div className="flex flex-col gap-5">
           {/* Recherche */}
           <section className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-4 shadow-md`}>
-            <h2 className={`mb-4 font-bold flex items-center ${isDark ? 'text-white' : 'text-gray-900'}`} style={{ fontSize: `${H2_PX}px` }}>
+            <h2
+              className={`mb-4 font-bold flex items-center ${isDark ? 'text-white' : 'text-gray-900'}`}
+              style={{ fontSize: `${H2_PX}px` }}
+            >
               <SearchIcon size={22} className="mr-2" />
               {t('searchTitle')}
             </h2>
-            <p className={`${isDark ? 'text-white' : 'text-gray-700'}`} style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}>
+            <p
+              className={`${isDark ? 'text-white' : 'text-gray-700'}`}
+              style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
+            >
               {t('aboutDescription')}
             </p>
           </section>
 
           {/* Aléatoire */}
           <section className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-4 shadow-md`}>
-            <h2 className={`mb-4 font-bold flex items-center ${isDark ? 'text-white' : 'text-gray-900'}`} style={{ fontSize: `${H2_PX}px` }}>
+            <h2
+              className={`mb-4 font-bold flex items-center ${isDark ? 'text-white' : 'text-gray-900'}`}
+              style={{ fontSize: `${H2_PX}px` }}
+            >
               <Shuffle size={22} className="mr-2" />
               {t('randomFeature')}
             </h2>
-            <p className={`${isDark ? 'text-white' : 'text-gray-700'}`} style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}>
+            <p
+              className={`${isDark ? 'text-white' : 'text-gray-700'}`}
+              style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
+            >
               {t('randomFeatureDesc')}
             </p>
           </section>
 
-          {/* Raccourcis */}
+          {/* Raccourcis (les 4 boutons) */}
           <section className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-4 shadow-md`}>
-            <h2 className={`mb-4 font-bold ${isDark ? 'text-white' : 'text-gray-900'}`} style={{ fontSize: `${H2_PX}px` }}>
+            <h2
+              className={`mb-4 font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}
+              style={{ fontSize: `${H2_PX}px` }}
+            >
               {t('readingShortcuts')}
             </h2>
             <QuickSlotsHelpInline />
@@ -107,37 +133,74 @@ export default function About() {
 
           {/* Versions */}
           <section className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-4 shadow-md`}>
-            <h2 className={`mb-3 font-bold ${isDark ? 'text-white' : 'text-gray-900'}`} style={{ fontSize: `${H2_PX}px` }}>
+            <h2
+              className={`mb-3 font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}
+              style={{ fontSize: `${H2_PX}px` }}
+            >
               {t('bibleVersions')}
             </h2>
-            <p className={`${isDark ? 'text-white/90' : 'text-gray-700'}`} style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}>
-              </p>
+
+            <p
+              className={`${isDark ? 'text-white/90' : 'text-gray-700'}`}
+              style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
+            >
+              {t('frenchVersion')}
+              <br />
+              <span className={`${isDark ? 'text-white/80' : 'text-gray-600'}`}>
+                {t('frenchVersionDetails')}
+              </span>
+            </p>
+
+            <p
+              className={`${isDark ? 'text-white/90' : 'text-gray-700'} mt-3`}
+              style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
+            >
+              {t('englishVersion')}
+              <br />
+              <span className={`${isDark ? 'text-white/80' : 'text-gray-600'}`}>
+                {t('englishVersionDetails')}
+              </span>
+            </p>
+
+            <p
+              className={`${isDark ? 'text-white/90' : 'text-gray-700'} mt-3`}
+              style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
+            >
+              {t('otherLanguagesNote')}
+            </p>
           </section>
 
           <footer className="text-center">
-            <p className={`${isDark ? 'text-white/80' : 'text-gray-600'}`} style={{ fontSize: `${TEXT_PX}px` }}>
+            <p
+              className={`${isDark ? 'text-white/80' : 'text-gray-600'}`}
+              style={{ fontSize: `${TEXT_PX}px` }}
+            >
               {t('versionsFootnote')}
             </p>
+
+            {/* ✅ Contact (sans i18n -> évite crash si clés manquantes côté TWA cache) */}
             <p className="mt-3">
-  <span
-    className={`${isDark ? 'text-white/80' : 'text-gray-600'} inline-flex items-center gap-2`}
-    style={{ fontSize: `${TEXT_PX}px` }}
-  >
-    <Mail size={18} />
-    Contact :
-  </span>{' '}
-  <a
-    href="mailto:contact@theword.fr"
-    className={`${isDark ? 'text-white underline' : 'text-gray-800 underline'}`}
-  >
-    contact@theword.fr
-  </a>
-</p>
+              <span
+                className={`${isDark ? 'text-white/80' : 'text-gray-600'} inline-flex items-center gap-2`}
+                style={{ fontSize: `${TEXT_PX}px` }}
+              >
+                <Mail size={18} />
+                Contact :
+              </span>{' '}
+              <a
+                href="mailto:contact@theword.fr"
+                className={`${isDark ? 'text-white underline' : 'text-gray-800 underline'}`}
+              >
+                contact@theword.fr
+              </a>
+            </p>
+
             <p className="mt-2">
-              <a href="https://theword.fr/privacy.html" className="underline">
-                {state.settings.language === 'fr'
-                  ? 'Politique de confidentialité'
-                  : 'Privacy policy'}
+              <a
+                href="https://theword.fr/privacy.html"
+                className={`${isDark ? 'text-white underline' : 'text-gray-800 underline'}`}
+              >
+                {state.settings.language === 'fr' ? 'Politique de confidentialité' : 'Privacy policy'}
               </a>
             </p>
           </footer>
