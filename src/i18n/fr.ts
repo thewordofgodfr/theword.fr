@@ -208,7 +208,7 @@ Avec le temps, j’ai ajouté d’autres fonctions, toujours avec la même inten
 
 Ma prière pour vous
 
-Ma prière, c’est que vous puissiez être touché par la Parole de Dieu, que vous compreniez l’amour de Dieu pour nous, et l’amour de Jésus-Christ son Fils, ainsi que le prix qu’il a payé pour que nous soyons réconciliés avec Dieu et que nous marchions avec Lui dans son amour.
+Ma prière, c’est que vous puissiez être touché par la Parole de Dieu, que vous compreniez l’amour que Dieu a pour vous, et l’amour de Jésus-Christ son Fils, ainsi que le prix qu’il a payé pour que nous soyons réconciliés avec Dieu et que nous marchions avec Lui dans son amour.
 
 L’amour de Dieu et l’appel à croire sont particulièrement visibles dans l’Évangile de Jean (ex : Jean 3:16).
 
