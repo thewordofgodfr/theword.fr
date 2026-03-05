@@ -262,7 +262,7 @@ Priez Dieu pour qu’il vous guide par sa Parole et par son Saint-Esprit. Suppli
 
 Luc 18:1  “il faut toujours prier, et ne point se relâcher”
 Jacques 1:5  “Si quelqu’un manque de sagesse, qu’il la demande à Dieu…”
-Psaume 34:20  “Le malheur atteint souvent le juste; mais l’Éternel l’en délivre toujours.”',
+Psaume 34:20  “Le malheur atteint souvent le juste; mais l’Éternel l’en délivre toujours.”`,
   bibleVersions: 'Versions de la Bible',
   frenchVersion:
     'Français : Louis Segond 1910 (LSG) — modernisation 2025 (vocabulaire/orthographe)',
