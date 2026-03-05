@@ -2,7 +2,7 @@
 import React from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
-import { Shuffle, Search as SearchIcon } from 'lucide-react';
+import { Shuffle, Search as SearchIcon, Mail } from 'lucide-react';
 
 /** Tailles fixes (non dynamiques) */
 const TITLE_PX = 21;
@@ -68,7 +68,7 @@ export default function About() {
           </h1>
           <p
             className={`${isDark ? 'text-white/90' : 'text-gray-700'} mt-3`}
-            style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7 }}
+            style={{ fontSize: `${TEXT_PX}px`, lineHeight: 1.7, whiteSpace: 'pre-line' }}
           >
             {t('aboutIntro')}
           </p>
@@ -118,6 +118,21 @@ export default function About() {
             <p className={`${isDark ? 'text-white/80' : 'text-gray-600'}`} style={{ fontSize: `${TEXT_PX}px` }}>
               {t('versionsFootnote')}
             </p>
+            <p className="mt-3">
+  <span
+    className={`${isDark ? 'text-white/80' : 'text-gray-600'} inline-flex items-center gap-2`}
+    style={{ fontSize: `${TEXT_PX}px` }}
+  >
+    <Mail size={18} />
+    Contact :
+  </span>{' '}
+  <a
+    href="mailto:contact@theword.fr"
+    className={`${isDark ? 'text-white underline' : 'text-gray-800 underline'}`}
+  >
+    contact@theword.fr
+  </a>
+</p>
             <p className="mt-2">
               <a href="https://theword.fr/privacy.html" className="underline">
                 {state.settings.language === 'fr'
