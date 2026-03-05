@@ -316,7 +316,7 @@ Salmo 34:19  “Muitas são as aflições do justo, mas o SENHOR o livra de toda
   createdWithLove:
     "Criado com amor para espalhar a Palavra de Deus",
   versionsFootnote:
-    "Todas as versões bíblicas usadas são de domínio público. Algumas foram parcialmente modernizadas (vocabulário, gramática), mantendo total fidelidade aos manuscritos originais. Se você deseja o aplicativo Android, envie-me um pedido por e-mail e eu lhe enviarei um link (aplicativo em versão de teste).",
+    "Todas as versões bíblicas usadas são de domínio público. Algumas foram parcialmente modernizadas (vocabulário, gramática), mantendo total fidelidade aos manuscritos originais.  Se você deseja o aplicativo Android, envie-me um pedido por e-mail e eu lhe enviarei um link (aplicativo em versão de teste).",
 
   // Quick slots
   quickSlotsIntro:
