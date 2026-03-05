@@ -202,8 +202,70 @@ const es: TranslationDict = {
   aboutTitle: '',
   aboutDescription:
     'The Word te permite descubrir la Palabra de Dios mediante versículos aleatorios y la lectura completa de la Biblia.',
-  aboutIntro:
-    'TheWord: lectura de la Biblia sin conexión, búsqueda instantánea, notas temáticas, compartir con un gesto. También puedes usar TheWord en la web: www.theword.fr',
+  aboutIntro: `Por qué creé The Word
+
+Al principio, creé esta aplicación por una razón muy simple: leer varios libros de la Biblia al mismo tiempo, sin perder el hilo de un día para otro, gracias a las pestañas 1 / 2 / 3 de la página Lectura.
+
+Con el tiempo, añadí otras funciones, siempre con la misma intención: ayudar a leer, meditar, recordar y poner en práctica la Palabra de Dios.
+
+Mi oración por ti
+
+Mi oración es que la Palabra de Dios te toque, que comprendas el amor que Dios tiene por ti y el amor de Jesucristo, su Hijo, así como el precio que pagó para que fuéramos reconciliados con Dios y caminemos con Él en su amor.
+
+El amor de Dios y el llamado a creer son especialmente visibles en el Evangelio de Juan (ej.: Juan 3:16).
+
+La clave para entrar en el Reino, y el llamado claro a responder a Dios, aparecen claramente en el libro de los Hechos (ej.: Hechos 2:38; Hechos 4:12).
+
+La Biblia: Dios nos habla
+
+Nunca debemos olvidar que toda la Biblia es inspirada por Dios: es Dios quien nos habla, y debemos temerle y obedecerle.
+
+2 Timoteo 3:16-17  “Toda la Escritura es inspirada por Dios…”
+Proverbios 9:10  “El temor de Jehová es el principio de la sabiduría…”
+Juan 13:34-35  “Amaos los unos a los otros, como yo os he amado…”
+
+El tiempo es corto: responder al llamado de Dios
+
+Creo que el tiempo es corto y que Dios desea ardientemente que cada persona responda a su llamado: arrepentirse, creer y ser bautizado para el perdón de los pecados. Es una oportunidad inmensa: estar con Dios eternamente. No tardemos, porque Dios cumplirá su justicia en el día que ha fijado, y Jesús a menudo nos llamó a velar y a estar preparados.
+
+1 Corintios 7:29  “El tiempo es corto…”
+Hechos 17:30-31  Dios llama a todos los hombres al arrepentimiento… “ha fijado un día…”
+Hechos 2:38  “Arrepentíos… para perdón de vuestros pecados…”
+Marcos 1:15  “Arrepentíos, y creed en el evangelio.”
+Mateo 24:42-44  “Velad… estad preparados…”
+Lucas 12:35-40  “Estén ceñidos vuestros lomos, y vuestras lámparas encendidas…”
+
+Por desgracia, muchos se han alejado de las Escrituras. La Biblia advierte que vendrá un tiempo en que algunos buscarán mensajes que les agraden y se rodearán de “una multitud de maestros”.
+
+Por eso estamos llamados a permanecer en la Palabra, a obedecer a Dios y a vivir de una manera digna del Evangelio, procurando también convencer a quienes nos rodean.
+
+2 Timoteo 4:3-4  “se amontonarán maestros…”
+Juan 8:31-32  “Si permanecéis en mi palabra…”
+Colosenses 1:23  “permanezcáis fundados y firmes…”
+Filipenses 1:27  “conduceos de una manera digna del evangelio…”
+2 Corintios 5:20  “somos embajadores…”
+
+Y a veces, una “iglesia” puede empezar humildemente: dos personas que buscan a Dios juntas.
+
+Mateo 18:20  “Donde están dos o tres congregados en mi nombre…”
+
+La puerta es estrecha: caminar humildemente con Dios
+
+Jesús dijo que la puerta es estrecha y que el camino que lleva a la perdición es ancho. No dejemos que nuestros pecados nos aparten de Dios. Obedezcamos con humildad su Palabra, con un corazón de niño: sencillo, sin hipocresía, pero también lúcido y prudente.
+
+Mateo 7:13-14  “Entrad por la puerta estrecha…”
+Hebreos 12:1-2  “dejemos todo peso y el pecado…”
+Mateo 18:3  “si no os hacéis como niños…”
+Mateo 10:16  “sencillos como palomas y prudentes como serpientes…”
+
+Orar, perseverar, no rendirse
+
+Ruega a Dios que te guíe por su Palabra y por su Espíritu Santo. Suplica. No te desanimes. No te rindas. Aunque el justo pase por sufrimientos, Dios permanece fiel y libra.
+
+Lucas 18:1  “es necesario orar siempre, y no desmayar”
+Santiago 1:5  “Si alguno tiene falta de sabiduría, pídala a Dios…”
+Salmo 34:19  “Muchas son las aflicciones del justo; pero de todas ellas le librará Jehová.”`,
+
   bibleVersions: 'Versiones de la Biblia',
   frenchVersion:
     'Francés: Louis Segond 1910 (LSG) – Revisión 2025 – Dominio público',
@@ -231,7 +293,7 @@ const es: TranslationDict = {
   createdWithLove:
     'Creado con amor para difundir la Palabra de Dios',
   versionsFootnote:
-    'Todas las versiones bíblicas utilizadas son de dominio público. Algunas han sido parcialmente modernizadas (vocabulario, gramática) manteniéndose estrictamente fieles a los manuscritos originales.',
+    'Todas las versiones bíblicas utilizadas son de dominio público. Algunas han sido parcialmente modernizadas (vocabulario, gramática) manteniéndose estrictamente fieles a los manuscritos originales. Si deseas la aplicación Android, envíame una solicitud por correo electrónico y te enviaré un enlace (versión de prueba).',
 
   // Quick slots / reading shortcuts
   quickSlotsIntro:
