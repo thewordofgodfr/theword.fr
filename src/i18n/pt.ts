@@ -224,8 +224,69 @@ const pt: TranslationDict = {
   aboutTitle: "",
   aboutDescription:
     "The Word permite que você descubra a Palavra de Deus por meio de versículos aleatórios e da leitura completa da Bíblia.",
-  aboutIntro:
-    "TheWord: leitura da Bíblia offline, pesquisa instantânea, notas temáticas, compartilhamento com um toque. Use também TheWord na web: www.theword.fr",
+  aboutIntro: `Por que criei o The Word
+
+No início, criei este aplicativo por uma coisa muito simples: ler vários livros da Bíblia ao mesmo tempo, sem perder o fio de um dia para o outro, graças às abas 1 / 2 / 3 da página Leitura.
+
+Com o tempo, adicionei outras funções, sempre com a mesma intenção: ajudar a ler, meditar, memorizar e colocar em prática a Palavra de Deus.
+
+Minha oração por vocês
+
+Minha oração é que vocês sejam tocados pela Palavra de Deus, que compreendam o amor que Deus tem por vocês e o amor de Jesus Cristo, seu Filho, bem como o preço que Ele pagou para que fôssemos reconciliados com Deus e caminhássemos com Ele em seu amor.
+
+O amor de Deus e o chamado para crer são particularmente visíveis no Evangelho de João (ex.: João 3:16).
+
+A chave de entrada no Reino e o chamado claro para responder a Deus aparecem claramente no livro de Atos (ex.: Atos 2:38; Atos 4:12).
+
+A Bíblia: Deus fala conosco
+
+Nunca devemos esquecer que toda a Bíblia é inspirada por Deus: é Deus quem fala conosco, e devemos temê-lo e obedecer-lhe.
+
+2 Timóteo 3:16-17  “Toda a Escritura é inspirada por Deus…”
+Provérbios 9:10  “O temor do SENHOR é o princípio da sabedoria…”
+João 13:34-35  “Amai-vos uns aos outros, como eu vos amei…”
+
+O tempo é curto: responder ao chamado de Deus
+
+Creio que o tempo é curto e que Deus deseja ardentemente que cada pessoa responda ao seu chamado: arrepender-se, crer e ser batizada para o perdão dos pecados. É uma oportunidade imensa: estar com Deus eternamente. Não demoremos, pois Deus cumprirá sua justiça no dia que determinou, e Jesus frequentemente nos chamou a vigiar e a estar prontos.
+
+1 Coríntios 7:29  “O tempo é curto…”
+Atos 17:30-31  Deus chama todos os homens ao arrependimento… “fixou um dia…”
+Atos 2:38  “Arrependei-vos, e cada um de vós seja batizado… para perdão dos vossos pecados…”
+Marcos 1:15  “Arrependei-vos e crede no evangelho.”
+Mateus 24:42-44  “Vigiai… estai preparados…”
+Lucas 12:35-40  “Estejam cingidos os vossos lombos e acesas as vossas lâmpadas…”
+
+Infelizmente, muitos se afastaram das Escrituras. A Bíblia adverte que virá um tempo em que alguns procurarão mensagens que lhes agradem e juntarão “uma multidão de mestres”.
+
+Por isso somos chamados a permanecer na Palavra, a obedecer a Deus e a viver de maneira digna do Evangelho, procurando também convencer aqueles ao nosso redor.
+
+2 Timóteo 4:3-4  “ajuntarão para si mestres…”
+João 8:31-32  “Se permanecerdes na minha palavra…”
+Colossenses 1:23  “permanecei firmes e inabaláveis…”
+Filipenses 1:27  “comportai-vos de modo digno do evangelho…”
+2 Coríntios 5:20  “somos embaixadores…”
+
+E, às vezes, uma “igreja” pode começar humildemente: duas pessoas buscando a Deus juntas.
+
+Mateus 18:20  “Onde estiverem dois ou três reunidos em meu nome…”
+
+A porta é estreita: caminhar humildemente com Deus
+
+Jesus disse que a porta é estreita e que o caminho que leva à perdição é largo. Não deixemos que nossos pecados nos afastem de Deus. Obedeçamos humildemente à sua Palavra, com um coração de criança: simples, sem hipocrisia, mas também lúcido e prudente.
+
+Mateus 7:13-14  “Entrai pela porta estreita…”
+Hebreus 12:1-2  “deixemos todo peso e o pecado…”
+Mateus 18:3  “se não vos tornardes como crianças…”
+Mateus 10:16  “simples como as pombas e prudentes como as serpentes…”
+
+Orar, perseverar, não desistir
+
+Orem a Deus para que Ele os guie por sua Palavra e por seu Espírito Santo. Supliquem. Não desanimem. Não desistam. Mesmo que o justo passe por sofrimentos, Deus permanece fiel e livra.
+
+Lucas 18:1  “é necessário orar sempre e nunca desanimar”
+Tiago 1:5  “Se alguém tem falta de sabedoria, peça-a a Deus…”
+Salmo 34:19  “Muitas são as aflições do justo, mas o SENHOR o livra de todas.”`,
   bibleVersions: "Versões da Bíblia",
   frenchVersion:
     "Francês: Louis Segond 1910 (LSG) – Revisão 2025 – Domínio público",
@@ -255,7 +316,7 @@ const pt: TranslationDict = {
   createdWithLove:
     "Criado com amor para espalhar a Palavra de Deus",
   versionsFootnote:
-    "Todas as versões bíblicas usadas são de domínio público. Algumas foram parcialmente modernizadas (vocabulário, gramática), mantendo total fidelidade aos manuscritos originais.",
+    "Todas as versões bíblicas usadas são de domínio público. Algumas foram parcialmente modernizadas (vocabulário, gramática), mantendo total fidelidade aos manuscritos originais. Se você deseja o aplicativo Android, envie-me um pedido por e-mail e eu lhe enviarei um link (aplicativo em versão de teste).",
 
   // Quick slots
   quickSlotsIntro:
