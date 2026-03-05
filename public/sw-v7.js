@@ -1,15 +1,17 @@
-// sw-v7.js — prod: https + cache propre + MAJ immédiate
+// sw-v7.js — prod: https + cache propre + MAJ fiable (sans Ctrl+F5)
 // ✅ 3 caches : APP (shell+assets) / DATA_CORE (langue user + fr/en/el/he) / DATA_EXTRA (autres langues)
-// ✅ Offline-first réel : navigation = cache-first (zéro écran blanc)
+// ✅ Offline-first réel : navigation -> sert toujours index.html du cache si dispo
+// ✅ MAJ robuste : quand index.html est rafraîchi, on met aussi à jour les assets référencés
 // ✅ Timeout réseau pour éviter les fetch "pending" quand le réseau tombe
 // ✅ Runtime cache data en CORE/EXTRA selon langue
 
-const CACHE_VERSION = 'v413'; // ← bump obligatoire
+const CACHE_VERSION = 'v414'; // ← bump obligatoire à chaque déploiement
 const CACHE_APP = `twog-app-${CACHE_VERSION}`;
 const CACHE_DATA_CORE = `twog-data-core-${CACHE_VERSION}`;
 const CACHE_DATA_EXTRA = `twog-data-extra-${CACHE_VERSION}`;
 
-const APP_SHELL = ['/', '/index.html', '/favicon.ico', '/logo192.png', '/logo512.png', '/site.webmanifest'];
+// ⚠️ IMPORTANT : on enlève '/' du shell, on ne garde que index.html + icônes
+const APP_SHELL = ['/index.html', '/favicon.ico', '/logo192.png', '/logo512.png', '/site.webmanifest'];
 
 const BIBLES_INDEX_URL = '/data/bible/bibles-index.json';
 
@@ -23,10 +25,11 @@ const PRECACHE_CHUNK = 15;
 const ORIGIN = self.location.origin;
 
 // Timeouts (important pour éviter écran blanc sur réseau instable)
-const NAV_FETCH_TIMEOUT_MS = 2500;     // navigation/doc
-const SMALL_FETCH_TIMEOUT_MS = 2500;   // json, index, version, etc.
+const NAV_FETCH_TIMEOUT_MS = 2500; // navigation/doc
+const SMALL_FETCH_TIMEOUT_MS = 2500; // json, index, version, etc.
 
-const toHttps = (u) => (typeof u === 'string' && u.startsWith('http://')) ? ('https://' + u.slice(7)) : u;
+const toHttps = (u) =>
+  typeof u === 'string' && u.startsWith('http://') ? 'https://' + u.slice(7) : u;
 
 const normalizeUrl = (u) => {
   if (typeof u !== 'string') return u;
@@ -37,7 +40,9 @@ const normalizeUrl = (u) => {
       return abs.pathname + abs.search;
     }
     return abs.href;
-  } catch { return u; }
+  } catch {
+    return u;
+  }
 };
 
 const isStaticAsset = (url) =>
@@ -45,8 +50,7 @@ const isStaticAsset = (url) =>
   /\.(js|css|png|jpe?g|svg|webp|woff2?|ttf|eot)$/.test(url.pathname);
 
 const isBibleJson = (url) =>
-  url.pathname.startsWith('/data/bible/') &&
-  /\.(json|jsonl)$/.test(url.pathname);
+  url.pathname.startsWith('/data/bible/') && /\.(json|jsonl)$/.test(url.pathname);
 
 function getLangFromBiblePath(pathname) {
   const m = pathname.match(/^\/data\/bible\/([^/]+)\//);
@@ -119,44 +123,49 @@ self.addEventListener('message', (e) => {
 
   if (data.type === 'SET_CORE_LANG' && typeof data.lang === 'string') {
     const lang = data.lang.trim();
-    e.waitUntil((async () => {
-      const current = await idbGet(IDB_KEY_USER_LANG);
-      if (!current && lang) await idbSet(IDB_KEY_USER_LANG, lang);
-    })());
+    e.waitUntil(
+      (async () => {
+        const current = await idbGet(IDB_KEY_USER_LANG);
+        if (!current && lang) await idbSet(IDB_KEY_USER_LANG, lang);
+      })()
+    );
   }
 
   if (data.type === 'CLEAR_ALL') {
-    e.waitUntil((async () => {
-      const keys = await caches.keys();
-      await Promise.all(keys.map(k => caches.delete(k)));
-      self.registration.unregister();
-      const clients = await self.clients.matchAll({ includeUncontrolled: true });
-      clients.forEach(c => c.navigate('/'));
-    })());
+    e.waitUntil(
+      (async () => {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+        self.registration.unregister();
+        const clients = await self.clients.matchAll({ includeUncontrolled: true });
+        clients.forEach((c) => c.navigate('/'));
+      })()
+    );
   }
 
   if (data.type === 'PURGE_EXTRA') {
-    e.waitUntil((async () => {
-      await caches.delete(CACHE_DATA_EXTRA);
-    })());
+    e.waitUntil(
+      (async () => {
+        await caches.delete(CACHE_DATA_EXTRA);
+      })()
+    );
   }
 });
 
 /* -------------------------------------------------- */
 /* App shell helper */
-async function getAppShellFromCache(cache) {
-  return (await cache.match('/', { ignoreSearch: true })) ||
-         (await cache.match('/index.html', { ignoreSearch: true }));
+async function getIndexFromCache(cache) {
+  return await cache.match('/index.html', { ignoreSearch: true });
 }
 
 /* -------------------------------------------------- */
-/* Precache assets Vite depuis index.html */
-async function precacheAppShellAssets(cache) {
+/* MAJ robuste : fetch index.html + precache assets Vite référencés */
+async function updateIndexAndAssets(cacheApp) {
   try {
-    const res = await fetch('/index.html', { cache: 'no-store' });
-    if (!res?.ok) return;
+    const res = await fetchWithTimeout('/index.html', NAV_FETCH_TIMEOUT_MS);
+    if (!res || !res.ok) return;
 
-    await cache.put('/index.html', res.clone());
+    await cacheApp.put('/index.html', res.clone());
     const html = await res.text();
 
     const urls = new Set();
@@ -170,16 +179,20 @@ async function precacheAppShellAssets(cache) {
       } catch {}
     }
 
-    const toCache = [...urls].filter(u =>
-      u.startsWith('/assets/') || /\.(js|css|woff2?|ttf|eot|svg|png|jpe?g|webp)$/.test(u)
+    const toCache = [...urls].filter(
+      (u) =>
+        u.startsWith('/assets/') ||
+        /\.(js|css|woff2?|ttf|eot|svg|png|jpe?g|webp)$/.test(u)
     );
 
-    await Promise.all(toCache.map(async (u) => {
-      try {
-        const r = await fetch(u, { cache: 'no-store' });
-        if (r && (r.ok || r.type === 'opaque')) await cache.put(u, r.clone());
-      } catch {}
-    }));
+    await Promise.all(
+      toCache.map(async (u) => {
+        try {
+          const r = await fetchWithTimeout(u, SMALL_FETCH_TIMEOUT_MS);
+          if (r && (r.ok || r.type === 'opaque')) await cacheApp.put(u, r.clone());
+        } catch {}
+      })
+    );
   } catch {}
 }
 
@@ -187,7 +200,6 @@ async function precacheAppShellAssets(cache) {
 /* Lire bibles-index et obtenir URL(s) pour une liste de langues */
 async function getBibleUrlsForLangs(langs) {
   try {
-    // Petite requête, mais réseau instable => timeout => pas bloquant
     const res = await fetchWithTimeout(BIBLES_INDEX_URL, SMALL_FETCH_TIMEOUT_MS);
     if (!res.ok) return [];
     const idx = await res.json();
@@ -213,12 +225,14 @@ async function precacheCoreBibles(cacheCore) {
   const urls = await getBibleUrlsForLangs([...coreLangs]);
 
   for (let i = 0; i < urls.length; i += PRECACHE_CHUNK) {
-    await Promise.all(urls.slice(i, i + PRECACHE_CHUNK).map(async (u) => {
-      try {
-        const r = await fetch(u, { cache: 'no-store' });
-        if (r && (r.ok || r.type === 'opaque')) await cacheCore.put(u, r.clone());
-      } catch {}
-    }));
+    await Promise.all(
+      urls.slice(i, i + PRECACHE_CHUNK).map(async (u) => {
+        try {
+          const r = await fetch(u, { cache: 'no-store' });
+          if (r && (r.ok || r.type === 'opaque')) await cacheCore.put(u, r.clone());
+        } catch {}
+      })
+    );
   }
 }
 
@@ -246,31 +260,40 @@ async function enforceExtraLimit(cacheExtra) {
 /* -------------------------------------------------- */
 /* Install */
 self.addEventListener('install', (event) => {
-  event.waitUntil((async () => {
-    const cacheApp = await caches.open(CACHE_APP);
-    const cacheCore = await caches.open(CACHE_DATA_CORE);
+  event.waitUntil(
+    (async () => {
+      const cacheApp = await caches.open(CACHE_APP);
+      const cacheCore = await caches.open(CACHE_DATA_CORE);
 
-    await cacheApp.addAll(APP_SHELL);
-    await precacheAppShellAssets(cacheApp);
-    await precacheCoreBibles(cacheCore);
+      // Precache shell
+      await cacheApp.addAll(APP_SHELL);
 
-    await self.skipWaiting();
-  })());
+      // MAJ + precache assets depuis index.html (robuste)
+      await updateIndexAndAssets(cacheApp);
+
+      // Precache bibles CORE
+      await precacheCoreBibles(cacheCore);
+
+      await self.skipWaiting();
+    })()
+  );
 });
 
 /* -------------------------------------------------- */
 /* Activate */
 self.addEventListener('activate', (event) => {
-  event.waitUntil((async () => {
-    const keys = await caches.keys();
-    const keep = new Set([CACHE_APP, CACHE_DATA_CORE, CACHE_DATA_EXTRA]);
-    await Promise.all(keys.filter(k => !keep.has(k)).map(k => caches.delete(k)));
+  event.waitUntil(
+    (async () => {
+      const keys = await caches.keys();
+      const keep = new Set([CACHE_APP, CACHE_DATA_CORE, CACHE_DATA_EXTRA]);
+      await Promise.all(keys.filter((k) => !keep.has(k)).map((k) => caches.delete(k)));
 
-    if ('navigationPreload' in self.registration) {
-      await self.registration.navigationPreload.enable();
-    }
-    await self.clients.claim();
-  })());
+      if ('navigationPreload' in self.registration) {
+        await self.registration.navigationPreload.enable();
+      }
+      await self.clients.claim();
+    })()
+  );
 });
 
 /* -------------------------------------------------- */
@@ -283,126 +306,135 @@ self.addEventListener('fetch', (event) => {
 
     // ✅ NAVIGATION (documents) — OFFLINE-FIRST (zéro écran blanc)
     if (req.mode === 'navigate' || req.destination === 'document') {
-      event.respondWith((async () => {
-        const cacheApp = await caches.open(CACHE_APP);
+      event.respondWith(
+        (async () => {
+          const cacheApp = await caches.open(CACHE_APP);
 
-        // 1) Répondre immédiatement depuis le cache (si dispo)
-        const shell = await getAppShellFromCache(cacheApp);
-        if (shell) {
-          // 2) Tenter une MAJ réseau en arrière-plan (sans bloquer)
-          event.waitUntil((async () => {
-            try {
-              const preload = await event.preloadResponse;
-              const res = preload || await fetchWithTimeout(req, NAV_FETCH_TIMEOUT_MS);
-              if (res && res.ok) {
-                // On met à jour index.html si c'est lui
-                if (req.url.endsWith('/') || req.url.endsWith('/index.html')) {
-                  await cacheApp.put('/index.html', res.clone());
-                }
-              }
-            } catch {}
-          })());
-          return shell;
-        }
+          // 1) répondre immédiatement avec index.html du cache (si dispo)
+          const cachedIndex = await getIndexFromCache(cacheApp);
+          if (cachedIndex) {
+            // 2) MAJ en arrière-plan: index + assets (sans bloquer l'utilisateur)
+            event.waitUntil(updateIndexAndAssets(cacheApp));
+            return cachedIndex;
+          }
 
-        // 3) Si pas de shell en cache (1er chargement)
-        try {
-          const preload = await event.preloadResponse;
-          const res = preload || await fetchWithTimeout(req, NAV_FETCH_TIMEOUT_MS);
-          return res;
-        } catch {
-          return new Response('', { status: 204 }); // silencieux
-        }
-      })());
+          // 3) 1er chargement (pas encore de cache) : réseau avec timeout
+          try {
+            const preload = await event.preloadResponse;
+            const res = preload || (await fetchWithTimeout('/index.html', NAV_FETCH_TIMEOUT_MS));
+            if (res && res.ok) {
+              await cacheApp.put('/index.html', res.clone());
+              // on tente aussi de precache les assets (best-effort)
+              event.waitUntil(updateIndexAndAssets(cacheApp));
+              return res;
+            }
+          } catch {}
+
+          // 4) dernier recours : aucune donnée => réponse offline minimaliste
+          return new Response('Offline', { status: 200, headers: { 'Content-Type': 'text/plain' } });
+        })()
+      );
       return;
     }
 
     const href = normalizeUrl(url.href);
-    const normReq = (href === url.href)
-      ? req
-      : new Request(href, { headers: req.headers, credentials: req.credentials, cache: 'no-store' });
+    const normReq =
+      href === url.href
+        ? req
+        : new Request(href, {
+            headers: req.headers,
+            credentials: req.credentials,
+            cache: 'no-store',
+          });
 
     // ASSETS → cache-first dans CACHE_APP
     if (isStaticAsset(url)) {
-      event.respondWith((async () => {
-        const cacheApp = await caches.open(CACHE_APP);
-        const cached = await cacheApp.match(normReq);
-        if (cached) return cached;
+      event.respondWith(
+        (async () => {
+          const cacheApp = await caches.open(CACHE_APP);
+          const cached = await cacheApp.match(normReq);
+          if (cached) return cached;
 
-        try {
-          const res = await fetchWithTimeout(normReq, SMALL_FETCH_TIMEOUT_MS);
-          if (res && (res.ok || res.type === 'opaque')) cacheApp.put(normReq, res.clone());
-          return res;
-        } catch {
-          return new Response('', { status: 204 });
-        }
-      })());
+          try {
+            const res = await fetchWithTimeout(normReq, SMALL_FETCH_TIMEOUT_MS);
+            if (res && (res.ok || res.type === 'opaque')) cacheApp.put(normReq, res.clone());
+            return res;
+          } catch {
+            return new Response('', { status: 204 });
+          }
+        })()
+      );
       return;
     }
 
     // BIBLES → cache-first + refresh en arrière-plan (silencieux)
     if (isBibleJson(url)) {
-      event.respondWith((async () => {
-        const lang = getLangFromBiblePath(url.pathname) || '';
-        const userLang = (await idbGet(IDB_KEY_USER_LANG)) || '';
-        const isCoreLang = FIXED_CORE_LANGS.includes(lang) || (userLang && lang === userLang);
+      event.respondWith(
+        (async () => {
+          const lang = getLangFromBiblePath(url.pathname) || '';
+          const userLang = (await idbGet(IDB_KEY_USER_LANG)) || '';
+          const isCoreLang = FIXED_CORE_LANGS.includes(lang) || (userLang && lang === userLang);
 
-        const cache = await caches.open(isCoreLang ? CACHE_DATA_CORE : CACHE_DATA_EXTRA);
-        const cached = await cache.match(normReq);
+          const cache = await caches.open(isCoreLang ? CACHE_DATA_CORE : CACHE_DATA_EXTRA);
+          const cached = await cache.match(normReq);
 
-        if (cached) {
-          // refresh silencieux
-          event.waitUntil((async () => {
-            try {
-              const res = await fetchWithTimeout(normReq, SMALL_FETCH_TIMEOUT_MS);
-              if (res && (res.ok || res.type === 'opaque')) {
-                await cache.put(normReq, res.clone());
-                if (!isCoreLang) {
-                  const cacheExtra = await caches.open(CACHE_DATA_EXTRA);
-                  await enforceExtraLimit(cacheExtra);
-                }
-              }
-            } catch {}
-          })());
-          return cached;
-        }
-
-        // si pas en cache : tenter réseau mais ne jamais bloquer longtemps
-        try {
-          const res = await fetchWithTimeout(normReq, SMALL_FETCH_TIMEOUT_MS);
-          if (res && (res.ok || res.type === 'opaque')) {
-            await cache.put(normReq, res.clone());
-            if (!isCoreLang) {
-              const cacheExtra = await caches.open(CACHE_DATA_EXTRA);
-              await enforceExtraLimit(cacheExtra);
-            }
+          if (cached) {
+            // refresh silencieux
+            event.waitUntil(
+              (async () => {
+                try {
+                  const res = await fetchWithTimeout(normReq, SMALL_FETCH_TIMEOUT_MS);
+                  if (res && (res.ok || res.type === 'opaque')) {
+                    await cache.put(normReq, res.clone());
+                    if (!isCoreLang) {
+                      const cacheExtra = await caches.open(CACHE_DATA_EXTRA);
+                      await enforceExtraLimit(cacheExtra);
+                    }
+                  }
+                } catch {}
+              })()
+            );
+            return cached;
           }
-          return res;
-        } catch {
-          return new Response('', { status: 204 });
-        }
-      })());
+
+          // pas en cache : tenter réseau, sinon fallback vide
+          try {
+            const res = await fetchWithTimeout(normReq, SMALL_FETCH_TIMEOUT_MS);
+            if (res && (res.ok || res.type === 'opaque')) {
+              await cache.put(normReq, res.clone());
+              if (!isCoreLang) {
+                const cacheExtra = await caches.open(CACHE_DATA_EXTRA);
+                await enforceExtraLimit(cacheExtra);
+              }
+            }
+            return res;
+          } catch {
+            return new Response('', { status: 204 });
+          }
+        })()
+      );
       return;
     }
 
-    // DEFAULT → cache-match simple puis réseau court (silencieux)
-    event.respondWith((async () => {
-      // On tente d'abord cache APP (pour éviter blocage)
-      const cacheApp = await caches.open(CACHE_APP);
-      const cached = await cacheApp.match(normReq);
-      if (cached) return cached;
+    // DEFAULT → cache-match simple puis réseau court
+    event.respondWith(
+      (async () => {
+        const cacheApp = await caches.open(CACHE_APP);
+        const cached = await cacheApp.match(normReq);
+        if (cached) return cached;
 
-      try {
-        return await fetchWithTimeout(normReq, SMALL_FETCH_TIMEOUT_MS);
-      } catch {
-        // si même origine : au moins renvoyer le shell si présent
-        if (url.origin === ORIGIN) {
-          const shell = await getAppShellFromCache(cacheApp);
-          if (shell) return shell;
+        try {
+          return await fetchWithTimeout(normReq, SMALL_FETCH_TIMEOUT_MS);
+        } catch {
+          // si même origine : renvoyer index.html si possible (SPA offline)
+          if (url.origin === ORIGIN) {
+            const idx = await getIndexFromCache(cacheApp);
+            if (idx) return idx;
+          }
+          return new Response('', { status: 204 });
         }
-        return new Response('', { status: 204 });
-      }
-    })());
+      })()
+    );
   } catch {
     event.respondWith((async () => new Response('', { status: 204 }))());
   }
