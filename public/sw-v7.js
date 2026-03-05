@@ -304,6 +304,18 @@ self.addEventListener('fetch', (event) => {
     if (req.method !== 'GET') return;
     const url = new URL(req.url);
 
+    // ✅ IMPORTANT : laisser passer les pages statiques hors SPA (privacy, robots, sitemap, etc.)
+const PASS_THROUGH_PAGES = new Set([
+  '/privacy.html',
+  '/robots.txt',
+  '/sitemap.xml',
+  '/manifest.webmanifest',
+]);
+
+if ((req.mode === 'navigate' || req.destination === 'document') && PASS_THROUGH_PAGES.has(url.pathname)) {
+  event.respondWith(fetch(req));
+  return;
+}
     // ✅ NAVIGATION (documents) — OFFLINE-FIRST (zéro écran blanc)
     if (req.mode === 'navigate' || req.destination === 'document') {
       event.respondWith(
