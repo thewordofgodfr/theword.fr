@@ -207,8 +207,69 @@ const tr: TranslationDict = {
   aboutTitle: "",
   aboutDescription:
     "The Word, rastgele ayetler ve bütün Kutsal Kitap okumaları aracılığıyla Tanrı'nın sözünü keşfetmene yardım eder.",
-  aboutIntro:
-    "TheWord: çevrimdışı Kutsal Kitap okuma, anında arama, tematik notlar, tek dokunuşla paylaşma. TheWord'ü web'de de kullanabilirsin: www.theword.fr",
+  aboutIntro: `The Word’ü neden oluşturdum
+
+Başlangıçta bu uygulamayı çok basit bir amaçla oluşturdum: Okuma sayfasındaki 1 / 2 / 3 sekmeleri sayesinde, Kutsal Kitap’ın birden fazla kitabını aynı anda okuyup, günden güne akışı kaybetmemek.
+
+Zamanla başka özellikler ekledim; ama niyetim hep aynı kaldı: Tanrı’nın Sözünü okumaya, düşünmeye, hatırlamaya ve uygulamaya yardımcı olmak.
+
+Sizler için duam
+
+Duam şudur: Tanrı’nın Sözü sizi derinden etkilesin; Tanrı’nın sizi ne kadar sevdiğini ve O’nun Oğlu İsa Mesih’in sevgisini anlayasınız; ayrıca Tanrı’yla barışmamız ve O’nun sevgisinde O’nunla yürümemiz için ödediği bedeli kavrayasınız.
+
+Tanrı’nın sevgisi ve iman etmeye çağrı özellikle Yuhanna Müjdesi’nde belirgindir (örn.: Yuhanna 3:16).
+
+Krallığa girişin anahtarı ve Tanrı’ya yanıt vermeye dair açık çağrı Elçilerin İşleri kitabında da açıkça görülür (örn.: Elçilerin İşleri 2:38; Elçilerin İşleri 4:12).
+
+Kutsal Kitap: Tanrı bize konuşur
+
+Tüm Kutsal Yazıların Tanrı esiniyle verildiğini asla unutmamalıyız: Tanrı bize konuşur; O’ndan korkmalı ve O’na itaat etmeliyiz.
+
+2 Timoteos 3:16-17  “Kutsal Yazıların tümü Tanrı esinidir…”
+Özdeyişler 9:10  “RAB korkusu bilgeliğin başlangıcıdır…”
+Yuhanna 13:34-35  “Birbirinizi sevin… Ben sizi sevdiğim gibi…”
+
+Zaman kısadır: Tanrı’nın çağrısına yanıt verin
+
+Zamanın kısa olduğuna inanıyorum ve Tanrı’nın her kişinin çağrısına yanıt vermesini derinden istediğine inanıyorum: tövbe etmek, iman etmek ve günahların bağışlanması için vaftiz olmak. Bu muazzam bir fırsattır: Tanrı’yla sonsuza dek birlikte olmak. Gecikmeyelim; çünkü Tanrı belirlediği günde adaletini yerine getirecek ve İsa bizi sık sık uyanık olmaya ve hazır durmaya çağırdı.
+
+1 Korintliler 7:29  “Zaman kısadır…”
+Elçilerin İşleri 17:30-31  Tanrı herkesin tövbe etmesini buyurur… “bir gün belirledi…”
+Elçilerin İşleri 2:38  “Tövbe edin… günahlarınız bağışlansın diye…”
+Markos 1:15  “Tövbe edin ve Müjde’ye iman edin.”
+Matta 24:42-44  “Uyanık kalın… hazır olun…”
+Luka 12:35-40  “Belleriniz kuşaklı, kandilleriniz yanar olsun…”
+
+Ne yazık ki birçok kişi Kutsal Yazılar’dan uzaklaştı. Kutsal Kitap, insanların hoşlarına giden mesajları arayacağı ve kendilerine “birçok öğretmen” toplayacağı bir zamanın geleceğini bildirir.
+
+Bu nedenle Söz’de kalmaya, Tanrı’ya itaat etmeye ve Müjde’ye yaraşır biçimde yaşamaya, ayrıca çevremizdekileri ikna etmeye çağrılıyız.
+
+2 Timoteos 4:3-4  “kendilerine birçok öğretmen toplayacaklar…”
+Yuhanna 8:31-32  “Sözümde kalırsanız…”
+Koloseliler 1:23  “imanınızda sağlam ve sarsılmaz kalın…”
+Filipililer 1:27  “Müjde’ye yaraşır biçimde yaşayın…”
+2 Korintliler 5:20  “Mesih’in elçileri gibiyiz…”
+
+Bazen bir “kilise” çok mütevazı şekilde başlayabilir: Tanrı’yı birlikte arayan iki kişi.
+
+Matta 18:20  “İki ya da üç kişi benim adımla bir araya geldiğinde…”
+
+Kapı dardır: Tanrı’yla alçakgönüllülükle yürüyün
+
+İsa, kapının dar, yıkıma götüren yolun ise geniş olduğunu söyledi. Günahlarımızın bizi Tanrı’dan uzaklaştırmasına izin vermeyelim. Çocuk yüreğiyle—sade, ikiyüzlülükten uzak, ama aynı zamanda uyanık ve temkinli—alçakgönüllülükle Söz’e itaat edelim.
+
+Matta 7:13-14  “Dar kapıdan girin…”
+İbraniler 12:1-2  “her yükü ve günahı üzerimizden atalım…”
+Matta 18:3  “çocuklar gibi olmazsanız…”
+Matta 10:16  “güvercinler gibi saf, yılanlar gibi akıllı…”
+
+Dua edin, sebat edin, vazgeçmeyin
+
+Tanrı’nın sizi Sözü ve Kutsal Ruhu aracılığıyla yönlendirmesi için dua edin. Yalvarın. Cesaretiniz kırılmasın. Vazgeçmeyin. Doğru kişi acılardan geçse bile Tanrı sadıktır ve kurtarır.
+
+Luka 18:1  “her zaman dua etmeli ve yılmamalı…”
+Yakup 1:5  “bilgelik eksiği olan Tanrı’dan istesin…”
+Mezmur 34:19  “Doğrunun sıkıntıları çoktur; ama RAB hepsinden onu kurtarır.”`,
   bibleVersions: "Kutsal Kitap çevirileri",
   frenchVersion:
     "Fransızca: Louis Segond 1910 (LSG) – 2025 gözden geçirilmiş – Kamu malı",
@@ -235,7 +296,7 @@ const tr: TranslationDict = {
   createdWithLove:
     "Tanrı'nın Sözünü yaymak için sevgiyle oluşturuldu",
   versionsFootnote:
-    "Kullanılan tüm Kutsal Kitap çevirileri kamu malıdır. Bazıları (söz varlığı ve dilbilgisi açısından) kısmen modernleştirilmiştir; ancak özgün el yazmalarına kesinlikle sadıktır.",
+    "Kullanılan tüm Kutsal Kitap çevirileri kamu malıdır. Bazıları (söz varlığı ve dilbilgisi açısından) kısmen modernleştirilmiştir; ancak özgün el yazmalarına kesinlikle sadıktır. Android uygulamasını isterseniz lütfen e-posta ile bana yazın; size bir bağlantı göndereceğim (test sürümü).",
 
   // Quick slots / raccourcis lecture
   quickSlotsIntro:
