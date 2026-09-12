@@ -198,11 +198,33 @@ export default function Home() {
               : 'linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.0))',
           }}
         >
-          Copyright {year}
-        </footer>
-      </div>
-    </div>
-  );
-}
-
+          <footer
+        className={`sticky bottom-0 z-10 text-center py-2 ${
+          isDark ? 'text-white/45' : 'text-gray-500'
+        }`}
+        style={{
+          fontSize: 12.5,
+          paddingBottom: 'calc(env(safe-area-inset-bottom) + 6px)',
+          background: isDark
+            ? 'linear-gradient(to top, rgba(17,24,39,0.92), rgba(17,24,39,0.0))'
+            : 'linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.0))',
+        }}
+      >
+        <div className="flex items-center justify-center gap-2">
+          <a
+            href="https://hits.sh/theword.fr/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Compteur de visites The Word"
+            className="inline-flex opacity-60 transition-opacity hover:opacity-90"
+          >
+            <img
+              alt="Visites"
+              src="https://hits.sh/theword.fr.svg?label=visites&style=flat&color=374151&labelColor=111827"
+              className="h-5 w-auto"
+            />
+          </a>
+          <span>Copyright {year}</span>
+        </div>
+      </footer>
 
