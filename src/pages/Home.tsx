@@ -186,14 +186,7 @@ export default function Home() {
           }}
         >
           <div className="flex items-center justify-center gap-2">
-            <a
-              href="https://hits.sh/theword.fr/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Compteur de visites The Word"
-              className="inline-flex opacity-60 transition-opacity hover:opacity-90"
-            >
-              <img
+            <img
                 alt="Visites"
                 src="https://hits.sh/theword.fr.svg?label=visites&style=flat&color=374151&labelColor=111827"
                 className="h-5 w-auto"
