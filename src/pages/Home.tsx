@@ -187,11 +187,10 @@ export default function Home() {
         >
           <div className="flex items-center justify-center gap-2">
             <img
-                alt="Visites"
-                src="https://hits.sh/theword.fr.svg?label=visites&style=flat&color=374151&labelColor=111827"
-                className="h-5 w-auto"
-              />
-            </a>
+              alt="Visites"
+              src="https://hits.sh/theword.fr.svg?label=visites&style=flat&color=374151&labelColor=111827"
+              className="h-5 w-auto opacity-60"
+            />
             <span>Copyright {year}</span>
           </div>
         </footer>
