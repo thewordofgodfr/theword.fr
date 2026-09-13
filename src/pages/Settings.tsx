@@ -36,7 +36,6 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   const style: React.CSSProperties = { width: size * (4 / 3), height: size };
 
   if (code === 'fr') {
-    // Drapeau France (bleu/blanc/rouge)
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="France" role="img">
@@ -49,17 +48,9 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   }
 
   if (code === 'us') {
-    // Drapeau USA (stripes + canton simplifié)
     return (
       <span className={`inline-block ${className}`} style={style}>
-        <svg
-          viewBox="0 0 19 10"
-          width="100%"
-          height="100%"
-          aria-label="United States"
-          role="img"
-        >
-          {/* Stripes */}
+        <svg viewBox="0 0 19 10" width="100%" height="100%" aria-label="United States" role="img">
           {Array.from({ length: 13 }).map((_, i) => (
             <rect
               key={i}
@@ -70,9 +61,7 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
               fill={i % 2 === 0 ? '#B22234' : '#FFFFFF'}
             />
           ))}
-          {/* Canton */}
           <rect x="0" y="0" width="7.6" height={(7 / 13) * 10} fill="#3C3B6E" />
-          {/* Étoiles simplifiées (points) */}
           {Array.from({ length: 9 }).map((_, row) =>
             Array.from({ length: row % 2 === 0 ? 6 : 5 }).map((__, col) => {
               const cols = row % 2 === 0 ? 6 : 5;
@@ -87,7 +76,6 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   }
 
   if (code === 'de') {
-    // Allemagne : noir / rouge / or
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Germany" role="img">
@@ -100,7 +88,6 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   }
 
   if (code === 'it') {
-    // Italie : vert / blanc / rouge
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Italy" role="img">
@@ -113,7 +100,6 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   }
 
   if (code === 'es') {
-    // Espagne : rouge / jaune / rouge
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Spain" role="img">
@@ -125,7 +111,6 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   }
 
   if (code === 'pt') {
-    // Portugal approximatif : vert / rouge
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Portugal" role="img">
@@ -137,7 +122,6 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   }
 
   if (code === 'ru') {
-    // Russie : blanc / bleu / rouge
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Russia" role="img">
@@ -150,7 +134,6 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   }
 
   if (code === 'hi') {
-    // Inde simplifiée : safran / blanc / vert + disque bleu
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="India" role="img">
@@ -164,7 +147,6 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   }
 
   if (code === 'zh') {
-    // Chine simplifiée : fond rouge + étoile
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="China" role="img">
@@ -176,7 +158,6 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   }
 
   if (code === 'ar') {
-    // Arabe générique : fond vert
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Arabic" role="img">
@@ -187,7 +168,6 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   }
 
   if (code === 'id') {
-    // Indonésie : rouge / blanc
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Indonesia" role="img">
@@ -199,7 +179,6 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   }
 
   if (code === 'sw') {
-    // Swahili (style générique vert/jaune)
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Swahili" role="img">
@@ -211,7 +190,6 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   }
 
   if (code === 'tr') {
-    // Turquie : rouge + croissant/étoile simplifiés
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Turkey" role="img">
@@ -228,7 +206,6 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   }
 
   if (code === 'ja') {
-    // Japon : fond blanc + disque rouge
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Japan" role="img">
@@ -240,7 +217,6 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   }
 
   if (code === 'ko') {
-    // Corée du Sud simplifiée
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Korea" role="img">
@@ -253,7 +229,6 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   }
 
   if (code === 'yo') {
-    // Yoruba -> drapeau type Nigéria (vert / blanc / vert)
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Yoruba" role="img">
@@ -266,14 +241,12 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   }
 
   if (code === 'he') {
-    // Hébreu / Israël : bandes bleues + étoile de David simplifiée
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Hebrew" role="img">
           <rect width="3" height="2" fill="#FFFFFF" />
           <rect width="3" height="0.25" y="0" fill="#0038B8" />
           <rect width="3" height="0.25" y="1.75" fill="#0038B8" />
-          {/* étoile de David simplifiée */}
           <polygon points="1.5,0.6 1.35,0.9 1.65,0.9" fill="#0038B8" />
           <polygon points="1.5,1.4 1.35,1.1 1.65,1.1" fill="#0038B8" />
           <polygon
@@ -288,17 +261,14 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   }
 
   if (code === 'el') {
-    // Grèce simplifiée : bleu / blanc + croix
     return (
       <span className={`inline-block ${className}`} style={style}>
         <svg viewBox="0 0 3 2" width="100%" height="100%" aria-label="Greece" role="img">
           <rect width="3" height="2" fill="#0D5EAF" />
-          {/* bandes blanches simplifiées */}
           <rect width="3" height="0.2" y="0.3" fill="#FFFFFF" />
           <rect width="3" height="0.2" y="0.7" fill="#FFFFFF" />
           <rect width="3" height="0.2" y="1.1" fill="#FFFFFF" />
           <rect width="3" height="0.2" y="1.5" fill="#FFFFFF" />
-          {/* canton avec croix */}
           <rect width="1.2" height="1.2" x="0" y="0" fill="#0D5EAF" />
           <rect width="0.3" height="1.2" x="0.45" y="0" fill="#FFFFFF" />
           <rect width="1.2" height="0.3" x="0" y="0.45" fill="#FFFFFF" />
@@ -307,7 +277,6 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
     );
   }
 
-  // Fallback gris (ne devrait pas arriver)
   return (
     <span className={`inline-block ${className}`} style={style}>
       <svg viewBox="0 0 3 2" width="100%" height="100%">
@@ -319,96 +288,24 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
 
 /** Config d'affichage par langue (titre + sous-titre + drapeau) */
 const LANGUAGE_CONFIG: Record<Language, { flag: FlagCode; label: string; subtitle: string }> = {
-  fr: {
-    flag: 'fr',
-    label: 'Français',
-    subtitle: 'Louis Segond 1910 (rév. 2025)',
-  },
-  en: {
-    flag: 'us',
-    label: 'English',
-    subtitle: 'King James Version (KJV)',
-  },
-  de: {
-    flag: 'de',
-    label: 'Deutsch',
-    subtitle: 'Lutherbibel 1912',
-  },
-  it: {
-    flag: 'it',
-    label: 'Italiano',
-    subtitle: 'Riveduta Bibbia 1927',
-  },
-  es: {
-    flag: 'es',
-    label: 'Español',
-    subtitle: 'Biblia en español',
-  },
-  pt: {
-    flag: 'pt',
-    label: 'Português',
-    subtitle: 'Bíblia Portuguesa Mundial',
-  },
-  ru: {
-    flag: 'ru',
-    label: 'Русский',
-    subtitle: 'Библия на русском',
-  },
-  hi: {
-    flag: 'hi',
-    label: 'हिन्दी',
-    subtitle: 'Indian Revised Version (IRV)',
-  },
-  zh: {
-    flag: 'zh',
-    label: '中文',
-    subtitle: 'Biblica 圣经当代译本',
-  },
-  ar: {
-    flag: 'ar',
-    label: 'العربية',
-    subtitle: 'Ketab El Hayat (Book of Life)',
-  },
-  id: {
-    flag: 'id',
-    label: 'Bahasa Indonesia',
-    subtitle: 'Alkitab TSI (Edisi ketiga)',
-  },
-  sw: {
-    flag: 'sw',
-    label: 'Kiswahili',
-    subtitle: 'Biblica Toleo Wazi Neno',
-  },
-  tr: {
-    flag: 'tr',
-    label: 'Türkçe',
-    subtitle: 'Yorumsuz Türkçe Çeviri (YTC)',
-  },
-  ja: {
-    flag: 'ja',
-    label: '日本語',
-    subtitle: '新改訳新約聖書 (1965)',
-  },
-  ko: {
-    flag: 'ko',
-    label: '한국어',
-    subtitle: '한국어 성경 1910',
-  },
-  yo: {
-    flag: 'yo',
-    label: 'Yorùbá',
-    subtitle: 'Biblica Yoruba Bible',
-  },
-  he: {
-    flag: 'he',
-    label: 'עִבְרִית',
-    subtitle: 'תנ״ך בעברית מקראית',
-  },
-  el: {
-    flag: 'el',
-    label: 'Ελληνικά',
-    subtitle: 'Κείμενο στην Κοινή Ελληνική',
-  },
+  fr: { flag: 'fr', label: 'Français', subtitle: 'Louis Segond 1910 (rév. 2025)' },
+  en: { flag: 'us', label: 'English', subtitle: 'King James Version (KJV)' },
+  de: { flag: 'de', label: 'Deutsch', subtitle: 'Lutherbibel 1912' },
+  it: { flag: 'it', label: 'Italiano', subtitle: 'Riveduta Bibbia 1927' },
+  es: { flag: 'es', label: 'Español', subtitle: 'Biblia en español' },
+  pt: { flag: 'pt', label: 'Português', subtitle: 'Bíblia Portuguesa Mundial' },
+  ru: { flag: 'ru', label: 'Русский', subtitle: 'Библия на русском' },
+  hi: { flag: 'hi', label: 'हिन्दी', subtitle: 'Indian Revised Version (IRV)' },
+  zh: { flag: 'zh', label: '中文', subtitle: 'Biblica 圣经当代译本' },
+  ar: { flag: 'ar', label: 'العربية', subtitle: 'Ketab El Hayat (Book of Life)' },
+  id: { flag: 'id', label: 'Bahasa Indonesia', subtitle: 'Alkitab TSI (Edisi ketiga)' },
+  sw: { flag: 'sw', label: 'Kiswahili', subtitle: 'Biblica Toleo Wazi Neno' },
+  tr: { flag: 'tr', label: 'Türkçe', subtitle: 'Yorumsuz Türkçe Çeviri (YTC)' },
+  ja: { flag: 'ja', label: '日本語', subtitle: '新改訳新約聖書 (1965)' },
+  ko: { flag: 'ko', label: '한국어', subtitle: '한국어 성경 1910' },
+  yo: { flag: 'yo', label: 'Yorùbá', subtitle: 'Biblica Yoruba Bible' },
+  he: { flag: 'he', label: 'עִבְרִית', subtitle: 'תנ״ך בעברית מקראית' },
+  el: { flag: 'el', label: 'Ελληνικά', subtitle: 'Κείμενο στην Κοινή Ελληνική' },
 };
 
 /** Langues réellement disponibles (Bible + interface) */
@@ -446,12 +343,10 @@ export default function Settings() {
   const { state, updateSettings } = useApp();
   const { t } = useTranslation();
 
-  // Option A : thème sombre strict (inchangé, mais garde-fou)
   useEffect(() => {
     if (state.settings.theme !== 'dark') updateSettings({ theme: 'dark' });
   }, [state.settings.theme, updateSettings]);
 
-  // --- Police par défaut à 25px au tout premier lancement ---
   useEffect(() => {
     try {
       const KEY = 'tw_firstRun_v2';
@@ -463,12 +358,10 @@ export default function Settings() {
         typeof current !== 'number' || current < 18 || current > 42 || !allowed.has(current);
 
       if (!seen && currentLooksInvalid) {
-        updateSettings({ fontSize: 25 }); // défaut demandé
+        updateSettings({ fontSize: 25 });
         localStorage.setItem(KEY, '1');
       }
-    } catch {
-      // silencieux
-    }
+    } catch {}
   }, [state.settings.fontSize, updateSettings]);
 
   const isDark = true;
@@ -485,8 +378,7 @@ export default function Settings() {
     if (!('serviceWorker' in navigator)) return;
     const onControllerChange = () => window.location.reload();
     navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
-    return () =>
-      navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
+    return () => navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
   }, []);
 
   const handleCheckUpdates = async () => {
@@ -525,10 +417,10 @@ export default function Settings() {
     }
   };
 
-  // --- Version minimaliste depuis /version.json ---
   type VersionInfo = { version?: string | null };
   const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
   const [versionError, setVersionError] = useState(false);
+  const [visitCount, setVisitCount] = useState<string | null>(null);
 
   useEffect(() => {
     let canceled = false;
@@ -553,7 +445,35 @@ export default function Settings() {
     };
   }, [updateStatus]);
 
-  // --- Bouton langue réutilisable ---
+  useEffect(() => {
+    let canceled = false;
+    (async () => {
+      try {
+        const res = await fetch('https://hits.sh/theword.fr/settings.svg?label=&style=flat', {
+          cache: 'no-store',
+        });
+        if (!res.ok) throw new Error('hits counter not ok');
+
+        const svg = await res.text();
+        const doc = new DOMParser().parseFromString(svg, 'image/svg+xml');
+        const texts = Array.from(doc.querySelectorAll('text'))
+          .map((node) => node.textContent?.trim() ?? '')
+          .filter(Boolean);
+
+        const count = [...texts].reverse().find((value) => /^\d[\d\s,.]*$/.test(value));
+
+        if (!canceled && count) {
+          setVisitCount(count.replace(/\s/g, ''));
+        }
+      } catch {
+        if (!canceled) setVisitCount(null);
+      }
+    })();
+    return () => {
+      canceled = true;
+    };
+  }, []);
+
   const LangButton: React.FC<{
     active: boolean;
     flag: React.ReactNode;
@@ -595,19 +515,16 @@ export default function Settings() {
     </button>
   );
 
-  // ✅ Ordre FIXE (ne change pas quand on clique)
   const orderedLangs = ORDERED_LANGUAGES;
 
   return (
     <div className={`min-h-[100svh] bg-gray-900 transition-colors duration-200`}>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          {/* Header */}
           <div className="text-center mb-8">
             <h1 className={`text-3xl md:text-4xl font-bold mb-2 text-white`}>{t('settings')}</h1>
           </div>
 
-          {/* 1) Langue */}
           <div className={`bg-gray-800 rounded-xl shadow-lg p-6 mb-6`}>
             <h2 className={`text-xl font-semibold mb-6 text-white flex items-center`}>
               <Globe size={24} className="mr-3" />
@@ -619,7 +536,6 @@ export default function Settings() {
                 const cfg = LANGUAGE_CONFIG[lang];
                 if (!cfg) return null;
 
-                // Diminutif : fr, en, es...
                 const abbr = String(lang).toLowerCase();
 
                 return (
@@ -636,7 +552,6 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* 2) Apparence + Taille de police */}
           <div className={`bg-gray-800 rounded-xl shadow-lg p-6 mb-6`}>
             <h2 className={`text-xl font-semibold mb-6 text-white flex items-center`}>
               <Palette size={24} className="mr-3" />
@@ -701,7 +616,6 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* 3) Mises à jour */}
           <div className={`bg-gray-800 rounded-xl shadow-lg p-6`}>
             <h2 className={`text-xl font-semibold mb-6 text-white flex items-center`}>
               <RefreshCcw size={22} className="mr-3" />
@@ -735,14 +649,9 @@ export default function Settings() {
               </div>
             </div>
 
-            {/* Statut */}
             <div className="mt-4 text-sm">
-              {updateStatus === 'checking' && (
-                <p className="text-white/80">{t('updatesChecking')}</p>
-              )}
-              {updateStatus === 'upToDate' && (
-                <p className="text-green-500">{t('updatesUpToDate')}</p>
-              )}
+              {updateStatus === 'checking' && <p className="text-white/80">{t('updatesChecking')}</p>}
+              {updateStatus === 'upToDate' && <p className="text-green-500">{t('updatesUpToDate')}</p>}
               {updateStatus === 'ready' && <p className="text-yellow-400">{t('updatesReady')}</p>}
               {updateStatus === 'unavailable' && (
                 <p className="text-red-400">{t('updatesUnavailable')}</p>
@@ -751,10 +660,12 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* Footer : Version uniquement */}
           <div className="mt-8 text-center text-xs">
             {versionInfo ? (
-              <p className="text-white/70">Version {versionInfo?.version ?? '0.0.0'}</p>
+              <p className="text-white/70">
+                Version {versionInfo?.version ?? '0.0.0'}
+                {visitCount ? `.${visitCount}` : ''}
+              </p>
             ) : (
               <p className="text-white/50">{versionError ? 'version.json indisponible' : '…'}</p>
             )}
@@ -764,4 +675,3 @@ export default function Settings() {
     </div>
   );
 }
-
