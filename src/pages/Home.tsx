@@ -18,6 +18,8 @@ export default function Home() {
 
   const isDark = state.settings.theme === 'dark';
   const lang = state.settings.language;
+
+  // ✅ Copyright auto
   const year = new Date().getFullYear();
 
   const saveVerseToSession = (v: BibleVerse, l: string) => {
@@ -53,6 +55,7 @@ export default function Home() {
     }
   };
 
+  // Ouvrir le verset aléatoire en Lecture + enregistrer dans la loupe (slot 0)
   const handleVerseClick = () => {
     if (!verse) return;
     try {
@@ -61,6 +64,7 @@ export default function Home() {
     navigateToVerse(verse.book, verse.chapter, verse.verse);
   };
 
+  // Au montage ET à chaque changement de langue :
   useEffect(() => {
     warmBibleCache(lang);
 
@@ -74,6 +78,7 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
 
+  // Clic sur la citation fixe -> ouvrir Jérémie 23:29 en surbrillance bleue
   const openJeremiah23 = () => {
     try {
       saveQuickSlot(0, { book: 'Jeremiah', chapter: 23, verse: 29 });
@@ -87,9 +92,11 @@ export default function Home() {
         isDark ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-indigo-100'
       } transition-colors duration-200`}
     >
+      {/* ✅ Zone scrollable : si contenu court => pas de scroll, si long => scroll normal */}
       <div className="flex-1 overflow-auto">
         <div className="container mx-auto px-4 py-6 md:py-10">
           <div className="max-w-4xl mx-auto">
+            {/* Titre */}
             <h1
               className={`text-center font-extrabold tracking-tight mb-5 md:mb-6 ${
                 isDark ? 'text-white' : 'text-gray-900'
@@ -98,6 +105,7 @@ export default function Home() {
               The Word
             </h1>
 
+            {/* Carte du verset */}
             <div
               className={`${
                 isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
@@ -140,13 +148,16 @@ export default function Home() {
                 </div>
               )}
 
+              {/* Bouton d'action */}
               <div className="flex justify-center mt-12">
                 <button
                   onClick={fetchRandomVerse}
                   disabled={loading}
-                  className={`flex items-center justify-center space-x-3 px-8 py-4 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl ${
-                    loading ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+                  className={`flex items-center justify-center space-x-3 px-8 py-4 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 ${
+                    isDark
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
                   <span>{t('newVerse')}</span>
@@ -154,6 +165,7 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Citation fixe (cliquable) */}
             <div className="text-center mt-12">
               <button
                 onClick={openJeremiah23}
@@ -173,6 +185,7 @@ export default function Home() {
           </div>
         </div>
 
+        {/* ✅ Footer "intelligent" : visible sans scroll si court, collé en bas en scroll si long */}
         <footer
           className={`sticky bottom-0 z-10 text-center py-2 ${
             isDark ? 'text-white/45' : 'text-gray-500'
@@ -185,14 +198,7 @@ export default function Home() {
               : 'linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.0))',
           }}
         >
-          <div className="flex items-center justify-center gap-2">
-            <img
-              alt="Visites"
-              src="https://hits.sh/theword.fr.svg?label=visites&style=flat&color=374151&labelColor=111827"
-              className="h-5 w-auto opacity-60"
-            />
-            <span>Copyright {year}</span>
-          </div>
+          Copyright {year}
         </footer>
       </div>
     </div>
