@@ -36,7 +36,7 @@ const normalizeUrl = (u) => {
   u = toHttps(u);
   try {
     const abs = new URL(u, ORIGIN);
-    if (abs.hostname.endsWith('theword.fr') || abs.hostname.endsWith('thewordofgod.fr')) {
+    if (abs.hostname.endsWith('theword.fr')) {
       return abs.pathname + abs.search;
     }
     return abs.href;
