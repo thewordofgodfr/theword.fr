@@ -6,7 +6,6 @@ import { useTranslation } from '../hooks/useTranslation';
 import { Globe, Palette, RefreshCcw } from 'lucide-react';
 import type { Language } from '../types/bible';
 
-/** Codes de drapeaux supportés */
 type FlagCode =
   | 'fr'
   | 'us'
@@ -27,7 +26,6 @@ type FlagCode =
   | 'he'
   | 'el';
 
-/** Petit composant Flag inline SVG pour compatibilité desktop/mobile */
 const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> = ({
   code,
   size = 26,
@@ -286,7 +284,6 @@ const FlagIcon: React.FC<{ code: FlagCode; size?: number; className?: string }> 
   );
 };
 
-/** Config d'affichage par langue (titre + sous-titre + drapeau) */
 const LANGUAGE_CONFIG: Record<Language, { flag: FlagCode; label: string; subtitle: string }> = {
   fr: { flag: 'fr', label: 'Français', subtitle: 'Louis Segond 1910 (rév. 2025)' },
   en: { flag: 'us', label: 'English', subtitle: 'King James Version (KJV)' },
@@ -308,7 +305,6 @@ const LANGUAGE_CONFIG: Record<Language, { flag: FlagCode; label: string; subtitl
   el: { flag: 'el', label: 'Ελληνικά', subtitle: 'Κείμενο στην Κοινή Ελληνική' },
 };
 
-/** Langues réellement disponibles (Bible + interface) */
 const AVAILABLE_LANGUAGES: Language[] = [
   'fr',
   'en',
@@ -330,7 +326,6 @@ const AVAILABLE_LANGUAGES: Language[] = [
   'el',
 ];
 
-/** ✅ Ordre FIXE des langues : fr, en, el, he, puis toutes les autres (sans doublon) */
 const ORDERED_LANGUAGES: Language[] = [
   'fr',
   'en',
@@ -420,7 +415,6 @@ export default function Settings() {
   type VersionInfo = { version?: string | null };
   const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
   const [versionError, setVersionError] = useState(false);
-  const [visitCount, setVisitCount] = useState<string | null>(null);
 
   useEffect(() => {
     let canceled = false;
@@ -444,35 +438,6 @@ export default function Settings() {
       canceled = true;
     };
   }, [updateStatus]);
-
-  useEffect(() => {
-    let canceled = false;
-    (async () => {
-      try {
-        const res = await fetch('https://hits.sh/theword.fr/settings.svg?label=&style=flat', {
-          cache: 'no-store',
-        });
-        if (!res.ok) throw new Error('hits counter not ok');
-
-        const svg = await res.text();
-        const doc = new DOMParser().parseFromString(svg, 'image/svg+xml');
-        const texts = Array.from(doc.querySelectorAll('text'))
-          .map((node) => node.textContent?.trim() ?? '')
-          .filter(Boolean);
-
-        const count = [...texts].reverse().find((value) => /^\d[\d\s,.]*$/.test(value));
-
-        if (!canceled && count) {
-          setVisitCount(count.replace(/\s/g, ''));
-        }
-      } catch {
-        if (!canceled) setVisitCount(null);
-      }
-    })();
-    return () => {
-      canceled = true;
-    };
-  }, []);
 
   const LangButton: React.FC<{
     active: boolean;
@@ -650,8 +615,12 @@ export default function Settings() {
             </div>
 
             <div className="mt-4 text-sm">
-              {updateStatus === 'checking' && <p className="text-white/80">{t('updatesChecking')}</p>}
-              {updateStatus === 'upToDate' && <p className="text-green-500">{t('updatesUpToDate')}</p>}
+              {updateStatus === 'checking' && (
+                <p className="text-white/80">{t('updatesChecking')}</p>
+              )}
+              {updateStatus === 'upToDate' && (
+                <p className="text-green-500">{t('updatesUpToDate')}</p>
+              )}
               {updateStatus === 'ready' && <p className="text-yellow-400">{t('updatesReady')}</p>}
               {updateStatus === 'unavailable' && (
                 <p className="text-red-400">{t('updatesUnavailable')}</p>
@@ -662,9 +631,14 @@ export default function Settings() {
 
           <div className="mt-8 text-center text-xs">
             {versionInfo ? (
-              <p className="text-white/70">
-                Version {versionInfo?.version ?? '0.0.0'}
-                {visitCount ? `.${visitCount}` : ''}
+              <p className="text-white/70 inline-flex items-center justify-center gap-0">
+                <span>Version {versionInfo?.version ?? '0.0.0'}.</span>
+                <img
+                  alt=""
+                  aria-hidden="true"
+                  src="https://hits.sh/theword.fr/settings.svg?label=&style=flat&color=111827&labelColor=111827"
+                  className="inline-block h-5 w-auto opacity-70"
+                />
               </p>
             ) : (
               <p className="text-white/50">{versionError ? 'version.json indisponible' : '…'}</p>
