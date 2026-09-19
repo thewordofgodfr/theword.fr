@@ -292,7 +292,7 @@ Psaume 34:20  “Le malheur atteint souvent le juste; mais l’Éternel l’en d
 
   // Quick slots
   quickSlotsIntro:
-    'Ces 4 boutons, permettent de revenir instantanément sur vos lectures fréquentes pour lire plusieurs livres en parallèle : utilisez 1/2/3 pour 3 emplacements distincts, et la loupe pour reprendre le dernier passage (verset aléatoire ou recherche).',
+    'Ces 4 boutons permettent de revenir instantanément sur vos lectures fréquentes pour lire plusieurs livres en parallèle : utilisez 1/2/3 pour 3 emplacements distincts, et la loupe pour reprendre le dernier passage (verset aléatoire ou recherche).',
   quickSlotsIllustrationLabel: 'Illustration des raccourcis',
   quickSlotLastPassageTooltip: 'Dernier passage',
   quickSlot1ActiveTooltip: 'Raccourci 1 (actif)',
