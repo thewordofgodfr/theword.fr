@@ -1193,150 +1193,56 @@ ${shareUrl}`;
               className="sticky z-40 -mx-4 sm:mx-0"
               style={{ top: `${NAV_H}px` }}
             >
-              <div className="bg-gray-800/95 backdrop-blur border border-gray-700 rounded-none sm:rounded-md shadow md:shadow-lg px-4 py-2 md:p-3">
-                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-2 w-full">
-                  <div className="flex flex-col w-full md:w-auto">
-                    <h2 className="font-semibold text-white text-sm md:text-base flex flex-col md:flex-row md:items-center gap-2 w-full">
-                      {/* MOBILE */}
-                      <div className="flex w-full items-center gap-2 overflow-hidden md:hidden">
-                        {/* Livre (mobile) — couleur = slot actif */}
-                        <button
-                          type="button"
-                          onClick={() => setShowBookPicker(true)}
-                          aria-expanded={showBookPicker}
-                          className={`min-w-0 inline-flex items-center justify-between gap-1 rounded-md px-2 py-1 text-sm leading-none font-semibold shadow active:scale-95 focus:outline-none focus:ring-2 ${
-                            activeTheme
-                              ? `${activeTheme.mobileBtn} ${activeTheme.mobileBtnHover}`
-                              : 'bg-blue-600 text-white hover:bg-blue-500'
-                          } focus:ring-blue-400 flex-1`}
-                          title={getBookName(selectedBook)}
-                          aria-label={t('chooseBook')}
-                        >
-                          <span className="truncate w-[13ch]">{shortBookName(selectedBook)}</span>
-                          <ChevronDown className="w-3.5 h-3.5 opacity-90" />
-                        </button>
+              <div className="bg-gray-800/95 backdrop-blur border border-gray-700 rounded-none sm:rounded-md shadow md:shadow-lg px-3 py-2 md:p-3">
+                {/* MOBILE : navigation Bible séparée des mémoires */}
+                <div className="md:hidden space-y-2">
+                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowBookPicker(true)}
+                      aria-expanded={showBookPicker}
+                      aria-label={t('chooseBook')}
+                      title={t('chooseBook')}
+                      className="min-w-0 h-10 inline-flex items-center justify-between gap-2 rounded-lg border border-gray-600 bg-gray-900/70 px-3 text-left shadow-sm active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                    >
+                      <span className="min-w-0 truncate text-sm font-semibold text-blue-300">
+                        {getBookName(selectedBook)}
+                      </span>
+                      <ChevronDown className="w-4 h-4 shrink-0 text-blue-300 opacity-90" />
+                    </button>
 
-                        {/* Chapitre (mobile) — idem */}
-                        <button
-                          type="button"
-                          onClick={() => setShowChapterPicker(true)}
-                          aria-expanded={showChapterPicker}
-                          className={`min-w-0 inline-flex items-center justify-between gap-1 rounded-md px-2 py-1 text-sm leading-none font-semibold shadow active:scale-95 focus:outline-none focus:ring-2 ${
-                            activeTheme
-                              ? `${activeTheme.mobileBtn} ${activeTheme.mobileBtnHover}`
-                              : 'bg-blue-600 text-white hover:bg-blue-500'
-                          } focus:ring-blue-400 flex-none shrink-0 whitespace-nowrap`}
-                          title={t('chooseChapter')}
-                          aria-label={t('chooseChapter')}
-                        >
-                          <span className="truncate">
-                            <span className="md:hidden">Ch.</span>
-                            <span className="hidden md:inline">{t('chapter')}</span>{' '}
-                            {selectedChapter}
-                          </span>
-                          <ChevronDown className="w-3.5 h-3.5 opacity-90" />
-                        </button>
-
-                        {/* Loupe + slots (mobile) */}
-                        <div className="flex items-center gap-2 md:hidden">
-                          {[0, 1, 2, 3].map(i => {
-                            const s = quickSlots[i];
-                            const filled = s !== null;
-                            const isNumeric = i !== 0;
-
-                            const base = isNumeric
-                              ? 'relative overflow-visible w-7 h-7 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
-                              : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all box-border';
-
-                            const isActive = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
-
-                            let cls = '';
-                            if (i === 0) {
-                              cls = 'bg-blue-600 text-white hover:bg-blue-500';
-                            } else {
-                              const theme = SLOT_THEMES[i as SlotKey];
-                              cls = filled
-                                ? `${theme.solid} ${theme.solidHover}`
-                                : 'bg-gray-800 text-white border border-gray-600';
-                            }
-
-                            const refText = s ? `${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : '';
-                            let title: string;
-                            if (i === 0) {
-                              title = s ? `${t('searchSlotLabel')}: ${refText}` : t('searchSlotEmpty');
-                            } else {
-                              title = s
-                                ? `${t('memorySlotLabel')} ${i}: ${refText}`
-                                : `${t('memorySlotLabel')} ${i} ${t('emptySlotSuffix')}`;
-                            }
-
-                            const activeRing = isActive ? 'border-2 border-white' : '';
-                            const numGlow =
-                              isNumeric && isActive
-                                ? 'shadow-[0_0_0_2px_rgba(37,99,235,0.9),0_0_10px_rgba(37,99,235,0.6)]'
-                                : '';
-
-                            return (
-                              <button
-                                key={`qs-m-${i}`}
-                                className={`${base} ${cls} ${activeRing} ${numGlow}`}
-                                onClick={() => jumpToSlot(i)}
-                                aria-label={title}
-                                title={title}
-                                aria-pressed={isActive}
-                                aria-current={isActive ? 'true' : undefined}
-                              >
-                                {i === 0 ? <SearchIcon className="w-4 h-4" /> : <span className="relative z-[1]">{i}</span>}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* DESKTOP : boutons Livre / Chapitre à gauche */}
-                      <div className="hidden md:flex md:items-center md:gap-2">
-                        <button
-                          onClick={() => setShowBookPicker(true)}
-                          className={`px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm
-                            ${activeTheme ? activeTheme.solid : 'bg-blue-600 text-white'}
-                            ${activeTheme ? activeTheme.solidHover : 'hover:bg-blue-500'}`}
-                          title={t('chooseBook')}
-                        >
-                          {shortBookName(selectedBook)}
-                        </button>
-
-                        <button
-                          onClick={() => setShowChapterPicker(true)}
-                          className={`px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm inline-flex items-center gap-1
-                            ${activeTheme ? activeTheme.solid : 'bg-blue-600 text-white'}
-                            ${activeTheme ? activeTheme.solidHover : 'hover:bg-blue-500'}`}
-                          title={t('chooseChapter')}
-                        >
-                          Ch. {selectedChapter}
-                          <ChevronDown className="w-3.5 h-3.5 opacity-90" />
-                        </button>
-                      </div>
-                    </h2>
+                    <button
+                      type="button"
+                      onClick={() => setShowChapterPicker(true)}
+                      aria-expanded={showChapterPicker}
+                      aria-label={t('chooseChapter')}
+                      title={t('chooseChapter')}
+                      className="h-10 inline-flex items-center justify-center gap-1.5 rounded-lg border border-blue-700/60 bg-blue-950/40 px-3 text-sm font-semibold text-blue-100 shadow-sm active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/40 whitespace-nowrap"
+                    >
+                      <span>
+                        {t('chapter')} {selectedChapter}
+                      </span>
+                      <ChevronDown className="w-4 h-4 shrink-0 opacity-90" />
+                    </button>
                   </div>
 
-                  {/* Desktop : actions à droite (slots + flèches) */}
-                  <div className="hidden md:flex items-center gap-2 ml-auto">
-                    {/* Loupe + slots (desktop) */}
-                    <div className="flex items-center gap-2 mr-2">
+                  <div className="flex items-center justify-between gap-3">
+                    {/* Loupe + mémoires 1/2/3 */}
+                    <div className="flex items-center gap-2">
                       {[0, 1, 2, 3].map(i => {
                         const s = quickSlots[i];
                         const filled = s !== null;
                         const isNumeric = i !== 0;
 
                         const base = isNumeric
-                          ? 'relative overflow-visible w-7 h-7 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
-                          : 'px-3 py-1.5 rounded-full text-xs font-semibold shadow active:scale-95 inline-flex items-center gap-1 transition-all box-border';
+                          ? 'relative overflow-visible w-8 h-8 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
+                          : 'w-8 h-8 rounded-full shadow active:scale-95 inline-flex items-center justify-center transition-all box-border';
 
                         const isActive = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
 
                         let cls = '';
                         if (i === 0) {
-                          cls = 'bg-blue-600 text-white hover:bg-blue-500';
+                          cls = 'bg-blue-700 text-white hover:bg-blue-600';
                         } else {
                           const theme = SLOT_THEMES[i as SlotKey];
                           cls = filled
@@ -1344,10 +1250,132 @@ ${shareUrl}`;
                             : 'bg-gray-800 text-white border border-gray-600';
                         }
 
-                        const refText = s ? `${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}` : '';
+                        const refText = s
+                          ? `${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}`
+                          : '';
+
                         let title: string;
                         if (i === 0) {
-                          title = s ? `${t('searchSlotLabel')}: ${refText}` : t('searchSlotEmpty');
+                          title = s
+                            ? `${t('searchSlotLabel')}: ${refText}`
+                            : t('searchSlotEmpty');
+                        } else {
+                          title = s
+                            ? `${t('memorySlotLabel')} ${i}: ${refText}`
+                            : `${t('memorySlotLabel')} ${i} ${t('emptySlotSuffix')}`;
+                        }
+
+                        const activeRing = isActive ? 'border-2 border-white' : '';
+                        const numGlow =
+                          isNumeric && isActive
+                            ? 'shadow-[0_0_0_2px_rgba(37,99,235,0.9),0_0_10px_rgba(37,99,235,0.6)]'
+                            : '';
+
+                        return (
+                          <button
+                            key={`qs-m-${i}`}
+                            type="button"
+                            className={`${base} ${cls} ${activeRing} ${numGlow}`}
+                            onClick={() => jumpToSlot(i)}
+                            aria-label={title}
+                            title={title}
+                            aria-pressed={isActive}
+                            aria-current={isActive ? 'true' : undefined}
+                          >
+                            {i === 0 ? (
+                              <SearchIcon className="w-4 h-4" />
+                            ) : (
+                              <span className="relative z-[1]">{i}</span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Navigation chapitre précédent / suivant visible sur mobile */}
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={handlePrevUnit}
+                        className="h-8 w-9 inline-flex items-center justify-center rounded-lg border border-gray-600 bg-gray-900/70 text-white hover:bg-gray-700 active:scale-95"
+                        title={t('prevChapter')}
+                        aria-label={t('prevChapter')}
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleNextUnit}
+                        className="h-8 w-9 inline-flex items-center justify-center rounded-lg border border-gray-600 bg-gray-900/70 text-white hover:bg-gray-700 active:scale-95"
+                        title={t('nextChapter')}
+                        aria-label={t('nextChapter')}
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* DESKTOP */}
+                <div className="hidden md:flex md:items-center md:gap-3 w-full">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <button
+                      type="button"
+                      onClick={() => setShowBookPicker(true)}
+                      aria-expanded={showBookPicker}
+                      className="min-w-0 inline-flex items-center gap-2 rounded-lg border border-gray-600 bg-gray-900/70 px-3 py-2 text-sm font-semibold text-blue-300 hover:bg-gray-700/80 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                      title={t('chooseBook')}
+                    >
+                      <span className="max-w-[18rem] truncate">{getBookName(selectedBook)}</span>
+                      <ChevronDown className="w-4 h-4 shrink-0 opacity-90" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowChapterPicker(true)}
+                      aria-expanded={showChapterPicker}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-blue-700/60 bg-blue-950/40 px-3 py-2 text-sm font-semibold text-blue-100 hover:bg-blue-900/50 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                      title={t('chooseChapter')}
+                    >
+                      {t('chapter')} {selectedChapter}
+                      <ChevronDown className="w-4 h-4 opacity-90" />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2 ml-auto">
+                    {/* Loupe + mémoires 1/2/3 */}
+                    <div className="flex items-center gap-2 mr-2">
+                      {[0, 1, 2, 3].map(i => {
+                        const s = quickSlots[i];
+                        const filled = s !== null;
+                        const isNumeric = i !== 0;
+
+                        const base = isNumeric
+                          ? 'relative overflow-visible w-8 h-8 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
+                          : 'w-8 h-8 rounded-full shadow active:scale-95 inline-flex items-center justify-center transition-all box-border';
+
+                        const isActive = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
+
+                        let cls = '';
+                        if (i === 0) {
+                          cls = 'bg-blue-700 text-white hover:bg-blue-600';
+                        } else {
+                          const theme = SLOT_THEMES[i as SlotKey];
+                          cls = filled
+                            ? `${theme.solid} ${theme.solidHover}`
+                            : 'bg-gray-800 text-white border border-gray-600';
+                        }
+
+                        const refText = s
+                          ? `${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}`
+                          : '';
+
+                        let title: string;
+                        if (i === 0) {
+                          title = s
+                            ? `${t('searchSlotLabel')}: ${refText}`
+                            : t('searchSlotEmpty');
                         } else {
                           title = s
                             ? `${t('memorySlotLabel')} ${i}: ${refText}`
@@ -1363,6 +1391,7 @@ ${shareUrl}`;
                         return (
                           <button
                             key={`qs-d-${i}`}
+                            type="button"
                             className={`${base} ${cls} ${activeRing} ${numGlow}`}
                             onClick={() => jumpToSlot(i)}
                             aria-label={title}
@@ -1370,26 +1399,33 @@ ${shareUrl}`;
                             aria-pressed={isActive}
                             aria-current={isActive ? 'true' : undefined}
                           >
-                            {i === 0 ? <SearchIcon className="w-4 h-4" /> : <span className="relative z-[1]">{i}</span>}
+                            {i === 0 ? (
+                              <SearchIcon className="w-4 h-4" />
+                            ) : (
+                              <span className="relative z-[1]">{i}</span>
+                            )}
                           </button>
                         );
                       })}
                     </div>
 
-                    {/* Flèches de navigation */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <button
-                        onClick={() => handlePrevUnit()}
-                        className="p-1.5 rounded-md transition-all bg-gray-700 text-white hover:bg-gray-600"
+                        type="button"
+                        onClick={handlePrevUnit}
+                        className="h-8 w-9 inline-flex items-center justify-center rounded-lg border border-gray-600 bg-gray-900/70 text-white hover:bg-gray-700 active:scale-95"
                         title={t('prevChapter')}
+                        aria-label={t('prevChapter')}
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
 
                       <button
-                        onClick={() => handleNextUnit()}
-                        className="p-1.5 rounded-md transition-all bg-gray-700 text-white hover:bg-gray-600"
+                        type="button"
+                        onClick={handleNextUnit}
+                        className="h-8 w-9 inline-flex items-center justify-center rounded-lg border border-gray-600 bg-gray-900/70 text-white hover:bg-gray-700 active:scale-95"
                         title={t('nextChapter')}
+                        aria-label={t('nextChapter')}
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>
@@ -1453,117 +1489,162 @@ ${shareUrl}`;
               </div>
             </div>
           )}
-          {/* MODAL : Choix du livre */}
+          {/* MODAL : choix du livre */}
           {showBookPicker && (
-            <div className="fixed inset-0 z-50 flex items-start justify-center pt-24">
-              <div
-                className="absolute inset-0 bg-black/60"
+            <div className="fixed inset-0 z-50 flex items-start justify-center px-3 pt-20 sm:pt-24">
+              <button
+                type="button"
+                className="absolute inset-0 bg-black/65"
                 onClick={() => setShowBookPicker(false)}
-                aria-hidden="true"
+                aria-label={t('close')}
               />
-              <div className="relative w-full max-w-3xl mx-4 bg-gray-900 text-white border border-gray-700 rounded-xl shadow-lg overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
-                  <div className="font-semibold text-lg">{t('chooseBook')}</div>
+
+              <div className="relative w-full max-w-3xl bg-gray-900 text-white border border-gray-700 rounded-2xl shadow-2xl overflow-hidden">
+                <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-gray-700 bg-gray-900">
+                  <div className="min-w-0">
+                    <div className="font-semibold text-lg">{t('chooseBook')}</div>
+                    <div className="mt-0.5 text-sm text-white/60 truncate">
+                      {selectedBook ? getBookName(selectedBook) : ''}
+                    </div>
+                  </div>
+
                   <button
                     type="button"
-                    className="px-3 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm"
+                    className="shrink-0 px-3 py-1.5 rounded-lg border border-gray-600 bg-gray-800 hover:bg-gray-700 text-sm"
                     onClick={() => setShowBookPicker(false)}
                   >
                     {t('close')}
                   </button>
                 </div>
 
-                <div className="max-h-[70vh] overflow-y-auto p-4 space-y-8">
-                  {/* Ancien Testament */}
-                  <div>
-                    <div className="text-lg font-extrabold text-white/90 mb-3 tracking-wide">
-    {t('oldTestament')}
-  </div>
-  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-    {oldTestamentBooks.map(b => {
-      const isCurrent = selectedBook?.name === b.name;
-      return (
-        <button
-          key={b.name}
-          type="button"
-          onClick={() => handleBookSelect(b)}
-          className={`text-left px-3 py-2 rounded-md border transition-colors ${
-            isCurrent
-              ? 'border-blue-400 bg-blue-600/30'
-              : 'border-gray-700 bg-white/5 hover:bg-white/10'
-          }`}
-        >
-          <div className="font-normal text-lg sm:text-xl leading-tight">{getBookName(b)}</div>
-          <div className="text-base sm:text-lg text-white/70">
-            {b.chapters} {t('chapter')}
-            {b.chapters > 1 ? 's' : ''}
-          </div>
-        </button>
-      );
-    })}
-  </div>
-</div>
+                <div className="max-h-[76vh] overflow-y-auto p-4 space-y-7">
+                  <section>
+                    <div className="text-sm font-bold uppercase tracking-wider text-white/60 mb-3">
+                      {t('oldTestament')}
+                    </div>
 
-{/* Nouveau Testament */}
-<div>
-  <div className="text-lg font-extrabold text-white/90 mb-3 tracking-wide">
-    {t('newTestament')}
-  </div>
-  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-    {newTestamentBooks.map(b => {
-      const isCurrent = selectedBook?.name === b.name;
-      return (
-        <button
-          key={b.name}
-          type="button"
-          onClick={() => handleBookSelect(b)}
-          className={`text-left px-3 py-2 rounded-md border transition-colors ${
-            isCurrent
-              ? 'border-blue-400 bg-blue-600/30'
-              : 'border-gray-700 bg-white/5 hover:bg-white/10'
-          }`}
-        >
-          <div className="font-normal text-lg sm:text-xl leading-tight">{getBookName(b)}</div>
-          <div className="text-base sm:text-lg text-white/70">
-            {b.chapters} {t('chapter')}
-            {b.chapters > 1 ? 's' : ''}
-          </div>
-        </button>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {oldTestamentBooks.map(b => {
+                        const isCurrent = selectedBook?.name === b.name;
+
+                        return (
+                          <button
+                            key={b.name}
+                            type="button"
+                            onClick={() => handleBookSelect(b)}
+                            aria-current={isCurrent ? 'true' : undefined}
+                            className={`min-h-[64px] text-left px-3 py-2.5 rounded-xl border transition-colors ${
+                              isCurrent
+                                ? 'border-blue-400 bg-blue-500/15 ring-1 ring-blue-500/30'
+                                : 'border-gray-700 bg-white/[0.035] hover:bg-white/[0.08] hover:border-gray-600'
+                            }`}
+                          >
+                            <div
+                              className={`font-semibold text-[15px] sm:text-base leading-tight ${
+                                isCurrent ? 'text-blue-200' : 'text-white'
+                              }`}
+                            >
+                              {getBookName(b)}
+                            </div>
+
+                            <div className="mt-1 text-xs sm:text-sm text-white/55">
+                              {b.chapters} {t('chapter')}
+                              {b.chapters > 1 ? 's' : ''}
+                            </div>
+                          </button>
                         );
                       })}
                     </div>
-                  </div>
+                  </section>
+
+                  <section>
+                    <div className="text-sm font-bold uppercase tracking-wider text-white/60 mb-3">
+                      {t('newTestament')}
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {newTestamentBooks.map(b => {
+                        const isCurrent = selectedBook?.name === b.name;
+
+                        return (
+                          <button
+                            key={b.name}
+                            type="button"
+                            onClick={() => handleBookSelect(b)}
+                            aria-current={isCurrent ? 'true' : undefined}
+                            className={`min-h-[64px] text-left px-3 py-2.5 rounded-xl border transition-colors ${
+                              isCurrent
+                                ? 'border-blue-400 bg-blue-500/15 ring-1 ring-blue-500/30'
+                                : 'border-gray-700 bg-white/[0.035] hover:bg-white/[0.08] hover:border-gray-600'
+                            }`}
+                          >
+                            <div
+                              className={`font-semibold text-[15px] sm:text-base leading-tight ${
+                                isCurrent ? 'text-blue-200' : 'text-white'
+                              }`}
+                            >
+                              {getBookName(b)}
+                            </div>
+
+                            <div className="mt-1 text-xs sm:text-sm text-white/55">
+                              {b.chapters} {t('chapter')}
+                              {b.chapters > 1 ? 's' : ''}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </section>
                 </div>
               </div>
             </div>
           )}
 
-          {/* MODAL : Choix du chapitre */}
+          {/* MODAL : choix du chapitre */}
           {showChapterPicker && selectedBook && (
-            <div className="fixed inset-0 z-50 flex items-start justify-center pt-24">
-              <div
-                className="absolute inset-0 bg-black/60"
+            <div className="fixed inset-0 z-50 flex items-start justify-center px-3 pt-20 sm:pt-24">
+              <button
+                type="button"
+                className="absolute inset-0 bg-black/65"
                 onClick={() => setShowChapterPicker(false)}
-                aria-hidden="true"
+                aria-label={t('close')}
               />
-              <div className="relative w-full max-w-2xl mx-4 bg-gray-900 text-white border border-gray-700 rounded-xl shadow-lg overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
-                  <div className="font-semibold text-lg">
-                    {t('chooseChapter')} — {getBookName(selectedBook)}
+
+              <div className="relative w-full max-w-2xl bg-gray-900 text-white border border-gray-700 rounded-2xl shadow-2xl overflow-hidden">
+                <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-gray-700">
+                  <div className="min-w-0">
+                    <div className="font-semibold text-lg">{t('chooseChapter')}</div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowChapterPicker(false);
+                        setShowBookPicker(true);
+                      }}
+                      className="mt-0.5 max-w-full inline-flex items-center gap-1.5 text-sm font-semibold text-blue-300 hover:text-blue-200"
+                      title={t('chooseBook')}
+                    >
+                      <span className="truncate">{getBookName(selectedBook)}</span>
+                      <ChevronDown className="w-3.5 h-3.5 shrink-0" />
+                    </button>
                   </div>
+
                   <button
                     type="button"
-                    className="px-3 py-1.5 rounded bg-gray-700 hover:bg-gray-600 text-sm"
+                    className="shrink-0 px-3 py-1.5 rounded-lg border border-gray-600 bg-gray-800 hover:bg-gray-700 text-sm"
                     onClick={() => setShowChapterPicker(false)}
                   >
                     {t('close')}
                   </button>
                 </div>
 
-                <div className="max-h-[70vh] overflow-y-auto p-4">
-                  <div className="grid grid-cols-5 sm:grid-cols-8 gap-2">
-                    {Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map(n => {
+                <div className="max-h-[76vh] overflow-y-auto p-4">
+                  <div className="grid grid-cols-6 sm:grid-cols-8 gap-2">
+                    {Array.from(
+                      { length: selectedBook.chapters },
+                      (_, i) => i + 1
+                    ).map(n => {
                       const isCurrent = n === selectedChapter;
+
                       return (
                         <button
                           key={n}
@@ -1572,10 +1653,11 @@ ${shareUrl}`;
                             setShowChapterPicker(false);
                             handleChapterSelect(n);
                           }}
-                          className={`flex items-center justify-center h-11 sm:h-12 rounded-lg text-base sm:text-lg font-bold border transition-colors ${
+                          aria-current={isCurrent ? 'true' : undefined}
+                          className={`aspect-square min-h-11 flex items-center justify-center rounded-xl text-base font-bold border transition-colors ${
                             isCurrent
-                              ? 'border-blue-400 bg-blue-600/30'
-                              : 'border-gray-700 bg-white/5 hover:bg-white/10'
+                              ? 'border-blue-400 bg-blue-700 text-white shadow-sm ring-1 ring-blue-400/30'
+                              : 'border-gray-700 bg-white/[0.035] text-white/90 hover:bg-white/[0.08] hover:border-gray-600'
                           }`}
                         >
                           {n}
