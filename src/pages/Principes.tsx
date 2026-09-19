@@ -1,10 +1,16 @@
 // src/pages/Principes.tsx
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
-import type { VerseList, VerseRef } from '../types/collections';
+
+import type {
+  VerseList,
+  VerseRef,
+} from '../types/collections';
+
 import {
-  List as ListIcon,
+  BookMarked,
   Edit3,
   Trash2,
   Share2,
@@ -15,1215 +21,3516 @@ import {
   Type as TextIcon,
   Edit2 as EditTextIcon,
   HelpCircle,
+  MoreVertical,
+  X,
+  BookOpen,
 } from 'lucide-react';
-import { encodeSharedList, decodeSharedList } from '../services/shareCodec';
 
-/** Sentinelle pour distinguer un bloc de texte libre d'un verset */
-const TEXT_SENTINEL = '__TEXT__';
+import {
+  encodeSharedList,
+  decodeSharedList,
+} from '../services/shareCodec';
 
-/* ===================== Stockage local dédié à Principes ===================== */
+const STORAGE_KEY =
+  'twog:principles:v1';
 
-// même clé que l’implémentation précédente pour ne PAS perdre les études existantes
-const P_LS_KEY = 'twog:principles:v1';
-// mémorise la dernière étude ouverte (utilisé aussi par Lecture)
-const LAST_LIST_STORAGE_KEY = 'twog:lastPrincipleId';
-// ordre manuel des listes (comme pour Notes, mais séparé)
-const LIST_ORDER_STORAGE_KEY = 'theword:principlesListOrder';
+const LAST_LIST_STORAGE_KEY =
+  'twog:lastPrincipleId';
 
-function p_safeParse<T>(raw: string | null, fallback: T): T {
-  if (!raw) return fallback;
-  try {
-    return JSON.parse(raw) as T;
-  } catch {
-    return fallback;
-  }
-}
-
-function p_readAll(): VerseList[] {
-  try {
-    return p_safeParse<VerseList[]>(localStorage.getItem(P_LS_KEY), []);
-  } catch {
-    return [];
-  }
-}
-
-function p_writeAll(all: VerseList[]) {
-  try {
-    localStorage.setItem(P_LS_KEY, JSON.stringify(all));
-  } catch {}
-}
-
-function p_makeId() {
-  return 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
-}
-
-// === API similaire à collectionsService, mais indépendante (Études) ===
-function p_getAllLists(): VerseList[] {
-  return p_readAll();
-}
-
-function p_getListById(id: string): VerseList | null {
-  return p_readAll().find((l) => l.id === id) ?? null;
-}
-
-function p_createList(title: string): VerseList {
-  const now = Date.now();
-  const list: VerseList = {
-    id: p_makeId(),
-    title: title?.trim() || 'Nouvelle étude',
-    createdAt: now,
-    updatedAt: now,
-    items: [],
-  };
-  const all = p_readAll();
-  all.push(list);
-  p_writeAll(all);
-  return list;
-}
-
-function p_renameList(id: string, newTitle: string): VerseList | null {
-  const all = p_readAll();
-  const i = all.findIndex((l) => l.id === id);
-  if (i < 0) return null;
-  all[i] = { ...all[i], title: newTitle?.trim() || all[i].title, updatedAt: Date.now() };
-  p_writeAll(all);
-  return all[i];
-}
-
-function p_deleteList(id: string): boolean {
-  const all = p_readAll();
-  const next = all.filter((l) => l.id !== id);
-  p_writeAll(next);
-  return next.length !== all.length;
-}
-
-function p_setListItems(id: string, items: VerseRef[]): VerseList | null {
-  const all = p_readAll();
-  const i = all.findIndex((l) => l.id === id);
-  if (i < 0) return null;
-  all[i] = { ...all[i], items: Array.isArray(items) ? items : [], updatedAt: Date.now() };
-  p_writeAll(all);
-  return all[i];
-}
-
-/* ========================== Utils d'affichage texte ========================== */
+const TEXT_SENTINEL =
+  '__TEXT__';
 
 type AnyItem = VerseRef & {
   kind?: 'text' | 'verse';
 };
 
-/** Découpe un texte en blocs séparés par au moins une ligne vide */
-function splitIntoBlocks(raw: string): string[] {
-  return raw
-    .split(/\n\s*\n+/)
-    .map((b) => b.trim())
-    .filter((b) => b.length > 0);
+function nowIso() {
+  return new Date().toISOString();
 }
 
-function buildPlainListText(list: VerseList): string {
-  const lines: string[] = [];
-  const title = (list.title || '').trim();
-  if (title) lines.push(title);
+function makeId() {
+  try {
+    if (
+      typeof crypto !== 'undefined' &&
+      'randomUUID' in crypto
+    ) {
+      return crypto.randomUUID();
+    }
+  } catch {
+    // fallback ci-dessous
+  }
+
+  return (
+    Date.now().toString(36) +
+    '-' +
+    Math.random()
+      .toString(36)
+      .slice(2, 10)
+  );
+}
+
+function normalizeList(
+  raw: any
+): VerseList | null {
+  if (
+    !raw ||
+    typeof raw !== 'object'
+  ) {
+    return null;
+  }
+
+  const id =
+    String(
+      raw.id ?? ''
+    ).trim();
+
+  if (!id) {
+    return null;
+  }
+
+  return {
+    ...raw,
+
+    id,
+
+    title:
+      String(
+        raw.title ?? ''
+      ),
+
+    items:
+      Array.isArray(
+        raw.items
+      )
+        ? raw.items
+        : [],
+
+    createdAt:
+      raw.createdAt ||
+      nowIso(),
+
+    updatedAt:
+      raw.updatedAt ||
+      raw.createdAt ||
+      nowIso(),
+  } as VerseList;
+}
+
+function p_getAll(): VerseList[] {
+  try {
+    const raw =
+      localStorage.getItem(
+        STORAGE_KEY
+      );
+
+    if (!raw) {
+      return [];
+    }
+
+    const parsed =
+      JSON.parse(raw);
+
+    if (
+      !Array.isArray(parsed)
+    ) {
+      return [];
+    }
+
+    return parsed
+      .map(normalizeList)
+      .filter(
+        (
+          item
+        ): item is VerseList =>
+          !!item
+      );
+  } catch {
+    return [];
+  }
+}
+
+function p_saveAll(
+  lists: VerseList[]
+) {
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(lists)
+  );
+}
+
+function p_getById(
+  id: string
+): VerseList | null {
+  return (
+    p_getAll().find(
+      (item) =>
+        item.id === id
+    ) || null
+  );
+}
+
+function p_create(
+  title: string
+): VerseList {
+  const all =
+    p_getAll();
+
+  const date =
+    nowIso();
+
+  const created =
+    {
+      id: makeId(),
+
+      title,
+
+      items: [],
+
+      createdAt: date,
+
+      updatedAt: date,
+    } as VerseList;
+
+  all.push(created);
+
+  p_saveAll(all);
+
+  return created;
+}
+
+function p_rename(
+  id: string,
+  title: string
+) {
+  const all =
+    p_getAll();
+
+  const index =
+    all.findIndex(
+      (item) =>
+        item.id === id
+    );
+
+  if (index < 0) {
+    return;
+  }
+
+  all[index] = {
+    ...all[index],
+
+    title,
+
+    updatedAt:
+      nowIso(),
+  };
+
+  p_saveAll(all);
+}
+
+function p_delete(
+  id: string
+) {
+  p_saveAll(
+    p_getAll().filter(
+      (item) =>
+        item.id !== id
+    )
+  );
+}
+
+function p_setItems(
+  id: string,
+  items: VerseRef[]
+) {
+  const all =
+    p_getAll();
+
+  const index =
+    all.findIndex(
+      (item) =>
+        item.id === id
+    );
+
+  if (index < 0) {
+    return;
+  }
+
+  all[index] = {
+    ...all[index],
+
+    items,
+
+    updatedAt:
+      nowIso(),
+  };
+
+  p_saveAll(all);
+}
+
+function splitIntoBlocks(
+  raw: string
+): string[] {
+  return raw
+    .split(/\n\s*\n+/)
+    .map(
+      (block) =>
+        block.trim()
+    )
+    .filter(Boolean);
+}
+
+function buildPlainListText(
+  list: VerseList
+): string {
+  const lines: string[] =
+    [];
+
+  const title =
+    (list.title || '')
+      .trim();
+
+  if (title) {
+    lines.push(title);
+  }
+
   lines.push('');
 
-  for (const itRaw of list.items as AnyItem[]) {
-    const it = itRaw || ({} as AnyItem);
-    const isText = it.bookId === TEXT_SENTINEL;
+  for (
+    const raw of
+      list.items as AnyItem[]
+  ) {
+    const item =
+      raw ||
+      ({} as AnyItem);
+
+    const isText =
+      item.bookId ===
+      TEXT_SENTINEL;
 
     if (isText) {
-      const body = (it.text || '').toString().trim();
-      if (body) lines.push(body);
+      const body =
+        String(
+          item.text ?? ''
+        ).trim();
+
+      if (body) {
+        lines.push(body);
+      }
+
       lines.push('');
+
       continue;
     }
 
-    const ref = `${(it.bookName ?? it.bookId) || ''} ${it.chapter}:${it.verse}`.trim();
-    if (ref) lines.push(ref);
-    if (it.text && String(it.text).trim()) lines.push(String(it.text).trim());
+    const ref =
+      `${
+        item.bookName ??
+        item.bookId ??
+        ''
+      } ${item.chapter}:${item.verse}`.trim();
+
+    if (ref) {
+      lines.push(ref);
+    }
+
+    const body =
+      String(
+        item.text ?? ''
+      ).trim();
+
+    if (body) {
+      lines.push(body);
+    }
+
     lines.push('');
   }
 
-  while (lines.length && lines[lines.length - 1] === '') lines.pop();
+  while (
+    lines.length &&
+    lines[
+      lines.length - 1
+    ] === ''
+  ) {
+    lines.pop();
+  }
+
   lines.push('');
+
   return lines.join('\n');
 }
 
-/** Construit le texte pour UN SEUL élément (verset ou bloc texte) */
-function buildItemPlainText(it: AnyItem): string {
-  const isText = it.bookId === TEXT_SENTINEL;
+function buildItemPlainText(
+  item: AnyItem
+): string {
+  const isText =
+    item.bookId ===
+    TEXT_SENTINEL;
+
   if (isText) {
-    return String(it.text ?? '').trim();
+    return String(
+      item.text ?? ''
+    ).trim();
   }
-  const ref = `${(it.bookName ?? it.bookId) || ''} ${it.chapter}:${it.verse}`.trim();
-  const body = String(it.text ?? '').trim();
-  return body ? `${ref}\n${body}` : ref;
+
+  const ref =
+    `${
+      item.bookName ??
+      item.bookId ??
+      ''
+    } ${item.chapter}:${item.verse}`.trim();
+
+  const body =
+    String(
+      item.text ?? ''
+    ).trim();
+
+  return body
+    ? `${ref}\n${body}`
+    : ref;
 }
 
-/* ================================== Page =================================== */
-
 export default function Principes() {
-  const { state, setPage } = useApp();
-  const { t, language } = useTranslation();
-  const isDark = state.settings.theme === 'dark';
+  const {
+    state,
+    setPage,
+  } = useApp();
 
-  const [lists, setLists] = useState<VerseList[]>([]);
-  const [expandedId, setExpandedId] = useState<string | null>(() => {
-    if (typeof window === 'undefined') return null;
+  const {
+    t,
+    language,
+  } = useTranslation();
+
+  const isDark =
+    state.settings.theme ===
+    'dark';
+
+  /*
+   * Permet de conserver l'i18n
+   * tout en évitant d'afficher
+   * une clé brute si une langue
+   * ne possède pas encore
+   * une traduction récente.
+   */
+  const tx = (
+    key: string,
+    fallback: string
+  ) => {
+    const value =
+      t(key);
+
+    return !value ||
+      value === key
+      ? fallback
+      : value;
+  };
+
+  const [lists, setLists] =
+    useState<VerseList[]>(
+      []
+    );
+
+  const [
+    expandedId,
+    setExpandedId,
+  ] = useState<
+    string | null
+  >(() => {
     try {
-      return window.localStorage.getItem(LAST_LIST_STORAGE_KEY) || null;
+      return (
+        localStorage.getItem(
+          LAST_LIST_STORAGE_KEY
+        ) || null
+      );
     } catch {
       return null;
     }
   });
 
-  // item sélectionné pour afficher ses actions
-  const [openItemMenu, setOpenItemMenu] = useState<{ listId: string; idx: number } | null>(null);
+  /*
+   * MENUS
+   */
 
-  // --- Mini outil "Importer depuis un texte" ---
-  const [showImportFromText, setShowImportFromText] = useState(false);
-  const [importTextTitle, setImportTextTitle] = useState('');
-  const [importTextBody, setImportTextBody] = useState('');
-  const [importSplitBlocks, setImportSplitBlocks] = useState(true);
+  const [
+    showMainMenu,
+    setShowMainMenu,
+  ] = useState(false);
 
-  // --- Édition multi-lignes d'un bloc texte (création + édition) ---
-  const [editingTextBlock, setEditingTextBlock] = useState<{
+  const [
+    openListMenu,
+    setOpenListMenu,
+  ] = useState<
+    string | null
+  >(null);
+
+  const [
+    openItemMenu,
+    setOpenItemMenu,
+  ] = useState<{
     listId: string;
-    idx: number | null; // null = nouveau bloc
-    initialValue: string;
-    insertAt?: number | null; // position d'insertion (si nouveau bloc)
+    idx: number;
   } | null>(null);
-  const [editingTextValue, setEditingTextValue] = useState('');
 
-  // Flag pour savoir si on doit scroller automatiquement vers le dernier élément
-  const [shouldScrollToLast, setShouldScrollToLast] = useState(false);
+  /*
+   * IMPORT TEXTE
+   */
 
-  // Aide / mode d'emploi
-  const [showHelp, setShowHelp] = useState(false);
+  const [
+    showImportFromText,
+    setShowImportFromText,
+  ] = useState(false);
 
-  // ✅ Toast (info copie/partage) — sans bouton OK
-  const [toast, setToast] = useState<string | null>(null);
-  const showToast = (msg: string) => {
-    setToast(msg);
-    window.setTimeout(() => setToast(null), 1400);
-  };
+  const [
+    importTextTitle,
+    setImportTextTitle,
+  ] = useState('');
 
-  const label = useMemo(
-    () => ({
-      title: t('principles'),
-      create: t('principlesPage.create'),
-      placeholder: t('principlesPage.placeholder'),
-      empty: t('principlesPage.empty'),
-      verses: t('principlesPage.items'),
-      copied: t('copiedShort'),
-      backAll: t('principlesPage.backAll'),
-      addTextBlock: t('principlesPage.addTextBlock'),
-      editTextBlock: t('principlesPage.editTextBlock'),
-      deleteItem: t('principlesPage.deleteItem'),
-      moveUp: t('principlesPage.moveUp'),
-      moveDown: t('principlesPage.moveDown'),
-      open: t('principlesPage.open'),
-      cancel: t('cancel'),
-      confirmDeleteItem: t('principlesPage.confirmDeleteItem'),
-      newTextPlaceholder: t('principlesPage.newTextPlaceholder'),
-      shareCode: t('principlesPage.shareCode'),
-      importCode: t('principlesPage.importCode'),
-      importPrompt: t('principlesPage.importPrompt'),
-      importError: t('principlesPage.importError'),
-      importSuccess: t('principlesPage.importSuccess'),
-      shareCodeCopied: t('principlesPage.shareCodeCopied'),
-      importTextButton: t('principlesPage.importTextButton'),
-      importTextTitlePlaceholder: t('principlesPage.importTextTitlePlaceholder'),
-      importTextDefaultTitle: t('principlesPage.importTextDefaultTitle'),
-      importTextBodyPlaceholder: t('principlesPage.importTextBodyPlaceholder'),
-      importTextNoBody: t('principlesPage.importTextNoBody'),
-      importTextNoBlock: t('principlesPage.importTextNoBlock'),
-      importTextSplitLabel: t('principlesPage.importTextSplitLabel'),
-      importTextInfo: t('principlesPage.importTextInfo'),
-      importTextCreate: t('principlesPage.importTextCreate'),
-      duplicateTitle: t('principlesPage.duplicateTitle'),
-      confirmDeleteList: t('principlesPage.confirmDeleteList'),
-      emptyList: t('principlesPage.emptyList'),
-      importFromTextTitle: t('principlesPage.importFromTextTitle'),
-      documentContent: t('principlesPage.documentContent'),
+  const [
+    importTextBody,
+    setImportTextBody,
+  ] = useState('');
 
-      // Aide / mode d'emploi (mutualisée avec Notes)
-      helpTitle: t('notesHelpTitle'),
-      helpIntro: t('notesHelpIntro'),
-      help1Title: t('notesHelp1Title'),
-      help1Body: t('notesHelp1Body'),
-      help2Title: t('notesHelp2Title'),
-      help2Body: t('notesHelp2Body'),
-      help3Title: t('notesHelp3Title'),
-      help3Body: t('notesHelp3Body'),
-      help4Title: t('notesHelp4Title'),
-      help4Body: t('notesHelp4Body'),
-      help5Title: t('notesHelp5Title'),
-      help5Body: t('notesHelp5Body'),
-      help6Title: t('notesHelp6Title'),
-      help6Body: t('notesHelp6Body'),
-      help7Title: t('notesHelp7Title'),
-      help7Body: t('notesHelp7Body'),
-      help8Title: t('notesHelp8Title'),
-      help8Body: t('notesHelp8Body'),
-      help9Title: t('notesHelp9Title'),
-      help9Body: t('notesHelp9Body'),
-      help10Title: t('notesHelp10Title'),
-      help10Body: t('notesHelp10Body'),
-    }),
-    [t, language]
-  );
+  const [
+    importSplitBlocks,
+    setImportSplitBlocks,
+  ] = useState(true);
 
-  const refresh = () => {
-    const all = p_getAllLists();
+  /*
+   * ÉDITION TEXTE
+   */
 
-    if (typeof window === 'undefined') {
-      setLists(all);
+  const [
+    editingTextBlock,
+    setEditingTextBlock,
+  ] = useState<{
+    listId: string;
+    idx: number | null;
+    initialValue: string;
+    insertAt?: number | null;
+  } | null>(null);
+
+  const [
+    editingTextValue,
+    setEditingTextValue,
+  ] = useState('');
+
+  /*
+   * AIDE
+   */
+
+  const [
+    showHelp,
+    setShowHelp,
+  ] = useState(false);
+
+  /*
+   * SCROLL / NOTIFICATION
+   */
+
+  const [
+    shouldScrollToLast,
+    setShouldScrollToLast,
+  ] = useState(false);
+
+  const [
+    toast,
+    setToast,
+  ] = useState<
+    string | null
+  >(null);
+
+  useEffect(() => {
+    if (!toast) {
       return;
     }
 
-    let storedOrder: string[] = [];
-    try {
-      const raw = window.localStorage.getItem(LIST_ORDER_STORAGE_KEY);
-      if (raw) storedOrder = JSON.parse(raw);
-    } catch {
-      storedOrder = [];
-    }
+    const timer =
+      window.setTimeout(
+        () =>
+          setToast(null),
+        1600
+      );
 
-    const validStored = storedOrder.filter((id) => all.some((l) => l.id === id));
-    const missingIds = all.filter((l) => !validStored.includes(l.id)).map((l) => l.id);
-    const finalOrder = [...validStored, ...missingIds];
+    return () =>
+      window.clearTimeout(
+        timer
+      );
+  }, [toast]);
 
-    const sorted = [...all].sort((a, b) => finalOrder.indexOf(a.id) - finalOrder.indexOf(b.id));
-    setLists(sorted);
+  const label =
+    useMemo(
+      () => ({
+        title:
+          tx(
+            'principles',
+            'Études'
+          ),
 
-    try {
-      window.localStorage.setItem(LIST_ORDER_STORAGE_KEY, JSON.stringify(finalOrder));
-    } catch {}
-  };
+        create:
+          tx(
+            'principlesPage.create',
+            'Créer une étude'
+          ),
+
+        placeholder:
+          tx(
+            'principlesPage.placeholder',
+            'Nom de l’étude'
+          ),
+
+        empty:
+          tx(
+            'principlesPage.empty',
+            'Aucune étude pour le moment.'
+          ),
+
+        items:
+          tx(
+            'principlesPage.items',
+            'éléments'
+          ),
+
+        copied:
+          tx(
+            'copiedShort',
+            'Copié'
+          ),
+
+        backAll:
+          tx(
+            'principlesPage.backAll',
+            'Toutes les études'
+          ),
+
+        addTextBlock:
+          tx(
+            'principlesPage.addTextBlock',
+            'Ajouter un texte'
+          ),
+
+        editTextBlock:
+          tx(
+            'principlesPage.editTextBlock',
+            'Modifier le texte'
+          ),
+
+        deleteItem:
+          tx(
+            'principlesPage.deleteItem',
+            'Supprimer'
+          ),
+
+        moveUp:
+          tx(
+            'principlesPage.moveUp',
+            'Monter'
+          ),
+
+        moveDown:
+          tx(
+            'principlesPage.moveDown',
+            'Descendre'
+          ),
+
+        open:
+          tx(
+            'principlesPage.openReading',
+            'Ouvrir dans Lecture'
+          ),
+
+        cancel:
+          tx(
+            'cancel',
+            'Annuler'
+          ),
+
+        confirmDeleteItem:
+          tx(
+            'principlesPage.confirmDeleteItem',
+            'Supprimer cet élément ?'
+          ),
+
+        newTextPlaceholder:
+          tx(
+            'principlesPage.newTextPlaceholder',
+            'Votre texte…'
+          ),
+
+        shareCode:
+          tx(
+            'principlesPage.shareCode',
+            'Copier le code de partage'
+          ),
+
+        importCode:
+          tx(
+            'principlesPage.importCode',
+            'Importer un code'
+          ),
+
+        importPrompt:
+          tx(
+            'principlesPage.importPrompt',
+            'Collez le code de partage :'
+          ),
+
+        importError:
+          tx(
+            'principlesPage.importError',
+            'Code invalide.'
+          ),
+
+        importSuccess:
+          tx(
+            'principlesPage.importSuccess',
+            'Étude importée.'
+          ),
+
+        shareCodeCopied:
+          tx(
+            'principlesPage.shareCodeCopied',
+            'Code copié ✅'
+          ),
+
+        importTextButton:
+          tx(
+            'principlesPage.importTextButton',
+            'Importer un texte'
+          ),
+
+        importTextTitlePlaceholder:
+          tx(
+            'principlesPage.importTextTitlePlaceholder',
+            'Titre de l’étude'
+          ),
+
+        importTextDefaultTitle:
+          tx(
+            'principlesPage.importTextDefaultTitle',
+            'Nouvelle étude'
+          ),
+
+        importTextBodyPlaceholder:
+          tx(
+            'principlesPage.importTextBodyPlaceholder',
+            'Collez votre texte ici…'
+          ),
+
+        importTextNoBody:
+          tx(
+            'principlesPage.importTextNoBody',
+            'Veuillez saisir du texte.'
+          ),
+
+        importTextNoBlock:
+          tx(
+            'principlesPage.importTextNoBlock',
+            'Aucun bloc de texte trouvé.'
+          ),
+
+        importTextSplitLabel:
+          tx(
+            'principlesPage.importTextSplitLabel',
+            'Séparer les paragraphes en plusieurs blocs'
+          ),
+
+        importTextInfo:
+          tx(
+            'principlesPage.importTextInfo',
+            'Les paragraphes séparés par une ligne vide peuvent être créés comme blocs distincts.'
+          ),
+
+        importTextCreate:
+          tx(
+            'principlesPage.importTextCreate',
+            'Créer l’étude'
+          ),
+
+        duplicateTitle:
+          tx(
+            'principlesPage.duplicateTitle',
+            'Une étude porte déjà ce nom.'
+          ),
+
+        confirmDeleteList:
+          tx(
+            'principlesPage.confirmDeleteList',
+            'Supprimer cette étude ?'
+          ),
+
+        emptyList:
+          tx(
+            'principlesPage.emptyList',
+            'Cette étude est vide.'
+          ),
+
+        importFromTextTitle:
+          tx(
+            'principlesPage.importFromTextTitle',
+            'Importer un texte'
+          ),
+
+        documentContent:
+          tx(
+            'principlesPage.documentContent',
+            'Contenu'
+          ),
+
+        rename:
+          tx(
+            'principlesPage.renameList',
+            'Renommer'
+          ),
+
+        share:
+          tx(
+            'shareLabel',
+            'Partager'
+          ),
+
+        copy:
+          tx(
+            'copyLabel',
+            'Copier'
+          ),
+
+        actions:
+          tx(
+            'actions',
+            'Actions'
+          ),
+      }),
+      [t, language]
+    );
+
+  const secondaryButton =
+    isDark
+      ? `
+        bg-gray-700
+        text-white
+        border-gray-600
+        hover:bg-gray-600
+      `
+      : `
+        bg-gray-100
+        text-gray-800
+        border-gray-200
+        hover:bg-gray-200
+      `;
+
+  const menuSurface =
+    isDark
+      ? `
+        bg-gray-800
+        border-gray-600
+        text-white
+      `
+      : `
+        bg-white
+        border-gray-200
+        text-gray-900
+      `;
+
+  const refresh =
+    () => {
+      const sorted =
+        [...p_getAll()]
+          .sort(
+            (a, b) => {
+              const first =
+                (
+                  a.title ||
+                  ''
+                ).trim();
+
+              const second =
+                (
+                  b.title ||
+                  ''
+                ).trim();
+
+              const compare =
+                first.localeCompare(
+                  second,
+                  undefined,
+                  {
+                    sensitivity:
+                      'base',
+                  }
+                );
+
+              if (
+                compare !== 0
+              ) {
+                return compare;
+              }
+
+              return String(
+                a.id
+              ).localeCompare(
+                String(b.id)
+              );
+            }
+          );
+
+      setLists(sorted);
+    };
 
   useEffect(() => {
     refresh();
   }, []);
 
   useEffect(() => {
-    if (expandedId) setShouldScrollToLast(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (expandedId) {
+      setShouldScrollToLast(
+        true
+      );
+    }
   }, []);
 
-  // mémoriser / nettoyer la dernière étude ouverte (Lecture ↔ Études)
   useEffect(() => {
     try {
-      if (expandedId) window.localStorage.setItem(LAST_LIST_STORAGE_KEY, expandedId);
-      else window.localStorage.removeItem(LAST_LIST_STORAGE_KEY);
-    } catch {}
+      if (expandedId) {
+        localStorage.setItem(
+          LAST_LIST_STORAGE_KEY,
+          expandedId
+        );
+      } else {
+        localStorage.removeItem(
+          LAST_LIST_STORAGE_KEY
+        );
+      }
+    } catch {
+      // ignore
+    }
   }, [expandedId]);
 
-  // si la liste mémorisée n'existe plus (supprimée), on nettoie l'état
   useEffect(() => {
-    if (!expandedId) return;
-    if (!lists.length) return;
-    if (!lists.some((l) => l.id === expandedId)) setExpandedId(null);
-  }, [lists, expandedId]);
-
-  // quand une liste restaurée est ouverte, descendre automatiquement sur le dernier élément
-  useEffect(() => {
-    if (!expandedId || !shouldScrollToLast) return;
-    const list = lists.find((l) => l.id === expandedId);
-    if (!list || !list.items.length) {
-      setShouldScrollToLast(false);
+    if (
+      !expandedId ||
+      !lists.length
+    ) {
       return;
     }
 
-    const lastIdx = list.items.length - 1;
-    const el = document.getElementById(`principle-item-${expandedId}-${lastIdx}`);
-    if (el && 'scrollIntoView' in el) (el as HTMLElement).scrollIntoView({ block: 'center', behavior: 'auto' });
-    setShouldScrollToLast(false);
-  }, [lists, expandedId, shouldScrollToLast]);
+    const exists =
+      lists.some(
+        (list) =>
+          list.id ===
+          expandedId
+      );
 
-  // synchroniser la valeur de la modale d'édition avec le bloc courant
+    if (!exists) {
+      setExpandedId(null);
+    }
+  }, [
+    lists,
+    expandedId,
+  ]);
+
   useEffect(() => {
-    if (editingTextBlock) setEditingTextValue(editingTextBlock.initialValue ?? '');
-    else setEditingTextValue('');
+    if (
+      !expandedId ||
+      !shouldScrollToLast
+    ) {
+      return;
+    }
+
+    const list =
+      lists.find(
+        (item) =>
+          item.id ===
+          expandedId
+      );
+
+    if (
+      !list ||
+      !list.items.length
+    ) {
+      setShouldScrollToLast(
+        false
+      );
+
+      return;
+    }
+
+    const idx =
+      list.items.length - 1;
+
+    const element =
+      document.getElementById(
+        `principle-item-${expandedId}-${idx}`
+      );
+
+    if (element) {
+      element.scrollIntoView({
+        block: 'center',
+        behavior: 'auto',
+      });
+    }
+
+    setShouldScrollToLast(
+      false
+    );
+  }, [
+    lists,
+    expandedId,
+    shouldScrollToLast,
+  ]);
+
+  useEffect(() => {
+    if (
+      editingTextBlock
+    ) {
+      setEditingTextValue(
+        editingTextBlock.initialValue ??
+          ''
+      );
+    } else {
+      setEditingTextValue('');
+    }
   }, [editingTextBlock]);
 
-  const doCreate = () => {
-    const title = prompt(label.placeholder) ?? '';
-    const trimmed = title.trim();
-    if (!trimmed) return;
+  useEffect(() => {
+    setShowMainMenu(false);
+    setOpenListMenu(null);
+    setOpenItemMenu(null);
+  }, [expandedId]);
 
-    const exists = p_getAllLists().find((l) => (l.title || '').trim().toLowerCase() === trimmed.toLowerCase());
-    if (exists) {
-      alert(label.duplicateTitle);
-      setExpandedId(exists.id);
+  /*
+   * CRÉER
+   */
+
+  const doCreate =
+    () => {
+      const title =
+        prompt(
+          label.placeholder
+        ) ?? '';
+
+      const trimmed =
+        title.trim();
+
+      if (!trimmed) {
+        return;
+      }
+
+      const exists =
+        p_getAll().find(
+          (list) =>
+            (
+              list.title ||
+              ''
+            )
+              .trim()
+              .toLowerCase() ===
+            trimmed.toLowerCase()
+        );
+
+      if (exists) {
+        alert(
+          label.duplicateTitle
+        );
+
+        setExpandedId(
+          exists.id
+        );
+
+        return;
+      }
+
+      const created =
+        p_create(
+          trimmed
+        );
+
+      refresh();
+
+      setExpandedId(
+        created.id
+      );
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'auto',
+      });
+    };
+
+  /*
+   * RENOMMER
+   */
+
+  const doRename = (
+    id: string,
+    current: string
+  ) => {
+    setOpenListMenu(null);
+
+    const title =
+      prompt(
+        label.placeholder,
+        current
+      ) ?? '';
+
+    const trimmed =
+      title.trim();
+
+    if (!trimmed) {
       return;
     }
-    const created = p_createList(trimmed);
-    refresh();
-    setExpandedId(created.id);
-    try {
-      window.scrollTo({ top: 0, behavior: 'auto' });
-    } catch {}
-  };
 
-  const doRename = (id: string, current: string) => {
-    const title = prompt(label.placeholder, current) ?? '';
-    const trimmed = title.trim();
-    if (!trimmed) return;
-    const exists = p_getAllLists().find(
-      (l) => l.id !== id && (l.title || '').trim().toLowerCase() === trimmed.toLowerCase()
+    const exists =
+      p_getAll().find(
+        (list) =>
+          list.id !== id &&
+          (
+            list.title ||
+            ''
+          )
+            .trim()
+            .toLowerCase() ===
+            trimmed.toLowerCase()
+      );
+
+    if (exists) {
+      alert(
+        label.duplicateTitle
+      );
+
+      return;
+    }
+
+    p_rename(
+      id,
+      trimmed
     );
-    if (exists) {
-      alert(label.duplicateTitle);
+
+    refresh();
+  };
+
+  /*
+   * SUPPRIMER ÉTUDE
+   */
+
+  const doDelete = (
+    id: string
+  ) => {
+    setOpenListMenu(null);
+
+    if (
+      !confirm(
+        label.confirmDeleteList
+      )
+    ) {
       return;
     }
-    p_renameList(id, trimmed);
+
+    p_delete(id);
+
     refresh();
+
+    if (
+      expandedId === id
+    ) {
+      setExpandedId(null);
+    }
   };
 
-  const doDelete = (id: string) => {
-    if (!confirm(label.confirmDeleteList)) return;
-    p_deleteList(id);
-    refresh();
-    if (expandedId === id) setExpandedId(null);
-  };
+  /*
+   * PARTAGE
+   */
 
-  // Réordonner les Études (monter / descendre)
-  const moveList = (id: string, dir: -1 | 1) => {
-    setLists((current) => {
-      const arr = [...current];
-      const index = arr.findIndex((l) => l.id === id);
-      if (index === -1) return current;
+  const doShare =
+    async (
+      id: string
+    ) => {
+      setOpenListMenu(null);
 
-      const target = index + dir;
-      if (target < 0 || target >= arr.length) return current;
+      const list =
+        p_getById(id);
 
-      const [moved] = arr.splice(index, 1);
-      arr.splice(target, 0, moved);
+      if (!list) {
+        return;
+      }
+
+      const payload =
+`${buildPlainListText(list)}
+
+Découvrir l’application The Word :
+https://www.theword.fr/#about`;
 
       try {
-        if (typeof window !== 'undefined') {
-          const order = arr.map((l) => l.id);
-          window.localStorage.setItem(LIST_ORDER_STORAGE_KEY, JSON.stringify(order));
+        const nav: any =
+          navigator;
+
+        if (nav?.share) {
+          await nav.share({
+            title:
+              list.title ||
+              label.title,
+
+            text: payload,
+          });
+        } else {
+          await navigator.clipboard.writeText(
+            payload
+          );
+
+          setToast(
+            `${tx(
+              'textReadyToShare',
+              'Texte prêt à partager'
+            )} ✅`
+          );
         }
-      } catch {}
-
-      return arr;
-    });
-  };
-
-  // Partage au même format que "Copier", avec lien en plus
-  const doShare = async (id: string) => {
-    const list = p_getListById(id);
-    if (!list) return;
-
-    const payload = `${buildPlainListText(list)}
-
-Découvrir l’application The Word :
-https://www.theword.fr/#about`;
-
-    try {
-      const nav: any = navigator;
-      if (nav?.share) await nav.share({ title: list.title || label.title, text: payload });
-      else {
-        await navigator.clipboard.writeText(payload);
-        showToast(t('textReadyToShare') + ' ✅');
+      } catch {
+        // annulation
       }
-    } catch {}
-  };
+    };
 
-  const copyListText = async (id: string) => {
-    const list = p_getListById(id);
-    if (!list) return;
-    const txt = buildPlainListText(list);
-    try {
-      await navigator.clipboard.writeText(txt);
-      showToast(label.copied + ' ✅');
-    } catch {}
-  };
+  const copyListText =
+    async (
+      id: string
+    ) => {
+      setOpenListMenu(null);
 
-  // --- Partage / import PAR CODE (type "principle") ---
-  const doShareCode = async (id: string) => {
-    const list = p_getListById(id);
-    if (!list) return;
-    const code = encodeSharedList('principle', list);
-    try {
-      await navigator.clipboard.writeText(code);
-      showToast(label.shareCodeCopied);
-    } catch {
-      prompt(label.shareCode, code);
-    }
-  };
+      const list =
+        p_getById(id);
 
-  const doImportFromCode = () => {
-    const code = prompt(label.importPrompt) ?? '';
-    const trimmed = code.trim();
-    if (!trimmed) return;
-
-    const payload = decodeSharedList(trimmed.replace(/\s+/g, ''));
-    if (!payload) {
-      alert(label.importError);
-      return;
-    }
-
-    const title = payload.title?.trim() || label.importTextDefaultTitle;
-
-    const created = p_createList(title);
-    p_setListItems(created.id, (payload.items || []) as VerseRef[]);
-    refresh();
-    setExpandedId(created.id);
-    alert(label.importSuccess);
-    try {
-      window.scrollTo({ top: 0, behavior: 'auto' });
-    } catch {}
-  };
-
-  // --- Import direct depuis un TEXTE ---
-  const openImportFromText = () => {
-    setImportTextTitle('');
-    setImportTextBody('');
-    setImportSplitBlocks(true);
-    setShowImportFromText(true);
-  };
-
-  const handleCreateFromText = () => {
-    const title = (importTextTitle || '').trim() || label.importTextDefaultTitle;
-    const raw = (importTextBody || '').trim();
-
-    if (!raw) {
-      alert(label.importTextNoBody);
-      return;
-    }
-
-    const blocks = importSplitBlocks ? splitIntoBlocks(raw) : [raw];
-    if (blocks.length === 0) {
-      alert(label.importTextNoBlock);
-      return;
-    }
-
-    const items: AnyItem[] = blocks.map((text) => ({
-      bookId: TEXT_SENTINEL,
-      bookName: '',
-      chapter: 0,
-      verse: 0,
-      text,
-      translation: state.settings.language,
-      kind: 'text',
-    }));
-
-    const created = p_createList(title);
-    p_setListItems(created.id, items as VerseRef[]);
-    refresh();
-    setExpandedId(created.id);
-    setShowImportFromText(false);
-    try {
-      window.scrollTo({ top: 0, behavior: 'auto' });
-    } catch {}
-  };
-
-  // --- opérations de copie/partage pour UN élément (verset OU bloc texte) ---
-  const copyItemText = async (it: AnyItem) => {
-    const txt = buildItemPlainText(it);
-    if (!txt) return;
-    try {
-      await navigator.clipboard.writeText(txt);
-      showToast(label.copied + ' ✅');
-    } catch {}
-  };
-
-  const shareItem = async (it: AnyItem) => {
-    const payload = `${buildItemPlainText(it)}
-
-Découvrir l’application The Word :
-https://www.theword.fr/#about`;
-
-    try {
-      const nav: any = navigator;
-      if (nav?.share) await nav.share({ title: t('verseWord'), text: payload });
-      else {
-        await navigator.clipboard.writeText(payload);
-        showToast(t('textReadyToShare') + ' ✅');
+      if (!list) {
+        return;
       }
-    } catch {}
-  };
 
-  // ---------- opérations sur items ----------
-  const updateItems = (listId: string, updater: (items: AnyItem[]) => AnyItem[]) => {
-    const list = p_getListById(listId);
-    if (!list) return;
-    const next = updater((list.items as AnyItem[]) ?? []);
-    try {
-      p_setListItems(listId, next as VerseRef[]);
+      try {
+        await navigator.clipboard.writeText(
+          buildPlainListText(
+            list
+          )
+        );
+
+        setToast(
+          `${label.copied} ✅`
+        );
+      } catch {
+        // ignore
+      }
+    };
+
+  const doShareCode =
+    async (
+      id: string
+    ) => {
+      setOpenListMenu(null);
+
+      const list =
+        p_getById(id);
+
+      if (!list) {
+        return;
+      }
+
+      const code =
+        encodeSharedList(
+          'principle',
+          list
+        );
+
+      try {
+        await navigator.clipboard.writeText(
+          code
+        );
+
+        setToast(
+          label.shareCodeCopied
+        );
+      } catch {
+        prompt(
+          label.shareCode,
+          code
+        );
+      }
+    };
+
+  /*
+   * IMPORT CODE
+   */
+
+  const doImportFromCode =
+    () => {
+      setShowMainMenu(false);
+
+      const code =
+        prompt(
+          label.importPrompt
+        ) ?? '';
+
+      const trimmed =
+        code.trim();
+
+      if (!trimmed) {
+        return;
+      }
+
+      const payload =
+        decodeSharedList(
+          trimmed
+        );
+
+      if (!payload) {
+        alert(
+          label.importError
+        );
+
+        return;
+      }
+
+      const title =
+        payload.title
+          ?.trim() ||
+        label.importTextDefaultTitle;
+
+      const created =
+        p_create(title);
+
+      p_setItems(
+        created.id,
+        (
+          payload.items ||
+          []
+        ) as VerseRef[]
+      );
+
       refresh();
-    } catch (e) {
-      console.error('setListItems error', e);
+
+      setExpandedId(
+        created.id
+      );
+
+      setToast(
+        label.importSuccess
+      );
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'auto',
+      });
+    };
+
+  /*
+   * IMPORT TEXTE
+   */
+
+  const openImportFromText =
+    () => {
+      setShowMainMenu(false);
+
+      setImportTextTitle('');
+      setImportTextBody('');
+      setImportSplitBlocks(
+        true
+      );
+
+      setShowImportFromText(
+        true
+      );
+    };
+
+  const handleCreateFromText =
+    () => {
+      const title =
+        (
+          importTextTitle ||
+          ''
+        ).trim() ||
+        label.importTextDefaultTitle;
+
+      const raw =
+        (
+          importTextBody ||
+          ''
+        ).trim();
+
+      if (!raw) {
+        alert(
+          label.importTextNoBody
+        );
+
+        return;
+      }
+
+      const blocks =
+        importSplitBlocks
+          ? splitIntoBlocks(
+              raw
+            )
+          : [raw];
+
+      if (
+        blocks.length === 0
+      ) {
+        alert(
+          label.importTextNoBlock
+        );
+
+        return;
+      }
+
+      const items:
+        AnyItem[] =
+        blocks.map(
+          (text) => ({
+            bookId:
+              TEXT_SENTINEL,
+
+            bookName: '',
+
+            chapter: 0,
+
+            verse: 0,
+
+            text,
+
+            translation:
+              state.settings
+                .language,
+
+            kind: 'text',
+          })
+        );
+
+      const created =
+        p_create(title);
+
+      p_setItems(
+        created.id,
+        items as VerseRef[]
+      );
+
+      refresh();
+
+      setExpandedId(
+        created.id
+      );
+
+      setShowImportFromText(
+        false
+      );
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'auto',
+      });
+    };
+
+  /*
+   * ITEMS
+   */
+
+  const updateItems = (
+    listId: string,
+    updater: (
+      items: AnyItem[]
+    ) => AnyItem[]
+  ) => {
+    const list =
+      p_getById(listId);
+
+    if (!list) {
+      return;
     }
+
+    const next =
+      updater(
+        (
+          list.items as AnyItem[]
+        ) ?? []
+      );
+
+    p_setItems(
+      listId,
+      next as VerseRef[]
+    );
+
+    refresh();
   };
 
-  const removeItem = (listId: string, idx: number) => {
-    if (!confirm(label.confirmDeleteItem)) return;
-    updateItems(listId, (items) => {
-      const arr = [...items];
-      if (idx >= 0 && idx < arr.length) arr.splice(idx, 1);
-      return arr;
-    });
+  const removeItem = (
+    listId: string,
+    idx: number
+  ) => {
+    if (
+      !confirm(
+        label.confirmDeleteItem
+      )
+    ) {
+      return;
+    }
+
+    updateItems(
+      listId,
+      (items) => {
+        const array =
+          [...items];
+
+        if (
+          idx >= 0 &&
+          idx <
+            array.length
+        ) {
+          array.splice(
+            idx,
+            1
+          );
+        }
+
+        return array;
+      }
+    );
+
     setOpenItemMenu(null);
   };
 
-  const moveItem = (listId: string, idx: number, dir: -1 | 1) => {
-    updateItems(listId, (items) => {
-      const arr = [...items];
-      const to = Math.max(0, Math.min(arr.length - 1, idx + dir));
-      if (to === idx) return arr;
-      const [moved] = arr.splice(idx, 1);
-      arr.splice(to, 0, moved);
-      return arr;
-    });
-    setOpenItemMenu((prev) => {
-      if (!prev) return null;
-      if (prev.listId !== listId) return prev;
-      return { listId, idx: Math.max(0, prev.idx + dir) };
-    });
+  const moveItem = (
+    listId: string,
+    idx: number,
+    dir: -1 | 1
+  ) => {
+    updateItems(
+      listId,
+      (items) => {
+        const array =
+          [...items];
+
+        const target =
+          Math.max(
+            0,
+            Math.min(
+              array.length - 1,
+              idx + dir
+            )
+          );
+
+        if (
+          target === idx
+        ) {
+          return array;
+        }
+
+        const [moved] =
+          array.splice(
+            idx,
+            1
+          );
+
+        array.splice(
+          target,
+          0,
+          moved
+        );
+
+        return array;
+      }
+    );
+
+    setOpenItemMenu(
+      (previous) => {
+        if (
+          !previous ||
+          previous.listId !==
+            listId
+        ) {
+          return previous;
+        }
+
+        return {
+          listId,
+
+          idx:
+            Math.max(
+              0,
+              previous.idx +
+                dir
+            ),
+        };
+      }
+    );
   };
 
-  // Ouverture d'un nouveau bloc texte (par défaut : en fin de liste)
-  const addTextBlock = (listId: string) => {
+  /*
+   * TEXTE
+   */
+
+  const addTextBlock = (
+    listId: string
+  ) => {
+    setOpenListMenu(null);
+
     setEditingTextBlock({
       listId,
+
       idx: null,
+
       initialValue: '',
+
       insertAt: null,
     });
   };
 
-  // Insérer un nouveau bloc texte à une position précise (ex: entre 2 items)
-  const insertTextBlockAt = (listId: string, insertAt: number) => {
-    setEditingTextBlock({
-      listId,
-      idx: null,
-      initialValue: '',
-      insertAt,
-    });
-  };
+  const insertTextBlockAt =
+    (
+      listId: string,
+      insertAt: number
+    ) => {
+      setOpenItemMenu(null);
 
-  // Édition d'un bloc texte existant
-  const editTextBlock = (listId: string, idx: number, currentText: string) => {
+      setEditingTextBlock({
+        listId,
+
+        idx: null,
+
+        initialValue: '',
+
+        insertAt,
+      });
+    };
+
+  const editTextBlock = (
+    listId: string,
+    idx: number,
+    currentText: string
+  ) => {
+    setOpenItemMenu(null);
+
     setEditingTextBlock({
       listId,
+
       idx,
-      initialValue: currentText || '',
+
+      initialValue:
+        currentText || '',
     });
   };
 
-  const handleSaveTextBlock = () => {
-    if (!editingTextBlock) return;
-    const raw = editingTextValue;
-    if (!raw.trim()) {
-      setEditingTextBlock(null);
+  const handleSaveTextBlock =
+    () => {
+      if (
+        !editingTextBlock
+      ) {
+        return;
+      }
+
+      const raw =
+        editingTextValue;
+
+      if (!raw.trim()) {
+        setEditingTextBlock(
+          null
+        );
+
+        return;
+      }
+
+      if (
+        editingTextBlock.idx ===
+        null
+      ) {
+        updateItems(
+          editingTextBlock.listId,
+
+          (items) => {
+            const array =
+              [...items];
+
+            const newItem:
+              AnyItem = {
+              bookId:
+                TEXT_SENTINEL,
+
+              bookName: '',
+
+              chapter: 0,
+
+              verse: 0,
+
+              text: raw,
+
+              translation:
+                state.settings
+                  .language,
+
+              kind: 'text',
+            };
+
+            const insertAt =
+              typeof editingTextBlock
+                .insertAt ===
+              'number'
+                ? Math.max(
+                    0,
+                    Math.min(
+                      array.length,
+                      editingTextBlock
+                        .insertAt
+                    )
+                  )
+                : null;
+
+            if (
+              insertAt === null
+            ) {
+              array.push(
+                newItem
+              );
+            } else {
+              array.splice(
+                insertAt,
+                0,
+                newItem
+              );
+            }
+
+            return array;
+          }
+        );
+      } else {
+        const idx =
+          editingTextBlock.idx;
+
+        updateItems(
+          editingTextBlock.listId,
+
+          (items) => {
+            const array =
+              [...items];
+
+            if (
+              idx < 0 ||
+              idx >=
+                array.length
+            ) {
+              return array;
+            }
+
+            array[idx] = {
+              ...array[idx],
+
+              text: raw,
+            };
+
+            return array;
+          }
+        );
+      }
+
+      setEditingTextBlock(
+        null
+      );
+    };
+
+  /*
+   * COPIE / PARTAGE ITEM
+   */
+
+  const copyItemText =
+    async (
+      item: AnyItem
+    ) => {
+      const text =
+        buildItemPlainText(
+          item
+        );
+
+      if (!text) {
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(
+          text
+        );
+
+        setToast(
+          `${label.copied} ✅`
+        );
+
+        setOpenItemMenu(
+          null
+        );
+      } catch {
+        // ignore
+      }
+    };
+
+  const shareItem =
+    async (
+      item: AnyItem
+    ) => {
+      const payload =
+`${buildItemPlainText(item)}
+
+Découvrir l’application The Word :
+https://www.theword.fr/#about`;
+
+      try {
+        const nav: any =
+          navigator;
+
+        if (nav?.share) {
+          await nav.share({
+            title:
+              tx(
+                'verseWord',
+                'Verset'
+              ),
+
+            text: payload,
+          });
+        } else {
+          await navigator.clipboard.writeText(
+            payload
+          );
+
+          setToast(
+            `${tx(
+              'textReadyToShare',
+              'Texte prêt à partager'
+            )} ✅`
+          );
+        }
+
+        setOpenItemMenu(
+          null
+        );
+      } catch {
+        // annulation
+      }
+    };
+
+  /*
+   * OUVRIR LECTURE
+   */
+
+  const openInReading = (
+    item: AnyItem
+  ) => {
+    if (
+      item.bookId ===
+      TEXT_SENTINEL
+    ) {
       return;
     }
 
-    if (editingTextBlock.idx === null) {
-      updateItems(editingTextBlock.listId, (items) => {
-        const arr = [...items];
-        const newItem: AnyItem = {
-          bookId: TEXT_SENTINEL,
-          bookName: '',
-          chapter: 0,
-          verse: 0,
-          text: raw,
-          translation: state.settings.language,
-          kind: 'text',
-        };
+    const url =
+      new URL(
+        window.location.href
+      );
 
-        const insertAt =
-          typeof editingTextBlock.insertAt === 'number'
-            ? Math.max(0, Math.min(arr.length, editingTextBlock.insertAt))
-            : null;
+    url.searchParams.set(
+      'b',
+      item.bookId
+    );
 
-        if (insertAt === null) arr.push(newItem);
-        else arr.splice(insertAt, 0, newItem);
+    url.searchParams.set(
+      'c',
+      String(
+        item.chapter
+      )
+    );
 
-        return arr;
-      });
-    } else {
-      const idx = editingTextBlock.idx;
-      updateItems(editingTextBlock.listId, (items) => {
-        const arr = [...items];
-        if (idx < 0 || idx >= arr.length) return arr;
-        const prev = (arr[idx] || {}) as AnyItem;
-        arr[idx] = { ...prev, text: raw } as AnyItem;
-        return arr;
-      });
-    }
+    url.searchParams.set(
+      'v',
+      String(
+        item.verse
+      )
+    );
 
-    setEditingTextBlock(null);
+    window.history.replaceState(
+      {},
+      '',
+      url.toString()
+    );
+
+    setOpenItemMenu(null);
+
+    setPage('reading');
   };
 
-  // quand une liste est ouverte, n'afficher qu'elle
-  const shownLists = expandedId ? lists.filter((l) => l.id === expandedId) : lists;
+  const shownLists =
+    expandedId
+      ? lists.filter(
+          (list) =>
+            list.id ===
+            expandedId
+        )
+      : lists;
 
-  // format date simple
-  const formatDate = (d: string | number | Date) =>
-    new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' });
+  const formatDate = (
+    date:
+      | string
+      | number
+      | Date
+  ) =>
+    new Date(
+      date
+    ).toLocaleDateString(
+      undefined,
+      {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }
+    );
 
   return (
-    <div className={`min-h-[100svh] ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* HEADER */}
+    <div
+      className={`
+        min-h-[100svh]
+
+        ${
+          isDark
+            ? 'bg-gray-900'
+            : 'bg-gray-50'
+        }
+      `}
+    >
+      <div className="container mx-auto px-4 py-6 md:py-8 max-w-4xl">
+
+        {/* =========================
+            TITRE
+        ========================== */}
+
         <div className="mb-6">
           <div className="flex items-center justify-between gap-3">
             <h1
-              className={`text-2xl md:text-3xl font-bold ${
-                isDark ? 'text-white' : 'text-gray-800'
-              } flex items-center gap-2`}
+              className={`
+                text-2xl
+                md:text-3xl
+                font-bold
+                flex
+                items-center
+                gap-2
+
+                ${
+                  isDark
+                    ? 'text-white'
+                    : 'text-gray-800'
+                }
+              `}
             >
-              <ListIcon className="w-6 h-6" />
+              <BookMarked className="w-6 h-6" />
+
               {label.title}
             </h1>
 
-            {/* Bouton aide / mode d'emploi Études */}
             <button
               type="button"
-              aria-label="Aide sur la page Études"
-              title="Aide / Mode d'emploi"
-              onClick={() => setShowHelp(true)}
-              className={`inline-flex items-center justify-center rounded-full p-2 border text-sm ${
-                isDark
-                  ? 'border-gray-600 text-gray-200 hover:border-indigo-400 hover:text-white'
-                  : 'border-gray-300 text-gray-600 hover:border-indigo-500 hover:text-gray-900'
-              }`}
+              aria-label="Aide"
+              title="Aide"
+              onClick={() =>
+                setShowHelp(true)
+              }
+              className={`
+                inline-flex
+                items-center
+                justify-center
+                rounded-full
+                p-2.5
+                border
+                transition-colors
+
+                ${
+                  isDark
+                    ? `
+                      border-gray-600
+                      text-gray-200
+                      hover:bg-gray-800
+                      hover:border-blue-500
+                    `
+                    : `
+                      border-gray-300
+                      text-gray-600
+                      hover:bg-gray-100
+                      hover:border-blue-500
+                    `
+                }
+              `}
             >
               <HelpCircle className="w-5 h-5" />
             </button>
           </div>
 
+          {/* =======================
+              PRINCIPAL
+          ======================== */}
+
           {!expandedId && (
-            <div className="mt-4 space-y-2">
-              {/* Gros bouton : créer une étude (VERT) */}
+            <div className="mt-5 flex items-center gap-2">
               <button
+                type="button"
                 onClick={doCreate}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 text-white font-semibold text-sm shadow hover:bg-emerald-500 active:scale-[0.98]"
+                className="
+                  flex-1
+                  sm:flex-none
+                  inline-flex
+                  items-center
+                  justify-center
+                  gap-2
+                  px-4
+                  py-2.5
+                  rounded-xl
+                  bg-blue-700
+                  text-white
+                  font-semibold
+                  text-sm
+                  shadow-sm
+                  hover:bg-blue-600
+                  active:scale-[0.98]
+                  transition
+                "
               >
                 <Plus size={18} />
+
                 {label.create}
               </button>
 
-              {/* Boutons secondaires à droite */}
-              <div className="flex flex-wrap items-center justify-end gap-2">
+              <div className="relative">
                 <button
-                  onClick={openImportFromText}
-                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
-                    isDark ? 'border-gray-500 text-gray-100 bg-gray-900' : 'border-gray-300 text-gray-800 bg-white'
-                  }`}
+                  type="button"
+                  aria-label="Autres options"
+                  title="Autres options"
+                  aria-expanded={
+                    showMainMenu
+                  }
+                  onClick={() =>
+                    setShowMainMenu(
+                      (value) =>
+                        !value
+                    )
+                  }
+                  className={`
+                    h-11
+                    w-11
+                    inline-flex
+                    items-center
+                    justify-center
+                    rounded-xl
+                    border
+                    transition-colors
+
+                    ${secondaryButton}
+                  `}
                 >
-                  <TextIcon size={14} />
-                  {label.importTextButton}
+                  <MoreVertical
+                    size={20}
+                  />
                 </button>
 
-                <button
-                  onClick={doImportFromCode}
-                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${
-                    isDark ? 'border-gray-500 text-gray-100 bg-gray-900' : 'border-gray-300 text-gray-800 bg-white'
-                  }`}
-                >
-                  <Copy size={14} />
-                  {label.importCode}
-                </button>
+                {showMainMenu && (
+                  <div
+                    className={`
+                      absolute
+                      right-0
+                      top-12
+                      z-30
+                      w-64
+                      rounded-xl
+                      border
+                      shadow-xl
+                      overflow-hidden
+
+                      ${menuSurface}
+                    `}
+                  >
+                    <button
+                      type="button"
+                      onClick={
+                        openImportFromText
+                      }
+                      className={`
+                        w-full
+                        flex
+                        items-center
+                        gap-3
+                        px-4
+                        py-3
+                        text-left
+                        text-sm
+
+                        ${
+                          isDark
+                            ? 'hover:bg-gray-700'
+                            : 'hover:bg-gray-100'
+                        }
+                      `}
+                    >
+                      <TextIcon
+                        size={18}
+                      />
+
+                      {
+                        label.importTextButton
+                      }
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={
+                        doImportFromCode
+                      }
+                      className={`
+                        w-full
+                        flex
+                        items-center
+                        gap-3
+                        px-4
+                        py-3
+                        text-left
+                        text-sm
+
+                        ${
+                          isDark
+                            ? 'hover:bg-gray-700'
+                            : 'hover:bg-gray-100'
+                        }
+                      `}
+                    >
+                      <Copy
+                        size={18}
+                      />
+
+                      {
+                        label.importCode
+                      }
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
         </div>
 
+        {/* =========================
+            BARRE ÉTUDE OUVERTE
+        ========================== */}
+
         {expandedId && (
-          <div className="mb-4 flex flex-col sm:flex-row sm:items-center gap-2">
-            {/* Bouton retour : vert */}
+          <div
+            className={`
+              mb-4
+              flex
+              items-center
+              gap-2
+              p-2
+              rounded-xl
+              border
+
+              ${
+                isDark
+                  ? `
+                    bg-gray-800/60
+                    border-gray-700
+                  `
+                  : `
+                    bg-white
+                    border-gray-200
+                  `
+              }
+            `}
+          >
             <button
-              onClick={() => setExpandedId(null)}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-500"
+              type="button"
+              onClick={() =>
+                setExpandedId(
+                  null
+                )
+              }
+              className={`
+                px-3
+                py-2
+                rounded-lg
+                text-sm
+                font-medium
+                border
+
+                ${secondaryButton}
+              `}
             >
               {label.backAll}
             </button>
 
-            {/* Ajouter un bloc de texte : bleu, comme Notes */}
             <button
-              onClick={() => expandedId && addTextBlock(expandedId)}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 text-sm"
+              type="button"
+              onClick={() =>
+                expandedId &&
+                addTextBlock(
+                  expandedId
+                )
+              }
+              className="
+                flex-1
+                sm:flex-none
+                inline-flex
+                items-center
+                justify-center
+                gap-2
+                px-3
+                py-2
+                rounded-lg
+                bg-blue-700
+                text-white
+                hover:bg-blue-600
+                text-sm
+                font-medium
+              "
             >
-              <TextIcon size={16} />
+              <TextIcon
+                size={16}
+              />
+
               {label.addTextBlock}
             </button>
           </div>
         )}
 
-        {shownLists.length === 0 ? (
-          <div className={`${isDark ? 'text-white/80' : 'text-gray-600'} text-center py-16`}>{label.empty}</div>
+        {/* =========================
+            ÉTUDES
+        ========================== */}
+
+        {shownLists.length ===
+        0 ? (
+          <div
+            className={`
+              text-center
+              py-16
+
+              ${
+                isDark
+                  ? 'text-white/80'
+                  : 'text-gray-600'
+              }
+            `}
+          >
+            {label.empty}
+          </div>
         ) : (
           <div className="space-y-4">
-            {shownLists.map((list) => {
-              const isOpen = expandedId === list.id;
-              const listIndex = lists.findIndex((l) => l.id === list.id);
-              const canMoveUp = listIndex > 0;
-              const canMoveDown = listIndex !== -1 && listIndex < lists.length - 1;
+            {shownLists.map(
+              (list) => {
+                const isOpen =
+                  expandedId ===
+                  list.id;
 
-              return (
-                <div
-                  key={list.id}
-                  onClick={
-                    !isOpen
-                      ? () => {
-                          setOpenItemMenu(null);
-                          setExpandedId(list.id);
-                          try {
-                            window.scrollTo({ top: 0, behavior: 'auto' });
-                          } catch {}
+                const listMenuOpen =
+                  openListMenu ===
+                  list.id;
+
+                return (
+                  <div
+                    key={list.id}
+                    className={`
+                      rounded-xl
+                      border
+                      shadow-sm
+
+                      ${
+                        isDark
+                          ? `
+                            bg-gray-800
+                            border-gray-700
+                            text-white
+                          `
+                          : `
+                            bg-white
+                            border-gray-200
+                            text-gray-800
+                          `
+                      }
+                    `}
+                  >
+                    <div className="relative flex items-start gap-3 p-4">
+                      <button
+                        type="button"
+                        onClick={
+                          !isOpen
+                            ? () => {
+                                setOpenItemMenu(
+                                  null
+                                );
+
+                                setExpandedId(
+                                  list.id
+                                );
+
+                                window.scrollTo(
+                                  {
+                                    top: 0,
+                                    behavior:
+                                      'auto',
+                                  }
+                                );
+                              }
+                            : undefined
                         }
-                      : undefined
-                  }
-                  className={`${isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} rounded-xl shadow p-4 ${
-                    !isOpen ? 'cursor-pointer' : ''
-                  }`}
-                  role={!isOpen ? 'button' : undefined}
-                  aria-expanded={isOpen}
-                  style={{ WebkitTapHighlightColor: 'transparent' }}
-                >
-                  {/* Titre + infos + (optionnel) boutons de réorganisation de liste */}
-                  <div className="min-w-0 flex items-start justify-between gap-3">
-                    <div>
-                      <div className="text-xl md:text-xl font-semibold leading-snug whitespace-normal break-words">
-                        {list.title}
-                      </div>
-                      <div className={`mt-1 text-xs ${isDark ? 'text-white/60' : 'text-gray-500'}`}>
-                        {list.items.length} {label.verses} • {formatDate(list.updatedAt)}
-                      </div>
+                        className={`
+                          flex-1
+                          min-w-0
+                          text-left
+
+                          ${
+                            !isOpen
+                              ? 'cursor-pointer'
+                              : 'cursor-default'
+                          }
+                        `}
+                      >
+                        <div className="text-xl font-semibold leading-snug break-words">
+                          {
+                            list.title
+                          }
+                        </div>
+
+                        <div
+                          className={`
+                            mt-1
+                            text-xs
+
+                            ${
+                              isDark
+                                ? 'text-white/60'
+                                : 'text-gray-500'
+                            }
+                          `}
+                        >
+                          {
+                            list.items
+                              .length
+                          }{' '}
+                          {
+                            label.items
+                          }{' '}
+                          •{' '}
+                          {formatDate(
+                            list.updatedAt
+                          )}
+                        </div>
+                      </button>
+
+                      {isOpen && (
+                        <div className="relative shrink-0">
+                          <button
+                            type="button"
+                            aria-label="Actions de l’étude"
+                            title="Actions"
+                            aria-expanded={
+                              listMenuOpen
+                            }
+                            onClick={() =>
+                              setOpenListMenu(
+                                listMenuOpen
+                                  ? null
+                                  : list.id
+                              )
+                            }
+                            className={`
+                              h-10
+                              w-10
+                              inline-flex
+                              items-center
+                              justify-center
+                              rounded-lg
+                              border
+
+                              ${secondaryButton}
+                            `}
+                          >
+                            <MoreVertical
+                              size={20}
+                            />
+                          </button>
+
+                          {listMenuOpen && (
+                            <div
+                              className={`
+                                absolute
+                                right-0
+                                top-11
+                                z-30
+                                w-60
+                                rounded-xl
+                                border
+                                shadow-xl
+                                overflow-hidden
+
+                                ${menuSurface}
+                              `}
+                            >
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  doRename(
+                                    list.id,
+                                    list.title
+                                  )
+                                }
+                                className={`
+                                  w-full
+                                  flex
+                                  items-center
+                                  gap-3
+                                  px-4
+                                  py-3
+                                  text-left
+                                  text-sm
+
+                                  ${
+                                    isDark
+                                      ? 'hover:bg-gray-700'
+                                      : 'hover:bg-gray-100'
+                                  }
+                                `}
+                              >
+                                <Edit3
+                                  size={17}
+                                />
+
+                                {
+                                  label.rename
+                                }
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  doShare(
+                                    list.id
+                                  )
+                                }
+                                className={`
+                                  w-full
+                                  flex
+                                  items-center
+                                  gap-3
+                                  px-4
+                                  py-3
+                                  text-left
+                                  text-sm
+
+                                  ${
+                                    isDark
+                                      ? 'hover:bg-gray-700'
+                                      : 'hover:bg-gray-100'
+                                  }
+                                `}
+                              >
+                                <Share2
+                                  size={17}
+                                />
+
+                                {
+                                  label.share
+                                }
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  copyListText(
+                                    list.id
+                                  )
+                                }
+                                className={`
+                                  w-full
+                                  flex
+                                  items-center
+                                  gap-3
+                                  px-4
+                                  py-3
+                                  text-left
+                                  text-sm
+
+                                  ${
+                                    isDark
+                                      ? 'hover:bg-gray-700'
+                                      : 'hover:bg-gray-100'
+                                  }
+                                `}
+                              >
+                                <Copy
+                                  size={17}
+                                />
+
+                                {
+                                  label.copy
+                                }
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  doShareCode(
+                                    list.id
+                                  )
+                                }
+                                className={`
+                                  w-full
+                                  flex
+                                  items-center
+                                  gap-3
+                                  px-4
+                                  py-3
+                                  text-left
+                                  text-sm
+
+                                  ${
+                                    isDark
+                                      ? 'hover:bg-gray-700'
+                                      : 'hover:bg-gray-100'
+                                  }
+                                `}
+                              >
+                                <Copy
+                                  size={17}
+                                />
+
+                                {
+                                  label.shareCode
+                                }
+                              </button>
+
+                              <div
+                                className={`
+                                  border-t
+
+                                  ${
+                                    isDark
+                                      ? 'border-gray-700'
+                                      : 'border-gray-200'
+                                  }
+                                `}
+                              />
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  doDelete(
+                                    list.id
+                                  )
+                                }
+                                className="
+                                  w-full
+                                  flex
+                                  items-center
+                                  gap-3
+                                  px-4
+                                  py-3
+                                  text-left
+                                  text-sm
+                                  text-red-500
+                                  hover:bg-red-500/10
+                                "
+                              >
+                                <Trash2
+                                  size={17}
+                                />
+
+                                {
+                                  label.deleteItem
+                                }
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
 
-                    {!isOpen && (
-                      <div className="flex flex-col items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (canMoveUp) moveList(list.id, -1);
-                          }}
-                          disabled={!canMoveUp}
-                          title={label.moveUp}
-                          className={`inline-flex items-center justify-center rounded-full p-1 border text-xs ${
-                            isDark
-                              ? 'border-gray-600 text-gray-200 bg-gray-900'
-                              : 'border-gray-300 text-gray-700 bg-gray-50'
-                          } ${!canMoveUp ? 'opacity-40 cursor-default' : 'active:scale-95'}`}
-                        >
-                          <ArrowUp size={14} />
-                        </button>
+                    {/* =====================
+                        CONTENU ÉTUDE
+                    ====================== */}
 
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (canMoveDown) moveList(list.id, 1);
-                          }}
-                          disabled={!canMoveDown}
-                          title={label.moveDown}
-                          className={`inline-flex items-center justify-center rounded-full p-1 border text-xs ${
+                    {isOpen && (
+                      <div
+                        className={`
+                          px-4
+                          pb-4
+                          border-t
+
+                          ${
                             isDark
-                              ? 'border-gray-600 text-gray-200 bg-gray-900'
-                              : 'border-gray-300 text-gray-700 bg-gray-50'
-                          } ${!canMoveDown ? 'opacity-40 cursor-default' : 'active:scale-95'}`}
-                        >
-                          <ArrowDown size={14} />
-                        </button>
+                              ? 'border-gray-700'
+                              : 'border-gray-200'
+                          }
+                        `}
+                      >
+                        {list.items
+                          .length ===
+                        0 ? (
+                          <div
+                            className={`
+                              py-6
+                              text-sm
+                              text-center
+
+                              ${
+                                isDark
+                                  ? 'text-white/60'
+                                  : 'text-gray-500'
+                              }
+                            `}
+                          >
+                            {
+                              label.emptyList
+                            }
+                          </div>
+                        ) : (
+                          <ul className="pt-4 space-y-3">
+                            {(
+                              list.items as AnyItem[]
+                            ).map(
+                              (
+                                item,
+                                idx
+                              ) => {
+                                const isText =
+                                  item.bookId ===
+                                  TEXT_SENTINEL;
+
+                                const menuOpen =
+                                  openItemMenu
+                                    ?.listId ===
+                                    list.id &&
+                                  openItemMenu
+                                    ?.idx ===
+                                    idx;
+
+                                return (
+                                  <li
+                                    key={idx}
+                                    id={`principle-item-${list.id}-${idx}`}
+                                    className={`
+                                      rounded-xl
+                                      border
+                                      overflow-hidden
+
+                                      ${
+                                        isText
+                                          ? isDark
+                                            ? 'bg-gray-700/60 border-gray-600'
+                                            : 'bg-blue-50 border-blue-100'
+                                          : isDark
+                                          ? 'bg-gray-900/50 border-gray-700'
+                                          : 'bg-gray-50 border-gray-200'
+                                      }
+                                    `}
+                                  >
+                                    <div className="flex items-start gap-2 p-3">
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          setOpenItemMenu(
+                                            menuOpen
+                                              ? null
+                                              : {
+                                                  listId:
+                                                    list.id,
+                                                  idx,
+                                                }
+                                          )
+                                        }
+                                        className="flex-1 min-w-0 text-left"
+                                      >
+                                        {!isText && (
+                                          <div
+                                            className={`
+                                              font-semibold
+                                              mb-1
+
+                                              ${
+                                                isDark
+                                                  ? 'text-blue-300'
+                                                  : 'text-blue-700'
+                                              }
+                                            `}
+                                          >
+                                            {(
+                                              item.bookName ??
+                                              item.bookId
+                                            ) ||
+                                              ''}{' '}
+                                            {
+                                              item.chapter
+                                            }
+                                            :
+                                            {
+                                              item.verse
+                                            }
+                                          </div>
+                                        )}
+
+                                        {item.text ? (
+                                          <div
+                                            className={`
+                                              whitespace-pre-wrap
+
+                                              ${
+                                                isDark
+                                                  ? 'text-white'
+                                                  : 'text-gray-800'
+                                              }
+
+                                              ${
+                                                isText
+                                                  ? 'font-serif'
+                                                  : ''
+                                              }
+                                            `}
+                                            style={{
+                                              fontSize:
+                                                `${state.settings.fontSize}px`,
+
+                                              lineHeight:
+                                                '1.55',
+                                            }}
+                                          >
+                                            {
+                                              item.text
+                                            }
+                                          </div>
+                                        ) : null}
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        aria-label="Actions"
+                                        title="Actions"
+                                        onClick={() =>
+                                          setOpenItemMenu(
+                                            menuOpen
+                                              ? null
+                                              : {
+                                                  listId:
+                                                    list.id,
+                                                  idx,
+                                                }
+                                          )
+                                        }
+                                        className={`
+                                          shrink-0
+                                          h-9
+                                          w-9
+                                          inline-flex
+                                          items-center
+                                          justify-center
+                                          rounded-lg
+
+                                          ${
+                                            isDark
+                                              ? 'text-gray-300 hover:bg-gray-700'
+                                              : 'text-gray-500 hover:bg-gray-200'
+                                          }
+                                        `}
+                                      >
+                                        <MoreVertical
+                                          size={18}
+                                        />
+                                      </button>
+                                    </div>
+
+                                    {/* =====================
+                                        ACTIONS ITEM
+                                    ====================== */}
+
+                                    {menuOpen && (
+                                      <div
+                                        className={`
+                                          border-t
+                                          p-3
+
+                                          ${
+                                            isDark
+                                              ? `
+                                                bg-gray-800
+                                                border-gray-700
+                                              `
+                                              : `
+                                                bg-white
+                                                border-gray-200
+                                              `
+                                          }
+                                        `}
+                                      >
+                                        <div className="flex items-center justify-between mb-3">
+                                          <span
+                                            className={`
+                                              text-xs
+                                              font-semibold
+                                              uppercase
+                                              tracking-wide
+
+                                              ${
+                                                isDark
+                                                  ? 'text-gray-400'
+                                                  : 'text-gray-500'
+                                              }
+                                            `}
+                                          >
+                                            {
+                                              label.actions
+                                            }
+                                          </span>
+
+                                          <button
+                                            type="button"
+                                            aria-label="Fermer"
+                                            onClick={() =>
+                                              setOpenItemMenu(
+                                                null
+                                              )
+                                            }
+                                            className={`
+                                              h-8
+                                              w-8
+                                              rounded-full
+                                              inline-flex
+                                              items-center
+                                              justify-center
+
+                                              ${
+                                                isDark
+                                                  ? 'hover:bg-gray-700'
+                                                  : 'hover:bg-gray-100'
+                                              }
+                                            `}
+                                          >
+                                            <X
+                                              size={17}
+                                            />
+                                          </button>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-2">
+                                          {!isText && (
+                                            <>
+                                              <button
+                                                type="button"
+                                                onClick={() =>
+                                                  openInReading(
+                                                    item
+                                                  )
+                                                }
+                                                className="
+                                                  inline-flex
+                                                  items-center
+                                                  justify-center
+                                                  gap-2
+                                                  px-3
+                                                  py-2.5
+                                                  rounded-lg
+                                                  bg-blue-700
+                                                  text-white
+                                                  text-sm
+                                                  hover:bg-blue-600
+                                                "
+                                              >
+                                                <BookOpen
+                                                  size={16}
+                                                />
+
+                                                {
+                                                  label.open
+                                                }
+                                              </button>
+
+                                              <button
+                                                type="button"
+                                                onClick={() =>
+                                                  copyItemText(
+                                                    item
+                                                  )
+                                                }
+                                                className={`
+                                                  inline-flex
+                                                  items-center
+                                                  justify-center
+                                                  gap-2
+                                                  px-3
+                                                  py-2.5
+                                                  rounded-lg
+                                                  border
+                                                  text-sm
+
+                                                  ${secondaryButton}
+                                                `}
+                                              >
+                                                <Copy
+                                                  size={16}
+                                                />
+
+                                                {
+                                                  label.copy
+                                                }
+                                              </button>
+
+                                              <button
+                                                type="button"
+                                                onClick={() =>
+                                                  shareItem(
+                                                    item
+                                                  )
+                                                }
+                                                className={`
+                                                  col-span-2
+                                                  inline-flex
+                                                  items-center
+                                                  justify-center
+                                                  gap-2
+                                                  px-3
+                                                  py-2.5
+                                                  rounded-lg
+                                                  border
+                                                  text-sm
+
+                                                  ${secondaryButton}
+                                                `}
+                                              >
+                                                <Share2
+                                                  size={16}
+                                                />
+
+                                                {
+                                                  label.share
+                                                }
+                                              </button>
+                                            </>
+                                          )}
+
+                                          {isText && (
+                                            <button
+                                              type="button"
+                                              onClick={() =>
+                                                editTextBlock(
+                                                  list.id,
+                                                  idx,
+                                                  String(
+                                                    item.text ||
+                                                      ''
+                                                  )
+                                                )
+                                              }
+                                              className="
+                                                col-span-2
+                                                inline-flex
+                                                items-center
+                                                justify-center
+                                                gap-2
+                                                px-3
+                                                py-2.5
+                                                rounded-lg
+                                                bg-blue-700
+                                                text-white
+                                                text-sm
+                                                hover:bg-blue-600
+                                              "
+                                            >
+                                              <EditTextIcon
+                                                size={16}
+                                              />
+
+                                              {
+                                                label.editTextBlock
+                                              }
+                                            </button>
+                                          )}
+                                        </div>
+
+                                        <div
+                                          className={`
+                                            my-3
+                                            border-t
+
+                                            ${
+                                              isDark
+                                                ? 'border-gray-700'
+                                                : 'border-gray-200'
+                                            }
+                                          `}
+                                        />
+
+                                        <div className="flex items-center gap-2">
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              moveItem(
+                                                list.id,
+                                                idx,
+                                                -1
+                                              )
+                                            }
+                                            disabled={
+                                              idx === 0
+                                            }
+                                            title={
+                                              label.moveUp
+                                            }
+                                            className={`
+                                              h-10
+                                              w-10
+                                              inline-flex
+                                              items-center
+                                              justify-center
+                                              rounded-lg
+                                              border
+
+                                              ${secondaryButton}
+
+                                              disabled:opacity-30
+                                              disabled:cursor-not-allowed
+                                            `}
+                                          >
+                                            <ArrowUp
+                                              size={17}
+                                            />
+                                          </button>
+
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              moveItem(
+                                                list.id,
+                                                idx,
+                                                1
+                                              )
+                                            }
+                                            disabled={
+                                              idx ===
+                                              list.items
+                                                .length -
+                                                1
+                                            }
+                                            title={
+                                              label.moveDown
+                                            }
+                                            className={`
+                                              h-10
+                                              w-10
+                                              inline-flex
+                                              items-center
+                                              justify-center
+                                              rounded-lg
+                                              border
+
+                                              ${secondaryButton}
+
+                                              disabled:opacity-30
+                                              disabled:cursor-not-allowed
+                                            `}
+                                          >
+                                            <ArrowDown
+                                              size={17}
+                                            />
+                                          </button>
+
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              insertTextBlockAt(
+                                                list.id,
+                                                idx + 1
+                                              )
+                                            }
+                                            title={
+                                              label.addTextBlock
+                                            }
+                                            className={`
+                                              h-10
+                                              w-10
+                                              inline-flex
+                                              items-center
+                                              justify-center
+                                              rounded-lg
+                                              border
+
+                                              ${secondaryButton}
+                                            `}
+                                          >
+                                            <TextIcon
+                                              size={17}
+                                            />
+                                          </button>
+
+                                          <div className="flex-1" />
+
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              removeItem(
+                                                list.id,
+                                                idx
+                                              )
+                                            }
+                                            title={
+                                              label.deleteItem
+                                            }
+                                            className="
+                                              h-10
+                                              w-10
+                                              inline-flex
+                                              items-center
+                                              justify-center
+                                              rounded-lg
+                                              border
+                                              border-red-500/40
+                                              text-red-500
+                                              hover:bg-red-500/10
+                                            "
+                                          >
+                                            <Trash2
+                                              size={17}
+                                            />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </li>
+                                );
+                              }
+                            )}
+                          </ul>
+                        )}
+
+                        {list.items
+                          .length >
+                          0 && (
+                          <div className="mt-5 flex justify-center">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                addTextBlock(
+                                  list.id
+                                )
+                              }
+                              className={`
+                                inline-flex
+                                items-center
+                                justify-center
+                                gap-2
+                                px-4
+                                py-2
+                                rounded-lg
+                                border
+                                text-sm
+
+                                ${secondaryButton}
+                              `}
+                            >
+                              <Plus
+                                size={16}
+                              />
+
+                              {
+                                label.addTextBlock
+                              }
+                            </button>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
-
-                  {/* Actions de la liste ouverte */}
-                  {isOpen && (
-                    <div className="mt-3 flex flex-wrap items-center gap-2">
-                      <button
-                        onClick={() => doRename(list.id, list.title)}
-                        className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
-                        title={t('principlesPage.renameList')}
-                      >
-                        <Edit3 size={16} />
-                        {t('principlesPage.renameList')}
-                      </button>
-
-                      <button
-                        onClick={() => doShare(list.id)}
-                        className="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-500 inline-flex items-center gap-2"
-                        title={t('shareLabel')}
-                      >
-                        <Share2 size={16} />
-                        {t('shareLabel')}
-                      </button>
-
-                      <button
-                        onClick={() => copyListText(list.id)}
-                        className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
-                        title={t('copyLabel')}
-                      >
-                        <Copy size={16} />
-                        {t('copyLabel')}
-                      </button>
-
-                      <button
-                        onClick={() => doShareCode(list.id)}
-                        className={`${isDark ? 'bg-gray-700 text-white' : 'bg-gray-100 text-gray-800'} px-3 py-2 rounded inline-flex items-center gap-2`}
-                        title={label.shareCode}
-                      >
-                        <Copy size={16} />
-                        {label.shareCode}
-                      </button>
-
-                      <button
-                        onClick={() => doDelete(list.id)}
-                        className="px-3 py-2 rounded bg-red-600 text-white hover:bg-red-500 inline-flex items-center gap-2"
-                        title={label.deleteItem}
-                      >
-                        <Trash2 size={16} />
-                        {label.deleteItem}
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Contenu de la liste ouverte */}
-                  {isOpen && (
-                    <div className="mt-4">
-                      {list.items.length === 0 ? (
-                        <div className={`${isDark ? 'text-white/70' : 'text-gray-600'} text-sm`}>{label.emptyList}</div>
-                      ) : (
-                        <>
-                          <ul className="space-y-3">
-                            {(list.items as AnyItem[]).map((it, idx) => {
-                              const isText = it.bookId === TEXT_SENTINEL;
-                              const menuOpen = openItemMenu?.listId === list.id && openItemMenu?.idx === idx;
-
-                              const baseItemBg = isText
-                                ? isDark
-                                  ? 'bg-gray-700/70 hover:bg-gray-700/90'
-                                  : 'bg-indigo-50 hover:bg-indigo-100'
-                                : isDark
-                                ? 'bg-gray-600/40 hover:bg-gray-600/60'
-                                : 'bg-white hover:bg-gray-100';
-
-                              const openInReading = () => {
-                                if (isText) return;
-                                const url = new URL(window.location.href);
-                                url.searchParams.set('b', it.bookId);
-                                url.searchParams.set('c', String(it.chapter));
-                                url.searchParams.set('v', String(it.verse));
-                                window.history.replaceState({}, '', url.toString());
-                                setPage('reading');
-                              };
-
-                              const textBaseClass = isDark
-                                ? 'text-white mt-1 whitespace-pre-wrap'
-                                : 'text-gray-800 mt-1 whitespace-pre-wrap';
-                              const textClass = isText ? `${textBaseClass} font-serif` : textBaseClass;
-
-                              return (
-                                <li
-                                  key={idx}
-                                  id={`principle-item-${list.id}-${idx}`}
-                                  className={`${baseItemBg} rounded-md p-3 transition ${isText ? 'border-l-4 border-indigo-400' : ''}`}
-                                >
-                                  <button
-                                    className="w-full text-left"
-                                    onClick={() => setOpenItemMenu(menuOpen ? null : { listId: list.id, idx })}
-                                  >
-                                    {!isText ? (
-                                      <div className="font-semibold">
-                                        {(it.bookName ?? it.bookId) || ''} {it.chapter}:{it.verse}
-                                      </div>
-                                    ) : null}
-
-                                    {it.text ? (
-                                      <div
-                                        style={{ fontSize: `${state.settings.fontSize}px`, lineHeight: '1.55' }}
-                                        className={textClass}
-                                      >
-                                        {it.text}
-                                      </div>
-                                    ) : null}
-                                  </button>
-
-                                  {menuOpen && (
-                                    <div
-                                      className={`mt-3 flex flex-wrap items-center gap-2 rounded-md px-2 py-2 ${
-                                        isDark ? 'bg-gray-800' : 'bg-gray-200'
-                                      }`}
-                                    >
-                                      {!isText && (
-                                        <>
-                                          <button
-                                            onClick={() => {
-                                              openInReading();
-                                              setOpenItemMenu(null);
-                                            }}
-                                            className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-500"
-                                          >
-                                            {label.open}
-                                          </button>
-
-                                          <button
-                                            onClick={async () => {
-                                              await copyItemText(it);
-                                              setOpenItemMenu(null);
-                                            }}
-                                            className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                              isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
-                                            }`}
-                                            title={t('copyLabel')}
-                                          >
-                                            <Copy size={16} />
-                                            {t('copyLabel')}
-                                          </button>
-
-                                          <button
-                                            onClick={async () => {
-                                              await shareItem(it);
-                                              setOpenItemMenu(null);
-                                            }}
-                                            className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500"
-                                            title={t('shareLabel')}
-                                          >
-                                            <Share2 size={16} />
-                                            {t('shareLabel')}
-                                          </button>
-                                        </>
-                                      )}
-
-                                      {/* ✅ Pour les blocs texte : Copier / Partager / Modifier */}
-                                      {isText && (
-                                        <>
-                                          <button
-                                            onClick={async () => {
-                                              await copyItemText(it);
-                                              setOpenItemMenu(null);
-                                            }}
-                                            className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                              isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
-                                            }`}
-                                            title={t('copyLabel')}
-                                          >
-                                            <Copy size={16} />
-                                            {t('copyLabel')}
-                                          </button>
-
-                                          <button
-                                            onClick={async () => {
-                                              await shareItem(it);
-                                              setOpenItemMenu(null);
-                                            }}
-                                            className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-500"
-                                            title={t('shareLabel')}
-                                          >
-                                            <Share2 size={16} />
-                                            {t('shareLabel')}
-                                          </button>
-
-                                          <button
-                                            onClick={() => {
-                                              editTextBlock(list.id, idx, String(it.text || ''));
-                                              setOpenItemMenu(null);
-                                            }}
-                                            className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-amber-600 text-white hover:bg-amber-500"
-                                            title={label.editTextBlock}
-                                          >
-                                            <EditTextIcon size={16} />
-                                            {label.editTextBlock}
-                                          </button>
-                                        </>
-                                      )}
-
-                                      {/* ✅ Forcer Monter + Descendre à rester ensemble */}
-                                      <div className="flex flex-wrap items-center gap-2 w-full">
-                                        <button
-                                          onClick={() => moveItem(list.id, idx, -1)}
-                                          className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                            isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
-                                          }`}
-                                          disabled={idx === 0}
-                                          title={label.moveUp}
-                                        >
-                                          <ArrowUp size={16} />
-                                          {label.moveUp}
-                                        </button>
-
-                                        <button
-                                          onClick={() => moveItem(list.id, idx, 1)}
-                                          className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                            isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
-                                          }`}
-                                          disabled={idx === list.items.length - 1}
-                                          title={label.moveDown}
-                                        >
-                                          <ArrowDown size={16} />
-                                          {label.moveDown}
-                                        </button>
-                                      </div>
-
-                                      {/* ✅ Insérer un bloc texte juste après cet item */}
-                                      <button
-                                        onClick={() => {
-                                          insertTextBlockAt(list.id, idx + 1);
-                                          setOpenItemMenu(null);
-                                        }}
-                                        className={`inline-flex items-center gap-1 px-2 py-1.5 rounded ${
-                                          isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
-                                        }`}
-                                        title={label.addTextBlock}
-                                      >
-                                        <TextIcon size={16} />
-                                        {label.addTextBlock}
-                                      </button>
-
-                                      <button
-                                        onClick={() => removeItem(list.id, idx)}
-                                        className="inline-flex items-center gap-1 px-2 py-1.5 rounded bg-red-600 text-white hover:bg-red-500"
-                                        title={label.deleteItem}
-                                      >
-                                        <Trash2 size={16} />
-                                        {label.deleteItem}
-                                      </button>
-
-                                      <button
-                                        onClick={() => setOpenItemMenu(null)}
-                                        className={`px-2 py-1.5 rounded ${
-                                          isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
-                                        }`}
-                                      >
-                                        {label.cancel}
-                                      </button>
-
-                                      {/* ✅ SUPPRIMÉ : bouton "OK" (validation) */}
-                                    </div>
-                                  )}
-                                </li>
-                              );
-                            })}
-                          </ul>
-
-                          {/* Bouton "Ajouter un bloc texte" en bas de la liste ouverte */}
-                          <div className="mt-4 flex justify-center">
-                            <button
-                              onClick={() => addTextBlock(list.id)}
-                              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 text-sm"
-                            >
-                              <TextIcon size={16} />
-                              {label.addTextBlock}
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                );
+              }
+            )}
           </div>
         )}
       </div>
 
-      {/* ✅ TOAST (info copie/partage) */}
-      {toast && (
-        <div className="fixed left-0 right-0 bottom-4 z-[60] flex justify-center px-4 pointer-events-none">
-          <div
-            className={`px-3 py-2 rounded-full text-sm shadow-lg border ${
-              isDark ? 'bg-gray-900/95 text-white border-gray-700' : 'bg-white/95 text-gray-900 border-gray-200'
-            }`}
-          >
-            {toast}
-          </div>
-        </div>
-      )}
+      {/* =========================
+          IMPORT TEXTE
+      ========================== */}
 
-      {/* MODALE : importer depuis un TEXTE */}
       {showImportFromText && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setShowImportFromText(false)} aria-hidden="true" />
-          <div
-            className={`relative w-full max-w-lg mx-4 rounded-2xl p-4 ${
-              isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
-            }`}
-          >
-            <h2 className="text-lg font-semibold mb-2">{label.importFromTextTitle}</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Fermer"
+            className="absolute inset-0 bg-black/60"
+            onClick={() =>
+              setShowImportFromText(
+                false
+              )
+            }
+          />
 
-            <div className="mb-3">
-              <label className="block text-sm mb-1">{label.importTextTitlePlaceholder}</label>
+          <div
+            className={`
+              relative
+              w-full
+              max-w-lg
+              rounded-2xl
+              p-5
+              shadow-2xl
+
+              ${
+                isDark
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-white text-gray-900'
+              }
+            `}
+          >
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <h2 className="text-lg font-semibold">
+                {
+                  label.importFromTextTitle
+                }
+              </h2>
+
+              <button
+                type="button"
+                aria-label="Fermer"
+                onClick={() =>
+                  setShowImportFromText(
+                    false
+                  )
+                }
+                className={`
+                  h-9
+                  w-9
+                  rounded-full
+                  flex
+                  items-center
+                  justify-center
+
+                  ${
+                    isDark
+                      ? 'hover:bg-gray-800'
+                      : 'hover:bg-gray-100'
+                  }
+                `}
+              >
+                <X size={19} />
+              </button>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm mb-1.5">
+                {
+                  label.importTextTitlePlaceholder
+                }
+              </label>
+
               <input
                 type="text"
-                className={`w-full rounded-md px-2 py-1.5 text-sm border ${
-                  isDark ? 'bg-gray-800 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
-                }`}
-                value={importTextTitle}
-                onChange={(e) => setImportTextTitle(e.target.value)}
-                placeholder={label.importTextTitlePlaceholder}
+                value={
+                  importTextTitle
+                }
+                onChange={(event) =>
+                  setImportTextTitle(
+                    event.target.value
+                  )
+                }
+                placeholder={
+                  label.importTextTitlePlaceholder
+                }
+                className={`
+                  w-full
+                  rounded-lg
+                  px-3
+                  py-2
+                  text-sm
+                  border
+                  outline-none
+                  focus:ring-2
+                  focus:ring-blue-500/20
+                  focus:border-blue-500
+
+                  ${
+                    isDark
+                      ? `
+                        bg-gray-800
+                        border-gray-600
+                        text-white
+                      `
+                      : `
+                        bg-gray-50
+                        border-gray-300
+                        text-gray-900
+                      `
+                  }
+                `}
               />
             </div>
 
             <div className="mb-3">
-              <label className="block text-sm mb-1">{label.documentContent}</label>
+              <label className="block text-sm mb-1.5">
+                {
+                  label.documentContent
+                }
+              </label>
+
               <textarea
-                className={`w-full rounded-md px-2 py-1.5 text-sm min-h-[160px] border resize-vertical ${
-                  isDark ? 'bg-gray-800 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
-                }`}
-                value={importTextBody}
-                onChange={(e) => setImportTextBody(e.target.value)}
-                placeholder={label.importTextBodyPlaceholder}
+                value={
+                  importTextBody
+                }
+                onChange={(event) =>
+                  setImportTextBody(
+                    event.target.value
+                  )
+                }
+                placeholder={
+                  label.importTextBodyPlaceholder
+                }
+                className={`
+                  w-full
+                  rounded-lg
+                  px-3
+                  py-2
+                  text-sm
+                  min-h-[180px]
+                  border
+                  resize-vertical
+                  outline-none
+                  focus:ring-2
+                  focus:ring-blue-500/20
+                  focus:border-blue-500
+
+                  ${
+                    isDark
+                      ? `
+                        bg-gray-800
+                        border-gray-600
+                        text-white
+                      `
+                      : `
+                        bg-gray-50
+                        border-gray-300
+                        text-gray-900
+                      `
+                  }
+                `}
               />
-              <div className="mt-1 text-xs opacity-75">{label.importTextInfo}</div>
+
+              <div className="mt-1.5 text-xs opacity-70">
+                {
+                  label.importTextInfo
+                }
+              </div>
             </div>
 
-            <label className="flex items-center gap-2 text-sm mb-4">
-              <input type="checkbox" checked={importSplitBlocks} onChange={(e) => setImportSplitBlocks(e.target.checked)} />
-              <span>{label.importTextSplitLabel}</span>
+            <label className="flex items-start gap-2 text-sm mb-5">
+              <input
+                type="checkbox"
+                checked={
+                  importSplitBlocks
+                }
+                onChange={(event) =>
+                  setImportSplitBlocks(
+                    event.target
+                      .checked
+                  )
+                }
+                className="mt-0.5"
+              />
+
+              <span>
+                {
+                  label.importTextSplitLabel
+                }
+              </span>
             </label>
 
-            <div className="flex justify-end gap-2 mt-2">
+            <div className="flex justify-end gap-2">
               <button
-                onClick={() => setShowImportFromText(false)}
-                className={`px-3 py-1.5 rounded text-sm ${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'}`}
+                type="button"
+                onClick={() =>
+                  setShowImportFromText(
+                    false
+                  )
+                }
+                className={`
+                  px-4
+                  py-2
+                  rounded-lg
+                  border
+                  text-sm
+
+                  ${secondaryButton}
+                `}
               >
                 {label.cancel}
               </button>
-              <button onClick={handleCreateFromText} className="px-3 py-1.5 rounded text-sm bg-blue-600 text-white hover:bg-blue-500">
-                {label.importTextCreate}
+
+              <button
+                type="button"
+                onClick={
+                  handleCreateFromText
+                }
+                className="
+                  px-4
+                  py-2
+                  rounded-lg
+                  text-sm
+                  font-medium
+                  bg-blue-700
+                  text-white
+                  hover:bg-blue-600
+                "
+              >
+                {
+                  label.importTextCreate
+                }
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* MODALE : édition / création d'un bloc de texte */}
+      {/* =========================
+          ÉDITION BLOC TEXTE
+      ========================== */}
+
       {editingTextBlock && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setEditingTextBlock(null)} aria-hidden="true" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Fermer"
+            className="absolute inset-0 bg-black/60"
+            onClick={() =>
+              setEditingTextBlock(
+                null
+              )
+            }
+          />
+
           <div
-            className={`relative w-full max-w-lg mx-4 rounded-2xl p-5 ${
-              isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
-            }`}
+            className={`
+              relative
+              w-full
+              max-w-lg
+              rounded-2xl
+              p-5
+              shadow-2xl
+
+              ${
+                isDark
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-white text-gray-900'
+              }
+            `}
           >
-            <h2 className="text-xl font-semibold mb-3">
-              {editingTextBlock.idx === null ? label.addTextBlock : label.editTextBlock}
-            </h2>
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <h2 className="text-xl font-semibold">
+                {editingTextBlock.idx ===
+                null
+                  ? label.addTextBlock
+                  : label.editTextBlock}
+              </h2>
+
+              <button
+                type="button"
+                aria-label="Fermer"
+                onClick={() =>
+                  setEditingTextBlock(
+                    null
+                  )
+                }
+                className={`
+                  h-9
+                  w-9
+                  rounded-full
+                  flex
+                  items-center
+                  justify-center
+
+                  ${
+                    isDark
+                      ? 'hover:bg-gray-800'
+                      : 'hover:bg-gray-100'
+                  }
+                `}
+              >
+                <X size={19} />
+              </button>
+            </div>
+
             <textarea
-              className={`w-full rounded-md px-3 py-2 text-base min-h-[220px] border resize-vertical ${
-                isDark ? 'bg-gray-800 border-gray-600 text-white' : 'bg-gray-50 border-gray-300 text-gray-900'
-              }`}
-              style={{ fontSize: `${state.settings.fontSize}px`, lineHeight: '1.6' }}
-              value={editingTextValue}
-              onChange={(e) => setEditingTextValue(e.target.value)}
-              placeholder={label.newTextPlaceholder}
+              value={
+                editingTextValue
+              }
+              onChange={(event) =>
+                setEditingTextValue(
+                  event.target.value
+                )
+              }
+              placeholder={
+                label.newTextPlaceholder
+              }
+              className={`
+                w-full
+                rounded-lg
+                px-3
+                py-2
+                min-h-[230px]
+                border
+                resize-vertical
+                outline-none
+                focus:ring-2
+                focus:ring-blue-500/20
+                focus:border-blue-500
+
+                ${
+                  isDark
+                    ? `
+                      bg-gray-800
+                      border-gray-600
+                      text-white
+                    `
+                    : `
+                      bg-gray-50
+                      border-gray-300
+                      text-gray-900
+                    `
+                }
+              `}
+              style={{
+                fontSize:
+                  `${state.settings.fontSize}px`,
+
+                lineHeight: '1.6',
+              }}
             />
+
             <div className="flex justify-end gap-2 mt-4">
               <button
-                onClick={() => setEditingTextBlock(null)}
-                className={`px-3 py-1.5 rounded text-base ${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'}`}
+                type="button"
+                onClick={() =>
+                  setEditingTextBlock(
+                    null
+                  )
+                }
+                className={`
+                  px-4
+                  py-2
+                  rounded-lg
+                  border
+
+                  ${secondaryButton}
+                `}
               >
                 {label.cancel}
               </button>
-              <button onClick={handleSaveTextBlock} className="px-3 py-1.5 rounded text-base bg-green-600 text-white hover:bg-green-500">
+
+              <button
+                type="button"
+                onClick={
+                  handleSaveTextBlock
+                }
+                className="
+                  px-5
+                  py-2
+                  rounded-lg
+                  bg-blue-700
+                  text-white
+                  font-medium
+                  hover:bg-blue-600
+                "
+              >
                 OK
               </button>
             </div>
@@ -1231,84 +3538,200 @@ https://www.theword.fr/#about`;
         </div>
       )}
 
-      {/* MODALE : Aide / mode d'emploi (même texte que Notes) */}
+      {/* =========================
+          AIDE
+      ========================== */}
+
       {showHelp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setShowHelp(false)} aria-hidden="true" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Fermer"
+            className="absolute inset-0 bg-black/60"
+            onClick={() =>
+              setShowHelp(false)
+            }
+          />
+
           <div
-            className={`relative w-full max-w-lg mx-4 rounded-2xl p-5 max-h-[90vh] overflow-y-auto ${
-              isDark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
-            }`}
+            className={`
+              relative
+              w-full
+              max-w-lg
+              rounded-2xl
+              p-5
+              max-h-[90vh]
+              overflow-y-auto
+              shadow-2xl
+
+              ${
+                isDark
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-white text-gray-900'
+              }
+            `}
           >
-            <h2 className="text-xl font-semibold mb-3">{label.helpTitle}</h2>
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <h2 className="text-xl font-semibold">
+                {tx(
+                  'notesHelpTitle',
+                  'Aide'
+                )}
+              </h2>
 
-            <div className="space-y-3 leading-relaxed text-left" style={{ fontSize: `${state.settings.fontSize}px`, lineHeight: 1.6 }}>
-              <p>{label.helpIntro}</p>
+              <button
+                type="button"
+                aria-label="Fermer"
+                onClick={() =>
+                  setShowHelp(false)
+                }
+                className={`
+                  shrink-0
+                  h-9
+                  w-9
+                  rounded-full
+                  flex
+                  items-center
+                  justify-center
 
-              <p>
-                <strong>{label.help1Title}</strong>
-                <br />
-                {label.help1Body}
-              </p>
-              <p>
-                <strong>{label.help2Title}</strong>
-                <br />
-                {label.help2Body}
-              </p>
-              <p>
-                <strong>{label.help3Title}</strong>
-                <br />
-                {label.help3Body}
-              </p>
-              <p>
-                <strong>{label.help4Title}</strong>
-                <br />
-                {label.help4Body}
-              </p>
-              <p>
-                <strong>{label.help5Title}</strong>
-                <br />
-                {label.help5Body}
-              </p>
-              <p>
-                <strong>{label.help6Title}</strong>
-                <br />
-                {label.help6Body}
-              </p>
-              <p>
-                <strong>{label.help7Title}</strong>
-                <br />
-                {label.help7Body}
-              </p>
-              <p>
-                <strong>{label.help8Title}</strong>
-                <br />
-                {label.help8Body}
-              </p>
-              <p>
-                <strong>{label.help9Title}</strong>
-                <br />
-                {label.help9Body}
-              </p>
-              <p>
-                <strong>{label.help10Title}</strong>
-                <br />
-                {label.help10Body}
-              </p>
+                  ${
+                    isDark
+                      ? 'hover:bg-gray-800'
+                      : 'hover:bg-gray-100'
+                  }
+                `}
+              >
+                <X size={19} />
+              </button>
             </div>
 
-            <div className="flex justify-end gap-2 mt-4">
+            <div
+              className="space-y-5 leading-relaxed"
+              style={{
+                fontSize:
+                  `${Math.min(
+                    state.settings
+                      .fontSize,
+                    22
+                  )}px`,
+
+                lineHeight: 1.6,
+              }}
+            >
+              <p>
+                {tx(
+                  'notesHelpIntro',
+                  'Vous pouvez organiser vos études avec des versets et des blocs de texte.'
+                )}
+              </p>
+
+              {Array.from({
+                length: 10,
+              }).map(
+                (_, index) => {
+                  const number =
+                    index + 1;
+
+                  const title =
+                    tx(
+                      `notesHelp${number}Title`,
+                      ''
+                    );
+
+                  const body =
+                    tx(
+                      `notesHelp${number}Body`,
+                      ''
+                    );
+
+                  if (
+                    !title &&
+                    !body
+                  ) {
+                    return null;
+                  }
+
+                  return (
+                    <section
+                      key={
+                        number
+                      }
+                    >
+                      {title && (
+                        <h3 className="font-semibold mb-1">
+                          {title}
+                        </h3>
+                      )}
+
+                      {body && (
+                        <p
+                          className={
+                            isDark
+                              ? 'text-white/80'
+                              : 'text-gray-700'
+                          }
+                        >
+                          {body}
+                        </p>
+                      )}
+                    </section>
+                  );
+                }
+              )}
+            </div>
+
+            <div className="mt-6 flex justify-end">
               <button
-                onClick={() => setShowHelp(false)}
-                className={`px-3 py-1.5 rounded text-sm ${isDark ? 'bg-gray-700 text-white' : 'bg-gray-200 text-gray-800'}`}
+                type="button"
+                onClick={() =>
+                  setShowHelp(false)
+                }
+                className="
+                  px-5
+                  py-2
+                  rounded-lg
+                  bg-blue-700
+                  text-white
+                  font-medium
+                  hover:bg-blue-600
+                "
               >
                 OK
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* =========================
+          TOAST
+      ========================== */}
+
+      {toast && (
+        <div
+          role="status"
+          className="
+            fixed
+            left-1/2
+            bottom-6
+            z-[70]
+            -translate-x-1/2
+            max-w-[90vw]
+            px-4
+            py-2.5
+            rounded-xl
+            bg-gray-950
+            text-white
+            text-sm
+            shadow-xl
+            border
+            border-gray-700
+            text-center
+          "
+        >
+          {toast}
         </div>
       )}
     </div>
   );
 }
-
