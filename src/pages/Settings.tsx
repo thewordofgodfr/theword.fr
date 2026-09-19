@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
-import { Globe, Palette, RefreshCcw } from 'lucide-react';
+import { Check, Globe, Palette, RefreshCcw, Search, X } from 'lucide-react';
 import type { Language } from '../types/bible';
 
 /** Codes de drapeaux supportés */
@@ -442,6 +442,39 @@ const ORDERED_LANGUAGES: Language[] = [
   ...AVAILABLE_LANGUAGES.filter((l) => !['fr', 'en', 'el', 'he'].includes(l)),
 ];
 
+/**
+ * Alias de recherche pour permettre de retrouver une langue
+ * même si son nom affiché est écrit dans sa langue d'origine.
+ */
+const LANGUAGE_SEARCH_ALIASES: Partial<Record<Language, string[]>> = {
+  fr: ['français', 'francais', 'french'],
+  en: ['anglais', 'english'],
+  de: ['allemand', 'german', 'deutsch'],
+  it: ['italien', 'italian', 'italiano'],
+  es: ['espagnol', 'spanish', 'español', 'espanol'],
+  pt: ['portugais', 'portuguese', 'português', 'portugues'],
+  ru: ['russe', 'russian'],
+  hi: ['hindi', 'inde', 'india'],
+  zh: ['chinois', 'chinese', 'mandarin'],
+  ar: ['arabe', 'arabic'],
+  id: ['indonésien', 'indonesien', 'indonesian'],
+  sw: ['swahili', 'kiswahili'],
+  tr: ['turc', 'turkish', 'türkçe', 'turkce'],
+  ja: ['japonais', 'japanese'],
+  ko: ['coréen', 'coreen', 'korean'],
+  yo: ['yoruba', 'yorùbá'],
+  he: ['hébreu', 'hebreu', 'hebrew'],
+  el: ['grec', 'greek', 'ελληνικά'],
+};
+
+function normalizeSearchText(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
 export default function Settings() {
   const { state, updateSettings } = useApp();
   const { t } = useTranslation();
@@ -475,6 +508,9 @@ export default function Settings() {
 
   const fontSizes = [21, 23, 25, 27];
   const XL_FONT = 42;
+
+  // Recherche dans la liste des langues
+  const [languageSearch, setLanguageSearch] = useState('');
 
   const [updateStatus, setUpdateStatus] = useState<
     'idle' | 'checking' | 'ready' | 'upToDate' | 'unavailable' | 'error'
@@ -566,7 +602,7 @@ export default function Settings() {
       className={`w-full flex items-center justify-between px-6 py-4 rounded-xl border-2 transition-all duration-200
         ${
           active
-            ? 'bg-blue-600 border-blue-600 text-white'
+            ? 'bg-blue-800 border-blue-600 text-white shadow-sm ring-1 ring-blue-500/30'
             : isDark
             ? 'bg-gray-700 border-gray-600 text-white hover:border-gray-500'
             : 'bg-white border-gray-300 text-gray-800 hover:border-gray-400'
@@ -598,6 +634,27 @@ export default function Settings() {
   // ✅ Ordre FIXE (ne change pas quand on clique)
   const orderedLangs = ORDERED_LANGUAGES;
 
+  const normalizedLanguageSearch = normalizeSearchText(languageSearch);
+
+  const filteredLangs = orderedLangs.filter((lang) => {
+    if (!normalizedLanguageSearch) return true;
+
+    const cfg = LANGUAGE_CONFIG[lang];
+    if (!cfg) return false;
+
+    const aliases = LANGUAGE_SEARCH_ALIASES[lang] ?? [];
+    const searchableText = [
+      String(lang),
+      cfg.label,
+      cfg.subtitle,
+      ...aliases,
+    ]
+      .map(normalizeSearchText)
+      .join(' ');
+
+    return searchableText.includes(normalizedLanguageSearch);
+  });
+
   return (
     <div className={`min-h-[100svh] bg-gray-900 transition-colors duration-200`}>
       <div className="container mx-auto px-4 py-8">
@@ -609,31 +666,98 @@ export default function Settings() {
 
           {/* 1) Langue */}
           <div className={`bg-gray-800 rounded-xl shadow-lg p-6 mb-6`}>
-            <h2 className={`text-xl font-semibold mb-6 text-white flex items-center`}>
+            <h2 className={`text-xl font-semibold mb-4 text-white flex items-center`}>
               <Globe size={24} className="mr-3" />
               {t('language')}
             </h2>
 
-            <div className="space-y-4">
-              {orderedLangs.map((lang) => {
-                const cfg = LANGUAGE_CONFIG[lang];
-                if (!cfg) return null;
+            {/* Recherche de langue */}
+            <div className="relative mb-5">
+              <Search
+                size={20}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none"
+                aria-hidden="true"
+              />
 
-                // Diminutif : fr, en, es...
-                const abbr = String(lang).toLowerCase();
+              <input
+                type="search"
+                value={languageSearch}
+                onChange={(e) => setLanguageSearch(e.target.value)}
+                placeholder={t('search')}
+                aria-label={`${t('search')} - ${t('language')}`}
+                className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-gray-600
+                  bg-gray-900/70
+                  pl-11
+                  pr-11
+                  py-3
+                  text-white
+                  placeholder:text-white/45
+                  outline-none
+                  transition
+                  focus:border-blue-500
+                  focus:ring-2
+                  focus:ring-blue-500/20
+                "
+              />
 
-                return (
-                  <LangButton
-                    key={lang}
-                    active={state.settings.language === lang}
-                    flag={<FlagIcon code={cfg.flag} />}
-                    title={`${cfg.label} (${abbr})`}
-                    subtitle={cfg.subtitle}
-                    onClick={() => updateSettings({ language: lang })}
-                  />
-                );
-              })}
+              {languageSearch && (
+                <button
+                  type="button"
+                  onClick={() => setLanguageSearch('')}
+                  aria-label={t('cancel')}
+                  title={t('cancel')}
+                  className="
+                    absolute
+                    right-2
+                    top-1/2
+                    -translate-y-1/2
+                    h-8
+                    w-8
+                    inline-flex
+                    items-center
+                    justify-center
+                    rounded-lg
+                    text-white/60
+                    hover:text-white
+                    hover:bg-gray-700
+                    transition-colors
+                  "
+                >
+                  <X size={18} />
+                </button>
+              )}
             </div>
+
+            {filteredLangs.length > 0 ? (
+              <div className="space-y-4">
+                {filteredLangs.map((lang) => {
+                  const cfg = LANGUAGE_CONFIG[lang];
+                  if (!cfg) return null;
+
+                  // Diminutif : fr, en, es...
+                  const abbr = String(lang).toLowerCase();
+
+                  return (
+                    <LangButton
+                      key={lang}
+                      active={state.settings.language === lang}
+                      flag={<FlagIcon code={cfg.flag} />}
+                      title={`${cfg.label} (${abbr})`}
+                      subtitle={cfg.subtitle}
+                      onClick={() => updateSettings({ language: lang })}
+                    />
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-gray-700 bg-gray-900/40 px-4 py-6 text-center text-white/65">
+                {t('searchNoResults')}
+              </div>
+            )}
           </div>
 
           {/* 2) Apparence + Taille de police */}
@@ -644,11 +768,38 @@ export default function Settings() {
             </h2>
 
             <div>
-              <div className={`block text-sm font-medium mb-4 text-white`}>{t('fontSize')}</div>
+              {/* Taille active clairement visible */}
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <div className="text-sm font-medium text-white">{t('fontSize')}</div>
+
+                <div
+                  className="
+                    shrink-0
+                    inline-flex
+                    items-center
+                    gap-2
+                    rounded-full
+                    border
+                    border-blue-600/60
+                    bg-blue-950/60
+                    px-3
+                    py-1.5
+                    text-sm
+                    font-semibold
+                    text-blue-200
+                  "
+                  aria-live="polite"
+                  aria-label={`${t('fontSize')}: ${state.settings.fontSize}px`}
+                >
+                  <span className="h-2 w-2 rounded-full bg-blue-400" aria-hidden="true" />
+                  {state.settings.fontSize}px
+                </div>
+              </div>
 
               <div className="grid grid-cols-2 gap-3">
                 {fontSizes.map((value) => {
                   const isSelected = state.settings.fontSize === value;
+
                   return (
                     <button
                       key={value}
@@ -658,13 +809,16 @@ export default function Settings() {
                         })
                       }
                       aria-pressed={isSelected}
-                      className={`px-4 py-3 rounded-lg border-2 font-medium transition-all duration-200 ${
+                      className={`px-4 py-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
                         isSelected
-                          ? 'border-green-500 bg-green-50 text-green-700'
-                          : 'border-gray-600 bg-gray-700 text-white hover:border-gray-500'
+                          ? 'border-blue-500 bg-blue-950/70 text-blue-100 ring-2 ring-blue-500/20'
+                          : 'border-gray-600 bg-gray-700 text-white hover:border-gray-500 hover:bg-gray-600'
                       }`}
                     >
-                      {value}px
+                      <span className="inline-flex items-center justify-center gap-2">
+                        {isSelected && <Check size={17} aria-hidden="true" />}
+                        {value}px
+                      </span>
                     </button>
                   );
                 })}
@@ -673,6 +827,7 @@ export default function Settings() {
               <div className="mt-4">
                 {(() => {
                   const isXL = state.settings.fontSize === XL_FONT;
+
                   return (
                     <button
                       onClick={() =>
@@ -683,17 +838,27 @@ export default function Settings() {
                       aria-pressed={isXL}
                       className={`w-full px-4 py-4 rounded-lg border-2 font-semibold tracking-wide transition-all duration-200 ${
                         isXL
-                          ? 'border-green-500 bg-green-50 text-green-700'
-                          : 'border-gray-500 bg-gray-700 text-white hover:border-gray-400'
+                          ? 'border-blue-500 bg-blue-950/70 text-blue-100 ring-2 ring-blue-500/20'
+                          : 'border-gray-500 bg-gray-700 text-white hover:border-gray-400 hover:bg-gray-600'
                       }`}
                     >
-                      {t('fontSizeXLLabel')}
+                      <span className="inline-flex items-center justify-center gap-2">
+                        {isXL && <Check size={18} aria-hidden="true" />}
+                        {t('fontSizeXLLabel')}
+                        <span className={isXL ? 'text-blue-200' : 'text-white/65'}>
+                          ({XL_FONT}px)
+                        </span>
+                      </span>
                     </button>
                   );
                 })()}
               </div>
 
-              <div className={`mt-4 p-4 bg-gray-700 rounded-lg`}>
+              <div className="mt-4 rounded-lg border border-gray-600 bg-gray-700 p-4">
+                <div className="mb-2 text-xs font-medium uppercase tracking-wide text-white/55">
+                  {state.settings.fontSize}px
+                </div>
+
                 <p className="text-white" style={{ fontSize: `${state.settings.fontSize}px` }}>
                   {t('fontSizePreview')}
                 </p>
@@ -715,7 +880,7 @@ export default function Settings() {
                 {updateStatus === 'ready' ? (
                   <button
                     onClick={applyUpdate}
-                    className="px-4 py-2 rounded-lg border-2 font-medium transition-all duration-200 border-green-500 bg-green-50 text-green-700"
+                    className="px-4 py-2 rounded-lg border-2 font-medium transition-all duration-200 border-blue-600 bg-blue-900/60 text-blue-100 hover:bg-blue-800/70"
                   >
                     {t('applyUpdate')}
                   </button>
