@@ -487,7 +487,7 @@ export default function Reading() {
 
   const desktopChipBase =
     'inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm whitespace-nowrap';
-  const desktopChipColors = activeTheme ? activeTheme.solid : 'bg-blue-600 text-white';
+  const desktopChipColors = activeTheme ? activeTheme.solid : 'bg-blue-700 text-white';
 
   const [hasLoadedContext, setHasLoadedContext] = useState(false);
 
@@ -1439,49 +1439,49 @@ ${shareUrl}`;
           {/* BARRE SELECTION (desktop) EN BAS DE L'ÉCRAN */}
           {selectedVerses.length > 0 && (
             <div className="hidden md:flex fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-full max-w-4xl px-4">
-              <div className="bg-white/5 text-white border border-gray-700 rounded-xl shadow px-4 py-3 flex items-center justify-between w-full">
+              <div className="bg-gray-900/95 backdrop-blur text-white border border-gray-700 rounded-xl shadow-lg px-4 py-3 flex items-center justify-between w-full">
                 <div className="inline-flex items-center px-3 py-1 rounded-full bg-black/90 text-white text-xs sm:text-sm shadow">
                   {selectedVerses.length} {t('versesSelectedSuffix')}
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => openAddToNotes()}
-                    className="inline-flex items-center px-3 py-2 rounded bg-orange-500 text-white hover:bg-orange-400"
+                    className="inline-flex items-center px-3 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 hover:bg-gray-700"
                   >
                     <ListPlusIcon size={16} className="mr-2" />
                     {t('toNotes')}
                   </button>
                   <button
                     onClick={() => openAddToPrinciples()}
-                    className="inline-flex items-center px-3 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-500"
+                    className="inline-flex items-center px-3 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 hover:bg-gray-700"
                   >
                     <ListPlusIcon size={16} className="mr-2" />
                     {t('toPrinciples')}
                   </button>
                   <button
                     onClick={openOtherLangs}
-                    className="inline-flex items-center px-3 py-2 rounded bg-teal-600 text-white hover:bg-teal-500"
+                    className="inline-flex items-center px-3 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 hover:bg-gray-700"
                   >
                     <LanguagesIcon size={16} className="mr-2" />
                     {t('showInOtherLangs')}
                   </button>
                   <button
                     onClick={copySelection}
-                    className="inline-flex items-center px-3 py-2 rounded bg-blue-600 text-white hover:bg-blue-500"
+                    className="inline-flex items-center px-3 py-2 rounded-lg bg-blue-800 text-white hover:bg-blue-700"
                   >
                     <CopyIcon size={16} className="mr-2" />
                     {t('copyLabel')}
                   </button>
                   <button
                     onClick={shareSelection}
-                    className="inline-flex items-center px-3 py-2 rounded bg-indigo-500 text-white hover:bg-indigo-400"
+                    className="inline-flex items-center px-3 py-2 rounded-lg bg-blue-950 text-blue-100 border border-blue-800 hover:bg-blue-900"
                   >
                     <ShareIcon size={16} className="mr-2" />
                     {t('shareLabel')}
                   </button>
                   <button
                     onClick={() => setSelectedVerses([])}
-                    className="bg-slate-500 text-white px-3 py-2 rounded hover:bg-slate-400"
+                    className="bg-gray-700 text-white px-3 py-2 rounded-lg hover:bg-gray-600"
                   >
                     {t('cancel')}
                   </button>
@@ -1691,7 +1691,7 @@ ${shareUrl}`;
                       const isSelected = selectedVerses.includes(v.verse);
                       const selectedBg = isSelected ? 'bg-blue-900/30' : '';
                       const highlightCls = isHighlighted
-                        ? 'bg-indigo-500/20 ring-2 ring-indigo-400/80'
+                        ? 'bg-blue-900/30 ring-2 ring-blue-500/60'
                         : '';
                       return (
                         <div
@@ -1739,26 +1739,26 @@ ${shareUrl}`;
           {/* BARRE SELECTION (mobile) */}
           {selectedVerses.length > 0 && (
             <div className="sm:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-full px-3">
-              <div className="bg-white/5 text-white shadow-lg rounded-2xl px-3 py-2 space-y-2 max-w-[500px] mx-auto">
+              <div className="bg-gray-900/95 backdrop-blur text-white border border-gray-700 shadow-xl rounded-2xl px-3 py-2 space-y-2 max-w-[500px] mx-auto">
                 {/* Ligne 1 : Notes / Principes / Autres langues */}
                 <div className="flex items-center justify-center gap-2">
                   <button
                     onClick={() => openAddToNotes()}
-                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-orange-500 text-white text-sm"
+                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-gray-800 text-white border border-gray-600 hover:bg-gray-700 text-sm"
                   >
                     <ListPlusIcon size={16} className="mr-1" />
                     {t('notes')}
                   </button>
                   <button
                     onClick={() => openAddToPrinciples()}
-                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-600 text-white text-sm"
+                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-gray-800 text-white border border-gray-600 hover:bg-gray-700 text-sm"
                   >
                     <ListPlusIcon size={16} className="mr-1" />
                     {t('principles')}
                   </button>
                   <button
                     onClick={openOtherLangs}
-                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-teal-600 text-white text-sm"
+                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-gray-800 text-white border border-gray-600 hover:bg-gray-700 text-sm"
                   >
                     <LanguagesIcon size={16} className="mr-1" />
                     {t('showInOtherLangs')}
@@ -1769,21 +1769,21 @@ ${shareUrl}`;
                 <div className="flex items-center justify-center gap-2">
                   <button
                     onClick={copySelection}
-                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-600 text-white text-sm"
+                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-800 hover:bg-blue-700 text-white text-sm"
                   >
                     <CopyIcon size={16} className="mr-1" />
                     {t('copyLabel')}
                   </button>
                   <button
                     onClick={shareSelection}
-                    className="bg-indigo-500 hover:bg-indigo-400 text-white px-3 py-1.5 rounded-full inline-flex items-center text-sm"
+                    className="bg-blue-950 hover:bg-blue-900 text-blue-100 border border-blue-800 px-3 py-1.5 rounded-full inline-flex items-center text-sm"
                   >
                     <ShareIcon size={16} className="mr-1" />
                     {t('shareLabel')}
                   </button>
                   <button
                     onClick={() => setSelectedVerses([])}
-                    className="bg-slate-500 hover:bg-slate-400 text-white px-3 py-1.5 rounded-full text-sm"
+                    className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-full text-sm"
                   >
                     {t('cancel')}
                   </button>
@@ -1820,7 +1820,7 @@ ${shareUrl}`;
                           <input
                             type="checkbox"
                             name="notesList"
-                            className="accent-emerald-500"
+                            className="accent-blue-600"
                             value={l.id}
                             checked={selectedNotesListIds.includes(l.id)}
                             onChange={e => {
@@ -1846,7 +1846,7 @@ ${shareUrl}`;
                     </label>
                     <input
                       type="text"
-                      className="w-full rounded-md bg-gray-800 border border-gray-600 px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full rounded-md bg-gray-800 border border-gray-600 px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
                       value={newNotesListTitle}
                       onChange={e => setNewNotesListTitle(e.target.value)}
                     />
@@ -1862,7 +1862,7 @@ ${shareUrl}`;
                     </button>
                     <button
                       type="submit"
-                      className="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-sm"
+                      className="px-3 py-1.5 rounded-lg bg-blue-700 hover:bg-blue-600 text-sm font-medium"
                     >
                       OK
                     </button>
@@ -1900,7 +1900,7 @@ ${shareUrl}`;
                           <input
                             type="checkbox"
                             name="principleList"
-                            className="accent-indigo-400"
+                            className="accent-blue-600"
                             value={l.id}
                             checked={selectedPrincipleListIds.includes(l.id)}
                             onChange={e => {
@@ -1926,7 +1926,7 @@ ${shareUrl}`;
                     </label>
                     <input
                       type="text"
-                      className="w-full rounded-md bg-gray-800 border border-gray-600 px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full rounded-md bg-gray-800 border border-gray-600 px-3 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
                       value={newPrincipleListTitle}
                       onChange={e => setNewPrincipleListTitle(e.target.value)}
                     />
@@ -1942,7 +1942,7 @@ ${shareUrl}`;
                     </button>
                     <button
                       type="submit"
-                      className="px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-sm"
+                      className="px-3 py-1.5 rounded-lg bg-blue-700 hover:bg-blue-600 text-sm font-medium"
                     >
                       OK
                     </button>
@@ -1996,7 +1996,7 @@ ${shareUrl}`;
                             <div className="flex items-center gap-1.5 flex-wrap justify-end">
                               <button
                                 onClick={() => sendOtherLangVerseToNotes(entry.lang, entry.text)}
-                                className="px-2.5 py-1 rounded-full bg-orange-500 text-white text-xs"
+                                className="px-2.5 py-1 rounded-full bg-gray-800 text-white border border-gray-600 hover:bg-gray-700 text-xs"
                               >
                                 {t('notes')}
                               </button>
@@ -2004,19 +2004,19 @@ ${shareUrl}`;
                                 onClick={() =>
                                   sendOtherLangVerseToPrinciples(entry.lang, entry.text)
                                 }
-                                className="px-2.5 py-1 rounded-full bg-emerald-600 text-white text-xs"
+                                className="px-2.5 py-1 rounded-full bg-gray-800 text-white border border-gray-600 hover:bg-gray-700 text-xs"
                               >
                                 {t('principles')}
                               </button>
                               <button
                                 onClick={() => copyOtherLangVerse(entry.lang, entry.text)}
-                                className="px-2.5 py-1 rounded-full bg-blue-600 text-white text-xs"
+                                className="px-2.5 py-1 rounded-full bg-blue-800 hover:bg-blue-700 text-white text-xs"
                               >
                                 {t('copyLabel')}
                               </button>
                               <button
                                 onClick={() => shareOtherLangVerse(entry.lang, entry.text)}
-                                className="px-2.5 py-1 rounded-full bg-indigo-500 text-white text-xs"
+                                className="px-2.5 py-1 rounded-full bg-blue-950 text-blue-100 border border-blue-800 hover:bg-blue-900 text-xs"
                               >
                                 {t('shareLabel')}
                               </button>
@@ -2052,22 +2052,22 @@ ${shareUrl}`;
 
           {/* TOASTS */}
           {copiedKey === 'selection' && (
-            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-green-600 text-white z-50">
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded-lg text-sm shadow-lg bg-gray-900 text-white border border-blue-800/60 z-50">
               {t('selectionCopied')}
             </div>
           )}
           {copiedKey === 'shared-fallback' && (
-            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-blue-600 text-white z-50">
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded-lg text-sm shadow-lg bg-gray-900 text-white border border-blue-800/60 z-50">
               {t('textReadyToShare')}
             </div>
           )}
           {copiedKey === 'added-to-notes' && (
-            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-orange-500 text-white z-50">
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded-lg text-sm shadow-lg bg-gray-900 text-white border border-blue-800/60 z-50">
               {t('addedToList')}
             </div>
           )}
           {copiedKey === 'added-to-principles' && (
-            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded text-sm shadow bg-emerald-600 text-white z-50">
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-2 rounded-lg text-sm shadow-lg bg-gray-900 text-white border border-blue-800/60 z-50">
               {t('addedToList')}
             </div>
           )}
