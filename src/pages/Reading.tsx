@@ -190,25 +190,25 @@ export default function Reading() {
     }
   > = {
     1: {
-      solid: 'bg-amber-600 text-white',
-      solidHover: 'hover:bg-amber-500',
-      mobileBtn: 'bg-amber-600 text-white',
-      mobileBtnHover: 'hover:bg-amber-500',
-      lightPaper: 'bg-amber-50',
+      solid: 'bg-amber-800 text-white',
+    solidHover: 'hover:bg-amber-700',
+    mobileBtn: 'bg-amber-800 text-white',
+    mobileBtnHover: 'hover:bg-amber-700',
+    lightPaper: 'bg-amber-50',
     },
     2: {
-      solid: 'bg-violet-600 text-white',
-      solidHover: 'hover:bg-violet-500',
-      mobileBtn: 'bg-violet-600 text-white',
-      mobileBtnHover: 'hover:bg-violet-500',
-      lightPaper: 'bg-violet-50',
+      solid: 'bg-violet-800 text-white',
+    solidHover: 'hover:bg-violet-700',
+    mobileBtn: 'bg-violet-800 text-white',
+    mobileBtnHover: 'hover:bg-violet-700',
+    lightPaper: 'bg-violet-50',
     },
     3: {
-      solid: 'bg-emerald-600 text-white',
-      solidHover: 'hover:bg-emerald-500',
-      mobileBtn: 'bg-emerald-600 text-white',
-      mobileBtnHover: 'hover:bg-emerald-500',
-      lightPaper: 'bg-emerald-50',
+      solid: 'bg-emerald-800 text-white',
+    solidHover: 'hover:bg-emerald-700',
+    mobileBtn: 'bg-emerald-800 text-white',
+    mobileBtnHover: 'hover:bg-emerald-700',
+    lightPaper: 'bg-emerald-50',
     },
   };
 
