@@ -240,7 +240,7 @@ Jean 8:31-32`,
   notesPoint3: 'Renommez vos listes, copiez/partagez.',
   createdWithLove: 'Créé avec amour pour répandre la Parole de Dieu',
   versionsFootnote:
-    'À propos des textes : les Bibles intégrées sont utilisées selon leurs licences respectives. Seule la Louis Segond 1910 a été modernisée en 2025 (grammaire et vocabulaire), dans le strict respect des manuscrits originaux .                  Si vous souhaitez l’application Android merci de m’envoyer une demande par e-mail et je vous enverrai un lien (application en version test).',
+    'À propos des textes : les Bibles intégrées sont utilisées selon leurs licences respectives. Seule la Louis Segond 1910 a été modernisée en 2025 (grammaire et vocabulaire), dans le strict respect des manuscrits originaux .',
 
   // Quick slots
   quickSlotsIntro:
