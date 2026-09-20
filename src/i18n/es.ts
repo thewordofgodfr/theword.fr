@@ -256,6 +256,61 @@ Juan 8:31-32`,
   quickSlot2Tooltip: 'Atajo 2',
   quickSlot3Tooltip: 'Atajo 3',
 
+    // Ayuda de Notas + Estudios (guía común)
+  notesHelpTitle: 'Notas y Estudios — Guía de uso',
+
+  notesHelpIntro:
+    'Las páginas Notas y Estudios permiten guardar y organizar versículos en listas temáticas y completarlos con tus propios bloques de texto. Puedes reunir pasajes, añadir tus reflexiones y crear estudios bíblicos estructurados. Tus Notas y Estudios se guardan localmente en tu dispositivo y permanecen accesibles sin necesidad de una cuenta.',
+
+  notesHelp1Title: '1. Crear y gestionar tus listas',
+
+  notesHelp1Body:
+    'La página principal muestra todas tus listas de Notas o todos tus Estudios. Puedes crear una lista, darle un título, cambiarle el nombre o eliminarla. Toca una lista para abrir su contenido. El botón «Todas las listas» o «Todos los estudios» permite volver a la vista general. Cuando vuelves a abrir Notas o Estudios, la aplicación abre automáticamente la última lista utilizada y se sitúa cerca de su último elemento para que puedas continuar fácilmente tu trabajo.',
+
+  notesHelp2Title: '2. Añadir versículos desde la Biblia',
+
+  notesHelp2Body:
+    'Desde la página Lectura, selecciona uno o varios versículos y utiliza el botón Notas o Estudios. Los versículos se añaden a las listas que elijas, junto con sus referencias y su texto. Puedes seleccionar varias listas y guardar el mismo versículo en distintos lugares.',
+
+  notesHelp3Title: '3. Añadir bloques de texto',
+
+  notesHelp3Body:
+    'Además de los versículos, puedes añadir tus propios bloques de texto: comentarios, reflexiones, preguntas, oraciones, puntos de predicación u otros contenidos. El botón «Añadir un bloque de texto» está disponible en la parte superior e inferior de una lista abierta. El botón + situado junto a un elemento también permite insertar un bloque en ese lugar exacto. Después, cada bloque de texto puede modificarse, desplazarse o eliminarse.',
+
+  notesHelp4Title: '4. Utilizar y reorganizar los elementos',
+
+  notesHelp4Body:
+    'Abre el menú de un elemento para ver las acciones disponibles. Un versículo puede abrirse directamente en la página Lectura, copiarse o compartirse. Un bloque de texto puede copiarse, compartirse o modificarse. Las flechas «Subir» y «Bajar» permiten cambiar el orden de los versículos y de los bloques de texto. También puedes eliminar cada elemento por separado.',
+
+  notesHelp5Title: '5. Copiar o compartir una lista completa',
+
+  notesHelp5Body:
+    'En el menú de una lista de Notas o de un Estudio, los botones «Copiar» y «Compartir» permiten recuperar todo su contenido: título, referencias bíblicas, textos de los versículos y bloques de texto personales. Después puedes pegar el contenido en un mensaje o documento, o enviarlo mediante una aplicación compatible instalada en tu dispositivo.',
+
+  notesHelp6Title: '6. Compartir o transferir con un código de The Word',
+
+  notesHelp6Body:
+    'El botón «Código» copia un código compacto que contiene el título y todo el contenido de la lista. Otra persona que utilice The Word puede seleccionar «Importar un código» para recrear la lista en su dispositivo. El mismo sistema también permite transferir contenido entre Notas y Estudios: copia el código en una página e impórtalo en la otra.',
+
+  notesHelp7Title: '7. Importar un documento de texto',
+
+  notesHelp7Body:
+    'La opción «Importar desde un texto» permite pegar el contenido de un documento, un correo electrónico, una predicación o un plan de estudio. Puedes conservar el documento en un solo bloque o pedir a la aplicación que lo divida automáticamente en varios bloques separados por líneas vacías. Se creará una nueva lista de Notas o un nuevo Estudio con el título que elijas.',
+
+  notesHelp8Title: '8. Almacenamiento local y copias de seguridad',
+
+  notesHelp8Body:
+    'Tus Notas y Estudios se guardan localmente en tu dispositivo y no se sincronizan automáticamente con una cuenta o un servidor. Si desinstalas la aplicación, restableces sus datos o borras los datos del navegador, su contenido puede eliminarse definitivamente. Para conservar una lista importante, utiliza las funciones Copiar, Compartir o Código de The Word.',
+
+  notesHelp9Title: '9. Algunas ideas de uso',
+
+  notesHelp9Body:
+    'Puedes utilizar Notas para guardar versículos que quieras memorizar, escribir tus reflexiones diarias, preparar una predicación o mantener una lista de oración. Utiliza Estudios para crear recorridos bíblicos más completos: estudiar un tema o un libro, preparar un grupo en casa, crear un plan de enseñanza o desarrollar una serie de mensajes.',
+
+  notesHelp10Title: '10. Combinar Notas y Estudios',
+
+  notesHelp10Body:
+    'Notas y Estudios pueden utilizarse conjuntamente. Por ejemplo, reúne rápidamente versículos, pensamientos y oraciones en Notas y transfiere después a Estudios los elementos que quieras profundizar mediante un código de The Word. A continuación podrás reorganizarlos, ampliarlos y compartirlos.',
   // Common
   loading: 'Cargando...',
   error: 'Error al cargar',
