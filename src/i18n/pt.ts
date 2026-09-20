@@ -223,7 +223,7 @@ const pt: TranslationDict = {
   // About
   aboutTitle: "",
   aboutDescription:
-    "The Word permite que você descubra a Palavra de Deus por meio de versículos aleatórios e da leitura completa da Bíblia.",
+    "Pesquise instantaneamente palavras ou expressões em toda a Bíblia, abra os resultados na secção Leitura e copie ou partilhe um versículo com um único toque.",
   aboutIntro: `Por que The Word?
 
 Criei o The Word para poder ler vários livros da Bíblia em paralelo sem perder o fio da leitura. Com o tempo, outras funções foram acrescentadas, sempre com o mesmo objetivo: ajudar cada pessoa a ler, meditar, guardar e colocar em prática a Palavra de Deus.
