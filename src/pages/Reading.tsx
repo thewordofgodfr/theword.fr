@@ -141,12 +141,6 @@ export default function Reading() {
 
   const commandBarRef = useRef<HTMLDivElement>(null);
   const [cmdH, setCmdH] = useState(0);
-  useEffect(() => {
-    const compute = () => setCmdH(commandBarRef.current?.offsetHeight || 0);
-    compute();
-    window.addEventListener('resize', compute);
-    return () => window.removeEventListener('resize', compute);
-  }, []);
 
   const [books] = useState(getBibleBooks());
   const [selectedBook, setSelectedBook] = useState<BibleBook | null>(null);
@@ -162,6 +156,26 @@ export default function Reading() {
 
   const [showBookPicker, setShowBookPicker] = useState<boolean>(false);
   const [showChapterPicker, setShowChapterPicker] = useState<boolean>(false);
+
+  // La barre n'existe pas encore au premier rendu. On la mesure dès qu'elle
+  // apparaît, puis à chaque changement réel de taille (mobile, rotation, etc.).
+  useEffect(() => {
+    const compute = () => setCmdH(commandBarRef.current?.offsetHeight || 0);
+    compute();
+
+    const frame = window.requestAnimationFrame(compute);
+    const observer =
+      typeof ResizeObserver !== 'undefined' ? new ResizeObserver(compute) : null;
+
+    if (commandBarRef.current) observer?.observe(commandBarRef.current);
+    window.addEventListener('resize', compute);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer?.disconnect();
+      window.removeEventListener('resize', compute);
+    };
+  }, [selectedBook?.name]);
 
   const [showSwipeHint, setShowSwipeHint] = useState(false);
   useEffect(() => {
@@ -225,9 +239,22 @@ export default function Reading() {
     if (!selectedBook) return;
     if (activeSlot !== null && activeSlot !== 0) {
       try {
+        const stored = readQuickSlot(activeSlot);
+
+        // Lorsqu'on revient sur une mémoire, ne surtout pas effacer son verset
+        // juste avant que le défilement de restauration ait lieu.
+        if (
+          stored &&
+          stored.book === selectedBook.name &&
+          stored.chapter === selectedChapter
+        ) {
+          return;
+        }
+
         saveQuickSlot(activeSlot, {
           book: selectedBook.name,
           chapter: selectedChapter,
+          verse: 1,
         });
         refreshSlots();
       } catch {}
@@ -399,7 +426,47 @@ export default function Reading() {
     } catch {}
   }
 
+  function getCurrentVisibleVerse(): number {
+    if (!chapter) return 1;
+
+    const barBottom = commandBarRef.current?.getBoundingClientRect().bottom;
+    const offset =
+      typeof barBottom === 'number' && barBottom > 0
+        ? barBottom + 16
+        : NAV_H + cmdH + 16;
+
+    let bestVerse = chapter.verses[0]?.verse ?? 1;
+    for (const verse of chapter.verses) {
+      const element = document.getElementById(`verse-${verse.verse}`);
+      if (!element) continue;
+      if (element.getBoundingClientRect().top <= offset) bestVerse = verse.verse;
+      else break;
+    }
+
+    return bestVerse;
+  }
+
+  function saveCurrentQuickSlotPosition() {
+    if (!selectedBook || !chapter) return;
+
+    const slotToUpdate =
+      activeSlot && activeSlot !== 0 ? activeSlot : lastTappedSlot === 0 ? 0 : null;
+    if (slotToUpdate === null) return;
+
+    try {
+      saveQuickSlot(slotToUpdate, {
+        book: selectedBook.name,
+        chapter: selectedChapter,
+        verse: getCurrentVisibleVerse(),
+      });
+      refreshSlots();
+    } catch {}
+  }
+
   function jumpToSlot(i: number) {
+    // Sauvegarde synchrone avant de changer de contexte : elle évite de perdre
+    // les derniers mouvements effectués pendant le délai du gestionnaire scroll.
+    saveCurrentQuickSlotPosition();
     const slot = readQuickSlot(i);
     setTapped(i);
     if (i === 0) {
@@ -427,7 +494,11 @@ export default function Reading() {
     setActiveSlot(i);
     if (!slot) {
       if (!selectedBook) return;
-      saveQuickSlot(i, { book: selectedBook.name, chapter: selectedChapter });
+      saveQuickSlot(i, {
+        book: selectedBook.name,
+        chapter: selectedChapter,
+        verse: getCurrentVisibleVerse(),
+      });
       refreshSlots();
       return;
     }
@@ -576,7 +647,11 @@ export default function Reading() {
     const lockMs = 2500;
     suppressAutoSaveUntil.current = now + lockMs;
     programmaticScrollUntil.current = now + lockMs;
-    const baseOffset = NAV_H + cmdH + 14;
+    const barBottom = commandBarRef.current?.getBoundingClientRect().bottom;
+    const baseOffset =
+      typeof barBottom === 'number' && barBottom > 0
+        ? Math.ceil(barBottom) + 16
+        : NAV_H + cmdH + 16;
     const offset = baseOffset + extraTop;
 
     let tries = 0;
@@ -1077,15 +1152,7 @@ ${shareUrl}`;
       if (scrollDebounce.current) window.clearTimeout(scrollDebounce.current);
       scrollDebounce.current = window.setTimeout(() => {
         try {
-          const offset = NAV_H + cmdH + 16;
-          let bestVerse = 1;
-          for (const v of chapter.verses) {
-            const el = document.getElementById(`verse-${v.verse}`);
-            if (!el) continue;
-            const top = el.getBoundingClientRect().top;
-            if (top - offset <= 0) bestVerse = v.verse;
-            else break;
-          }
+          const bestVerse = getCurrentVisibleVerse();
 
           const slotToUpdate =
             activeSlot && activeSlot !== 0 ? activeSlot : lastTappedSlot === 0 ? 0 : null;
