@@ -324,7 +324,7 @@ const zh: TranslationDict = {
 
   // Quick slots
   quickSlotsIntro:
-    "这 4 个按钮位于卷书/章节选择器右侧，可让你立即回到常读的经文，以便并行阅读多卷书：使用 1/2/3 保存三个位置，用放大镜返回到上一次阅读的位置（随机经文或搜索结果）。",
+    "这 4 个按钮可让您立即返回经常阅读的位置，并同时阅读多卷书：使用 1/2/3 保存 3 个不同的位置，使用放大镜返回上一次打开的经文（随机经文或搜索结果）。",
   quickSlotsIllustrationLabel:
     "快捷方式示意图",
   quickSlotLastPassageTooltip:
