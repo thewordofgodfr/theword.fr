@@ -341,7 +341,7 @@ Zaburi 34:19  “Mateso ya mwenye haki ni mengi; lakini BWANA humponya na humtoa
 
   // Quick slots
   quickSlotsIntro:
-    "Vitufe hivi 4, vilivyo upande wa kulia wa kiteua Kitabu/Sura, vinakuruhusu kurudi mara moja kwenye usomaji unaourudia mara nyingi ili usome vitabu kadhaa kwa wakati mmoja: tumia 1/2/3 kwa sehemu tatu, na kioo cha kukuza kurudi kwenye sehemu ya mwisho (aya ya nasibu au matokeo ya utafutaji).",
+    "Vitufe hivi 4 vinakuwezesha kurudi mara moja kwenye sehemu unazosoma mara kwa mara na kusoma vitabu kadhaa kwa wakati mmoja: tumia 1/2/3 kwa nafasi 3 tofauti, na kioo cha kukuza kurudi kwenye kifungu cha mwisho (mstari wa nasibu au matokeo ya utafutaji).",
   quickSlotsIllustrationLabel:
     "Mchoro wa njia za mkato",
   quickSlotLastPassageTooltip:
