@@ -247,41 +247,61 @@ John 8:31-32`,
   quickSlot2Tooltip: 'Shortcut 2',
   quickSlot3Tooltip: 'Shortcut 3',
 
-    // Notes + Studies help (shared how-to)
-  notesHelpTitle: 'Notes & Studies — how it works',
-  notesHelpIntro:
-    'The Notes and Studies pages let you memorise verses, create themed lists and build real studies by combining verses and text blocks. Everything is stored locally on your device, 100% offline, with no account and no internet connection.',
-  notesHelp1Title: '1. Notes & Studies home page',
-  notesHelp1Body:
-    'Groups all your Notes and Studies lists. Tap a list to open its content. The “All lists” or “All studies” button at the top returns to the global view. When you come back from the Reading page, the app automatically reopens the last Notes list or Study you used and scrolls to the end so you can continue working easily.',
-  notesHelp2Title: '2. Add verses from the Bible',
-  notesHelp2Body:
-    'From the Reading page, you can add verses either to your Notes or to your Studies using the dedicated buttons. The selected verses are saved in the list(s) or study(ies) you choose, with the reference and verse text. You can memorise the same verse in several different lists.',
-  notesHelp3Title: '3. Free text blocks',
-  notesHelp3Body:
-    'In addition to verses, you can add free text blocks (comments, personal ideas, questions, sermon points, etc.). The “Add text block” button (at the top and bottom of an open list or study) opens a large editor area. The text is stored as a full item that you can then edit, move or delete.',
-  notesHelp4Title: '4. Reorder items',
-  notesHelp4Body:
-    'By tapping an item (verse or text block), you open its action menu. The “Move up” and “Move down” arrows let you change the order of items in the list or study, so you can adapt the structure to your Bible study, sermon or meditation time.',
-  notesHelp5Title: '5. Copy and share a whole list',
-  notesHelp5Body:
-    'In an open Notes list or Study, the “Share” and “Copy” buttons let you retrieve all the content: title, references, texts and note blocks. You can then paste this content into a message, a document or another tool, or for example send it to someone by SMS, WhatsApp or another messaging app.',
-  notesHelp6Title: '6. Share with a The Word code',
-  notesHelp6Body:
-    'The “Code” button generates a compact code you can send to someone who also has the The Word app. In their app, they can use the import-by-code option to recreate exactly the same Notes list or Study (title and content) on their device. The “Code” button also lets you turn a Note into a Study, so you can transfer the entire content of a Notes list into Studies.',
-  notesHelp7Title: '7. Import from a text',
-  notesHelp7Body:
-    'The “Import from text” button lets you paste a complete document (Word notes, email, sermon, study plan, etc.). The app splits the text into blocks (separated by blank lines) and automatically creates a list or study made up of those text blocks. This is very handy to quickly turn an existing document into Notes or a Study inside The Word.',
-  notesHelp8Title: '8. Local storage and privacy',
-  notesHelp8Body:
-    'All your Notes and Studies are stored only on your device. The Word does not sync anything to a server and does not collect any personal data. If you delete the app or clear browsing data, your Notes lists and Studies will be deleted as well.',
-  notesHelp9Title: '9. Ideas for use',
-  notesHelp9Body:
-    'You can use Notes to prepare sermons, follow a personal study plan, keep a prayer list, write down what God reminds you of during the day or store verses to memorise. Use Studies to build complete Bible courses (by theme, by book, for a home group, sermon series, etc.) that you can then teach or share easily.',
-  notesHelp10Title: '10. Notes & Studies together',
-  notesHelp10Body:
-    'Do not hesitate to combine Notes and Studies: for example, keep your daily thoughts and prayers in Notes, and reserve Studies for plans you want to rework, teach or share with a group.',
+    // Notes + Studies help (shared user guide)
+notesHelpTitle: 'Notes & Studies — User Guide',
 
+notesHelpIntro:
+'The Notes and Studies pages allow you to save and organize verses in themed lists, then supplement them with your own text blocks. You can gather passages, add your thoughts, and build structured Bible studies. Your Notes and Studies are stored locally on your device and remain accessible without an account.',
+
+notesHelp1Title: '1. Create and manage your lists',
+
+notesHelp1Body:
+'The main page displays all your Notes lists or Studies. You can create a list, give it a title, rename it, or delete it. Tap a list to open its contents. The “All lists” or “All studies” button returns you to the main view. When you open Notes or Studies again, the application automatically reopens the last list you used and moves near its final item so you can easily continue your work.',
+
+notesHelp2Title: '2. Add verses from the Bible',
+
+notesHelp2Body:
+'From the Reading page, select one or more verses, then use the Notes or Studies button. The verses are added to the lists you choose, together with their references and text. You can select several lists and save the same verse in different places.',
+
+notesHelp3Title: '3. Add text blocks',
+
+notesHelp3Body:
+'In addition to verses, you can add your own text blocks: comments, reflections, questions, prayers, sermon points, or other content. The “Add text block” button is available at the top and bottom of an open list. The + button beside an item also allows you to insert a block at that exact position. Each text block can later be edited, moved, or deleted.',
+
+notesHelp4Title: '4. Use and reorganize items',
+
+notesHelp4Body:
+'Open an item’s menu to display its available actions. A verse can be opened directly on the Reading page, copied, or shared. A text block can be copied, shared, or edited. The “Move up” and “Move down” arrows allow you to change the order of verses and text blocks. Each item can also be deleted individually.',
+
+notesHelp5Title: '5. Copy or share an entire list',
+
+notesHelp5Body:
+'In the menu of a Notes list or Study, the “Copy” and “Share” buttons allow you to retrieve all its contents: the title, Bible references, verse texts, and personal text blocks. You can then paste the content into a message or document, or send it using a compatible application installed on your device.',
+
+notesHelp6Title: '6. Share or transfer with a The Word code',
+
+notesHelp6Body:
+'The “Code” button copies a compact code containing the title and all the contents of the list. Another person using The Word can select “Import a code” to recreate the list on their device. The same system also allows you to transfer content between Notes and Studies: copy the code on one page, then import it on the other.',
+
+notesHelp7Title: '7. Import a text document',
+
+notesHelp7Body:
+'The “Import from text” option allows you to paste the contents of a document, an email, a sermon, or a study plan. You can keep the document in a single block or ask the application to divide it automatically into several blocks separated by blank lines. A new Notes list or Study is then created with the title you choose.',
+
+notesHelp8Title: '8. Local storage and backups',
+
+notesHelp8Body:
+'Your Notes and Studies are stored locally on your device and are not automatically synchronized with an account or server. If you uninstall the application, reset its data, or clear your browser data, their contents may be permanently deleted. To preserve an important list, use the Copy, Share, or The Word code functions.',
+
+notesHelp9Title: '9. Some ideas for using them',
+
+notesHelp9Body:
+'You can use Notes to save verses to memorize, record your daily thoughts, prepare a sermon, or keep a prayer list. Use Studies to build more complete Bible studies: explore a theme or book, prepare a home group, create a teaching plan, or develop a series of messages.',
+
+notesHelp10Title: '10. Combine Notes and Studies',
+
+notesHelp10Body:
+'Notes and Studies can be used together. For example, quickly collect verses, thoughts, and prayers in Notes, then transfer the items you want to explore more deeply into Studies using a The Word code. You can then reorganize, expand, and share them.',
   // Common
   loading: 'Loading...',
   error: 'Error loading content',
