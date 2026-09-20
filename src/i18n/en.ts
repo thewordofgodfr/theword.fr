@@ -236,7 +236,7 @@ John 8:31-32`,
   notesPoint3: 'Rename lists, copy/share.',
   createdWithLove: "Created with love to spread God's Word",
   versionsFootnote:
-    'All Bible versions used are in the public domain. Some have been partially modernized (vocabulary, grammar) while remaining strictly faithful to the original manuscripts. If you would like the Android app, please send me a request by email and I will send you a link (test version).',
+    'About the texts: the included Bibles are used in accordance with their respective licenses. Only the Louis Segond 1910 was modernized in 2025 (grammar and vocabulary), with strict respect for the original manuscripts.',
 
   // Quick slots
   quickSlotsIntro:
