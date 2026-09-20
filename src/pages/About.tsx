@@ -18,10 +18,8 @@ const TEXT_PX = 19;
 /* =========================================================
    AIDE VISUELLE DES MÉMOIRES RAPIDES
    Même palette que la page Lecture :
-   - Loupe : bleu sombre
-   - 1 : ambre sombre
-   - 2 : violet sombre
-   - 3 : vert sombre
+   - état inactif : bleu nuit
+   - état actif : bleu vif, contour blanc et légère lueur
 ========================================================= */
 
 const QuickSlotsHelpInline: React.FC = () => {
@@ -32,19 +30,13 @@ const QuickSlotsHelpInline: React.FC = () => {
     state.settings.theme === 'dark';
 
   const CHIP_BASE =
-    'w-9 h-9 rounded-full inline-flex items-center justify-center text-sm font-bold shadow-sm transition-all';
+    'w-9 h-9 rounded-full border-2 inline-flex items-center justify-center text-sm font-bold shadow transition-all box-border';
 
-  const SEARCH_FILLED =
-    'bg-blue-700 text-white';
+  const CHIP_INACTIVE =
+    'border-blue-800 bg-blue-950/80 text-blue-100';
 
-  const SLOT1 =
-    'bg-amber-800 text-white';
-
-  const SLOT2 =
-    'bg-violet-800 text-white';
-
-  const SLOT3 =
-    'bg-emerald-800 text-white';
+  const CHIP_ACTIVE =
+    'border-white bg-blue-600 text-white shadow-[0_0_0_2px_rgba(37,99,235,0.9),0_0_12px_rgba(37,99,235,0.65)]';
 
   return (
     <div>
@@ -76,7 +68,7 @@ const QuickSlotsHelpInline: React.FC = () => {
       >
         {/* Loupe */}
         <span
-          className={`${CHIP_BASE} ${SEARCH_FILLED}`}
+          className={`${CHIP_BASE} ${CHIP_INACTIVE}`}
           title={t(
             'quickSlotLastPassageTooltip'
           )}
@@ -86,12 +78,7 @@ const QuickSlotsHelpInline: React.FC = () => {
 
         {/* Mémoire 1 illustrée comme active */}
         <span
-          className={`
-            ${CHIP_BASE}
-            ${SLOT1}
-            border-2
-            border-white
-          `}
+          className={`${CHIP_BASE} ${CHIP_ACTIVE}`}
           title={t(
             'quickSlot1ActiveTooltip'
           )}
@@ -100,7 +87,7 @@ const QuickSlotsHelpInline: React.FC = () => {
         </span>
 
         <span
-          className={`${CHIP_BASE} ${SLOT2}`}
+          className={`${CHIP_BASE} ${CHIP_INACTIVE}`}
           title={t(
             'quickSlot2Tooltip'
           )}
@@ -109,7 +96,7 @@ const QuickSlotsHelpInline: React.FC = () => {
         </span>
 
         <span
-          className={`${CHIP_BASE} ${SLOT3}`}
+          className={`${CHIP_BASE} ${CHIP_INACTIVE}`}
           title={t(
             'quickSlot3Tooltip'
           )}
