@@ -315,7 +315,7 @@ Salmo 34:19  “Molte sono le afflizioni del giusto, ma il SIGNORE lo libera da 
 
   // Quick slots
   quickSlotsIntro:
-    "Questi 4 pulsanti, allineati a destra del selettore Libro/Capitolo, permettono di tornare subito alle letture frequenti per seguire più libri in parallelo: usa 1/2/3 per tre posizioni e la lente per riprendere l’ultimo passaggio (versetto casuale o ricerca).",
+    "Questi 4 pulsanti permettono di tornare immediatamente alle letture frequenti e di leggere più libri in parallelo: usa 1/2/3 per 3 posizioni distinte e la lente d’ingrandimento per tornare all’ultimo passo (versetto casuale o risultato di ricerca).",
   quickSlotsIllustrationLabel:
     "Illustrazione delle scorciatoie",
   quickSlotLastPassageTooltip:
