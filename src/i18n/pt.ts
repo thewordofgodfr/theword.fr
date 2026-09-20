@@ -238,7 +238,7 @@ Leia a sua Palavra. Examine-a com atenção. Peça a Deus que guie você e depoi
 
 “Se vocês permanecerem na minha palavra, serão verdadeiramente meus discípulos; conhecerão a verdade, e a verdade os libertará.”
 
-João 8:31-32”`,
+João 8:31-32`,
   bibleVersions: "Versões da Bíblia",
   frenchVersion:
     "Francês: Louis Segond 1910 (LSG) – Revisão 2025 – Domínio público",
