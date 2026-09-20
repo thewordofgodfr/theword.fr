@@ -253,7 +253,7 @@ Nínú ayé tí ọ̀pọ̀ ohùn ti ń gbìyànjú láti ní ipa lórí wa, ìf
 
 “Bí ẹ bá dúró nínú ọ̀rọ̀ mi, ọmọ-ẹ̀yìn mi ni yín nítòótọ́; ẹ ó mọ òtítọ́, òtítọ́ náà yóò sì sọ yín di òmìnira.”
 
-Jòhánù 8:31-32”`,
+Jòhánù 8:31-32`,
   bibleVersions: "Àwọn ìtumọ̀ Bíbélì",
   frenchVersion:
     "Fáransé: Louis Segond 1910 (LSG) – Àtúnṣe 2025 – Gbólóhùn àwùjọ",
