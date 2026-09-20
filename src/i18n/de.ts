@@ -216,7 +216,7 @@ Lesen Sie sein Wort. Prüfen Sie es aufmerksam. Bitten Sie Gott, Sie zu führen,
 
 „Wenn ihr in meinem Wort bleibt, seid ihr wirklich meine Jünger; ihr werdet die Wahrheit erkennen, und die Wahrheit wird euch frei machen.“
 
-Johannes 8,31–32”`,
+Johannes 8,31–32`,
   bibleVersions: "Bibelübersetzungen",
   frenchVersion:
     "Französisch: Louis Segond 1910 (LSG) – Überarbeitung 2025 – gemeinfrei",
