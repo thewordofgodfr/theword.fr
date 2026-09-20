@@ -201,7 +201,7 @@ const de: TranslationDict = {
   // About
   aboutTitle: "",
   aboutDescription:
-    "The Word hilft dir, Gottes Wort durch Zufallsverse und vollständiges Bibellesen zu entdecken.",
+    "Durchsuchen Sie sofort die gesamte Bibel nach Wörtern oder Ausdrücken, öffnen Sie die Ergebnisse unter „Lesen“ und kopieren oder teilen Sie einen Vers mit nur einer Berührung.",
   aboutIntro: `Warum The Word?
 
 Ich habe The Word entwickelt, um mehrere Bücher der Bibel parallel lesen zu können, ohne den Faden meiner Lektüre zu verlieren. Mit der Zeit kamen weitere Funktionen hinzu, doch das Ziel blieb immer dasselbe: jedem dabei zu helfen, Gottes Wort zu lesen, darüber nachzudenken, es im Gedächtnis zu bewahren und danach zu leben.
