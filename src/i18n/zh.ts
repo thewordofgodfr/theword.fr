@@ -242,7 +242,7 @@ const zh: TranslationDict = {
 
 “你们若常常遵守我的道，就真是我的门徒；你们必认识真理，真理也必使你们自由。”
 
-约翰福音 8:31-32”`,
+约翰福音 8:31-32`,
   bibleVersions: "圣经版本",
   frenchVersion:
     "法语：Louis Segond 1910 (LSG) – 2025 修订版 – 公有领域",
