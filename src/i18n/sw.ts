@@ -243,7 +243,7 @@ const sw: TranslationDict = {
   // About
   aboutTitle: "",
   aboutDescription:
-    "The Word hukusaidia kugundua Neno la Mungu kupitia aya za nasibu na usomaji kamili wa Biblia.",
+    "Tafuta mara moja maneno au vifungu katika Biblia nzima, fungua matokeo katika sehemu ya Kusoma, kisha nakili au shiriki mstari kwa mguso mmoja.",
   aboutIntro: `Kwa nini The Word?
 
 Niliunda The Word ili niweze kusoma vitabu kadhaa vya Biblia kwa wakati mmoja bila kupoteza nilipofikia. Baada ya muda, vipengele vingine viliongezwa, lakini kusudi lilibaki lilelile: kumsaidia kila mtu kusoma, kutafakari, kukumbuka na kutenda Neno la Mungu.
