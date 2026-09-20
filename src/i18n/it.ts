@@ -232,7 +232,7 @@ Leggete la sua Parola. Esaminatela attentamente. Chiedete a Dio di guidarvi, poi
 
 «Se dimorate nella mia parola, siete veramente miei discepoli; conoscerete la verità e la verità vi renderà liberi.»
 
-Giovanni 8:31-32”`,
+Giovanni 8:31-32`,
   bibleVersions: "Versioni della Bibbia",
   frenchVersion:
     "Francese: Louis Segond 1910 (LSG) – Revisione 2025 – Dominio pubblico",
