@@ -244,7 +244,7 @@ Johannes 8,31–32`,
   createdWithLove:
     "Mit Liebe erstellt, um Gottes Wort zu verbreiten",
   versionsFootnote:
-    "Alle verwendeten Bibelübersetzungen sind gemeinfrei. Einige wurden sprachlich leicht modernisiert, bleiben aber streng den ursprünglichen Handschriften treu. Wenn du die Android-App möchtest, sende mir bitte eine Anfrage per E-Mail, und ich schicke dir einen Link (Testversion).",
+    "Zu den Texten: Die integrierten Bibelausgaben werden gemäß ihren jeweiligen Lizenzen verwendet. Ausschließlich die Louis Segond 1910 wurde 2025 sprachlich modernisiert (Grammatik und Wortschatz), unter strikter Wahrung der ursprünglichen Manuskripte.",
 
   // Quick slots
   quickSlotsIntro:
