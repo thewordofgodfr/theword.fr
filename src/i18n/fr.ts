@@ -214,7 +214,7 @@ Lisez sa Parole. Examinez-la avec attention. Demandez à Dieu de vous guider, pu
 
 « Si vous demeurez dans ma parole, vous êtes vraiment mes disciples ; vous connaîtrez la vérité, et la vérité vous rendra libres. »
 
-Jean 8:31-32”`,
+Jean 8:31-32`,
   bibleVersions: 'Versions de la Bible',
   frenchVersion:
     'Français : Louis Segond 1910 (LSG) — modernisation 2025 (vocabulaire/orthographe)',
