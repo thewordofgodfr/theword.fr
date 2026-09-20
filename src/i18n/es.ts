@@ -216,7 +216,7 @@ Lee su Palabra. Examínala atentamente. Pide a Dios que te guíe y responde desp
 
 «Si permanecéis en mi palabra, seréis verdaderamente mis discípulos; conoceréis la verdad, y la verdad os hará libres».
 
-Juan 8:31-32”`,
+Juan 8:31-32`,
 
   bibleVersions: 'Versiones de la Biblia',
   frenchVersion:
