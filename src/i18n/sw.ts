@@ -244,69 +244,21 @@ const sw: TranslationDict = {
   aboutTitle: "",
   aboutDescription:
     "The Word hukusaidia kugundua Neno la Mungu kupitia aya za nasibu na usomaji kamili wa Biblia.",
-  aboutIntro: `Kwa nini niliunda The Word
+  aboutIntro: `Kwa nini The Word?
 
-Mwanzoni, niliunda programu hii kwa sababu moja rahisi sana: kusoma vitabu kadhaa vya Biblia kwa wakati mmoja bila kupoteza mfuatano kutoka siku moja hadi nyingine, kwa msaada wa vichupo 1 / 2 / 3 kwenye ukurasa wa Kusoma.
+Niliunda The Word ili niweze kusoma vitabu kadhaa vya Biblia kwa wakati mmoja bila kupoteza nilipofikia. Baada ya muda, vipengele vingine viliongezwa, lakini kusudi lilibaki lilelile: kumsaidia kila mtu kusoma, kutafakari, kukumbuka na kutenda Neno la Mungu.
 
-Kadiri muda ulivyopita, niliongeza vipengele vingine, daima kwa nia ile ile: kusaidia kusoma, kutafakari, kukumbuka, na kutenda Neno la Mungu.
+Tamaa yangu
 
-Ombi langu kwa ajili yenu
+Katika ulimwengu ambamo sauti nyingi sana zinajaribu kutushawishi, tamaa yangu ni rahisi: kumhimiza kila mtu arudi moja kwa moja katika Biblia kwa moyo wa kweli na kutafuta ukweli ndani yake.
 
-Ombi langu ni kwamba mteguswe na Neno la Mungu, kwamba muelewe upendo ambao Mungu anao kwenu, na upendo wa Yesu Kristo Mwana wake, pamoja na gharama aliyolipa ili tupatanishwe na Mungu na kutembea naye katika upendo wake.
+Ombi langu ni kwamba programu hii ikusaidie kugundua upendo wa Mungu, kumjua Yesu Kristo na kuelewa kile alichofanya ili kutupatanisha na Mungu.
 
-Upendo wa Mungu na mwito wa kuamini vinaonekana wazi sana katika Injili ya Yohana (mf.: Yohana 3:16).
+Soma Neno lake. Lichunguze kwa makini. Mwombe Mungu akuongoze, kisha uitikie wito wake kwa imani, toba na utii.
 
-Ufunguo wa kuingia Ufalme na mwito wazi wa kuitikia Mungu unaonekana wazi katika kitabu cha Matendo (mf.: Matendo 2:38; Matendo 4:12).
+“Mkidumu katika neno langu, mmekuwa wanafunzi wangu kweli; mtaujua ukweli, na ukweli utawaweka huru.”
 
-Biblia: Mungu anasema nasi
-
-Hatupaswi kamwe kusahau kwamba Biblia yote imevuviwa na Mungu: ni Mungu anayesema nasi, na tunapaswa kumcha na kumtii.
-
-2 Timotheo 3:16-17  “Kila Andiko, lenye pumzi ya Mungu…”
-Mithali 9:10  “Kumcha BWANA ndiyo mwanzo wa hekima…”
-Yohana 13:34-35  “Mpendane ninyi kwa ninyi, kama mimi nilivyowapenda…”
-
-Wakati ni mfupi: kuitikia mwito wa Mungu
-
-Ninaamini wakati ni mfupi na kwamba Mungu anatamani sana kila mtu aitikie mwito wake: kutubu, kuamini, na kubatizwa kwa ondoleo la dhambi. Hii ni fursa kubwa: kuwa pamoja na Mungu milele. Tusichelewe, kwa maana Mungu atatimiza haki yake siku aliyoweka, na Yesu mara nyingi alituambia tuwe macho na tayari.
-
-1 Wakorintho 7:29  “Wakati ni mfupi…”
-Matendo 17:30-31  Mungu anawaita watu wote watubu… “ameweka siku…”
-Matendo 2:38  “Tubuni… mpate ondoleo la dhambi…”
-Marko 1:15  “Tubuni, mkiamini Injili.”
-Mathayo 24:42-44  “Kesheni… jiwekeni tayari…”
-Luka 12:35-40  “Viuno vyenu viwe vimefungwa, na taa zenu ziwe zinawaka…”
-
-Kwa bahati mbaya, wengi wameyaacha Maandiko. Biblia inaonya kwamba kutakuja wakati ambapo baadhi watatafuta ujumbe unaowapendeza na watajipatia “wingi wa walimu”.
-
-Ndiyo sababu tumeitwa kudumu katika Neno, kumtii Mungu, na kuishi kwa namna inayostahili Injili—na pia kutafuta kuwashawishi wale wanaotuzunguka.
-
-2 Timotheo 4:3-4  “watajikusanyia walimu wengi…”
-Yohana 8:31-32  “Mkikaa katika neno langu…”
-Wakolosai 1:23  “kaeni mkiwa thabiti na msiotikisika…”
-Wafilipi 1:27  “ishini kwa namna inayostahili Injili…”
-2 Wakorintho 5:20  “sisi ni mabalozi…”
-
-Na wakati mwingine, “kanisa” linaweza kuanza kwa unyenyekevu: watu wawili wanaomtafuta Mungu pamoja.
-
-Mathayo 18:20  “Palipo na wawili au watatu wamekusanyika kwa jina langu…”
-
-Lango ni jembamba: tembea kwa unyenyekevu na Mungu
-
-Yesu alisema lango ni jembamba, na njia iendayo upotevuni ni pana. Tusiruhusu dhambi zetu zitutenge na Mungu. Tumtii Neno lake kwa unyenyekevu, kwa moyo wa mtoto: rahisi, bila unafiki, lakini pia tukiwa makini na wenye hekima.
-
-Mathayo 7:13-14  “Ingieni kwa kupitia lango jembamba…”
-Waebrania 12:1-2  “tuweke kando kila mzigo na dhambi…”
-Mathayo 18:3  “msipogeuka na kuwa kama watoto…”
-Mathayo 10:16  “wapole kama hua na wenye busara kama nyoka…”
-
-Ombeni, vumilieni, msikate tamaa
-
-Mwombeni Mungu awaongoze kwa Neno lake na kwa Roho Mtakatifu wake. Ombeni kwa bidii. Msivunjike moyo. Msikate tamaa. Hata mwenye haki akipitia mateso, Mungu hubaki mwaminifu na huokoa.
-
-Luka 18:1  “imewapasa kuomba siku zote, wala msikate tamaa”
-Yakobo 1:5  “Mtu akipungukiwa na hekima na aombe kwa Mungu…”
-Zaburi 34:19  “Mateso ya mwenye haki ni mengi; lakini BWANA humponya na humtoa katika hayo yote.”`,
+Yohana 8:31-32”`,
   bibleVersions: "Toleo za Biblia",
   frenchVersion:
     "Kifaransa: Louis Segond 1910 (LSG) – Marekebisho 2025 – Eneo la umma",
