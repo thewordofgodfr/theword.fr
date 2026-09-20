@@ -240,7 +240,7 @@ const ko: TranslationDict = {
   createdWithLove:
     "하나님의 말씀을 전하기 위해 사랑으로 만들었습니다",
   versionsFootnote:
-    "사용되는 모든 성경 번역은 퍼블릭 도메인입니다. 일부는 어휘와 문법이 부분적으로 현대화되었지만, 원본 사본에 엄격히 충실합니다. Android 앱을 원하시면 이메일로 요청해 주시면 링크를 보내 드리겠습니다(테스트 버전).",
+    "본문 안내: 앱에 포함된 각 성경은 해당 라이선스에 따라 사용됩니다. Louis Segond 1910만 원문 사본을 엄격히 존중하는 범위에서 2025년에 문법과 어휘가 현대화되었습니다.",
 
   // Quick slots
   quickSlotsIntro:
