@@ -281,7 +281,7 @@ Yohanes 8:31-32`,
   createdWithLove:
     "Dibuat dengan kasih untuk menyebarkan Firman Tuhan",
   versionsFootnote:
-    "Semua versi Alkitab yang digunakan berada di domain publik. Beberapa telah dimodernisasi sebagian (kosakata, tata bahasa) tetapi tetap sangat setia pada naskah aslinya. Jika Anda menginginkan aplikasi Android, silakan kirim permintaan melalui email dan saya akan mengirimkan tautan (versi uji coba).",
+    "Tentang teks: Alkitab yang disertakan digunakan sesuai dengan lisensinya masing-masing. Hanya Louis Segond 1910 yang dimodernisasi pada tahun 2025 (tata bahasa dan kosakata), dengan tetap menghormati naskah-naskah asli secara ketat.",
 
   // Quick slots
   quickSlotsIntro:
