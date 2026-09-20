@@ -235,7 +235,7 @@ const id: TranslationDict = {
   // About
   aboutTitle: "",
   aboutDescription:
-    "The Word membantu Anda menemukan firman Tuhan melalui ayat acak dan pembacaan Alkitab secara lengkap.",
+    "Cari kata atau frasa secara instan di seluruh Alkitab, buka hasilnya di bagian Bacaan, lalu salin atau bagikan ayat hanya dengan satu ketukan.",
   aboutIntro: `Mengapa The Word?
 
 Saya membuat The Word agar dapat membaca beberapa kitab dalam Alkitab secara bersamaan tanpa kehilangan jejak bacaan. Seiring waktu, berbagai fitur lain ditambahkan, tetapi tujuannya tetap sama: membantu setiap orang membaca, merenungkan, mengingat, dan melakukan Firman Allah.
