@@ -320,7 +320,7 @@ Salmo 34:19  “Muitas são as aflições do justo, mas o SENHOR o livra de toda
 
   // Quick slots
   quickSlotsIntro:
-    "Esses 4 botões, alinhados à direita do seletor Livro/Capítulo, permitem voltar imediatamente às leituras frequentes para acompanhar vários livros em paralelo: use 1/2/3 para três posições e a lupa para retomar a última passagem (verso aleatório ou pesquisa).",
+    "Estes 4 botões permitem voltar instantaneamente às suas leituras frequentes para ler vários livros em paralelo: use 1/2/3 para 3 posições distintas e a lupa para voltar à última passagem (versículo aleatório ou resultado de pesquisa).",
   quickSlotsIllustrationLabel:
     "Ilustração dos atalhos",
   quickSlotLastPassageTooltip:
