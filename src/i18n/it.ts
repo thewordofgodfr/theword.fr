@@ -263,7 +263,7 @@ Giovanni 8:31-32`,
   createdWithLove:
     "Creato con amore per diffondere la Parola di Dio",
   versionsFootnote:
-    "Tutte le versioni bibliche utilizzate sono di dominio pubblico. Alcune sono state parzialmente modernizzate (vocabolario, grammatica), mantenendo la massima fedeltà ai manoscritti originali. Se desiderate l’app Android, inviatemi una richiesta via e-mail e vi invierò un link (app in versione di test).",
+    "Informazioni sui testi: le Bibbie integrate sono utilizzate nel rispetto delle rispettive licenze. Soltanto la Louis Segond 1910 è stata modernizzata nel 2025 (grammatica e vocabolario), nel rigoroso rispetto dei manoscritti originali.",
 
   // Quick slots
   quickSlotsIntro:
