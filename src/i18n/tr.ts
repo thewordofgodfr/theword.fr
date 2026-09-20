@@ -206,7 +206,7 @@ const tr: TranslationDict = {
   // About / versions
   aboutTitle: "",
   aboutDescription:
-    "The Word, rastgele ayetler ve bütün Kutsal Kitap okumaları aracılığıyla Tanrı'nın sözünü keşfetmene yardım eder.",
+    "Kutsal Kitap’ın tamamında kelime veya ifadeleri anında arayın, sonuçları Okuma bölümünde açın ve bir ayeti tek dokunuşla kopyalayın veya paylaşın.",
   aboutIntro: `Neden The Word?
 
 The Word’ü, Kutsal Kitap’ın birden fazla bölümünü eş zamanlı okuyabilmek ve kaldığım yeri kaybetmemek için oluşturdum. Zamanla başka özellikler de eklendi, ancak amaç hep aynı kaldı: herkesin Tanrı’nın Sözü’nü okumasına, üzerinde düşünmesine, onu hatırlamasına ve yaşamında uygulamasına yardımcı olmak.
