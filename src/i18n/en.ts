@@ -196,7 +196,7 @@ const en: TranslationDict = {
   // About page
   aboutTitle: '',
   aboutDescription:
-    "The Word allows you to discover God's word through random verses and complete Bible reading.",
+    "Instantly search for words or phrases throughout the Bible, open the results in Reading, and copy or share a verse with a single tap.",
   aboutIntro: `Why The Word?
 
 I created The Word so that I could read several books of the Bible in parallel without losing track of my progress. Over time, other features were added, always with the same purpose: to help everyone read, meditate on, remember, and put God’s Word into practice.
