@@ -296,7 +296,7 @@ Psalm 34:19  “Viele Leiden hat der Gerechte; aber aus allen rettet ihn der HER
 
   // Quick slots
   quickSlotsIntro:
-    "Diese 4 Schaltflächen rechts vom Buch/Kapitel-Wähler lassen dich schnell zu häufigen Lesungen zurückkehren, um mehrere Bücher parallel zu verfolgen: Nutze 1/2/3 für drei Speicherplätze und die Lupe, um zur letzten Stelle zurückzukehren (Zufallsvers oder Suchergebnis).",
+    "Mit diesen 4 Schaltflächen können Sie sofort zu Ihren häufig gelesenen Stellen zurückkehren und mehrere Bücher parallel lesen: Verwenden Sie 1/2/3 für 3 verschiedene Speicherplätze und die Lupe, um zum letzten Abschnitt zurückzukehren (Zufallsvers oder Suchergebnis).",
   quickSlotsIllustrationLabel:
     "Abbildung der Schnellzugriffe",
   quickSlotLastPassageTooltip: "Letzter Abschnitt",
