@@ -336,7 +336,7 @@ Sáàmù 34:19  “Ọ̀pọ̀ ni ìpọnjú ẹni olódodo; ṣùgbọ́n OLÚW
 
   // Quick slots
   quickSlotsIntro:
-    "Àwọn bọ́tìnì mẹ́rin yìí, tí wọ́n wà ní apa ọ̀tún aṣàyàn Ìwé/Apá, ń jẹ́ kí o padà sí ìkàwé tí o máa ń kà lọ́pọ̀ jù lọ láìpé, kí o lè kà ọ̀pọ̀ ìwé ní àkókò kan: lo 1/2/3 fún ipò mẹ́ta, kí o sì lo lúpà láti padà sí apá tí o kà gbẹ́yìn (ẹsẹ àdánidá tàbí abájáde ìṣàwárí).",
+    "Àwọn bọ́tìnì mẹ́rin yìí jẹ́ kí o lè padà lẹ́sẹ̀kẹsẹ̀ sí àwọn ibi tí o máa ń kà lọ́pọ̀ ìgbà, kí o sì lè ka ọ̀pọ̀ ìwé ní àkókò kan: lo 1/2/3 fún ibi ìpamọ́ mẹ́ta ọ̀tọ̀ọ̀tọ̀, kí o sì lo gíláàsì ìwádìí láti padà sí apá tí o kà kẹ́yìn (ẹsẹ̀ àìròtẹ́lẹ̀ tàbí àbájáde ìwádìí).",
   quickSlotsIllustrationLabel:
     "Àpẹẹrẹ àwọn ọ̀nà kíákíá",
   quickSlotLastPassageTooltip:
