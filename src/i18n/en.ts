@@ -211,7 +211,7 @@ Read his Word. Examine it carefully. Ask God to guide you, then answer his call 
 
 “If you remain in my word, you are truly my disciples; you will know the truth, and the truth will set you free.”
 
-John 8:31-32”`,
+John 8:31-32`,
   bibleVersions: 'Bible Versions',
   frenchVersion: 'French: Louis Segond 1910 (LSG) - Public Domain',
   englishVersion: 'English: King James Version (KJV) - Public Domain',
