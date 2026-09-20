@@ -227,7 +227,7 @@ const zh: TranslationDict = {
   // About
   aboutTitle: "",
   aboutDescription:
-    "The Word 帮助你通过随机经文和完整读经来发现神的话语。",
+    "即时搜索整本圣经中的单词或短语，在“阅读”页面打开搜索结果，并可一键复制或分享经文。",
   aboutIntro: `为什么选择 The Word？
 
 我创建 The Word，是为了能够同时阅读多卷圣经，并且不会忘记自己的阅读进度。随着时间推移，我又加入了其他功能，但目的始终不变：帮助每个人阅读、默想、牢记并实践上帝的话语。
