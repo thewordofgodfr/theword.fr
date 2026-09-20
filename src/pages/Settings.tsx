@@ -854,12 +854,21 @@ export default function Settings() {
                 })()}
               </div>
 
-              <div className="mt-4 rounded-lg border border-gray-600 bg-gray-700 p-4">
-                <div className="mb-2 text-xs font-medium uppercase tracking-wide text-white/55">
+              <div
+                className="mt-4 rounded-lg border-2 border-blue-500 bg-blue-950/70 p-4 ring-2 ring-blue-500/20 transition-all duration-200"
+                aria-label={`${t('fontSizePreview')}: ${state.settings.fontSize}px`}
+              >
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-blue-300">
                   {state.settings.fontSize}px
                 </div>
 
-                <p className="text-white" style={{ fontSize: `${state.settings.fontSize}px` }}>
+                <p
+                  className="text-white"
+                  style={{
+                    fontSize: `${state.settings.fontSize}px`,
+                    lineHeight: 1.5,
+                  }}
+                >
                   {t('fontSizePreview')}
                 </p>
               </div>
