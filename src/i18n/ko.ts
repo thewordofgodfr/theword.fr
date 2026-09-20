@@ -292,7 +292,7 @@ const ko: TranslationDict = {
 
   // Quick slots
   quickSlotsIntro:
-    "책/장 선택기 오른쪽에 있는 네 개의 버튼은 자주 읽는 본문으로 즉시 돌아가 여러 책을 병행해서 읽을 수 있게 해 줍니다. 1/2/3은 세 개의 위치에, 돋보기는 마지막 본문(무작위 구절 또는 검색 결과)에 사용하세요.",
+    "이 4개의 버튼을 사용하면 자주 읽는 위치로 즉시 돌아가 여러 성경 책을 동시에 읽을 수 있습니다. 1/2/3은 서로 다른 3개의 저장 위치로 사용하고, 돋보기는 마지막으로 열었던 구절(무작위 구절 또는 검색 결과)로 돌아갈 때 사용합니다.",
   quickSlotsIllustrationLabel: "바로가기 예시",
   quickSlotLastPassageTooltip: "마지막 본문",
   quickSlot1ActiveTooltip: "바로가기 1 (활성)",
