@@ -300,7 +300,7 @@ Mezmur 34:19  “Doğrunun sıkıntıları çoktur; ama RAB hepsinden onu kurtar
 
   // Quick slots / raccourcis lecture
   quickSlotsIntro:
-    "Kitap/Bölüm seçicisinin sağındaki bu 4 düğme, sık okunan yerlere anında dönmene ve birden çok kitabı paralel olarak takip etmene yardım eder: üç konum için 1/2/3'ü ve son bölüme (rastgele ayet veya arama sonucu) dönmek için büyüteci kullan.",
+    "Bu 4 düğme, sık okuduğunuz bölümlere anında dönmenizi ve birden fazla kitabı paralel olarak okumanızı sağlar: 3 ayrı konum için 1/2/3’ü, son bölüme dönmek için ise büyüteci kullanın (rastgele ayet veya arama sonucu).",
   quickSlotsIllustrationLabel: "Kısayolların görseli",
   quickSlotLastPassageTooltip: "Son bölüm",
   quickSlot1ActiveTooltip: "Kısayol 1 (etkin)",
