@@ -236,69 +236,21 @@ const id: TranslationDict = {
   aboutTitle: "",
   aboutDescription:
     "The Word membantu Anda menemukan firman Tuhan melalui ayat acak dan pembacaan Alkitab secara lengkap.",
-  aboutIntro: `Mengapa saya membuat The Word
+  aboutIntro: `Mengapa The Word?
 
-Pada awalnya, saya membuat aplikasi ini untuk satu alasan yang sangat sederhana: membaca beberapa kitab Alkitab sekaligus, tanpa kehilangan alur dari hari ke hari, berkat tab 1 / 2 / 3 pada halaman Membaca.
+Saya membuat The Word agar dapat membaca beberapa kitab dalam Alkitab secara bersamaan tanpa kehilangan jejak bacaan. Seiring waktu, berbagai fitur lain ditambahkan, tetapi tujuannya tetap sama: membantu setiap orang membaca, merenungkan, mengingat, dan melakukan Firman Allah.
 
-Seiring waktu, saya menambahkan fitur-fitur lain, selalu dengan tujuan yang sama: membantu membaca, merenungkan, mengingat, dan mempraktikkan Firman Allah.
+Kerinduan saya
 
-Doa saya untuk Anda
+Di dunia tempat begitu banyak suara berusaha memengaruhi kita, kerinduan saya sederhana: mendorong setiap orang untuk kembali langsung kepada Alkitab dengan hati yang tulus dan mencari kebenaran di dalamnya.
 
-Doa saya adalah agar Anda disentuh oleh Firman Allah, agar Anda memahami kasih Allah bagi Anda, dan kasih Yesus Kristus, Putra-Nya, serta harga yang Ia bayar supaya kita diperdamaikan dengan Allah dan berjalan bersama-Nya dalam kasih-Nya.
+Doa saya adalah agar aplikasi ini menolong Anda menemukan kasih Allah, mengenal Yesus Kristus, dan memahami apa yang telah dilakukan-Nya untuk mendamaikan kita dengan Allah.
 
-Kasih Allah dan panggilan untuk percaya terlihat sangat jelas dalam Injil Yohanes (mis.: Yohanes 3:16).
+Bacalah Firman-Nya. Periksalah dengan saksama. Mintalah Allah membimbing Anda, lalu jawablah panggilan-Nya dengan iman, pertobatan, dan ketaatan.
 
-Kunci untuk masuk ke dalam Kerajaan dan panggilan yang jelas untuk menanggapi Allah tampak jelas dalam kitab Kisah Para Rasul (mis.: Kisah Para Rasul 2:38; Kisah Para Rasul 4:12).
+“Jika kamu tetap dalam firman-Ku, kamu benar-benar murid-Ku; kamu akan mengetahui kebenaran, dan kebenaran itu akan memerdekakan kamu.”
 
-Alkitab: Allah berbicara kepada kita
-
-Kita tidak boleh lupa bahwa seluruh Alkitab diilhamkan oleh Allah: Allah yang berbicara kepada kita, dan kita harus takut akan Dia dan taat kepada-Nya.
-
-2 Timotius 3:16-17  “Segala tulisan yang diilhamkan Allah…”
-Amsal 9:10  “Permulaan hikmat adalah takut akan TUHAN…”
-Yohanes 13:34-35  “Kasihilah seorang akan yang lain, seperti Aku telah mengasihi kamu…”
-
-Waktu singkat: menanggapi panggilan Allah
-
-Saya percaya bahwa waktu singkat dan Allah sangat menghendaki setiap orang menanggapi panggilan-Nya: bertobat, percaya, dan dibaptis untuk pengampunan dosa. Ini adalah kesempatan yang sangat besar: bersama Allah untuk selama-lamanya. Jangan menunda, sebab Allah akan melaksanakan keadilan-Nya pada hari yang telah Ia tetapkan, dan Yesus sering memanggil kita untuk berjaga-jaga dan siap sedia.
-
-1 Korintus 7:29  “Waktu telah singkat…”
-Kisah Para Rasul 17:30-31  Allah memerintahkan semua orang untuk bertobat… “Ia telah menetapkan suatu hari…”
-Kisah Para Rasul 2:38  “Bertobatlah… untuk pengampunan dosamu…”
-Markus 1:15  “Bertobatlah dan percayalah kepada Injil.”
-Matius 24:42-44  “Berjaga-jagalah… bersiaplah…”
-Lukas 12:35-40  “Ikatlah pinggangmu dan nyalakanlah pelitamu…”
-
-Sayangnya, banyak orang menjauh dari Kitab Suci. Alkitab memperingatkan bahwa akan datang suatu waktu ketika sebagian orang mencari pesan yang menyenangkan telinga mereka dan mengumpulkan “banyak guru” bagi diri mereka sendiri.
-
-Karena itu kita dipanggil untuk tinggal dalam Firman, taat kepada Allah, dan hidup dengan cara yang layak bagi Injil—serta juga berusaha meyakinkan orang-orang di sekitar kita.
-
-2 Timotius 4:3-4  “mereka akan mengumpulkan guru-guru…”
-Yohanes 8:31-32  “Jika kamu tetap dalam firman-Ku…”
-Kolose 1:23  “tetap teguh dan tidak bergoncang…”
-Filipi 1:27  “hiduplah berpadanan dengan Injil…”
-2 Korintus 5:20  “kami ini utusan-utusan…”
-
-Dan kadang-kadang, sebuah “gereja” dapat dimulai dengan sangat sederhana: dua orang yang mencari Allah bersama-sama.
-
-Matius 18:20  “Di mana dua atau tiga orang berkumpul dalam nama-Ku…”
-
-Pintu itu sempit: berjalan dengan rendah hati bersama Allah
-
-Yesus berkata bahwa pintu itu sempit dan jalan yang menuju kebinasaan itu lebar. Jangan biarkan dosa-dosa kita menjauhkan kita dari Allah. Mari taat dengan rendah hati kepada Firman-Nya, dengan hati seperti anak kecil: sederhana, tanpa kemunafikan, namun juga sadar dan bijaksana.
-
-Matius 7:13-14  “Masuklah melalui pintu yang sempit…”
-Ibrani 12:1-2  “menanggalkan setiap beban dan dosa…”
-Matius 18:3  “jika kamu tidak menjadi seperti anak kecil…”
-Matius 10:16  “tulus seperti merpati dan cerdik seperti ular…”
-
-Berdoa, bertekun, jangan menyerah
-
-Berdoalah kepada Allah agar Ia menuntun Anda melalui Firman-Nya dan Roh Kudus-Nya. Mohonlah dengan sungguh-sungguh. Jangan putus asa. Jangan menyerah. Sekalipun orang benar melewati penderitaan, Allah tetap setia dan membebaskan.
-
-Lukas 18:1  “harus selalu berdoa dan jangan jemu-jemu”
-Yakobus 1:5  “Jika di antara kamu ada yang kekurangan hikmat, hendaklah ia memintanya kepada Allah…”
-Mazmur 34:19  “Kemalangan orang benar banyak, tetapi TUHAN melepaskan dia dari semuanya itu.”`,
+Yohanes 8:31-32”`,
   bibleVersions: "Versi Alkitab",
   frenchVersion:
     "Prancis: Louis Segond 1910 (LSG) – Revisi 2025 – Domain publik",
