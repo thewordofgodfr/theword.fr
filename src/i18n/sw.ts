@@ -258,7 +258,7 @@ Soma Neno lake. Lichunguze kwa makini. Mwombe Mungu akuongoze, kisha uitikie wit
 
 “Mkidumu katika neno langu, mmekuwa wanafunzi wangu kweli; mtaujua ukweli, na ukweli utawaweka huru.”
 
-Yohana 8:31-32”`,
+Yohana 8:31-32`,
   bibleVersions: "Toleo za Biblia",
   frenchVersion:
     "Kifaransa: Louis Segond 1910 (LSG) – Marekebisho 2025 – Eneo la umma",
