@@ -250,7 +250,7 @@ Bacalah Firman-Nya. Periksalah dengan saksama. Mintalah Allah membimbing Anda, l
 
 “Jika kamu tetap dalam firman-Ku, kamu benar-benar murid-Ku; kamu akan mengetahui kebenaran, dan kebenaran itu akan memerdekakan kamu.”
 
-Yohanes 8:31-32”`,
+Yohanes 8:31-32`,
   bibleVersions: "Versi Alkitab",
   frenchVersion:
     "Prancis: Louis Segond 1910 (LSG) – Revisi 2025 – Domain publik",
