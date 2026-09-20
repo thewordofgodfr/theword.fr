@@ -284,7 +284,7 @@ Jòhánù 8:31-32`,
   createdWithLove:
     "A dá a sílẹ̀ pẹ̀lú ìfẹ́ láti tàn Ọ̀rọ̀ Ọlọ́run ka",
   versionsFootnote:
-    "Gbogbo àwọn ìtumọ̀ Bíbélì tí a lo wà ní gbòlóhùn àwùjọ. Díẹ̀ lára wọn ni a ti ṣe àtúnṣe díẹ̀ (ọ̀rọ̀ àti gírámà) ṣùgbọ́n wọ́n ṣi wà ní ìfarahàn pípé sí àwọn ìwé àtẹ̀jáde. Bí ẹ bá fẹ́ app Android, ẹ jọ̀wọ́ ẹ rán mi létí nípasẹ̀ email, emi yóò sì rán yín ní ìjápọ̀ (ẹ̀dà ìdánwò).",
+    "Nípa àwọn ọ̀rọ̀ inú Bíbélì: a ń lo àwọn ẹ̀dà Bíbélì tí ó wà nínú ètò yìí ní ìbámu pẹ̀lú ìwé-àṣẹ ọ̀kọ̀ọ̀kan wọn. Louis Segond 1910 nìkan ni a mú bá èdè òde òní mu ní ọdún 2025 nípa gírámà àti àwọn ọ̀rọ̀, láì yà kúrò ní ìtumọ̀ àwọn ìwé àfọwọ́kọ ìpilẹ̀ṣẹ̀.",
 
   // Quick slots
   quickSlotsIntro:
