@@ -221,7 +221,7 @@ O’nun Sözü’nü okuyun. Dikkatle inceleyin. Tanrı’dan size yol gösterme
 
 “Eğer benim sözüme bağlı kalırsanız, gerçekten öğrencilerim olursunuz; gerçeği bileceksiniz ve gerçek sizi özgür kılacak.”
 
-Yuhanna 8:31-32”`,
+Yuhanna 8:31-32`,
   bibleVersions: "Kutsal Kitap çevirileri",
   frenchVersion:
     "Fransızca: Louis Segond 1910 (LSG) – 2025 gözden geçirilmiş – Kamu malı",
