@@ -272,7 +272,7 @@ const zh: TranslationDict = {
   createdWithLove:
     "怀着爱心制作，只为传扬神的话语",
   versionsFootnote:
-    "所有使用的圣经版本都属于公有领域。其中一些在词汇和语法上略作现代化，但仍完全忠于原始手稿。并严格尊重原始手稿。若您希望获得 Android 应用，请通过电子邮件向我提出请求，我会发送链接（测试版应用）。",
+    "关于经文：应用中收录的各个圣经版本均按照各自的许可协议使用。只有 Louis Segond 1910 在严格尊重原始手稿的前提下，于2025年对语法和词汇进行了现代化调整。",
 
   // Quick slots
   quickSlotsIntro:
