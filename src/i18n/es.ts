@@ -245,7 +245,7 @@ Juan 8:31-32`,
   createdWithLove:
     'Creado con amor para difundir la Palabra de Dios',
   versionsFootnote:
-    'Todas las versiones bíblicas utilizadas son de dominio público. Algunas han sido parcialmente modernizadas (vocabulario, gramática) manteniéndose estrictamente fieles a los manuscritos originales. Si deseas la aplicación Android, envíame una solicitud por correo electrónico y te enviaré un enlace (versión de prueba).',
+    'Acerca de los textos: las Biblias integradas se utilizan de acuerdo con sus respectivas licencias. Únicamente la Louis Segond 1910 fue modernizada en 2025 (gramática y vocabulario), respetando estrictamente los manuscritos originales.',
 
   // Quick slots / reading shortcuts
   quickSlotsIntro:
