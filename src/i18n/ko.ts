@@ -212,7 +212,7 @@ const ko: TranslationDict = {
 
 “너희가 내 말에 거하면 참으로 내 제자가 되고, 진리를 알게 될 것이며, 진리가 너희를 자유롭게 할 것이다.”
 
-요한복음 8:31-32”`,
+요한복음 8:31-32`,
   bibleVersions: "성경 번역들",
   frenchVersion:
     "프랑스어: Louis Segond 1910 (LSG) – 2025 개정 – 퍼블릭 도메인",
