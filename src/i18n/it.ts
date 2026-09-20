@@ -218,69 +218,21 @@ const it: TranslationDict = {
   aboutTitle: "",
   aboutDescription:
     "The Word ti permette di scoprire la Parola di Dio attraverso versetti casuali e la lettura completa della Bibbia.",
-  aboutIntro: `Perché ho creato The Word
+  aboutIntro: `Perché The Word?
 
-All’inizio ho creato questa applicazione per una cosa molto semplice: leggere più libri della Bibbia allo stesso tempo, senza perdere il filo da un giorno all’altro, grazie alle schede 1 / 2 / 3 della pagina Lettura.
+Ho creato The Word per poter leggere contemporaneamente diversi libri della Bibbia senza perdere il filo della lettura. Nel tempo sono state aggiunte altre funzioni, sempre con lo stesso obiettivo: aiutare ciascuno a leggere, meditare, ricordare e mettere in pratica la Parola di Dio.
 
-Con il tempo ho aggiunto altre funzioni, sempre con la stessa intenzione: aiutare a leggere, meditare, ricordare e mettere in pratica la Parola di Dio.
+Il mio desiderio
 
-La mia preghiera per voi
+In un mondo in cui tante voci cercano di influenzarci, il mio desiderio è semplice: incoraggiare ciascuno a tornare direttamente alla Bibbia, con cuore sincero, per cercarvi la verità.
 
-La mia preghiera è che possiate essere toccati dalla Parola di Dio, che comprendiate l’amore che Dio ha per voi e l’amore di Gesù Cristo, suo Figlio, così come il prezzo che ha pagato affinché fossimo riconciliati con Dio e camminassimo con Lui nel suo amore.
+La mia preghiera è che questa applicazione vi aiuti a scoprire l’amore di Dio, a conoscere Gesù Cristo e a comprendere ciò che ha fatto per riconciliarci con Dio.
 
-L’amore di Dio e l’invito a credere sono particolarmente visibili nel Vangelo di Giovanni (es.: Giovanni 3:16).
+Leggete la sua Parola. Esaminatela attentamente. Chiedete a Dio di guidarvi, poi rispondete alla sua chiamata con fede, ravvedimento e obbedienza.
 
-La chiave per entrare nel Regno e il chiaro invito a rispondere a Dio appaiono chiaramente nel libro degli Atti (es.: Atti 2:38; Atti 4:12).
+«Se dimorate nella mia parola, siete veramente miei discepoli; conoscerete la verità e la verità vi renderà liberi.»
 
-La Bibbia: Dio ci parla
-
-Non bisogna mai dimenticare che tutta la Bibbia è ispirata da Dio: è Dio che ci parla, e dobbiamo temerlo e ubbidirgli.
-
-2 Timoteo 3:16-17  “Tutta la Scrittura è ispirata da Dio…”
-Proverbi 9:10  “Il timore del SIGNORE è il principio della sapienza…”
-Giovanni 13:34-35  “Amatevi gli uni gli altri, come io vi ho amati…”
-
-Il tempo è breve: rispondere alla chiamata di Dio
-
-Credo che il tempo sia breve e che Dio desideri ardentemente che ogni persona risponda alla sua chiamata: pentirsi, credere ed essere battezzati per il perdono dei peccati. È un’opportunità immensa: essere con Dio per l’eternità. Non tardiamo, perché Dio compirà la sua giustizia nel giorno che ha stabilito, e Gesù ci ha spesso chiamati a vegliare e a farci trovare pronti.
-
-1 Corinzi 7:29  “Il tempo è breve…”
-Atti 17:30-31  Dio chiama tutti gli uomini al ravvedimento… “ha stabilito un giorno…”
-Atti 2:38  “Ravvedetevi, e ciascuno di voi sia battezzato… per il perdono dei vostri peccati…”
-Marco 1:15  “Ravvedetevi e credete alla buona notizia.”
-Matteo 24:42-44  “Vegliate dunque… siate pronti…”
-Luca 12:35-40  “Siano i vostri fianchi cinti e le vostre lampade accese…”
-
-Purtroppo molti si sono allontanati dalle Scritture. La Bibbia avverte che verrà un tempo in cui alcuni cercheranno messaggi che piacciono loro e si daranno “una folla di maestri”.
-
-Per questo siamo chiamati a rimanere nella Parola, a ubbidire a Dio e a camminare in modo degno del Vangelo, cercando anche di convincere coloro che ci circondano.
-
-2 Timoteo 4:3-4  “si accumuleranno maestri…”
-Giovanni 8:31-32  “Se dimorate nella mia parola…”
-Colossesi 1:23  “rimanete fondati e saldi…”
-Filippesi 1:27  “comportatevi in modo degno del Vangelo…”
-2 Corinzi 5:20  “Noi facciamo dunque da ambasciatori…”
-
-E talvolta una “chiesa” può semplicemente iniziare umilmente: due persone che cercano Dio insieme.
-
-Matteo 18:20  “Dove due o tre sono riuniti nel mio nome…”
-
-La porta è stretta: camminare umilmente con Dio
-
-Gesù ha detto che la porta è stretta e che la via che conduce alla perdizione è larga. Non lasciamo che i nostri peccati ci allontanino da Dio. Ubbidiamo umilmente alla sua Parola, con un cuore di bambino: semplice, senza ipocrisia, ma anche lucido e prudente.
-
-Matteo 7:13-14  “Entrate per la porta stretta…”
-Ebrei 12:1-2  “deponiamo ogni peso e il peccato…”
-Matteo 18:3  “se non diventate come i piccoli bambini…”
-Matteo 10:16  “semplici come le colombe e prudenti come i serpenti…”
-
-Pregare, perseverare, non arrendersi
-
-Pregate Dio affinché vi guidi mediante la sua Parola e il suo Santo Spirito. Supplicate. Non scoraggiatevi. Non arrendetevi. Anche se il giusto attraversa sofferenze, Dio rimane fedele e libera.
-
-Luca 18:1  “bisogna pregare sempre e non scoraggiarsi”
-Giacomo 1:5  “Se qualcuno manca di saggezza, la chieda a Dio…”
-Salmo 34:19  “Molte sono le afflizioni del giusto, ma il SIGNORE lo libera da tutte.”`,
+Giovanni 8:31-32”`,
   bibleVersions: "Versioni della Bibbia",
   frenchVersion:
     "Francese: Louis Segond 1910 (LSG) – Revisione 2025 – Dominio pubblico",
