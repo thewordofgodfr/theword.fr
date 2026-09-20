@@ -297,7 +297,7 @@ Salmo 34:19  “Muchas son las aflicciones del justo; pero de todas ellas le lib
 
   // Quick slots / reading shortcuts
   quickSlotsIntro:
-    'Estos 4 botones, alineados a la derecha del selector Libro/Capítulo, permiten volver al instante a tus lecturas frecuentes para seguir varios libros en paralelo: usa 1/2/3 para tres posiciones distintas y la lupa para retomar el último pasaje (versículo aleatorio o búsqueda).',
+    'Estos 4 botones permiten volver instantáneamente a tus lecturas frecuentes para leer varios libros en paralelo: usa 1/2/3 para 3 posiciones distintas y la lupa para volver al último pasaje (versículo aleatorio o resultado de búsqueda).',
   quickSlotsIllustrationLabel: 'Ilustración de los atajos',
   quickSlotLastPassageTooltip: 'Último pasaje',
   quickSlot1ActiveTooltip: 'Atajo 1 (activo)',
