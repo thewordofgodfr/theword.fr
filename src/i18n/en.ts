@@ -288,7 +288,7 @@ Psalm 34:19  “Many are the afflictions of the righteous, but the LORD delivers
 
   // Quick slots
   quickSlotsIntro:
-    'These 4 buttons let you jump back to frequent readings to follow several books in parallel: use 1/2/3 for three locations, and the magnifier to resume the last passage (random verse or search).',
+    'These 4 buttons let you instantly return to your frequent readings so you can read several books in parallel: use 1/2/3 for 3 separate slots, and the magnifying glass to return to the last passage (random verse or search result).',
   quickSlotsIllustrationLabel: 'Shortcuts illustration',
   quickSlotLastPassageTooltip: 'Last passage',
   quickSlot1ActiveTooltip: 'Shortcut 1 (active)',
