@@ -248,7 +248,7 @@ Yuhanna 8:31-32`,
   createdWithLove:
     "Tanrı'nın Sözünü yaymak için sevgiyle oluşturuldu",
   versionsFootnote:
-    "Kullanılan tüm Kutsal Kitap çevirileri kamu malıdır. Bazıları (söz varlığı ve dilbilgisi açısından) kısmen modernleştirilmiştir; ancak özgün el yazmalarına kesinlikle sadıktır. Android uygulamasını isterseniz lütfen e-posta ile bana yazın; size bir bağlantı göndereceğim (test sürümü).",
+    "Metinler hakkında: Uygulamaya dâhil edilen Kutsal Kitap çevirileri kendi lisanslarına uygun olarak kullanılmaktadır. Yalnızca Louis Segond 1910, özgün el yazmalarına titizlikle bağlı kalınarak 2025 yılında dil bilgisi ve kelime dağarcığı bakımından güncellenmiştir.",
 
   // Quick slots / raccourcis lecture
   quickSlotsIntro:
