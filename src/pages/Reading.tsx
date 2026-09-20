@@ -177,41 +177,6 @@ export default function Reading() {
   // Mode sombre fixe
   const isDark = true;
 
-  // Thèmes des slots
-  type SlotKey = 1 | 2 | 3;
-  const SLOT_THEMES: Record<
-    SlotKey,
-    {
-      solid: string;
-      solidHover: string;
-      mobileBtn: string;
-      mobileBtnHover: string;
-      lightPaper: string;
-    }
-  > = {
-    1: {
-      solid: 'bg-amber-800 text-white',
-    solidHover: 'hover:bg-amber-700',
-    mobileBtn: 'bg-amber-800 text-white',
-    mobileBtnHover: 'hover:bg-amber-700',
-    lightPaper: 'bg-amber-50',
-    },
-    2: {
-      solid: 'bg-violet-800 text-white',
-    solidHover: 'hover:bg-violet-700',
-    mobileBtn: 'bg-violet-800 text-white',
-    mobileBtnHover: 'hover:bg-violet-700',
-    lightPaper: 'bg-violet-50',
-    },
-    3: {
-      solid: 'bg-emerald-800 text-white',
-    solidHover: 'hover:bg-emerald-700',
-    mobileBtn: 'bg-emerald-800 text-white',
-    mobileBtnHover: 'hover:bg-emerald-700',
-    lightPaper: 'bg-emerald-50',
-    },
-  };
-
   const fetchChapter = async (book: BibleBook, chapterNum: number) => {
     setLoading(true);
     try {
@@ -479,15 +444,6 @@ export default function Reading() {
     fetchChapter(book, slot.chapter);
     saveReadingPosition(book.name, slot.chapter);
   }
-
-  const activeTheme =
-    activeSlot === 1 || activeSlot === 2 || activeSlot === 3
-      ? SLOT_THEMES[activeSlot as SlotKey]
-      : null;
-
-  const desktopChipBase =
-    'inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-semibold shadow-sm whitespace-nowrap';
-  const desktopChipColors = activeTheme ? activeTheme.solid : 'bg-blue-700 text-white';
 
   const [hasLoadedContext, setHasLoadedContext] = useState(false);
 
@@ -1205,10 +1161,10 @@ ${shareUrl}`;
                       title={t('chooseBook')}
                       className="min-w-0 h-10 inline-flex items-center justify-between gap-2 rounded-lg border border-gray-600 bg-gray-900/70 px-3 text-left shadow-sm active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/40"
                     >
-                      <span className="min-w-0 truncate text-sm font-semibold text-blue-300">
+                      <span className="min-w-0 truncate text-sm font-semibold text-white">
                         {getBookName(selectedBook)}
                       </span>
-                      <ChevronDown className="w-4 h-4 shrink-0 text-blue-300 opacity-90" />
+                      <ChevronDown className="w-4 h-4 shrink-0 text-white opacity-90" />
                     </button>
 
                     <button
@@ -1217,7 +1173,7 @@ ${shareUrl}`;
                       aria-expanded={showChapterPicker}
                       aria-label={t('chooseChapter')}
                       title={t('chooseChapter')}
-                      className="h-10 inline-flex items-center justify-center gap-1.5 rounded-lg border border-blue-700/60 bg-blue-950/40 px-3 text-sm font-semibold text-blue-100 shadow-sm active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/40 whitespace-nowrap"
+                      className="h-10 inline-flex items-center justify-center gap-1.5 rounded-lg border border-blue-700/60 bg-blue-950/40 px-3 text-sm font-semibold text-white shadow-sm active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/40 whitespace-nowrap"
                     >
                       <span>
                         {t('chapter')} {selectedChapter}
@@ -1235,20 +1191,16 @@ ${shareUrl}`;
                         const isNumeric = i !== 0;
 
                         const base = isNumeric
-                          ? 'relative overflow-visible w-8 h-8 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
-                          : 'w-8 h-8 rounded-full shadow active:scale-95 inline-flex items-center justify-center transition-all box-border';
+                          ? 'relative overflow-visible w-8 h-8 rounded-full border-2 text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
+                          : 'w-8 h-8 rounded-full border-2 shadow active:scale-95 inline-flex items-center justify-center transition-all box-border';
 
                         const isActive = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
 
-                        let cls = '';
-                        if (i === 0) {
-                          cls = 'bg-blue-700 text-white hover:bg-blue-600';
-                        } else {
-                          const theme = SLOT_THEMES[i as SlotKey];
-                          cls = filled
-                            ? `${theme.solid} ${theme.solidHover}`
-                            : 'bg-gray-800 text-white border border-gray-600';
-                        }
+                        const cls = isActive
+                          ? 'border-white bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_0_2px_rgba(37,99,235,0.9),0_0_12px_rgba(37,99,235,0.65)]'
+                          : filled
+                            ? 'border-blue-800 bg-blue-950/80 text-blue-100 hover:border-blue-600 hover:bg-blue-900'
+                            : 'border-blue-900/80 bg-blue-950/50 text-blue-200/80 hover:border-blue-700 hover:bg-blue-900/70';
 
                         const refText = s
                           ? `${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}`
@@ -1265,17 +1217,11 @@ ${shareUrl}`;
                             : `${t('memorySlotLabel')} ${i} ${t('emptySlotSuffix')}`;
                         }
 
-                        const activeRing = isActive ? 'border-2 border-white' : '';
-                        const numGlow =
-                          isNumeric && isActive
-                            ? 'shadow-[0_0_0_2px_rgba(37,99,235,0.9),0_0_10px_rgba(37,99,235,0.6)]'
-                            : '';
-
                         return (
                           <button
                             key={`qs-m-${i}`}
                             type="button"
-                            className={`${base} ${cls} ${activeRing} ${numGlow}`}
+                            className={`${base} ${cls}`}
                             onClick={() => jumpToSlot(i)}
                             aria-label={title}
                             title={title}
@@ -1324,7 +1270,7 @@ ${shareUrl}`;
                       type="button"
                       onClick={() => setShowBookPicker(true)}
                       aria-expanded={showBookPicker}
-                      className="min-w-0 inline-flex items-center gap-2 rounded-lg border border-gray-600 bg-gray-900/70 px-3 py-2 text-sm font-semibold text-blue-300 hover:bg-gray-700/80 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                      className="min-w-0 inline-flex items-center gap-2 rounded-lg border border-gray-600 bg-gray-900/70 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700/80 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
                       title={t('chooseBook')}
                     >
                       <span className="max-w-[18rem] truncate">{getBookName(selectedBook)}</span>
@@ -1335,7 +1281,7 @@ ${shareUrl}`;
                       type="button"
                       onClick={() => setShowChapterPicker(true)}
                       aria-expanded={showChapterPicker}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-blue-700/60 bg-blue-950/40 px-3 py-2 text-sm font-semibold text-blue-100 hover:bg-blue-900/50 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-blue-700/60 bg-blue-950/40 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-900/50 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
                       title={t('chooseChapter')}
                     >
                       {t('chapter')} {selectedChapter}
@@ -1352,20 +1298,16 @@ ${shareUrl}`;
                         const isNumeric = i !== 0;
 
                         const base = isNumeric
-                          ? 'relative overflow-visible w-8 h-8 rounded-full text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
-                          : 'w-8 h-8 rounded-full shadow active:scale-95 inline-flex items-center justify-center transition-all box-border';
+                          ? 'relative overflow-visible w-8 h-8 rounded-full border-2 text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
+                          : 'w-8 h-8 rounded-full border-2 shadow active:scale-95 inline-flex items-center justify-center transition-all box-border';
 
                         const isActive = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
 
-                        let cls = '';
-                        if (i === 0) {
-                          cls = 'bg-blue-700 text-white hover:bg-blue-600';
-                        } else {
-                          const theme = SLOT_THEMES[i as SlotKey];
-                          cls = filled
-                            ? `${theme.solid} ${theme.solidHover}`
-                            : 'bg-gray-800 text-white border border-gray-600';
-                        }
+                        const cls = isActive
+                          ? 'border-white bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_0_2px_rgba(37,99,235,0.9),0_0_12px_rgba(37,99,235,0.65)]'
+                          : filled
+                            ? 'border-blue-800 bg-blue-950/80 text-blue-100 hover:border-blue-600 hover:bg-blue-900'
+                            : 'border-blue-900/80 bg-blue-950/50 text-blue-200/80 hover:border-blue-700 hover:bg-blue-900/70';
 
                         const refText = s
                           ? `${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}`
@@ -1382,17 +1324,11 @@ ${shareUrl}`;
                             : `${t('memorySlotLabel')} ${i} ${t('emptySlotSuffix')}`;
                         }
 
-                        const activeRing = isActive ? 'border-2 border-white' : '';
-                        const numGlow =
-                          isNumeric && isActive
-                            ? 'shadow-[0_0_0_2px_rgba(37,99,235,0.9),0_0_10px_rgba(37,99,235,0.6)]'
-                            : '';
-
                         return (
                           <button
                             key={`qs-d-${i}`}
                             type="button"
-                            className={`${base} ${cls} ${activeRing} ${numGlow}`}
+                            className={`${base} ${cls}`}
                             onClick={() => jumpToSlot(i)}
                             aria-label={title}
                             title={title}
