@@ -238,7 +238,7 @@ const yo: TranslationDict = {
   // About page
   aboutTitle: "",
   aboutDescription:
-    "The Word ń ràn ọ́ lọ́wọ́ láti ṣàwárí Ọ̀rọ̀ Ọlọ́run nípasẹ̀ ẹsẹ àdánidá àti kíkà Bíbélì tán.",
+    "Ṣàwárí àwọn ọ̀rọ̀ tàbí gbólóhùn lẹ́sẹ̀kẹsẹ̀ nínú gbogbo Bíbélì, ṣí àbájáde náà ní abala Kíkà, kí o sì da ẹsẹ kan kọ tàbí pín in pẹ̀lú ìfọwọ́kan kan ṣoṣo.",
   aboutIntro: `Kí nìdí The Word?
 
 Mo dá The Word sílẹ̀ kí n lè máa ka ọ̀pọ̀ ìwé inú Bíbélì lẹ́gbẹ̀ẹ́ ara wọn láì pàdánù ibi tí mo dé. Bí àkókò ti ń lọ, a fi àwọn iṣẹ́ míì kún un, ṣùgbọ́n ète náà kò yí padà: láti ran gbogbo ènìyàn lọ́wọ́ láti ka Ọ̀rọ̀ Ọlọ́run, ronú lé e, rántí rẹ̀, kí wọ́n sì fi í sílò.
