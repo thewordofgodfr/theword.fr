@@ -333,7 +333,7 @@ Mazmur 34:19  “Kemalangan orang benar banyak, tetapi TUHAN melepaskan dia dari
 
   // Quick slots
   quickSlotsIntro:
-    "Keempat tombol di sebelah kanan pemilih Kitab/Pasal ini memudahkan Anda kembali ke bacaan yang sering, sehingga dapat mengikuti beberapa kitab secara paralel: gunakan 1/2/3 untuk tiga lokasi, dan kaca pembesar untuk kembali ke bagian terakhir (ayat acak atau hasil pencarian).",
+    "Keempat tombol ini memungkinkan Anda langsung kembali ke bacaan yang sering dibuka untuk membaca beberapa kitab secara paralel: gunakan 1/2/3 untuk 3 tempat yang berbeda, dan kaca pembesar untuk kembali ke bagian terakhir (ayat acak atau hasil pencarian).",
   quickSlotsIllustrationLabel:
     "Ilustrasi jalan pintas",
   quickSlotLastPassageTooltip:
