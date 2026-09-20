@@ -239,69 +239,21 @@ const yo: TranslationDict = {
   aboutTitle: "",
   aboutDescription:
     "The Word ń ràn ọ́ lọ́wọ́ láti ṣàwárí Ọ̀rọ̀ Ọlọ́run nípasẹ̀ ẹsẹ àdánidá àti kíkà Bíbélì tán.",
-  aboutIntro: `Ìdí tí mo fi dá The Word sílẹ̀
+  aboutIntro: `Kí nìdí The Word?
 
-Ní ìbẹ̀rẹ̀, mo dá ohun elo yìí sílẹ̀ fún ohun kan tó rọrùn gan-an: kí ẹ lè ka ọ̀pọ̀ ìwé Bíbélì ní àkókò kan náà, kí ẹ má bà a sọnù láti ọjọ́ kan sí ọjọ́ míì, nípasẹ̀ taabu 1 / 2 / 3 lórí ojúewé Kíkà.
+Mo dá The Word sílẹ̀ kí n lè máa ka ọ̀pọ̀ ìwé inú Bíbélì lẹ́gbẹ̀ẹ́ ara wọn láì pàdánù ibi tí mo dé. Bí àkókò ti ń lọ, a fi àwọn iṣẹ́ míì kún un, ṣùgbọ́n ète náà kò yí padà: láti ran gbogbo ènìyàn lọ́wọ́ láti ka Ọ̀rọ̀ Ọlọ́run, ronú lé e, rántí rẹ̀, kí wọ́n sì fi í sílò.
 
-Pẹ̀lú àkókò, mo fi àwọn iṣẹ́ míì kún un, pẹ̀lú ìfẹ́kúfẹ̀ẹ́ kan náà: láti ràn yín lọ́wọ́ láti ka, láti ronú lórí, láti rántí, àti láti ṣe Ọ̀rọ̀ Ọlọ́run ní ìṣe.
+Ìfẹ́ ọkàn mi
 
-Àdúrà mi fún yín
+Nínú ayé tí ọ̀pọ̀ ohùn ti ń gbìyànjú láti ní ipa lórí wa, ìfẹ́ ọkàn mi rọrùn: láti gba gbogbo ènìyàn níyànjú láti fi ọkàn òtítọ́ padà tààrà sí Bíbélì, kí wọ́n sì wá òtítọ́ nínú rẹ̀.
 
-Àdúrà mi ni pé Ọ̀rọ̀ Ọlọ́run yóò kan yín, kí ẹ lè mọ ìfẹ́ tí Ọlọ́run ní fún yín, àti ìfẹ́ Jesu Kristi Ọmọ rẹ̀, pẹ̀lú iye tí ó san kí a lè bá Ọlọ́run rẹ́kọ́jọ̀, kí a sì máa rìn pẹ̀lú Rẹ̀ nínú ìfẹ́ Rẹ̀.
+Àdúrà mi ni pé kí ètò yìí ràn yín lọ́wọ́ láti mọ ìfẹ́ Ọlọ́run, láti mọ Jésù Kristi àti láti lóye ohun tí ó ṣe láti mú wa padà bá Ọlọ́run.
 
-Ìfẹ́ Ọlọ́run àti ìpè láti gbàgbọ́ hàn kedere ní Ìhìn Rere Johanu (àpẹẹrẹ: Johanu 3:16).
+Ẹ ka Ọ̀rọ̀ rẹ̀. Ẹ ṣàyẹ̀wò rẹ̀ dáadáa. Ẹ bẹ Ọlọ́run pé kí ó tọ́ yín sọ́nà, lẹ́yìn náà kí ẹ dáhùn sí ìpè rẹ̀ pẹ̀lú ìgbàgbọ́, ìrònúpìwàdà àti ìgbọràn.
 
-Bọtini ìwọ̀lé sí Ìjọba àti ìpè kedere láti dáhùn sí Ọlọ́run hàn kedere ní ìwé Ìṣe (àpẹẹrẹ: Ìṣe 2:38; Ìṣe 4:12).
+“Bí ẹ bá dúró nínú ọ̀rọ̀ mi, ọmọ-ẹ̀yìn mi ni yín nítòótọ́; ẹ ó mọ òtítọ́, òtítọ́ náà yóò sì sọ yín di òmìnira.”
 
-Bíbélì: Ọlọ́run ń bá wa sọ̀rọ̀
-
-A kò gbọ́dọ̀ gbàgbé pé gbogbo Bíbélì ni Ọlọ́run fi mí: Ọlọ́run ló ń bá wa sọ̀rọ̀, a sì gbọ́dọ̀ bẹ̀rù Rẹ̀ kí a sì gbọ́ràn sí i.
-
-2 Timotiu 3:16-17  “Gbogbo Ìwé Mímọ́ ni a fi mí láti ọ̀dọ̀ Ọlọ́run…”
-Òwe 9:10  “Ìbẹ̀rù OLÚWA ni ìbẹ̀rẹ̀ ọgbọ́n…”
-Johanu 13:34-35  “Ẹ fẹ́ràn ara yín bí mo ti fẹ́ràn yín…”
-
-Àkókò kúrú: dáhùn sí ìpè Ọlọ́run
-
-Mo gbà pé àkókò kúrú, àti pé Ọlọ́run fẹ́ gidigidi kí gbogbo ènìyàn dáhùn sí ìpè Rẹ̀: kí wọ́n ronúpìwàdà, kí wọ́n gbàgbọ́, kí wọ́n sì gba ìbaptísímù fún ìdáríjì ẹ̀ṣẹ̀. Èyí jẹ́ àǹfààní ńlá: láti wà pẹ̀lú Ọlọ́run títí láé. Ẹ má ṣe pẹ́, nítorí Ọlọ́run yóò ṣe ìdájọ́ Rẹ̀ ní ọjọ́ tí ó ti yàn, Jesu sì máa ń pè wa láti ṣọ́ra kí a sì múra tán.
-
-1 Kọrinti 7:29  “Àkókò kúrú…”
-Ìṣe 17:30-31  Ọlọ́run ń pè gbogbo ènìyàn sí ronúpìwàdà… “ó ti yàn ọjọ́ kan…”
-Ìṣe 2:38  “Ẹ ronúpìwàdà… fún ìdáríjì ẹ̀ṣẹ̀ yín…”
-Marku 1:15  “Ẹ ronúpìwàdà, ẹ sì gbàgbọ́ ìhìn rere.”
-Matteu 24:42-44  “Ẹ ṣọ́ra… ẹ múra tán…”
-Luku 12:35-40  “Ẹ jẹ́ kí ìgbẹ̀ yín wà ní dì, kí ìmọ́lẹ̀ yín sì máa tàn…”
-
-Ó ṣòro, ṣùgbọ́n ọ̀pọ̀ ènìyàn ti yà kúrò ní Ìwé Mímọ́. Bíbélì kìlọ̀ pé àkókò kan yóò dé tí àwọn kan yóò máa wá ohun tí ó dùn mọ́ wọn, wọ́n á sì kó “ọ̀pọ̀ olùkọ́” jọ.
-
-Nítorí náà a pè wá láti dúró nínú Ọ̀rọ̀, láti gbọ́ràn sí Ọlọ́run, láti rìn ní ọna tí ó bá Ìhìn Rere mu, àti láti gbìyànjú láti dá àwọn tí ó yí wa ká lójú.
-
-2 Timotiu 4:3-4  “wọ́n á kó ọ̀pọ̀ olùkọ́ jọ…”
-Johanu 8:31-32  “Bí ẹ bá dúró nínú ọ̀rọ̀ mi…”
-Kolosi 1:23  “ẹ dúró ní ìgbàgbọ́, ẹ sì má ṣe yí…”
-Filipi 1:27  “ẹ hùwà bí ó ti yẹ fún Ìhìn Rere…”
-2 Kọrinti 5:20  “àwa jẹ́ aṣojú…”
-
-Nígbà míì, “ìjọ” lè bẹ̀rẹ̀ ní ìrẹ̀lẹ̀: ènìyàn méjì tí wọ́n ń wá Ọlọ́run pọ̀.
-
-Matteu 18:20  “Níbi tí ènìyàn méjì tàbí mẹ́ta bá kó ara wọn jọ ní orúkọ mi…”
-
-Ẹnu-ọ̀nà dín: rìn ní ìrẹ̀lẹ̀ pẹ̀lú Ọlọ́run
-
-Jesu sọ pé ẹnu-ọ̀nà dín ni, ọ̀nà tó lọ sí ìparun sì gbooro. Ẹ má jẹ́ kí ẹ̀ṣẹ̀ yín yí yín kúrò lọ́dọ̀ Ọlọ́run. Ẹ gbọ́ràn sí Ọ̀rọ̀ Rẹ̀ ní ìrẹ̀lẹ̀, pẹ̀lú ọkàn ọmọ: rọrùn, láìsí ìwà ìtanràn, ṣùgbọ́n pẹ̀lú ìmúrasílẹ̀ àti ìṣọ́ra.
-
-Matteu 7:13-14  “Ẹ wọlé nípasẹ̀ ẹnu-ọ̀nà dín…”
-Hébérù 12:1-2  “jẹ́ ká yọ gbogbo ẹrù àti ẹ̀ṣẹ̀ kúrò…”
-Matteu 18:3  “bí ẹ kò bá di bí ọmọ kékeré…”
-Matteu 10:16  “aláìlọ́́gbọn bí àdàbà, ṣùgbọ́n ọlọ́gbọ́n bí ejò…”
-
-Ẹ gbàdúrà, ẹ fara da, ẹ má ṣe kọ́ silẹ̀
-
-Ẹ gbàdúrà pé Ọlọ́run yóò tọ́ yín sójú pẹ̀lú Ọ̀rọ̀ Rẹ̀ àti Ẹ̀mí Mímọ́ Rẹ̀. Ẹ bẹ̀bẹ̀. Ẹ má ṣe rẹ̀wẹ̀sì. Ẹ má ṣe kọ́ silẹ̀. Bí ẹni olódodo bá kọjá nípasẹ̀ ìpọnjú, Ọlọ́run ṣì jẹ́ olóòótọ́, ó sì ń gba là.
-
-Luku 18:1  “ó yẹ kí a máa gbàdúrà ní gbogbo ìgbà, kí a má sì rẹ̀…”
-Jakọbu 1:5  “Bí ẹnikẹ́ni bá ṣáì ní ọgbọ́n, kó bẹ Ọlọ́run…”
-Sáàmù 34:19  “Ọ̀pọ̀ ni ìpọnjú ẹni olódodo; ṣùgbọ́n OLÚWA ń gba a kúrò nínú gbogbo rẹ.”`,
+Jòhánù 8:31-32”`,
   bibleVersions: "Àwọn ìtumọ̀ Bíbélì",
   frenchVersion:
     "Fáransé: Louis Segond 1910 (LSG) – Àtúnṣe 2025 – Gbólóhùn àwùjọ",
