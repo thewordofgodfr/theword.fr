@@ -289,7 +289,7 @@ Yohana 8:31-32`,
   createdWithLove:
     "Imetengenezwa kwa upendo ili kueneza Neno la Mungu",
   versionsFootnote:
-    "Toleo zote za Biblia zinazotumika ziko katika eneo la umma. Baadhi zimesasishwa kidogo (msamiati, sarufi) huku zikiendelea kuwa waaminifu kabisa kwa maandiko asili. Ikiwa mnataka programu ya Android, tafadhali nitumieni ombi kwa barua pepe nami nitawatumia kiungo (toleo la majaribio).",
+    "Kuhusu maandiko: Biblia zilizojumuishwa zinatumika kwa mujibu wa leseni zao husika. Ni Louis Segond 1910 pekee iliyosasishwa mwaka 2025 katika sarufi na msamiati, huku maandishi ya awali yakiheshimiwa kikamilifu.",
 
   // Quick slots
   quickSlotsIntro:
