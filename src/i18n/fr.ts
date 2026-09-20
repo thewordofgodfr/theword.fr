@@ -200,69 +200,21 @@ const fr: TranslationDict = {
   aboutTitle: '',
   aboutDescription:
     'Recherchez instantanément des mots ou expressions dans toute la Bible, ouvrez les résultats en Lecture, et copiez/partagez un verset en un geste.',
-  aboutIntro: `Pourquoi j’ai créé The Word
+  aboutIntro: `Pourquoi The Word ?
 
-Au départ, j’ai créé cette application pour une chose très simple : lire plusieurs livres de la Bible en même temps, sans perdre le fil d’un jour à l’autre, grâce aux onglets 1 / 2 / 3 de la page Lecture.
+J’ai créé The Word pour pouvoir lire plusieurs livres de la Bible en parallèle, sans perdre le fil de ma lecture. Au fil du temps, d’autres fonctions ont été ajoutées, toujours dans le même but : aider chacun à lire, méditer, retenir et mettre en pratique la Parole de Dieu.
 
-Avec le temps, j’ai ajouté d’autres fonctions, toujours avec la même intention : aider à lire, méditer, retenir, et mettre en pratique la Parole de Dieu.
+Mon désir
 
-Ma prière pour vous
+Dans un monde où tant de voix cherchent à nous influencer, mon désir est simple : encourager chacun à revenir directement à la Bible, avec un cœur sincère, pour y chercher la vérité.
 
-Ma prière, c’est que vous puissiez être touché par la Parole de Dieu, que vous compreniez l’amour que Dieu a pour vous, et l’amour de Jésus-Christ son Fils, ainsi que le prix qu’il a payé pour que nous soyons réconciliés avec Dieu et que nous marchions avec Lui dans son amour.
+Ma prière est que cette application vous aide à découvrir l’amour de Dieu, à connaître Jésus-Christ et à comprendre ce qu’il a accompli afin de nous réconcilier avec Dieu.
 
-L’amour de Dieu et l’appel à croire sont particulièrement visibles dans l’Évangile de Jean (ex : Jean 3:16).
+Lisez sa Parole. Examinez-la avec attention. Demandez à Dieu de vous guider, puis répondez à son appel avec foi, repentance et obéissance.
 
-La clé de l’entrée dans le Royaume, et l’appel clair à répondre à Dieu, apparaissent clairement dans le livre des Actes (ex : Actes 2:38 ; Actes 4:12).
+« Si vous demeurez dans ma parole, vous êtes vraiment mes disciples ; vous connaîtrez la vérité, et la vérité vous rendra libres. »
 
-La Bible : Dieu nous parle
-
-Il ne faut jamais oublier que toute la Bible est inspirée de Dieu : c’est Dieu qui nous parle, et nous devons le craindre et lui obéir.
-
-2 Timothée 3:16-17  “Toute Écriture est inspirée de Dieu…”
-Proverbes 9:10  “La crainte de l’Éternel est le commencement de la sagesse…”
-Jean 13:34-35  “Aimez-vous les uns les autres, comme je vous ai aimés…”
-
-Le temps est court : répondre à l’appel de Dieu
-
-Je crois que le temps est court et que Dieu désire ardemment que chaque personne réponde à son appel : se repentir, croire, et être baptisé pour le pardon des péchés. C’est une opportunité immense : être avec Dieu éternellement. Ne tardons pas, car Dieu accomplira sa justice au jour qu’il a fixé, et Jésus nous a souvent appelés à veiller et à nous tenir prêts.
-
-1 Corinthiens 7:29  “Le temps est court…”
-Actes 17:30-31  Dieu appelle tous les hommes à la repentance… “il a fixé un jour…”
-Actes 2:38  “Repentez-vous, et que chacun de vous soit baptisé… pour le pardon de vos péchés…”
-Marc 1:15  “Repentez-vous, et croyez à la bonne nouvelle.”
-Matthieu 24:42-44  “Veillez donc… tenez-vous prêts…”
-Luc 12:35-40  “Que vos reins soient ceints, et vos lampes allumées…”
-
-Malheureusement, beaucoup se sont éloignés des Écritures. La Bible avertit qu’un temps viendra où certains chercheront des messages qui leur plaisent et se donneront “une foule de maîtres”.
-
-C’est pourquoi nous sommes appelés à demeurer dans la Parole, à obéir à Dieu, et à marcher d’une manière digne de l’Évangile, en cherchant aussi à convaincre ceux qui nous entourent.
-
-2 Timothée 4:3-4  “ils se donneront une foule de docteurs…”
-Jean 8:31-32  “Si vous demeurez dans ma parole…”
-Colossiens 1:23  “demeurez fondés et inébranlables…”
-Philippiens 1:27  “conduisez-vous d’une manière digne de l’Évangile…”
-2 Corinthiens 5:20  “Nous faisons donc les fonctions d’ambassadeurs…”
-
-Et parfois, une “église” peut simplement commencer humblement : deux personnes qui cherchent Dieu ensemble.
-
-Matthieu 18:20  “Là où deux ou trois sont assemblés en mon nom…”
-
-La porte est étroite : marcher humblement avec Dieu
-
-Jésus a dit que la porte est étroite, et que le chemin qui mène à la perdition est large. Ne laissons pas nos péchés nous détourner de Dieu. Obéissons avec humilité à sa Parole, avec un cœur d’enfant : simple, sans hypocrisie, mais aussi lucide et prudent.
-
-Matthieu 7:13-14  “Entrez par la porte étroite…”
-Hébreux 12:1-2  “rejetons tout fardeau et le péché…”
-Matthieu 18:3  “si vous ne devenez comme les petits enfants…”
-Matthieu 10:16  “simples comme les colombes et prudents comme les serpents…”
-
-Prier, persévérer, ne pas abandonner
-
-Priez Dieu pour qu’il vous guide par sa Parole et par son Saint-Esprit. Suppliez. Ne vous découragez pas. N’abandonnez pas. Même si le juste traverse des souffrances, Dieu reste fidèle et délivre.
-
-Luc 18:1  “il faut toujours prier, et ne point se relâcher”
-Jacques 1:5  “Si quelqu’un manque de sagesse, qu’il la demande à Dieu…”
-Psaume 34:20  “Le malheur atteint souvent le juste; mais l’Éternel l’en délivre toujours.”`,
+Jean 8:31-32”`,
   bibleVersions: 'Versions de la Bible',
   frenchVersion:
     'Français : Louis Segond 1910 (LSG) — modernisation 2025 (vocabulaire/orthographe)',
