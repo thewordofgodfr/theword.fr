@@ -55,18 +55,18 @@ export default function Navigation() {
       ].join(' ')}
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
-      <div className="max-w-7xl mx-auto px-1 sm:px-4 lg:px-6">
+      <div className="max-w-7xl mx-auto px-1 lg:px-4 xl:px-6">
         <div className="h-16 flex items-center">
           {/*
-            MOBILE :
+            TÉLÉPHONE / PETIT ÉCRAN / PAYSAGE :
             - 7 colonnes de largeur identique
-            - icône + libellé
+            - icône au-dessus du libellé
             - tout tient sur une seule ligne
 
-            TABLETTE / PC :
-            - disposition horizontale classique
+            GRAND ÉCRAN :
+            - disposition horizontale classique à partir de 1024 px
           */}
-          <div className="grid grid-cols-7 w-full sm:flex sm:items-center sm:justify-center sm:gap-2">
+          <div className="grid grid-cols-7 w-full lg:flex lg:items-center lg:justify-center lg:gap-2">
             {navItems.map(({ id, icon: Icon, label }) => {
               const active = state.currentPage === (id as any);
 
@@ -86,13 +86,13 @@ export default function Navigation() {
                   className={[
                     baseBtn,
 
-                    // Mobile
+                    // Téléphone, paysage et petit écran pliable
                     'min-w-0 h-[52px] px-0.5 py-1',
                     'flex flex-col items-center justify-center gap-1',
 
-                    // Tablette / desktop
-                    'sm:h-auto sm:px-3 sm:py-2',
-                    'sm:flex-row sm:gap-2',
+                    // Grand écran
+                    'lg:h-auto lg:px-3 lg:py-2',
+                    'lg:flex-row lg:gap-2',
 
                     active ? activeBtn : idleBtn,
                   ].join(' ')}
@@ -115,9 +115,9 @@ export default function Navigation() {
                       leading-none
                       font-medium
 
-                      sm:w-auto
-                      sm:text-sm
-                      sm:leading-none
+                      lg:w-auto
+                      lg:text-sm
+                      lg:leading-none
                     "
                   >
                     {label}
