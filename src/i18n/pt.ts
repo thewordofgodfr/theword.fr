@@ -281,7 +281,60 @@ João 8:31-32`,
     "Atalho 1 (ativo)",
   quickSlot2Tooltip: "Atalho 2",
   quickSlot3Tooltip: "Atalho 3",
+notesHelpTitle: 'Notas e Estudos — Guia de utilização',
 
+notesHelpIntro:
+'As páginas Notas e Estudos permitem guardar e organizar versículos em listas temáticas e completá-los com blocos de texto pessoais. Pode reunir passagens, acrescentar reflexões e criar estudos bíblicos estruturados. As Notas e os Estudos são guardados localmente no dispositivo e permanecem acessíveis sem uma conta.',
+
+notesHelp1Title: '1. Criar e gerir as suas listas',
+
+notesHelp1Body:
+'A página principal apresenta todas as listas de Notas ou Estudos. Pode criar uma lista, atribuir-lhe um título, mudar o nome ou eliminá-la. Toque numa lista para abrir o conteúdo. O botão «Todas as listas» ou «Todos os estudos» regressa à vista geral. Quando volta a abrir a página, a aplicação abre automaticamente a última lista utilizada e posiciona-se perto do último elemento.',
+
+notesHelp2Title: '2. Adicionar versículos da Bíblia',
+
+notesHelp2Body:
+'Na página Leitura, selecione um ou vários versículos e utilize o botão Notas ou Estudos. Os versículos são adicionados às listas escolhidas com a referência e o texto. Pode selecionar várias listas e guardar o mesmo versículo em locais diferentes.',
+
+notesHelp3Title: '3. Adicionar blocos de texto',
+
+notesHelp3Body:
+'Além dos versículos, pode adicionar comentários, reflexões, perguntas, orações, pontos de pregação ou outros conteúdos. O botão «Adicionar bloco de texto» está disponível no início e no fim de uma lista aberta. O botão + junto de um elemento também permite inserir um bloco nessa posição exata. Cada bloco pode ser editado, movido ou eliminado.',
+
+notesHelp4Title: '4. Utilizar e reorganizar os elementos',
+
+notesHelp4Body:
+'Abra o menu de um elemento para ver as ações disponíveis. Um versículo pode ser aberto diretamente em Leitura, copiado ou partilhado. Um bloco de texto pode ser copiado, partilhado ou editado. As setas para cima e para baixo alteram a ordem dos elementos. Cada elemento também pode ser eliminado individualmente.',
+
+notesHelp5Title: '5. Copiar ou partilhar uma lista completa',
+
+notesHelp5Body:
+'No menu de uma lista de Notas ou de um Estudo, os botões «Copiar» e «Partilhar» permitem obter todo o conteúdo: título, referências bíblicas, textos dos versículos e blocos pessoais. Pode depois colá-lo numa mensagem ou documento, ou enviá-lo através de uma aplicação compatível.',
+
+notesHelp6Title: '6. Partilhar ou transferir com um código The Word',
+
+notesHelp6Body:
+'O botão «Código» copia um código compacto com o título e todo o conteúdo da lista. Outro utilizador do The Word pode selecionar «Importar um código» para recriar a lista no seu dispositivo. Também pode transferir conteúdos entre Notas e Estudos copiando o código numa página e importando-o na outra.',
+
+notesHelp7Title: '7. Importar um documento de texto',
+
+notesHelp7Body:
+'A opção «Importar de texto» permite colar o conteúdo de um documento, e-mail, pregação ou plano de estudo. Pode mantê-lo num único bloco ou dividi-lo automaticamente em vários blocos separados por linhas vazias. É criada uma nova lista ou Estudo com o título escolhido.',
+
+notesHelp8Title: '8. Armazenamento local e cópias de segurança',
+
+notesHelp8Body:
+'As Notas e os Estudos são guardados localmente no dispositivo e não são sincronizados automaticamente com uma conta ou servidor. Se desinstalar a aplicação, repuser os dados ou apagar os dados do navegador, o conteúdo poderá ser eliminado definitivamente. Utilize Copiar, Partilhar ou um código The Word para guardar listas importantes.',
+
+notesHelp9Title: '9. Algumas ideias de utilização',
+
+notesHelp9Body:
+'Utilize Notas para guardar versículos a memorizar, reflexões diárias, preparações de pregações ou listas de oração. Utilize Estudos para explorar um tema ou livro, preparar um grupo em casa, um plano de ensino ou uma série de mensagens.',
+
+notesHelp10Title: '10. Combinar Notas e Estudos',
+
+notesHelp10Body:
+'Notas e Estudos podem ser utilizados em conjunto. Reúna rapidamente versículos, pensamentos e orações em Notas e transfira para Estudos aquilo que deseja aprofundar através de um código The Word. Depois poderá reorganizar, desenvolver e partilhar o conteúdo.',
   // Common
   loading: "Carregando...",
   error: "Erro ao carregar",
