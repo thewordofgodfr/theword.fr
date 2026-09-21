@@ -294,7 +294,60 @@ Yohanes 8:31-32`,
     "Jalan pintas 1 (aktif)",
   quickSlot2Tooltip: "Jalan pintas 2",
   quickSlot3Tooltip: "Jalan pintas 3",
+notesHelpTitle: 'Catatan & Studi — Panduan Penggunaan',
 
+notesHelpIntro:
+'Halaman Catatan dan Studi memungkinkan Anda menyimpan dan mengatur ayat dalam daftar bertema, lalu melengkapinya dengan blok teks sendiri. Anda dapat mengumpulkan bagian Alkitab, menambahkan pemikiran, dan menyusun studi Alkitab yang terstruktur. Catatan dan Studi disimpan secara lokal di perangkat dan dapat digunakan tanpa akun.',
+
+notesHelp1Title: '1. Buat dan kelola daftar',
+
+notesHelp1Body:
+'Halaman utama menampilkan semua daftar Catatan atau Studi. Anda dapat membuat daftar, memberinya judul, mengganti namanya, atau menghapusnya. Ketuk daftar untuk membuka isinya. Tombol “Semua daftar” atau “Semua studi” mengembalikan Anda ke tampilan utama. Saat halaman dibuka kembali, aplikasi otomatis membuka daftar terakhir dan berpindah mendekati item terakhirnya.',
+
+notesHelp2Title: '2. Tambahkan ayat dari Alkitab',
+
+notesHelp2Body:
+'Dari halaman Bacaan, pilih satu atau beberapa ayat, lalu gunakan tombol Catatan atau Studi. Ayat ditambahkan ke daftar pilihan Anda bersama referensi dan teksnya. Anda dapat memilih beberapa daftar dan menyimpan ayat yang sama di tempat berbeda.',
+
+notesHelp3Title: '3. Tambahkan blok teks',
+
+notesHelp3Body:
+'Selain ayat, Anda dapat menambahkan komentar, renungan, pertanyaan, doa, pokok khotbah, atau isi lainnya. Tombol “Tambahkan blok teks” tersedia di bagian atas dan bawah daftar yang terbuka. Tombol + di samping item juga dapat menyisipkan blok tepat di posisi tersebut. Setiap blok dapat diedit, dipindahkan, atau dihapus.',
+
+notesHelp4Title: '4. Gunakan dan atur ulang item',
+
+notesHelp4Body:
+'Buka menu item untuk melihat tindakan yang tersedia. Ayat dapat dibuka langsung di halaman Bacaan, disalin, atau dibagikan. Blok teks dapat disalin, dibagikan, atau diedit. Panah naik dan turun mengubah urutan ayat dan blok teks. Setiap item juga dapat dihapus secara terpisah.',
+
+notesHelp5Title: '5. Salin atau bagikan seluruh daftar',
+
+notesHelp5Body:
+'Di menu daftar Catatan atau Studi, tombol “Salin” dan “Bagikan” mengambil seluruh isinya: judul, referensi Alkitab, teks ayat, dan blok teks pribadi. Isi tersebut dapat ditempelkan ke pesan atau dokumen, atau dikirim melalui aplikasi kompatibel di perangkat.',
+
+notesHelp6Title: '6. Bagikan atau pindahkan dengan kode The Word',
+
+notesHelp6Body:
+'Tombol “Kode” menyalin kode ringkas yang berisi judul dan seluruh isi daftar. Pengguna The Word lain dapat memilih “Impor kode” untuk membuat ulang daftar di perangkatnya. Isi juga dapat dipindahkan antara Catatan dan Studi dengan menyalin kode di satu halaman lalu mengimpornya di halaman lainnya.',
+
+notesHelp7Title: '7. Impor dokumen teks',
+
+notesHelp7Body:
+'Pilihan “Impor dari teks” memungkinkan Anda menempelkan isi dokumen, email, khotbah, atau rencana studi. Dokumen dapat disimpan sebagai satu blok atau dibagi otomatis menjadi beberapa blok berdasarkan baris kosong. Daftar Catatan atau Studi baru dibuat dengan judul pilihan Anda.',
+
+notesHelp8Title: '8. Penyimpanan lokal dan cadangan',
+
+notesHelp8Body:
+'Catatan dan Studi disimpan secara lokal di perangkat dan tidak otomatis disinkronkan dengan akun atau server. Jika aplikasi dihapus, datanya direset, atau data browser dibersihkan, isinya dapat hilang permanen. Gunakan Salin, Bagikan, atau kode The Word untuk menyimpan daftar penting.',
+
+notesHelp9Title: '9. Beberapa ide penggunaan',
+
+notesHelp9Body:
+'Gunakan Catatan untuk menyimpan ayat hafalan, pemikiran harian, persiapan khotbah, atau daftar doa. Gunakan Studi untuk menyusun pembelajaran yang lebih lengkap tentang tema atau kitab, kelompok rumah, rencana pengajaran, atau rangkaian pesan.',
+
+notesHelp10Title: '10. Gabungkan Catatan dan Studi',
+
+notesHelp10Body:
+'Catatan dan Studi dapat digunakan bersama. Kumpulkan ayat, pemikiran, dan doa dengan cepat di Catatan, lalu pindahkan hal yang ingin dipelajari lebih dalam ke Studi menggunakan kode The Word. Setelah itu Anda dapat mengatur ulang, mengembangkan, dan membagikannya.',
   // Common
   loading: "Memuat...",
   error: "Terjadi kesalahan saat memuat",
