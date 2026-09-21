@@ -25,10 +25,13 @@
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
       }
 
-      h1,
+      h1 {
+        color: #ffffff;
+      }
+
       h2,
       h3 {
-        color: #fbbf24;
+        color: #60a5fa;
       }
 
       a {
@@ -55,8 +58,9 @@
 
       .actions {
         display: flex;
-        justify-content: center;
+        justify-content: flex-end;
         margin-top: 2rem;
+        padding-bottom: max(1rem, env(safe-area-inset-bottom));
       }
 
       .ok-button {
@@ -98,8 +102,13 @@
           padding: 18px;
         }
 
+        .actions {
+          padding-right: 4px;
+        }
+
         .ok-button {
-          width: 100%;
+          width: auto;
+          min-width: 120px;
         }
       }
     </style>
@@ -109,9 +118,7 @@
     <main>
       <h1>Politique de confidentialité – TheWord</h1>
 
-      <small>
-        Dernière mise à jour&nbsp;: 21 septembre 2026
-      </small>
+      <small>Dernière mise à jour&nbsp;: 21 septembre 2026</small>
 
       <section>
         <p>
@@ -204,12 +211,10 @@
 
         <ul>
           <li>mémoriser vos préférences (thème, langue, taille du texte) ;</li>
-
           <li>
             permettre la lecture hors ligne de la Bible en mettant en cache
             certains contenus ;
           </li>
-
           <li>stocker vos notes et listes.</li>
         </ul>
 
@@ -232,12 +237,10 @@
 
         <ul>
           <li>fournir un outil de lecture et d’étude de la Bible ;</li>
-
           <li>
             assurer la sécurité et la stabilité techniques du site et de
             l’application ;
           </li>
-
           <li>corriger les bugs et améliorer l’expérience utilisateur.</li>
         </ul>
 
