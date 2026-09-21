@@ -297,7 +297,60 @@ Jòhánù 8:31-32`,
     "Ọ̀nà kíákíá 1 (nṣiṣẹ́)",
   quickSlot2Tooltip: "Ọ̀nà kíákíá 2",
   quickSlot3Tooltip: "Ọ̀nà kíákíá 3",
+notesHelpTitle: 'Àwọn Àkọsílẹ̀ àti Ìkẹ́kọ̀ọ́ — Ìtọ́sọ́nà lílò',
 
+notesHelpIntro:
+'Àwọn ojúewé Àkọsílẹ̀ àti Ìkẹ́kọ̀ọ́ ń jẹ́ kí o tọ́jú àti ṣètò àwọn ẹsẹ Bíbélì sínú àkójọ gẹ́gẹ́ bí kókó, kí o sì fi àwọn ìwé tirẹ̀ kún wọn. O lè kó àwọn ẹsẹ jọ, fi èrò rẹ kún un, kí o sì dá ìkẹ́kọ̀ọ́ Bíbélì tí a ṣètò sílẹ̀. Gbogbo rẹ̀ ni a fi pamọ́ sínú ẹ̀rọ rẹ láì nílò àkọọ́lẹ̀.',
+
+notesHelp1Title: '1. Ṣẹ̀dá àti ṣàkóso àwọn àkójọ rẹ',
+
+notesHelp1Body:
+'Ojúewé àkọ́kọ́ ń fi gbogbo àkójọ Àkọsílẹ̀ tàbí Ìkẹ́kọ̀ọ́ hàn. O lè ṣẹ̀dá àkójọ, fún un ní àkọlé, tún orúkọ rẹ ṣe tàbí pa á rẹ́. Fọwọ́ kan àkójọ láti ṣí i. Bọ́tìnì “Gbogbo àkójọ” tàbí “Gbogbo ìkẹ́kọ̀ọ́” yóò dá ọ padà sí ojú gbogbo. Nígbà tí o bá tún ṣí ojúewé náà, ètò yóò ṣí àkójọ tí o lò kẹ́yìn, yóò sì lọ sí ẹ̀gbẹ́ ohun tó kẹ́yìn.',
+
+notesHelp2Title: '2. Fi àwọn ẹsẹ Bíbélì kún un',
+
+notesHelp2Body:
+'Lórí ojúewé Kíkà, yan ẹsẹ kan tàbí púpọ̀, lẹ́yìn náà lo bọ́tìnì Àkọsílẹ̀ tàbí Ìkẹ́kọ̀ọ́. A ó fi àwọn ẹsẹ náà, ìtọ́kasí àti ọ̀rọ̀ wọn sínú àwọn àkójọ tí o yàn. O lè yan ọ̀pọ̀ àkójọ, kí o sì tọ́jú ẹsẹ kan náà sí ibi ọ̀tọ̀ọ̀tọ̀.',
+
+notesHelp3Title: '3. Fi àwọn ìpín ọ̀rọ̀ kún un',
+
+notesHelp3Body:
+'Yàtọ̀ sí àwọn ẹsẹ, o lè fi àlàyé, èrò, ìbéèrè, àdúrà, kókó ìwàásù tàbí ohun mìíràn kún un. Bọ́tìnì “Fi ìpín ọ̀rọ̀ kún un” wà lókè àti ìsàlẹ̀ àkójọ tí a ṣí. Bọ́tìnì + lẹ́gbẹ̀ẹ́ ohun kan yóò fi ìpín sí ibẹ̀ gan-an. O lè ṣàtúnṣe, gbe tàbí pa ìpín kọ̀ọ̀kan rẹ́.',
+
+notesHelp4Title: '4. Lo àti tún àwọn ohun ṣètò',
+
+notesHelp4Body:
+'Ṣí àkojọ aṣayan ohun kan láti rí àwọn iṣẹ́ tó wà. O lè ṣí ẹsẹ kan ní Kíkà, da a kọ tàbí pín in. O lè da ìpín ọ̀rọ̀ kọ, pín in tàbí ṣàtúnṣe rẹ. Ọfà òkè àti ìsàlẹ̀ ń yí bí àwọn ohun ṣe tẹ̀ lé ara wọn padà. O tún lè pa ohun kọ̀ọ̀kan rẹ́.',
+
+notesHelp5Title: '5. Da gbogbo àkójọ kọ tàbí pín in',
+
+notesHelp5Body:
+'Nínú àkojọ aṣayan Àkọsílẹ̀ tàbí Ìkẹ́kọ̀ọ́, “Dà kọ” àti “Pín” ń gba gbogbo àkóónú: àkọlé, ìtọ́kasí Bíbélì, ọ̀rọ̀ àwọn ẹsẹ àti àwọn ìpín tirẹ̀. O lè lẹ̀ ẹ́ sínú ìfiránṣẹ́ tàbí ìwé, tàbí fi ránṣẹ́ pẹ̀lú ètò míì tó bá a ṣiṣẹ́.',
+
+notesHelp6Title: '6. Pín tàbí gbe lọ pẹ̀lú kóòdù The Word',
+
+notesHelp6Body:
+'Bọ́tìnì “Kóòdù” ń da kóòdù kékeré tó ní àkọlé àti gbogbo àkóónú àkójọ kọ. Ẹlòmíràn tó ń lo The Word lè yan “Gbé kóòdù wọlé” láti dá àkójọ náà sílẹ̀ lórí ẹ̀rọ rẹ. O tún lè gbe àkóónú láàárín Àkọsílẹ̀ àti Ìkẹ́kọ̀ọ́ nípa dídà kóòdù kọ ní ojúewé kan àti gbígbé e wọlé ní èkejì.',
+
+notesHelp7Title: '7. Gbé ìwé ọ̀rọ̀ wọlé',
+
+notesHelp7Body:
+'“Gbé wọlé láti inú ọ̀rọ̀” ń jẹ́ kí o lẹ àkóónú ìwé, ímeèlì, ìwàásù tàbí ètò ìkẹ́kọ̀ọ́. O lè pa á mọ́ gẹ́gẹ́ bí ìpín kan tàbí jẹ́ kí ètò pín in sí ọ̀pọ̀ ìpín níbi àwọn ìlà òfìfo. A ó ṣẹ̀dá Àkọsílẹ̀ tàbí Ìkẹ́kọ̀ọ́ tuntun pẹ̀lú àkọlé tí o yàn.',
+
+notesHelp8Title: '8. Ìfipamọ́ inú ẹ̀rọ àti àdàkọ ààbò',
+
+notesHelp8Body:
+'Àwọn Àkọsílẹ̀ àti Ìkẹ́kọ̀ọ́ wà nínú ẹ̀rọ rẹ, wọn kì í sì í ṣiṣẹ́pọ̀ fúnra wọn pẹ̀lú àkọọ́lẹ̀ tàbí olupin. Bí o bá yọ ètò náà, tún dátà rẹ̀ ṣe tàbí pa dátà aṣàwákiri rẹ́, àkóónú lè sọnù pátápátá. Lo Dà kọ, Pín tàbí kóòdù The Word láti dáàbò bo àkójọ pàtàkì.',
+
+notesHelp9Title: '9. Àwọn èrò fún lílò wọn',
+
+notesHelp9Body:
+'Lo Àkọsílẹ̀ fún àwọn ẹsẹ tí o fẹ́ há sórí, èrò ojoojúmọ́, ìmúrasílẹ̀ ìwàásù tàbí àkójọ àdúrà. Lo Ìkẹ́kọ̀ọ́ fún ṣíṣàyẹ̀wò kókó tàbí ìwé Bíbélì, ẹgbẹ́ ilé, ètò ìkọ́ni tàbí ọ̀wọ́ ìfiránṣẹ́.',
+
+notesHelp10Title: '10. Darapọ̀ Àkọsílẹ̀ àti Ìkẹ́kọ̀ọ́',
+
+notesHelp10Body:
+'O lè lo Àkọsílẹ̀ àti Ìkẹ́kọ̀ọ́ pọ̀. Kó àwọn ẹsẹ, èrò àti àdúrà jọ sínú Àkọsílẹ̀, lẹ́yìn náà gbe ohun tí o fẹ́ jinlẹ̀ sí Ìkẹ́kọ̀ọ́ pẹ̀lú kóòdù The Word. O lè tún wọn ṣètò, fi kún wọn, kí o sì pín wọn.',
   // Common
   loading: "Ṣíṣí…",
   error: "Àsìse nígbà títẹ̀jáde"
