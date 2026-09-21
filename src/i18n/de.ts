@@ -255,7 +255,60 @@ Johannes 8,31–32`,
   quickSlot1ActiveTooltip: "Schnellzugriff 1 (aktiv)",
   quickSlot2Tooltip: "Schnellzugriff 2",
   quickSlot3Tooltip: "Schnellzugriff 3",
+notesHelpTitle: 'Notizen & Studien — Bedienungsanleitung',
 
+notesHelpIntro:
+'Auf den Seiten „Notizen“ und „Studien“ können Sie Verse in thematischen Listen speichern und ordnen und sie durch eigene Textblöcke ergänzen. So können Sie Bibelstellen sammeln, Gedanken hinzufügen und strukturierte Bibelstudien erstellen. Ihre Notizen und Studien werden lokal auf Ihrem Gerät gespeichert und bleiben ohne Benutzerkonto verfügbar.',
+
+notesHelp1Title: '1. Listen erstellen und verwalten',
+
+notesHelp1Body:
+'Die Hauptseite zeigt alle Notizlisten oder Studien. Sie können eine Liste erstellen, benennen, umbenennen oder löschen. Tippen Sie auf eine Liste, um ihren Inhalt zu öffnen. Mit „Alle Listen“ oder „Alle Studien“ kehren Sie zur Gesamtansicht zurück. Wenn Sie Notizen oder Studien erneut öffnen, wird automatisch die zuletzt verwendete Liste geöffnet und nahezu bis zu ihrem letzten Element gescrollt.',
+
+notesHelp2Title: '2. Verse aus der Bibel hinzufügen',
+
+notesHelp2Body:
+'Wählen Sie auf der Seite „Lesen“ einen oder mehrere Verse aus und verwenden Sie anschließend die Schaltfläche „Notizen“ oder „Studien“. Die Verse werden mit Bibelstelle und Text in den gewählten Listen gespeichert. Derselbe Vers kann in mehreren Listen abgelegt werden.',
+
+notesHelp3Title: '3. Textblöcke hinzufügen',
+
+notesHelp3Body:
+'Zusätzlich zu Versen können Sie eigene Textblöcke mit Kommentaren, Gedanken, Fragen, Gebeten, Predigtpunkten oder anderen Inhalten hinzufügen. „Textblock hinzufügen“ ist oben und unten in einer geöffneten Liste verfügbar. Über die Schaltfläche + neben einem Element können Sie einen Block genau an dieser Stelle einfügen. Textblöcke können bearbeitet, verschoben oder gelöscht werden.',
+
+notesHelp4Title: '4. Elemente verwenden und neu ordnen',
+
+notesHelp4Body:
+'Öffnen Sie das Menü eines Elements, um die verfügbaren Aktionen anzuzeigen. Ein Vers kann direkt unter „Lesen“ geöffnet, kopiert oder geteilt werden. Ein Textblock kann kopiert, geteilt oder bearbeitet werden. Mit „Nach oben“ und „Nach unten“ ändern Sie die Reihenfolge. Jedes Element kann einzeln gelöscht werden.',
+
+notesHelp5Title: '5. Eine vollständige Liste kopieren oder teilen',
+
+notesHelp5Body:
+'Im Menü einer Notizliste oder Studie können Sie mit „Kopieren“ und „Teilen“ den gesamten Inhalt übernehmen: Titel, Bibelstellen, Verstexte und persönliche Textblöcke. Anschließend können Sie ihn in eine Nachricht oder ein Dokument einfügen oder über eine kompatible App versenden.',
+
+notesHelp6Title: '6. Mit einem The-Word-Code teilen oder übertragen',
+
+notesHelp6Body:
+'Die Schaltfläche „Code“ kopiert einen kompakten Code mit dem Titel und dem gesamten Inhalt der Liste. Eine andere Person mit The Word kann über „Code importieren“ dieselbe Liste auf ihrem Gerät wiederherstellen. Inhalte können damit auch zwischen Notizen und Studien übertragen werden: Kopieren Sie den Code auf einer Seite und importieren Sie ihn auf der anderen.',
+
+notesHelp7Title: '7. Ein Textdokument importieren',
+
+notesHelp7Body:
+'Mit „Aus Text importieren“ können Sie den Inhalt eines Dokuments, einer E-Mail, einer Predigt oder eines Studienplans einfügen. Sie können alles in einem Block behalten oder automatisch anhand leerer Zeilen in mehrere Blöcke aufteilen lassen. Anschließend wird eine neue Notizliste oder Studie mit dem gewählten Titel erstellt.',
+
+notesHelp8Title: '8. Lokale Speicherung und Sicherungen',
+
+notesHelp8Body:
+'Ihre Notizen und Studien werden lokal auf Ihrem Gerät gespeichert und nicht automatisch mit einem Konto oder Server synchronisiert. Beim Deinstallieren der App, Zurücksetzen ihrer Daten oder Löschen der Browserdaten können die Inhalte dauerhaft verloren gehen. Sichern Sie wichtige Listen durch Kopieren, Teilen oder einen The-Word-Code.',
+
+notesHelp9Title: '9. Verwendungsmöglichkeiten',
+
+notesHelp9Body:
+'Verwenden Sie Notizen für Verse zum Auswendiglernen, tägliche Gedanken, Predigtvorbereitungen oder Gebetslisten. Studien eignen sich für ausführlichere Bibelarbeiten über ein Thema oder Buch, Hauskreise, Unterrichtspläne oder Predigtreihen.',
+
+notesHelp10Title: '10. Notizen und Studien kombinieren',
+
+notesHelp10Body:
+'Notizen und Studien können gemeinsam verwendet werden. Sammeln Sie beispielsweise Verse, Gedanken und Gebete zunächst in Notizen und übertragen Sie Inhalte, die Sie vertiefen möchten, mit einem The-Word-Code in Studien. Dort können Sie sie neu ordnen, erweitern und teilen.',
   // Common
   loading: "Laden...",
   error: "Fehler beim Laden",
