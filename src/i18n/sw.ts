@@ -304,7 +304,60 @@ Yohana 8:31-32`,
     "Njia ya mkato 2",
   quickSlot3Tooltip:
     "Njia ya mkato 3",
+notesHelpTitle: 'Maelezo na Masomo — Mwongozo wa matumizi',
 
+notesHelpIntro:
+'Kurasa za Maelezo na Masomo hukuwezesha kuhifadhi na kupanga mistari katika orodha za mada, kisha kuongeza maandishi yako mwenyewe. Unaweza kukusanya vifungu, kuongeza mawazo na kujenga masomo ya Biblia yaliyopangwa. Maelezo na Masomo huhifadhiwa kwenye kifaa chako na yanapatikana bila akaunti.',
+
+notesHelp1Title: '1. Unda na usimamie orodha zako',
+
+notesHelp1Body:
+'Ukurasa mkuu unaonyesha orodha zote za Maelezo au Masomo. Unaweza kuunda orodha, kuipa kichwa, kubadili jina au kuifuta. Gusa orodha ili kufungua yaliyomo. Kitufe cha “Orodha zote” au “Masomo yote” hurudisha kwenye mwonekano mkuu. Ukifungua ukurasa tena, programu hufungua orodha ya mwisho uliyotumia na kusogea karibu na kipengele chake cha mwisho.',
+
+notesHelp2Title: '2. Ongeza mistari kutoka Biblia',
+
+notesHelp2Body:
+'Kwenye ukurasa wa Kusoma, chagua mstari mmoja au zaidi, kisha utumie kitufe cha Maelezo au Masomo. Mistari huongezwa kwenye orodha ulizochagua pamoja na marejeo na maandishi yake. Unaweza kuchagua orodha kadhaa na kuhifadhi mstari uleule katika sehemu tofauti.',
+
+notesHelp3Title: '3. Ongeza vipande vya maandishi',
+
+notesHelp3Body:
+'Mbali na mistari, unaweza kuongeza maoni, tafakari, maswali, sala, hoja za mahubiri au maudhui mengine. Kitufe cha “Ongeza kipande cha maandishi” kinapatikana juu na chini ya orodha iliyofunguliwa. Kitufe cha + karibu na kipengele huingiza maandishi katika nafasi hiyo. Kila kipande kinaweza kuhaririwa, kuhamishwa au kufutwa.',
+
+notesHelp4Title: '4. Tumia na kupanga upya vipengele',
+
+notesHelp4Body:
+'Fungua menyu ya kipengele ili kuona vitendo vinavyopatikana. Mstari unaweza kufunguliwa katika Kusoma, kunakiliwa au kushirikiwa. Kipande cha maandishi kinaweza kunakiliwa, kushirikiwa au kuhaririwa. Mishale ya juu na chini hubadili mpangilio, na kila kipengele kinaweza kufutwa kivyake.',
+
+notesHelp5Title: '5. Nakili au shiriki orodha nzima',
+
+notesHelp5Body:
+'Katika menyu ya orodha ya Maelezo au Somo, vitufe vya “Nakili” na “Shiriki” huchukua maudhui yote: kichwa, marejeo ya Biblia, maandishi ya mistari na vipande binafsi. Unaweza kuyabandika kwenye ujumbe au hati, au kuyatuma kupitia programu inayofaa kwenye kifaa.',
+
+notesHelp6Title: '6. Shiriki au hamisha kwa msimbo wa The Word',
+
+notesHelp6Body:
+'Kitufe cha “Msimbo” hunakili msimbo mfupi wenye kichwa na maudhui yote ya orodha. Mtumiaji mwingine wa The Word anaweza kuchagua “Leta msimbo” ili kuunda orodha hiyo kwenye kifaa chake. Pia unaweza kuhamisha maudhui kati ya Maelezo na Masomo kwa kunakili msimbo katika ukurasa mmoja na kuuleta katika mwingine.',
+
+notesHelp7Title: '7. Leta hati ya maandishi',
+
+notesHelp7Body:
+'Chaguo la “Leta kutoka maandishi” hukuruhusu kubandika hati, barua pepe, mahubiri au mpango wa somo. Unaweza kuiweka katika kipande kimoja au kuigawa kiotomatiki katika vipande vinavyotenganishwa na mistari mitupu. Orodha mpya au Somo jipya huundwa kwa kichwa unachochagua.',
+
+notesHelp8Title: '8. Hifadhi ya kifaa na nakala rudufu',
+
+notesHelp8Body:
+'Maelezo na Masomo huhifadhiwa kwenye kifaa chako na hayalandanishwi kiotomatiki na akaunti au seva. Ukiondoa programu, kuweka upya data yake au kufuta data ya kivinjari, maudhui yanaweza kupotea kabisa. Tumia Nakili, Shiriki au msimbo wa The Word kuhifadhi orodha muhimu.',
+
+notesHelp9Title: '9. Mawazo ya matumizi',
+
+notesHelp9Body:
+'Tumia Maelezo kuhifadhi mistari ya kukariri, mawazo ya kila siku, maandalizi ya mahubiri au orodha ya sala. Tumia Masomo kuchunguza mada au kitabu, kuandaa kikundi cha nyumbani, mpango wa kufundisha au mfululizo wa ujumbe.',
+
+notesHelp10Title: '10. Unganisha Maelezo na Masomo',
+
+notesHelp10Body:
+'Maelezo na Masomo yanaweza kutumiwa pamoja. Kusanya mistari, mawazo na sala katika Maelezo, kisha hamishia katika Masomo mambo unayotaka kuchunguza zaidi kwa kutumia msimbo wa The Word. Baadaye unaweza kuyapanga, kuyapanua na kuyashiriki.',
   // Common
   loading: "Inapakia...",
   error:
