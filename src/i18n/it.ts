@@ -276,7 +276,60 @@ Giovanni 8:31-32`,
     "Scorciatoia 1 (attiva)",
   quickSlot2Tooltip: "Scorciatoia 2",
   quickSlot3Tooltip: "Scorciatoia 3",
+notesHelpTitle: 'Note e Studi — Guida all’uso',
 
+notesHelpIntro:
+'Le pagine Note e Studi consentono di salvare e organizzare versetti in elenchi tematici e completarli con blocchi di testo personali. Puoi raccogliere passi, aggiungere riflessioni e creare studi biblici strutturati. Note e Studi vengono salvati localmente sul dispositivo e rimangono accessibili senza un account.',
+
+notesHelp1Title: '1. Creare e gestire gli elenchi',
+
+notesHelp1Body:
+'La pagina principale mostra tutti gli elenchi di Note o gli Studi. Puoi creare un elenco, assegnargli un titolo, rinominarlo o eliminarlo. Tocca un elenco per aprirlo. Il pulsante «Tutti gli elenchi» o «Tutti gli studi» riporta alla vista generale. Quando riapri la pagina, l’applicazione apre automaticamente l’ultimo elenco utilizzato e si posiziona vicino al suo ultimo elemento.',
+
+notesHelp2Title: '2. Aggiungere versetti dalla Bibbia',
+
+notesHelp2Body:
+'Dalla pagina Lettura, seleziona uno o più versetti e usa il pulsante Note o Studi. I versetti vengono aggiunti agli elenchi scelti con il riferimento e il testo. Puoi selezionare più elenchi e salvare lo stesso versetto in luoghi diversi.',
+
+notesHelp3Title: '3. Aggiungere blocchi di testo',
+
+notesHelp3Body:
+'Oltre ai versetti puoi aggiungere commenti, riflessioni, domande, preghiere, punti di predicazione o altri contenuti. «Aggiungi blocco di testo» è disponibile in alto e in basso nell’elenco aperto. Il pulsante + accanto a un elemento inserisce un blocco in quella posizione esatta. Ogni blocco può essere modificato, spostato o eliminato.',
+
+notesHelp4Title: '4. Utilizzare e riordinare gli elementi',
+
+notesHelp4Body:
+'Apri il menu di un elemento per visualizzare le azioni disponibili. Un versetto può essere aperto in Lettura, copiato o condiviso. Un blocco di testo può essere copiato, condiviso o modificato. Le frecce Su e Giù cambiano l’ordine degli elementi. Ogni elemento può anche essere eliminato singolarmente.',
+
+notesHelp5Title: '5. Copiare o condividere un intero elenco',
+
+notesHelp5Body:
+'Nel menu di un elenco di Note o di uno Studio, «Copia» e «Condividi» consentono di recuperare tutto il contenuto: titolo, riferimenti biblici, testi dei versetti e blocchi personali. Puoi quindi incollarlo in un messaggio o documento oppure inviarlo tramite un’applicazione compatibile.',
+
+notesHelp6Title: '6. Condividere o trasferire con un codice The Word',
+
+notesHelp6Body:
+'Il pulsante «Codice» copia un codice compatto contenente il titolo e tutto il contenuto dell’elenco. Un altro utente di The Word può scegliere «Importa un codice» per ricrearlo sul proprio dispositivo. Puoi anche trasferire contenuti tra Note e Studi copiando il codice in una pagina e importandolo nell’altra.',
+
+notesHelp7Title: '7. Importare un documento di testo',
+
+notesHelp7Body:
+'«Importa da testo» permette di incollare il contenuto di un documento, un’email, una predicazione o un piano di studio. Puoi conservarlo in un unico blocco oppure dividerlo automaticamente in più blocchi separati da righe vuote. Verrà creato un nuovo elenco o Studio con il titolo scelto.',
+
+notesHelp8Title: '8. Archiviazione locale e copie di sicurezza',
+
+notesHelp8Body:
+'Note e Studi vengono salvati localmente sul dispositivo e non sono sincronizzati automaticamente con un account o un server. Se disinstalli l’applicazione, ne reimposti i dati o cancelli i dati del browser, il contenuto potrebbe essere eliminato definitivamente. Proteggi gli elenchi importanti con Copia, Condividi o un codice The Word.',
+
+notesHelp9Title: '9. Alcune idee di utilizzo',
+
+notesHelp9Body:
+'Usa Note per conservare versetti da memorizzare, riflessioni quotidiane, preparazioni di predicazioni o elenchi di preghiera. Usa Studi per approfondire un tema o un libro, preparare un gruppo in casa, un piano didattico o una serie di messaggi.',
+
+notesHelp10Title: '10. Combinare Note e Studi',
+
+notesHelp10Body:
+'Note e Studi possono essere utilizzati insieme. Raccogli rapidamente versetti, pensieri e preghiere nelle Note, quindi trasferisci negli Studi ciò che desideri approfondire mediante un codice The Word. Potrai poi riordinare, ampliare e condividere il contenuto.',
   // Common
   loading: "Caricamento...",
   error: "Errore durante il caricamento",
