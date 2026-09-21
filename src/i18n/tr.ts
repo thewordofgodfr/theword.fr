@@ -258,7 +258,60 @@ Yuhanna 8:31-32`,
   quickSlot1ActiveTooltip: "Kısayol 1 (etkin)",
   quickSlot2Tooltip: "Kısayol 2",
   quickSlot3Tooltip: "Kısayol 3",
+notesHelpTitle: 'Notlar ve Çalışmalar — Kullanım Kılavuzu',
 
+notesHelpIntro:
+'Notlar ve Çalışmalar sayfaları, ayetleri konu listelerinde saklayıp düzenlemenize ve kendi metin bloklarınızla tamamlamanıza olanak tanır. Bölümleri toplayabilir, düşüncelerinizi ekleyebilir ve düzenli Kutsal Kitap çalışmaları hazırlayabilirsiniz. Veriler cihazınızda yerel olarak saklanır ve hesap olmadan kullanılabilir.',
+
+notesHelp1Title: '1. Listelerinizi oluşturun ve yönetin',
+
+notesHelp1Body:
+'Ana sayfa bütün Not listelerinizi veya Çalışmalarınızı gösterir. Bir liste oluşturabilir, başlık verebilir, yeniden adlandırabilir veya silebilirsiniz. İçeriğini açmak için listeye dokunun. “Tüm listeler” veya “Tüm çalışmalar” genel görünüme döndürür. Sayfayı yeniden açtığınızda uygulama son kullandığınız listeyi açar ve son öğesinin yakınına gider.',
+
+notesHelp2Title: '2. Kutsal Kitap’tan ayet ekleyin',
+
+notesHelp2Body:
+'Okuma sayfasında bir veya birkaç ayet seçin, ardından Notlar veya Çalışmalar düğmesini kullanın. Ayetler, referansları ve metinleriyle seçtiğiniz listelere eklenir. Birden fazla liste seçebilir ve aynı ayeti farklı yerlerde saklayabilirsiniz.',
+
+notesHelp3Title: '3. Metin blokları ekleyin',
+
+notesHelp3Body:
+'Ayetlerin yanında yorumlar, düşünceler, sorular, dualar, vaaz noktaları veya başka içerikler ekleyebilirsiniz. “Metin bloğu ekle” düğmesi açık listenin üstünde ve altında bulunur. Bir öğenin yanındaki + düğmesi de tam o konuma blok ekler. Her blok düzenlenebilir, taşınabilir veya silinebilir.',
+
+notesHelp4Title: '4. Öğeleri kullanın ve yeniden sıralayın',
+
+notesHelp4Body:
+'Mevcut işlemleri görmek için öğenin menüsünü açın. Bir ayet Okuma sayfasında açılabilir, kopyalanabilir veya paylaşılabilir. Metin bloğu kopyalanabilir, paylaşılabilir veya düzenlenebilir. Yukarı ve aşağı okları sıralamayı değiştirir. Her öğe ayrı ayrı silinebilir.',
+
+notesHelp5Title: '5. Listenin tamamını kopyalayın veya paylaşın',
+
+notesHelp5Body:
+'Bir Not listesi veya Çalışmanın menüsündeki “Kopyala” ve “Paylaş” düğmeleri başlık, Kutsal Kitap referansları, ayet metinleri ve kişisel metin blokları dâhil tüm içeriği alır. İçeriği bir mesaja veya belgeye yapıştırabilir ya da uyumlu bir uygulamayla gönderebilirsiniz.',
+
+notesHelp6Title: '6. The Word koduyla paylaşın veya aktarın',
+
+notesHelp6Body:
+'“Kod” düğmesi listenin başlığını ve tüm içeriğini taşıyan kısa bir kodu kopyalar. Başka bir The Word kullanıcısı “Kod içe aktar” seçeneğiyle listeyi kendi cihazında yeniden oluşturabilir. Kodu bir sayfada kopyalayıp diğerinde içe aktararak Notlar ve Çalışmalar arasında içerik de aktarabilirsiniz.',
+
+notesHelp7Title: '7. Metin belgesi içe aktarın',
+
+notesHelp7Body:
+'“Metinden içe aktar” seçeneği bir belge, e-posta, vaaz veya çalışma planını yapıştırmanızı sağlar. Belgeyi tek blok hâlinde tutabilir veya boş satırlara göre otomatik olarak birkaç bloğa bölebilirsiniz. Seçtiğiniz başlıkla yeni bir Not listesi veya Çalışma oluşturulur.',
+
+notesHelp8Title: '8. Yerel depolama ve yedekleme',
+
+notesHelp8Body:
+'Notlar ve Çalışmalar cihazınızda yerel olarak saklanır ve bir hesap ya da sunucuyla otomatik eşitlenmez. Uygulamayı kaldırır, verilerini sıfırlar veya tarayıcı verilerini silerseniz içerikler kalıcı olarak kaybolabilir. Önemli listeler için Kopyala, Paylaş veya The Word kodunu kullanın.',
+
+notesHelp9Title: '9. Bazı kullanım fikirleri',
+
+notesHelp9Body:
+'Notları ezberlenecek ayetler, günlük düşünceler, vaaz hazırlığı veya dua listeleri için kullanın. Çalışmaları bir konuyu veya kitabı incelemek, ev grubu, eğitim planı ya da mesaj dizisi hazırlamak için kullanın.',
+
+notesHelp10Title: '10. Notları ve Çalışmaları birlikte kullanın',
+
+notesHelp10Body:
+'Notlar ve Çalışmalar birlikte kullanılabilir. Ayetleri, düşünceleri ve duaları önce Notlarda toplayın, daha derin incelemek istediklerinizi The Word koduyla Çalışmalara aktarın. Ardından yeniden sıralayabilir, geliştirebilir ve paylaşabilirsiniz.',
   // Common
   loading: "Yükleniyor...",
   error: "Yüklenirken bir hata oluştu",
