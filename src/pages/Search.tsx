@@ -576,6 +576,9 @@ export default function Search() {
   const [expanded, setExpanded] =
     useState<Record<string, boolean>>({});
 
+  const [restoredExpandedKey, setRestoredExpandedKey] = useState('');
+  const [resultsKey, setResultsKey] = useState('');
+
   const lastExecutedQidRef =
     useRef<string>('');
 
@@ -660,6 +663,7 @@ export default function Search() {
       return;
     }
 
+    let cancelled = false;
     const handle = window.setTimeout(
       async () => {
         if (
@@ -689,6 +693,8 @@ export default function Search() {
               state.settings.language
             );
 
+          if (cancelled) return;
+
           const enriched: ResultItem[] = [];
 
           for (const verse of found) {
@@ -707,21 +713,25 @@ export default function Search() {
           }
 
           setResults(enriched);
+          setResultsKey(expandedKey);
 
           lastExecutedQidRef.current =
             currentQid || '';
         } finally {
-          setLoading(false);
+          if (!cancelled) setLoading(false);
         }
       },
       300
     );
 
-    return () =>
+    return () => {
+      cancelled = true;
       window.clearTimeout(handle);
+    };
   }, [
     query,
     currentQid,
+    expandedKey,
     state.settings.language,
   ]);
 
@@ -785,8 +795,7 @@ export default function Search() {
     ]);
 
   useEffect(() => {
-    if (!grouped.length) {
-      setExpanded({});
+    if (!grouped.length || resultsKey !== expandedKey || loading) {
       return;
     }
 
@@ -828,6 +837,7 @@ export default function Search() {
         }
 
         setExpanded(next);
+        setRestoredExpandedKey(expandedKey);
         return;
       }
     } catch {
@@ -844,62 +854,48 @@ export default function Search() {
     }
 
     setExpanded(next);
+    setRestoredExpandedKey(expandedKey);
   }, [
     grouped,
     expandedKey,
+    resultsKey,
+    loading,
   ]);
 
   useEffect(() => {
-    if (
-      !grouped.length ||
-      loading ||
-      !scrollKey
-    ) {
+    if (!grouped.length || loading || !scrollKey
+      || resultsKey !== expandedKey || restoredExpandedKey !== expandedKey) {
       return;
     }
 
+    let savedY = 0;
     try {
-      const raw =
-        sessionStorage.getItem(
-          scrollKey
-        );
-
-      const y = raw
-        ? parseInt(raw, 10)
-        : 0;
-
-      if (
-        Number.isFinite(y) &&
-        y > 0
-      ) {
-        window.setTimeout(() => {
-          window.scrollTo({
-            top: y,
-            behavior: 'auto',
-          });
-        }, 0);
-      }
+      const raw = sessionStorage.getItem(scrollKey);
+      const y = raw ? Number(raw) : 0;
+      if (Number.isFinite(y) && y >= 0) savedY = y;
     } catch {
-      // restauration impossible
+      // sessionStorage indisponible
     }
-  }, [
-    grouped,
-    loading,
-    scrollKey,
-  ]);
 
-  useEffect(() => {
-    return () => {
-      persistScrollNow();
-      persistExpandedNow(
-        expanded
-      );
+    // Wait until the restored open books have been rendered. Do not save
+    // scroll events caused by the temporary, collapsed results while loading.
+    const saveScroll = () => {
+      try {
+        sessionStorage.setItem(scrollKey, String(window.scrollY || 0));
+      } catch {
+        // sessionStorage indisponible
+      }
     };
-  }, [
-    expandedKey,
-    scrollKey,
-    expanded,
-  ]);
+    const frame = window.requestAnimationFrame(() => {
+      window.scrollTo({ top: savedY, behavior: 'auto' });
+      window.addEventListener('scroll', saveScroll, { passive: true });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', saveScroll);
+    };
+  }, [grouped, loading, scrollKey, expandedKey, resultsKey, restoredExpandedKey]);
 
   const toggleGroup = (
     bookId: string
