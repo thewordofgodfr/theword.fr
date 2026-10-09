@@ -2,6 +2,7 @@
 import type { TranslationDict } from './types';
 
 const ja: TranslationDict = {
+  discoverAndroidApp: "Android 版 The Word アプリはこちら：",
   // Backup and restoration
   backupTitle: "バックアップと復元",
   backupDescription: "ノート、学び、読書位置、設定をファイルに保存します。復元時は現在の内容を削除せずにデータを統合します。",

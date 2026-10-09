@@ -2,6 +2,7 @@
 import type { TranslationDict } from './types';
 
 const el: TranslationDict = {
+  discoverAndroidApp: "Ανακαλύψτε την εφαρμογή The Word για Android:",
   // Backup and restoration
   backupTitle: "Αντίγραφο ασφαλείας και επαναφορά",
   backupDescription: "Αποθηκεύστε Σημειώσεις, Μελέτες, θέσεις ανάγνωσης και προτιμήσεις σε αρχείο. Η επαναφορά συγχωνεύει τα δεδομένα χωρίς να διαγράφει το υπάρχον περιεχόμενο.",

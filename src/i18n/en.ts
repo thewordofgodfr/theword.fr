@@ -2,6 +2,7 @@
 import type { TranslationDict } from './types';
 
 const en: TranslationDict = {
+  discoverAndroidApp: "Discover The Word app on Android:",
   // Navigation
   home: 'Home',
   reading: 'Reading',

@@ -768,7 +768,7 @@ export default function Reading() {
 
 ${body}
 
-Découvrir l’application The Word :
+${t('discoverAndroidApp')}
 ${shareUrl}`;
 
     try {
@@ -1064,7 +1064,7 @@ ${shareUrl}`;
 
 ${text}
 
-Découvrir l’application The Word :
+${t('discoverAndroidApp')}
 ${shareUrl}`;
 
     try {
