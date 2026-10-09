@@ -2,6 +2,7 @@
 import type { TranslationDict } from './types';
 
 const ko: TranslationDict = {
+  discoverAndroidApp: "Android용 The Word 앱을 만나보세요:",
   // Backup and restoration
   backupTitle: "백업 및 복원",
   backupDescription: "노트, 성경 공부, 읽기 위치와 설정을 파일에 저장합니다. 복원 시 기존 내용을 삭제하지 않고 데이터를 병합합니다.",

@@ -762,13 +762,13 @@ export default function Reading() {
     const ref = getBookName(selectedBook) + ' ' + chapter.chapter + ':' + ranges;
 
     const body = chosen.map(v => String(v.text)).join('\n');
-    const shareUrl = 'https://www.theword.fr/#about';
+    const shareUrl = 'https://play.google.com/store/apps/details?id=fr.theword.www.twa';
 
     const shareText = `${ref}
 
 ${body}
 
-Découvrir l’application The Word :
+${t('discoverAndroidApp')}
 ${shareUrl}`;
 
     try {
@@ -1058,13 +1058,13 @@ ${shareUrl}`;
     if (!otherLangTarget || !selectedBook || !text) return;
     const range = compressRanges(otherLangTarget.verses);
     const ref = getBookName(selectedBook) + ' ' + otherLangTarget.chapter + ':' + range;
-    const shareUrl = 'https://www.theword.fr/#about';
+    const shareUrl = 'https://play.google.com/store/apps/details?id=fr.theword.www.twa';
 
     const shareText = `${ref}
 
 ${text}
 
-Découvrir l’application The Word :
+${t('discoverAndroidApp')}
 ${shareUrl}`;
 
     try {

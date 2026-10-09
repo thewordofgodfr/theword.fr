@@ -2,6 +2,7 @@
 import type { TranslationDict } from './types';
 
 const pt: TranslationDict = {
+  discoverAndroidApp: "Conheça o aplicativo The Word para Android:",
   // Backup and restoration
   backupTitle: "Backup e restauração",
   backupDescription: "Salve Notas, Estudos, memórias de leitura e preferências em um arquivo. A restauração mescla os dados sem excluir o conteúdo atual.",

@@ -2,6 +2,7 @@
 import type { TranslationDict } from './types';
 
 const zh: TranslationDict = {
+  discoverAndroidApp: "了解 Android 版 The Word 应用：",
   // Backup and restoration
   backupTitle: "备份与恢复",
   backupDescription: "将笔记、研读、阅读书签和偏好设置保存到文件。恢复时会合并数据，不会删除现有内容。",

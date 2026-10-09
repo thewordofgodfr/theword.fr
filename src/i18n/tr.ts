@@ -2,6 +2,7 @@
 import type { TranslationDict } from './types';
 
 const tr: TranslationDict = {
+  discoverAndroidApp: "Android için The Word uygulamasını keşfedin:",
   // Backup and restoration
   backupTitle: "Yedekleme ve geri yükleme",
   backupDescription: "Notları, Çalışmaları, okuma konumlarını ve tercihleri bir dosyaya kaydedin. Geri yükleme mevcut içeriği silmeden verileri birleştirir.",

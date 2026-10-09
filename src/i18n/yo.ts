@@ -2,6 +2,7 @@
 import type { TranslationDict } from './types';
 
 const yo: TranslationDict = {
+  discoverAndroidApp: "Ṣe ìwádìí ohun èlò The Word fún Android:",
   // Backup and restoration
   backupTitle: "Ìfipamọ́ àdàkọ àti ìmúpadàbọ̀",
   backupDescription: "Fi Àkọsílẹ̀, Ẹ̀kọ́, ibi ìkàwé àti àwọn ààyò pamọ́ sínú fáìlì. Ìmúpadàbọ̀ máa darapọ̀ dátà láìpa àkóónú tó wà rẹ́.",

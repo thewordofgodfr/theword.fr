@@ -2,6 +2,7 @@
 import type { TranslationDict } from './types';
 
 const id: TranslationDict = {
+  discoverAndroidApp: "Temukan aplikasi The Word untuk Android:",
   // Backup and restoration
   backupTitle: "Pencadangan dan pemulihan",
   backupDescription: "Simpan Catatan, Studi, posisi bacaan, dan preferensi dalam berkas. Pemulihan menggabungkan data tanpa menghapus konten saat ini.",

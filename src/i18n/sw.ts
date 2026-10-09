@@ -2,6 +2,7 @@
 import type { TranslationDict } from './types';
 
 const sw: TranslationDict = {
+  discoverAndroidApp: "Fahamu programu ya The Word kwa Android:",
   // Backup and restoration
   backupTitle: "Hifadhi nakala na urejeshaji",
   backupDescription: "Hifadhi Madokezo, Masomo, nafasi za usomaji na mapendeleo kwenye faili. Urejeshaji huunganisha data bila kufuta yaliyomo sasa.",
