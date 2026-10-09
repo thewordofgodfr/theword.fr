@@ -524,15 +524,16 @@ export default function Reading() {
       book: BibleBook,
       chapNum: number,
       scrollVerse: number | null,
-      highlightVerse: number | null
+      highlightVerse: number | null,
+      slotIndex = 0
     ) => {
       setSelectedBook(book);
       setSelectedChapter(chapNum);
       setSelectedVerses([]);
       setHighlightedVerse(highlightVerse);
       setScrollTargetVerse(scrollVerse);
-      setTapped(0);
-      setActiveSlot(null);
+      setTapped(slotIndex);
+      setActiveSlot(slotIndex === 0 ? null : slotIndex);
       try {
         window.scrollTo({ top: 0 });
       } catch {}
@@ -600,9 +601,7 @@ export default function Reading() {
         if (s) {
           const b = resolveBook(s.book);
           if (b) {
-            const changed = applyIfChanged(b, s.chapter, s.verse ?? null, null);
-            setActiveSlot(i);
-            setLastTappedSlot(i);
+            const changed = applyIfChanged(b, s.chapter, s.verse ?? null, null, i);
             setHasLoadedContext(true);
             if (changed) return;
           }
