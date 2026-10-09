@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" class="dark theme-dark-blue" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content" />
 
     <!-- Indiquer aux moteurs de recherche qu'ils peuvent indexer -->
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
@@ -18,8 +18,8 @@
 
     <!-- Metas pour l'UI système (valeur mise à jour par le script ci-dessous) -->
     <meta name="theme-color" content="#000000"/>
-    <meta name="color-scheme" content="light dark" />
-    <meta name="supported-color-schemes" content="light dark" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="supported-color-schemes" content="dark" />
 
     <!-- Favicons / PWA -->
     <link rel="icon" href="/favicon.ico" sizes="any">
@@ -44,43 +44,21 @@
     <script>
       (function () {
         try {
-          var saved = localStorage.getItem('bibleApp_settings');
-          var theme = 'dark'; // défaut : sombre
-          if (saved) {
-            try { theme = JSON.parse(saved).theme || 'dark'; } catch (e) {}
-          }
-
+          // L’application est toujours sombre, y compris avant le démarrage React.
           var root = document.documentElement;
-
-          if (theme === 'dark') {
-            // Appli sombre -> palette bleu foncé (même rendu quel que soit le tel)
-            root.classList.add('dark','theme-dark-blue');
-            root.setAttribute('data-theme','dark');
-            root.style.colorScheme = 'dark';
-            // fond immédiat pour éviter tout flash
-            root.style.setProperty('--force-body-bg', '#0f172a'); // slate-900
-            // teinte de la barre système
-            var metaTC = document.querySelector('meta[name="theme-color"]');
-            if (metaTC) metaTC.content = '#0f172a';
-            var metaCS = document.querySelector('meta[name="color-scheme"]');
-            if (metaCS) metaCS.content = 'dark';
-          } else {
-            // Appli claire -> VRAI clair même si le téléphone est en sombre
-            root.classList.remove('dark','theme-dark-blue');
-            root.setAttribute('data-theme','light');
-            root.style.colorScheme = 'light';
-            root.style.forcedColorAdjust = 'none';
-            root.style.setProperty('--force-body-bg', '#ffffff');
-            var metaTC2 = document.querySelector('meta[name="theme-color"]');
-            if (metaTC2) metaTC2.content = '#ffffff';
-            var metaCS2 = document.querySelector('meta[name="color-scheme"]');
-            if (metaCS2) metaCS2.content = 'light';
-          }
+          root.style.colorScheme = 'dark';
+          root.style.setProperty('--force-body-bg', '#0f172a');
+          var metaTC = document.querySelector('meta[name="theme-color"]');
+          if (metaTC) metaTC.content = '#0f172a';
         } catch (e) {}
       })();
     </script>
     <!-- évite le flash de mauvais fond avant le CSS -->
-    <style> body { background: var(--force-body-bg, #0f172a); } </style>
+    <style>
+      html, body, #root { background-color: #0f172a; color-scheme: dark; }
+      html, body, #root { min-height: 100vh; min-height: 100lvh; }
+      body { margin: 0; }
+    </style>
     <!-- ===== FIN boot thème ===== -->
   </head>
 
