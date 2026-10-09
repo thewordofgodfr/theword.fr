@@ -111,27 +111,6 @@ const ANDROID_LABELS: Record<string, readonly [string, string, string]> = {
   ]
 };
 
-// Only show the download card in a browser tab, never in an installed PWA or TWA.
-function isBrowserView(): boolean {
-  return typeof window !== 'undefined'
-    && !document.referrer.startsWith('android-app://')
-    && !(navigator as Navigator & { standalone?: boolean }).standalone
-    && window.matchMedia('(display-mode: browser)').matches;
-}
-
-function useBrowserView() {
-  const [isBrowser, setIsBrowser] = React.useState(isBrowserView);
-  React.useEffect(() => {
-    const media = window.matchMedia('(display-mode: browser)');
-    const update = () => setIsBrowser(isBrowserView());
-    media.addEventListener('change', update);
-    update();
-    return () => media.removeEventListener('change', update);
-  }, []);
-  return isBrowser;
-}
-
-
 /* =========================================================
    AIDE VISUELLE DES MÉMOIRES RAPIDES
    Même palette que la page Lecture :
@@ -249,7 +228,6 @@ const QuickSlotsHelpInline: React.FC = () => {
 export default function About() {
   const { state } = useApp();
   const { t } = useTranslation();
-  const showAndroidDownload = useBrowserView();
   const androidLabels = ANDROID_LABELS[state.settings.language] ?? ANDROID_LABELS.en;
 
   const isDark =
@@ -584,7 +562,6 @@ export default function About() {
               </p>
             </footer>
 
-            {showAndroidDownload && (
               <section className={CARD_CLASS} aria-labelledby="android-download-title" data-android-download>
                 <h2 id="android-download-title" className={HEADING_CLASS} style={{ fontSize: H2_PX }}>
                   {androidLabels[0]}
@@ -609,7 +586,6 @@ export default function About() {
                   </div>
                 </div>
               </section>
-            )}
           </div>
         </div>
       </div>
