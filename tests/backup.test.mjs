@@ -69,6 +69,49 @@ test('latest list metadata wins; local-only lists and items survive without dupl
   assert.equal(get(keys.notes).find(x => x.id === 'same').items.length, 3);
 });
 
+test('restoring an exact backup preserves repeated blocks and verses in Notes and Studies', async () => {
+  for (const key of [keys.notes, keys.studies]) {
+    const original = [list('repeated', 5, [text('Repeat'), verse, text('Repeat'), verse])];
+    put(key, original);
+    const backup = api.createBackup().file;
+    await api.restoreBackupByMerging(backup);
+    assert.deepEqual(get(key), original);
+    await api.restoreBackupByMerging(backup);
+    assert.deepEqual(get(key), original);
+  }
+});
+
+test('merge preserves the larger occurrence count from either version and remains idempotent', async () => {
+  for (const key of [keys.notes, keys.studies]) {
+    for (const importedWins of [false, true]) {
+      for (const newerHasMore of [false, true]) {
+        globalThis.localStorage = new MemoryStorage();
+        const newerItems = newerHasMore
+          ? [text('Repeat'), verse, text('Repeat'), verse, text('New only')]
+          : [text('Repeat'), verse, text('New only')];
+        const olderItems = newerHasMore
+          ? [text('Repeat'), verse, text('Old only')]
+          : [text('Repeat'), verse, text('Repeat'), verse, text('Old only')];
+        const newer = list('same', 10, newerItems);
+        const older = list('same', 2, olderItems);
+        put(key, [importedWins ? newer : older]);
+        const backup = api.createBackup().file;
+        put(key, [importedWins ? older : newer]);
+        await api.restoreBackupByMerging(backup);
+        const result = get(key)[0];
+        assert.equal(result.updatedAt, 10);
+        assert.deepEqual(result.items.slice(0, newerItems.length), newerItems);
+        assert.equal(result.items.filter(item => item.text === 'Repeat').length, 2);
+        assert.equal(result.items.filter(item => item.bookId === 'John').length, 2);
+        assert.equal(result.items.filter(item => item.text === 'New only').length, 1);
+        assert.equal(result.items.filter(item => item.text === 'Old only').length, 1);
+        await api.restoreBackupByMerging(backup);
+        assert.deepEqual(get(key)[0], result);
+      }
+    }
+  }
+});
+
 test('null backup slots keep local slots and saved slots restore 1–3', async () => {
   put(keys.slots, [null, slot('Genesis'), null, slot('Luke')]);
   const backup = api.createBackup().file;
