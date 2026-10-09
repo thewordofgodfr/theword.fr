@@ -165,10 +165,22 @@ function mergeLists(current: StoredValue, imported: StoredValue): string {
     const existing = merged.get(list.id);
     if (!existing) { merged.set(list.id, list); continue; }
     const [newer, older] = timestamp(list) > timestamp(existing) ? [list, existing] : [existing, list];
-    // Keep the latest title/order/content while retaining items absent from that version.
-    const items = new Map(newer.items.map(item => [itemKey(item), item]));
-    for (const item of older.items) if (!items.has(itemKey(item))) items.set(itemKey(item), item);
-    merged.set(list.id, { ...newer, items: [...items.values()] });
+    // Preserve every occurrence in the latest version, including intentional repeats.
+    // Match occurrences across versions; keep the larger count rather than adding them.
+    const items = [...newer.items];
+    const newerCounts = new Map<string, number>();
+    for (const item of newer.items) {
+      const key = itemKey(item);
+      newerCounts.set(key, (newerCounts.get(key) ?? 0) + 1);
+    }
+    const olderCounts = new Map<string, number>();
+    for (const item of older.items) {
+      const key = itemKey(item);
+      const count = (olderCounts.get(key) ?? 0) + 1;
+      olderCounts.set(key, count);
+      if (count > (newerCounts.get(key) ?? 0)) items.push(item);
+    }
+    merged.set(list.id, { ...newer, items });
   }
   return JSON.stringify([...merged.values()]);
 }
