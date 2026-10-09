@@ -2,6 +2,19 @@
 import type { TranslationDict } from './types';
 
 const ar: TranslationDict = {
+  // Backup and restoration
+  backupTitle: "النسخ الاحتياطي والاستعادة",
+  backupDescription: "احفظ الملاحظات والدراسات ومواضع القراءة والتفضيلات في ملف. تدمج الاستعادة البيانات دون حذف المحتوى الحالي.",
+  backupCreate: "إنشاء نسخة احتياطية",
+  backupRestore: "استعادة نسخة احتياطية",
+  backupWorking: "جارٍ المعالجة…",
+  backupSuccess: "اكتملت العملية.",
+  backupError: "الملف غير صالح أو فشلت العملية.",
+  backupConfirm: "هل تريد دمج هذه النسخة الاحتياطية مع البيانات الحالية؟",
+  backupRestoreSuccess: "تمت استعادة النسخة الاحتياطية ودمجها:",
+  backupNotes: "قوائم ملاحظات",
+  backupStudies: "دراسات",
+  backupReadingSlots: "مواضع قراءة",
   // Navigation
   home: "الصفحة الرئيسية",
   reading: "القراءة",

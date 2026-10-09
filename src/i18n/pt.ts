@@ -2,6 +2,19 @@
 import type { TranslationDict } from './types';
 
 const pt: TranslationDict = {
+  // Backup and restoration
+  backupTitle: "Backup e restauração",
+  backupDescription: "Salve Notas, Estudos, memórias de leitura e preferências em um arquivo. A restauração mescla os dados sem excluir o conteúdo atual.",
+  backupCreate: "Criar um backup",
+  backupRestore: "Restaurar um backup",
+  backupWorking: "Processando…",
+  backupSuccess: "Operação concluída.",
+  backupError: "O arquivo é inválido ou a operação falhou.",
+  backupConfirm: "Mesclar este backup com os dados atuais?",
+  backupRestoreSuccess: "Backup restaurado e mesclado:",
+  backupNotes: "listas de Notas",
+  backupStudies: "Estudos",
+  backupReadingSlots: "memórias de leitura",
   // Navigation
   home: "Início",
   reading: "Leitura",

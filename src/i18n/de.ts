@@ -2,6 +2,19 @@
 import type { TranslationDict } from './types';
 
 const de: TranslationDict = {
+  // Backup and restoration
+  backupTitle: "Sicherung und Wiederherstellung",
+  backupDescription: "Speichern Sie Notizen, Studien, Lesespeicher und Einstellungen in einer Datei. Die Wiederherstellung führt die Daten zusammen, ohne vorhandene Inhalte zu löschen.",
+  backupCreate: "Sicherung erstellen",
+  backupRestore: "Sicherung wiederherstellen",
+  backupWorking: "Wird verarbeitet…",
+  backupSuccess: "Vorgang abgeschlossen.",
+  backupError: "Die Datei ist ungültig oder der Vorgang ist fehlgeschlagen.",
+  backupConfirm: "Diese Sicherung mit den vorhandenen Daten zusammenführen?",
+  backupRestoreSuccess: "Sicherung wiederhergestellt und zusammengeführt:",
+  backupNotes: "Notizlisten",
+  backupStudies: "Studien",
+  backupReadingSlots: "Lesespeicher",
   // Navigation
   home: "Startseite",
   reading: "Lesen",

@@ -2,6 +2,19 @@
 import type { TranslationDict } from './types';
 
 const sw: TranslationDict = {
+  // Backup and restoration
+  backupTitle: "Hifadhi nakala na urejeshaji",
+  backupDescription: "Hifadhi Madokezo, Masomo, nafasi za usomaji na mapendeleo kwenye faili. Urejeshaji huunganisha data bila kufuta yaliyomo sasa.",
+  backupCreate: "Unda nakala ya hifadhi",
+  backupRestore: "Rejesha nakala ya hifadhi",
+  backupWorking: "Inachakata…",
+  backupSuccess: "Imekamilika.",
+  backupError: "Faili si halali au operesheni imeshindwa.",
+  backupConfirm: "Unganisha nakala hii na data iliyopo?",
+  backupRestoreSuccess: "Nakala imerejeshwa na kuunganishwa:",
+  backupNotes: "orodha za Madokezo",
+  backupStudies: "Masomo",
+  backupReadingSlots: "nafasi za usomaji",
   // Navigation
   home: "Mwanzo",
   reading: "Usomaji",

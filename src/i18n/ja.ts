@@ -2,6 +2,19 @@
 import type { TranslationDict } from './types';
 
 const ja: TranslationDict = {
+  // Backup and restoration
+  backupTitle: "バックアップと復元",
+  backupDescription: "ノート、学び、読書位置、設定をファイルに保存します。復元時は現在の内容を削除せずにデータを統合します。",
+  backupCreate: "バックアップを作成",
+  backupRestore: "バックアップを復元",
+  backupWorking: "処理中…",
+  backupSuccess: "操作が完了しました。",
+  backupError: "ファイルが無効か、操作に失敗しました。",
+  backupConfirm: "このバックアップを現在のデータと統合しますか？",
+  backupRestoreSuccess: "バックアップを復元して統合しました：",
+  backupNotes: "ノートのリスト",
+  backupStudies: "学び",
+  backupReadingSlots: "読書位置",
   // Navigation
   home: "ホーム",
   reading: "聖書を読む",

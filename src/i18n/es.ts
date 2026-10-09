@@ -2,6 +2,19 @@
 import type { TranslationDict } from './types';
 
 const es: TranslationDict = {
+  // Backup and restoration
+  backupTitle: "Copia de seguridad y restauración",
+  backupDescription: "Guarda tus Notas, Estudios, memorias de lectura y preferencias en un archivo. La restauración combina los datos sin eliminar el contenido actual.",
+  backupCreate: "Crear una copia",
+  backupRestore: "Restaurar una copia",
+  backupWorking: "Procesando…",
+  backupSuccess: "Operación completada.",
+  backupError: "El archivo no es válido o la operación ha fallado.",
+  backupConfirm: "¿Combinar esta copia con los datos actuales?",
+  backupRestoreSuccess: "Copia restaurada y combinada:",
+  backupNotes: "listas de Notas",
+  backupStudies: "Estudios",
+  backupReadingSlots: "memorias de lectura",
   // Navigation
   home: 'Inicio',
   reading: 'Lectura',

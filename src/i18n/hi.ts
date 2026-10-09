@@ -2,6 +2,19 @@
 import type { TranslationDict } from './types';
 
 const hi: TranslationDict = {
+  // Backup and restoration
+  backupTitle: "बैकअप और पुनर्स्थापना",
+  backupDescription: "नोट्स, अध्ययन, पढ़ने के स्थान और प्राथमिकताएँ फ़ाइल में सहेजें। पुनर्स्थापना मौजूदा सामग्री हटाए बिना डेटा मिलाती है।",
+  backupCreate: "बैकअप बनाएँ",
+  backupRestore: "बैकअप पुनर्स्थापित करें",
+  backupWorking: "प्रक्रिया जारी है…",
+  backupSuccess: "प्रक्रिया पूरी हुई।",
+  backupError: "फ़ाइल अमान्य है या प्रक्रिया विफल हुई।",
+  backupConfirm: "इस बैकअप को मौजूदा डेटा के साथ मिलाएँ?",
+  backupRestoreSuccess: "बैकअप पुनर्स्थापित और मिलाया गया:",
+  backupNotes: "नोट्स की सूचियाँ",
+  backupStudies: "अध्ययन",
+  backupReadingSlots: "पढ़ने के स्थान",
   // Navigation
   home: "मुखपृष्ठ",
   reading: "पाठ",

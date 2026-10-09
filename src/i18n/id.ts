@@ -2,6 +2,19 @@
 import type { TranslationDict } from './types';
 
 const id: TranslationDict = {
+  // Backup and restoration
+  backupTitle: "Pencadangan dan pemulihan",
+  backupDescription: "Simpan Catatan, Studi, posisi bacaan, dan preferensi dalam berkas. Pemulihan menggabungkan data tanpa menghapus konten saat ini.",
+  backupCreate: "Buat cadangan",
+  backupRestore: "Pulihkan cadangan",
+  backupWorking: "Sedang memproses…",
+  backupSuccess: "Operasi selesai.",
+  backupError: "Berkas tidak valid atau operasi gagal.",
+  backupConfirm: "Gabungkan cadangan ini dengan data saat ini?",
+  backupRestoreSuccess: "Cadangan dipulihkan dan digabungkan:",
+  backupNotes: "daftar Catatan",
+  backupStudies: "Studi",
+  backupReadingSlots: "posisi bacaan",
   // Navigation
   home: "Beranda",
   reading: "Bacaan",

@@ -193,6 +193,20 @@ const en: TranslationDict = {
   updatesUnavailable: 'Automatic update unavailable (No Service Worker).',
   updatesError: 'Error while checking. Please try again.',
 
+  backupTitle: 'Backup and restore',
+  backupDescription:
+    'Save your Notes, Studies, reading shortcuts and preferences in one file. Restoring merges data without deleting current content.',
+  backupCreate: 'Create a backup',
+  backupRestore: 'Restore a backup',
+  backupWorking: 'Processing…',
+  backupSuccess: 'Operation completed.',
+  backupError: 'The file is invalid or the operation failed.',
+  backupConfirm: 'Merge this backup with the current data?',
+  backupRestoreSuccess: 'Backup restored and merged:',
+  backupNotes: 'Notes list(s)',
+  backupStudies: 'Study list(s)',
+  backupReadingSlots: 'reading memory slot(s)',
+
   // About page
   aboutTitle: '',
   aboutDescription:

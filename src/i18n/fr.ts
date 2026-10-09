@@ -196,6 +196,20 @@ const fr: TranslationDict = {
     'Mise à jour automatique indisponible (Service Worker non détecté).',
   updatesError: 'Erreur lors de la vérification. Réessayez.',
 
+  backupTitle: 'Sauvegarde et restauration',
+  backupDescription:
+    'Conservez vos Notes, Études, raccourcis de lecture et préférences dans un fichier. La restauration fusionne les données sans supprimer le contenu actuel.',
+  backupCreate: 'Créer une sauvegarde',
+  backupRestore: 'Restaurer une sauvegarde',
+  backupWorking: 'Traitement en cours…',
+  backupSuccess: 'Opération terminée.',
+  backupError: "Le fichier est invalide ou l’opération a échoué.",
+  backupConfirm: 'Fusionner cette sauvegarde avec les données actuelles ?',
+  backupRestoreSuccess: 'Sauvegarde restaurée et fusionnée :',
+  backupNotes: 'liste(s) de Notes',
+  backupStudies: 'Étude(s)',
+  backupReadingSlots: 'mémoire(s) de lecture',
+
   // About / versions
   aboutTitle: '',
   aboutDescription:

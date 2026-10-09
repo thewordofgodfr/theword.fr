@@ -2,6 +2,19 @@
 import type { TranslationDict } from './types';
 
 const zh: TranslationDict = {
+  // Backup and restoration
+  backupTitle: "备份与恢复",
+  backupDescription: "将笔记、研读、阅读书签和偏好设置保存到文件。恢复时会合并数据，不会删除现有内容。",
+  backupCreate: "创建备份",
+  backupRestore: "恢复备份",
+  backupWorking: "处理中…",
+  backupSuccess: "操作完成。",
+  backupError: "文件无效或操作失败。",
+  backupConfirm: "将此备份与现有数据合并吗？",
+  backupRestoreSuccess: "备份已恢复并合并：",
+  backupNotes: "笔记列表",
+  backupStudies: "研读",
+  backupReadingSlots: "阅读书签",
   // Navigation
   home: "首页",
   reading: "阅读",
