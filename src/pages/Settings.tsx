@@ -1,10 +1,15 @@
 // src/pages/Settings.tsx
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
-import { Check, Globe, Palette, RefreshCcw, Search, X } from 'lucide-react';
+import { Check, Download, Globe, Palette, RefreshCcw, Search, Upload, X } from 'lucide-react';
 import type { Language } from '../types/bible';
+import {
+  createBackup,
+  inspectBackup,
+  restoreBackupByMerging,
+  shareOrDownloadBackup,
+} from '../utils/backupUtils';
 
 /** Codes de drapeaux supportés */
 type FlagCode =
@@ -476,7 +481,7 @@ function normalizeSearchText(value: string): string {
 }
 
 export default function Settings() {
-  const { state, updateSettings } = useApp();
+  const { state, updateSettings, dispatch } = useApp();
   const { t } = useTranslation();
 
   // Option A : thème sombre strict (inchangé, mais garde-fou)
@@ -516,7 +521,6 @@ export default function Settings() {
     'idle' | 'checking' | 'ready' | 'upToDate' | 'unavailable' | 'error'
   >('idle');
   const [waitingSW, setWaitingSW] = useState<ServiceWorker | null>(null);
-
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return;
     const onControllerChange = () => window.location.reload();
@@ -524,6 +528,52 @@ export default function Settings() {
     return () =>
       navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
   }, []);
+
+  const backupInputRef = useRef<HTMLInputElement>(null);
+  const [backupStatus, setBackupStatus] = useState<'idle' | 'working' | 'success' | 'error'>('idle');
+
+  const handleCreateBackup = async () => {
+    try {
+      setBackupStatus('working');
+      const { file } = createBackup();
+      const completed = await shareOrDownloadBackup(file);
+      setBackupStatus(completed ? 'success' : 'idle');
+    } catch {
+      setBackupStatus('error');
+    }
+  };
+
+  const handleRestoreBackup = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    try {
+      setBackupStatus('working');
+      const preview = await inspectBackup(file);
+      const confirmed = window.confirm(
+        `${t('backupConfirm')}\n${preview.notes} ${t('backupNotes')}\n${preview.studies} ${t('backupStudies')}\n${preview.readingSlots} ${t('backupReadingSlots')}`
+      );
+      if (!confirmed) {
+        setBackupStatus('idle');
+        return;
+      }
+      const restored = await restoreBackupByMerging(file);
+      const restoredSettings = localStorage.getItem('bibleApp_settings');
+      if (restoredSettings) {
+        dispatch({
+          type: 'LOAD_SETTINGS',
+          payload: { ...state.settings, ...JSON.parse(restoredSettings), theme: 'dark' },
+        });
+      }
+      setBackupStatus('success');
+      window.alert(
+        `${t('backupRestoreSuccess')}\n${restored.notes} ${t('backupNotes')}\n${restored.studies} ${t('backupStudies')}\n${restored.readingSlots} ${t('backupReadingSlots')}`
+      );
+    } catch {
+      setBackupStatus('error');
+    }
+  };
 
   const handleCheckUpdates = async () => {
     if (!('serviceWorker' in navigator)) {
@@ -875,7 +925,51 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* 3) Mises à jour */}
+          {/* 3) Sauvegarde et restauration */}
+          <div className={`bg-gray-800 rounded-xl shadow-lg p-6 mb-6`}>
+            <h2 className={`text-xl font-semibold mb-4 text-white flex items-center`}>
+              <Download size={22} className="mr-3" />
+              {t('backupTitle')}
+            </h2>
+
+            <p className="text-white/80 text-sm mb-5">{t('backupDescription')}</p>
+
+            <div className="grid sm:grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={handleCreateBackup}
+                disabled={backupStatus === 'working'}
+                className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-blue-600 bg-blue-900/60 text-blue-100 font-medium hover:bg-blue-800/70 disabled:opacity-60"
+              >
+                <Download size={19} />
+                {t('backupCreate')}
+              </button>
+              <button
+                type="button"
+                onClick={() => backupInputRef.current?.click()}
+                disabled={backupStatus === 'working'}
+                className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-blue-600 bg-blue-900/60 text-blue-100 font-medium hover:bg-blue-800/70 disabled:opacity-60"
+              >
+                <Upload size={19} />
+                {t('backupRestore')}
+              </button>
+              <input
+                ref={backupInputRef}
+                type="file"
+                accept="application/json,.json"
+                onChange={handleRestoreBackup}
+                className="hidden"
+              />
+            </div>
+
+            <div className="mt-4 text-sm" aria-live="polite">
+              {backupStatus === 'working' && <p className="text-white/80">{t('backupWorking')}</p>}
+              {backupStatus === 'success' && <p className="text-green-500">{t('backupSuccess')}</p>}
+              {backupStatus === 'error' && <p className="text-red-400">{t('backupError')}</p>}
+            </div>
+          </div>
+
+          {/* 4) Mises à jour */}
           <div className={`bg-gray-800 rounded-xl shadow-lg p-6`}>
             <h2 className={`text-xl font-semibold mb-6 text-white flex items-center`}>
               <RefreshCcw size={22} className="mr-3" />

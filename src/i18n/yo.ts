@@ -2,6 +2,19 @@
 import type { TranslationDict } from './types';
 
 const yo: TranslationDict = {
+  // Backup and restoration
+  backupTitle: "Ìfipamọ́ àdàkọ àti ìmúpadàbọ̀",
+  backupDescription: "Fi Àkọsílẹ̀, Ẹ̀kọ́, ibi ìkàwé àti àwọn ààyò pamọ́ sínú fáìlì. Ìmúpadàbọ̀ máa darapọ̀ dátà láìpa àkóónú tó wà rẹ́.",
+  backupCreate: "Ṣẹ̀dá àdàkọ ìfipamọ́",
+  backupRestore: "Mú àdàkọ padà",
+  backupWorking: "Ó ń ṣiṣẹ́…",
+  backupSuccess: "Iṣẹ́ ti parí.",
+  backupError: "Fáìlì náà kò tọ́ tàbí iṣẹ́ náà kùnà.",
+  backupConfirm: "Ṣe a darapọ̀ àdàkọ yìí mọ́ dátà tó wà?",
+  backupRestoreSuccess: "A ti mú àdàkọ padà, a sì darapọ̀ rẹ̀:",
+  backupNotes: "àtòjọ Àkọsílẹ̀",
+  backupStudies: "Ẹ̀kọ́",
+  backupReadingSlots: "ibi ìkàwé",
   // Navigation
   home: "Ìbẹ̀rẹ̀",
   reading: "Kà Bíbélì",

@@ -2,6 +2,19 @@
 import type { TranslationDict } from './types';
 
 const he: TranslationDict = {
+  // Backup and restoration
+  backupTitle: "גיבוי ושחזור",
+  backupDescription: "שמרו הערות, לימודים, מיקומי קריאה והעדפות בקובץ. השחזור ממזג נתונים בלי למחוק את התוכן הקיים.",
+  backupCreate: "יצירת גיבוי",
+  backupRestore: "שחזור גיבוי",
+  backupWorking: "הפעולה מתבצעת…",
+  backupSuccess: "הפעולה הושלמה.",
+  backupError: "הקובץ אינו תקין או שהפעולה נכשלה.",
+  backupConfirm: "למזג גיבוי זה עם הנתונים הקיימים?",
+  backupRestoreSuccess: "הגיבוי שוחזר ומוזג:",
+  backupNotes: "רשימות הערות",
+  backupStudies: "לימודים",
+  backupReadingSlots: "מיקומי קריאה",
   // Navigation
   home: 'דף הבית',
   reading: 'קריאה',

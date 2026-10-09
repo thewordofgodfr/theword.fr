@@ -2,6 +2,19 @@
 import type { TranslationDict } from './types';
 
 const ko: TranslationDict = {
+  // Backup and restoration
+  backupTitle: "백업 및 복원",
+  backupDescription: "노트, 성경 공부, 읽기 위치와 설정을 파일에 저장합니다. 복원 시 기존 내용을 삭제하지 않고 데이터를 병합합니다.",
+  backupCreate: "백업 만들기",
+  backupRestore: "백업 복원",
+  backupWorking: "처리 중…",
+  backupSuccess: "작업이 완료되었습니다.",
+  backupError: "파일이 유효하지 않거나 작업에 실패했습니다.",
+  backupConfirm: "이 백업을 현재 데이터와 병합하시겠습니까?",
+  backupRestoreSuccess: "백업을 복원하고 병합했습니다:",
+  backupNotes: "노트 목록",
+  backupStudies: "성경 공부",
+  backupReadingSlots: "읽기 위치",
   // Navigation
   home: "홈",
   reading: "성경 읽기",

@@ -2,6 +2,19 @@
 import type { TranslationDict } from './types';
 
 const ru: TranslationDict = {
+  // Backup and restoration
+  backupTitle: "Резервное копирование и восстановление",
+  backupDescription: "Сохраните заметки, исследования, закладки чтения и настройки в файл. Восстановление объединяет данные, не удаляя текущее содержимое.",
+  backupCreate: "Создать резервную копию",
+  backupRestore: "Восстановить резервную копию",
+  backupWorking: "Обработка…",
+  backupSuccess: "Операция завершена.",
+  backupError: "Файл недействителен или операция не удалась.",
+  backupConfirm: "Объединить эту резервную копию с текущими данными?",
+  backupRestoreSuccess: "Резервная копия восстановлена и объединена:",
+  backupNotes: "списков заметок",
+  backupStudies: "исследований",
+  backupReadingSlots: "закладок чтения",
   // Navigation
   home: 'Главная',
   reading: 'Чтение',

@@ -2,6 +2,19 @@
 import type { TranslationDict } from './types';
 
 const tr: TranslationDict = {
+  // Backup and restoration
+  backupTitle: "Yedekleme ve geri yükleme",
+  backupDescription: "Notları, Çalışmaları, okuma konumlarını ve tercihleri bir dosyaya kaydedin. Geri yükleme mevcut içeriği silmeden verileri birleştirir.",
+  backupCreate: "Yedek oluştur",
+  backupRestore: "Yedeği geri yükle",
+  backupWorking: "İşleniyor…",
+  backupSuccess: "İşlem tamamlandı.",
+  backupError: "Dosya geçersiz veya işlem başarısız oldu.",
+  backupConfirm: "Bu yedek mevcut verilerle birleştirilsin mi?",
+  backupRestoreSuccess: "Yedek geri yüklendi ve birleştirildi:",
+  backupNotes: "Not listesi",
+  backupStudies: "Çalışma",
+  backupReadingSlots: "okuma konumu",
   // Navigation
   home: "Ana sayfa",
   reading: "Okuma",

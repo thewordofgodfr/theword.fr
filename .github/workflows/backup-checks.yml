@@ -1,0 +1,30 @@
+name: Backup and restore checks
+
+on:
+  pull_request:
+    paths:
+      - 'src/utils/backupUtils.ts'
+      - 'src/pages/Settings.tsx'
+      - 'src/i18n/**'
+      - 'tests/backup.test.mjs'
+      - '.github/workflows/backup-checks.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node --test tests/backup.test.mjs
+      - run: npx eslint src/utils/backupUtils.ts src/pages/Settings.tsx src/i18n/*.ts
+      - run: npx tsc --noEmit --strict --target ES2020 --module ESNext --moduleResolution bundler --lib ES2020,DOM --skipLibCheck src/utils/backupUtils.ts
+      # The deployment workflow stamps the release version only after approval/merge.
+      - run: npx vite build

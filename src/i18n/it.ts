@@ -2,6 +2,19 @@
 import type { TranslationDict } from './types';
 
 const it: TranslationDict = {
+  // Backup and restoration
+  backupTitle: "Backup e ripristino",
+  backupDescription: "Salva Note, Studi, memorie di lettura e preferenze in un file. Il ripristino unisce i dati senza eliminare i contenuti attuali.",
+  backupCreate: "Crea un backup",
+  backupRestore: "Ripristina un backup",
+  backupWorking: "Elaborazione in corso…",
+  backupSuccess: "Operazione completata.",
+  backupError: "Il file non è valido oppure l’operazione non è riuscita.",
+  backupConfirm: "Unire questo backup ai dati attuali?",
+  backupRestoreSuccess: "Backup ripristinato e unito:",
+  backupNotes: "elenchi di Note",
+  backupStudies: "Studi",
+  backupReadingSlots: "memorie di lettura",
   // Navigation
   home: "Home",
   reading: "Lettura",

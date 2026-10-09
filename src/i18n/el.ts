@@ -2,6 +2,19 @@
 import type { TranslationDict } from './types';
 
 const el: TranslationDict = {
+  // Backup and restoration
+  backupTitle: "Αντίγραφο ασφαλείας και επαναφορά",
+  backupDescription: "Αποθηκεύστε Σημειώσεις, Μελέτες, θέσεις ανάγνωσης και προτιμήσεις σε αρχείο. Η επαναφορά συγχωνεύει τα δεδομένα χωρίς να διαγράφει το υπάρχον περιεχόμενο.",
+  backupCreate: "Δημιουργία αντιγράφου",
+  backupRestore: "Επαναφορά αντιγράφου",
+  backupWorking: "Επεξεργασία…",
+  backupSuccess: "Η ενέργεια ολοκληρώθηκε.",
+  backupError: "Το αρχείο δεν είναι έγκυρο ή η ενέργεια απέτυχε.",
+  backupConfirm: "Συγχώνευση αυτού του αντιγράφου με τα υπάρχοντα δεδομένα;",
+  backupRestoreSuccess: "Το αντίγραφο επαναφέρθηκε και συγχωνεύτηκε:",
+  backupNotes: "λίστες Σημειώσεων",
+  backupStudies: "Μελέτες",
+  backupReadingSlots: "θέσεις ανάγνωσης",
   // Navigation
   home: 'Αρχική',
   reading: 'Ανάγνωση',
