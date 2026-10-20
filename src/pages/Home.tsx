@@ -4,14 +4,14 @@ import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { getRandomVerse, warmBibleCache } from '../services/bibleService';
 import { BibleVerse } from '../types/bible';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, BookOpen, Search, List, BookMarked, Settings, Info, Download } from 'lucide-react';
 import { saveSlot as saveQuickSlot } from '../services/readingSlots';
 
 const STORAGE_KEY = 'home_random_verse';
 const STORAGE_LANG_KEY = 'home_random_verse_lang';
 
 export default function Home() {
-  const { state, navigateToVerse } = useApp();
+  const { state, dispatch, navigateToVerse } = useApp();
   const { t } = useTranslation();
   const [verse, setVerse] = useState<BibleVerse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -86,121 +86,99 @@ export default function Home() {
     navigateToVerse('Jeremiah', 23, 29);
   };
 
+  const sections = [
+    { page: 'reading', icon: BookOpen, label: t('reading') },
+    { page: 'search', icon: Search, label: t('search') },
+    { page: 'notes', icon: List, label: t('notes') },
+    { page: 'principes', icon: BookMarked, label: t('principles') },
+    { page: 'settings', icon: Settings, label: t('settings') },
+    { page: 'about', icon: Info, label: t('about') },
+  ] as const;
+  const androidUrl = 'https://play.google.com/store/apps/details?id=fr.theword.www.twa';
+  const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const surface = isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200';
+
   return (
-    <div
-      className={`min-h-[100dvh] flex flex-col ${
-        isDark ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 to-indigo-100'
-      } transition-colors duration-200`}
-    >
-      {/* ✅ Zone scrollable : si contenu court => pas de scroll, si long => scroll normal */}
-      <div className="flex-1 overflow-auto">
-        <div className="container mx-auto px-4 py-6 md:py-10">
-          <div className="max-w-4xl mx-auto">
-            {/* Titre */}
-            <h1
-              className={`text-center font-extrabold tracking-tight mb-5 md:mb-6 ${
-                isDark ? 'text-white' : 'text-gray-900'
-              } text-3xl md:text-4xl`}
-            >
-              The Word
-            </h1>
+    <div className={`min-h-[100dvh] flex flex-col ${isDark ? 'bg-gray-900 text-white' : 'bg-blue-50 text-gray-900'}`}>
+      <header className={`border-b ${surface}`} style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+        <div className="max-w-6xl mx-auto h-16 px-5 flex items-center gap-3">
+          <img src="/logo192.png" alt="" width={36} height={36} className="rounded-lg shrink-0" />
+          <span className="text-xl font-bold tracking-tight">The Word</span>
+        </div>
+      </header>
 
-            {/* Carte du verset */}
-            <div
-              className={`${
-                isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-              } rounded-2xl shadow-2xl border p-6 md:p-10 transition-all duration-300 hover:shadow-3xl`}
-            >
-              {loading ? (
-                <div className="flex items-center justify-center py-16">
-                  <div
-                    className={`animate-spin rounded-full h-12 w-12 border-b-2 ${
-                      isDark ? 'border-blue-400' : 'border-blue-600'
-                    }`}
-                  />
-                  <span className={`ml-4 text-lg ${isDark ? 'text-white' : 'text-gray-600'}`}>
-                    {t('loading')}
-                  </span>
-                </div>
-              ) : verse ? (
-                <div className="text-center">
-                  <blockquote
-                    onClick={handleVerseClick}
-                    className={`text-lg md:text-xl leading-relaxed mb-8 italic cursor-pointer transition-all duration-200 hover:scale-105 ${
-                      isDark ? 'text-white hover:text-blue-300' : 'text-gray-700 hover:text-blue-600'
-                    }`}
-                    style={{ fontSize: `${state.settings.fontSize}px`, lineHeight: '1.8' }}
-                  >
-                    “{verse.text}”
-                  </blockquote>
-                  <cite
-                    onClick={handleVerseClick}
-                    className={`text-base font-medium cursor-pointer transition-all duration-200 hover:underline ${
-                      isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'
-                    }`}
-                  >
-                    {verse.reference}
-                  </cite>
-                </div>
-              ) : (
-                <div className={`text-center py-16 ${isDark ? 'text-white/80' : 'text-gray-500'}`}>
-                  {t('error')}
-                </div>
-              )}
-
-              {/* Bouton d'action */}
-              <div className="flex justify-center mt-12">
-                <button
-                  onClick={fetchRandomVerse}
-                  disabled={loading}
-                  className={`flex items-center justify-center space-x-3 px-8 py-4 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 ${
-                    isDark
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
-                  } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
-                  <span>{t('newVerse')}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Citation fixe (cliquable) */}
-            <div className="text-center mt-12">
-              <button
-                onClick={openJeremiah23}
-                className="mx-auto block focus:outline-none"
-                aria-label={t('openJeremiah')}
-                title={t('openJeremiah')}
-              >
-                <p
-                  className={`italic hover:underline ${
-                    isDark ? 'text-white' : 'text-gray-700'
-                  } text-base md:text-lg`}
-                >
-                  {t('jeremiah23Quote')}
-                </p>
-              </button>
-            </div>
-          </div>
+      <div className="w-full max-w-6xl mx-auto px-4 py-6 md:py-8 flex-1">
+        <div className="text-center mb-6">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">{t('homeWelcome')}</h1>
+          <p className={isDark ? 'text-blue-100/80' : 'text-gray-600'}>{t('homeIntro')}</p>
         </div>
 
-        {/* ✅ Footer "intelligent" : visible sans scroll si court, collé en bas en scroll si long */}
-        <footer
-          className={`sticky bottom-0 z-10 text-center py-2 ${
-            isDark ? 'text-white/45' : 'text-gray-500'
-          }`}
-          style={{
-            fontSize: 12.5,
-            paddingBottom: 'calc(env(safe-area-inset-bottom) + 6px)',
-            background: isDark
-              ? 'linear-gradient(to top, rgba(17,24,39,0.92), rgba(17,24,39,0.0))'
-              : 'linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0.0))',
-          }}
-        >
-          Copyright {year}
-        </footer>
+        <nav aria-label={t('home')} className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-6">
+          {sections.map(({ page, icon: Icon, label }) => (
+            <button
+              key={page}
+              type="button"
+              onClick={() => dispatch({ type: 'SET_PAGE', payload: page })}
+              className={`flex flex-col items-center justify-center gap-3 min-h-[106px] md:min-h-[122px] p-4 rounded-xl border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${surface} ${isDark ? 'hover:bg-gray-700 hover:border-blue-500' : 'hover:bg-blue-50 hover:border-blue-500'}`}
+            >
+              <Icon size={34} strokeWidth={1.7} className={isDark ? 'text-blue-400' : 'text-blue-600'} aria-hidden="true" />
+              <span className="font-semibold text-sm md:text-base">{label}</span>
+            </button>
+          ))}
+        </nav>
+
+        <div className={isMobileDevice ? '' : 'lg:grid lg:grid-cols-[210px_minmax(0,1fr)] lg:gap-5'}>
+          {!isMobileDevice && (
+            <aside className={`hidden lg:flex flex-col items-center justify-center gap-3 p-5 rounded-xl border text-center ${surface}`} aria-label={t('androidApp')}>
+              <h2 className="font-semibold">{t('androidApp')}</h2>
+              <a href={androidUrl} target="_blank" rel="noopener noreferrer" aria-label={t('openGooglePlay')} className="rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">
+                <img src="/android-app-qr.svg" alt={t('scanAndroidQr')} width={140} height={140} className="rounded-lg" style={{ backgroundColor: '#fff' }} />
+              </a>
+              <p className={`text-xs ${isDark ? 'text-blue-100/80' : 'text-gray-600'}`}>{t('scanAndroidQr')}</p>
+              <a href={androidUrl} target="_blank" rel="noopener noreferrer" className="w-full inline-flex items-center justify-center gap-2 px-3 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">
+                <Download size={17} aria-hidden="true" />
+                Google Play
+              </a>
+            </aside>
+          )}
+
+          <section className={`rounded-xl border p-5 md:p-7 flex flex-col justify-center ${surface}`} aria-label={t('randomVerse')}>
+            <h2 className={`text-xs font-medium uppercase tracking-widest mb-4 ${isDark ? 'text-blue-100/70' : 'text-gray-500'}`}>{t('randomVerse')}</h2>
+            {loading ? (
+              <div className="flex justify-center items-center gap-3 py-8" role="status">
+                <RefreshCw className="animate-spin text-blue-400" size={24} aria-hidden="true" />
+                <span>{t('loading')}</span>
+              </div>
+            ) : verse ? (
+              <button type="button" onClick={handleVerseClick} className="w-full text-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 group">
+                <blockquote className={`italic leading-relaxed mb-3 transition-colors ${isDark ? 'group-hover:text-blue-300' : 'group-hover:text-blue-600'}`} style={{ fontSize: `${state.settings.fontSize}px`, lineHeight: '1.65' }}>
+                  “{verse.text}”
+                </blockquote>
+                <span className={`block font-medium text-sm ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>{verse.reference}</span>
+              </button>
+            ) : (
+              <p className="text-center py-8">{t('error')}</p>
+            )}
+            <div className="flex justify-center mt-5">
+              <button type="button" onClick={fetchRandomVerse} disabled={loading} className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">
+                <RefreshCw size={18} className={loading ? 'animate-spin' : ''} aria-hidden="true" />
+                {t('newVerse')}
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <div className="text-center mt-7">
+          <button type="button" onClick={openJeremiah23} aria-label={t('openJeremiah')} title={t('openJeremiah')} className="italic text-sm md:text-base hover:underline rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">
+            {t('jeremiah23Quote')}
+          </button>
+        </div>
       </div>
+      <footer className="text-center text-xs text-white/60 py-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}>
+        Copyright {year}
+      </footer>
     </div>
   );
 }
+

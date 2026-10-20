@@ -19,6 +19,9 @@ export default function Navigation() {
 
   const isDark = state.settings.theme === 'dark';
 
+  // L’accueil dispose de ses propres grandes entrées et du logo de l’application.
+  if (state.currentPage === 'home') return null;
+
   const navItems = [
     { id: 'home', icon: Home, label: t('home') },
     { id: 'search', icon: SearchIcon, label: t('search') },
@@ -89,6 +92,7 @@ export default function Navigation() {
                     // Téléphone, paysage et petit écran pliable
                     'min-w-0 h-[52px] px-0.5 py-1',
                     'flex flex-col items-center justify-center gap-1',
+                    id === 'settings' ? 'order-last lg:order-none' : '',
 
                     // Grand écran
                     'lg:h-auto lg:px-3 lg:py-2',
@@ -106,7 +110,7 @@ export default function Navigation() {
 
                   <span
                     className="
-                      block
+                      hidden
                       w-full
                       min-w-0
                       truncate
@@ -116,6 +120,7 @@ export default function Navigation() {
                       font-medium
 
                       lg:w-auto
+                      lg:block
                       lg:text-sm
                       lg:leading-none
                     "
@@ -131,4 +136,5 @@ export default function Navigation() {
     </nav>
   );
 }
+
 

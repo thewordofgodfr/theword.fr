@@ -13,6 +13,11 @@ const fr: TranslationDict = {
   principles: 'Études',
 
   // Home page
+  homeWelcome: 'Bienvenue',
+  homeIntro: 'Lire, chercher et étudier la Bible.',
+  androidApp: 'Sur Android',
+  scanAndroidQr: 'Scannez pour installer l’application.',
+  openGooglePlay: 'Découvrir The Word sur Google Play',
   randomVerse: 'Verset Aléatoire',
   newVerse: 'Nouveau Verset',
   copyVerse: 'Copier le Verset',
@@ -327,4 +332,5 @@ notesHelp10Body:
 };
 
 export default fr;
+
 

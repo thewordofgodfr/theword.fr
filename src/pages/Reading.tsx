@@ -32,6 +32,7 @@ import {
   addVersesToList,
 } from '../services/collectionsService';
 import type { VerseRef, VerseList } from '../types/collections';
+import { getBookAbbreviation } from '../utils/readingLabels';
 
 /* ========= Helpers de stockage pour PRINCIPES (même format que Principes.tsx) ========= */
 
@@ -1205,6 +1206,52 @@ ${shareUrl}`;
     }
   };
 
+
+  const renderQuickSlots = (compact: boolean) => (
+    <div className={compact ? 'grid grid-cols-4 gap-2 w-full min-w-0' : 'flex items-center gap-2 min-w-0'}>
+      {[0, 1, 2, 3].map(i => {
+        const isActive = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
+        const saved = quickSlots[i];
+        // Le libellé actif suit immédiatement les sélecteurs, sans attendre
+        // l’enregistrement différé de la position de lecture.
+        const position = isActive && selectedBook
+          ? { book: selectedBook.name, chapter: selectedChapter, verse: saved?.verse }
+          : saved;
+        const book = position ? resolveBook(position.book) : null;
+        const fullName = book ? getBookName(book) : position?.book ?? '';
+        const shortName = book ? getBookAbbreviation(book, state.settings.language) : fullName;
+        const reference = position ? `${fullName} ${position.chapter}` : '';
+        const label = i === 0 ? t('searchSlotLabel') : `${t('memorySlotLabel')} ${i}`;
+        const title = reference ? `${label}: ${reference}` : `${label} ${t('emptySlotSuffix')}`;
+        return (
+          <button
+            key={i}
+            type="button"
+            onClick={() => jumpToSlot(i)}
+            aria-label={title}
+            title={title}
+            aria-pressed={isActive}
+            className={[
+              'min-w-0 rounded-lg border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400',
+              compact ? 'min-h-[48px] px-1 py-1 flex flex-col items-center justify-center gap-0.5' : 'min-h-[40px] px-3 py-2 inline-flex items-center justify-center gap-2',
+              isActive ? 'bg-blue-600 border-blue-400 text-white' : 'bg-blue-950/50 border-blue-800 text-blue-100 hover:bg-blue-900',
+            ].join(' ')}
+          >
+            {i === 0 ? <SearchIcon className="w-4 h-4 shrink-0" aria-hidden="true" /> : <span className="text-sm leading-none font-bold shrink-0">{i}</span>}
+            {position ? (
+              <span className={compact ? 'text-[11px] leading-tight flex items-baseline justify-center gap-1 w-full min-w-0' : 'text-xs flex items-baseline gap-1 min-w-0'}>
+                <span className={compact ? 'truncate' : 'max-w-[8rem] truncate'}>{compact ? shortName : fullName}</span>
+                <span className="shrink-0">{position.chapter}</span>
+              </span>
+            ) : (
+              <span className="text-xs leading-tight" aria-hidden="true">—</span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+
   return (
     <div className="min-h-[100svh] bg-gray-950 transition-colors duration-200">
       <div className="container mx-auto px-4 pb-6">
@@ -1218,7 +1265,7 @@ ${shareUrl}`;
               <div className="bg-gray-800/95 backdrop-blur border border-gray-700 rounded-none sm:rounded-md shadow md:shadow-lg px-3 py-2 md:p-3">
                 {/* MOBILE : navigation Bible séparée des mémoires */}
                 <div className="md:hidden space-y-2">
-                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+                  <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2">
                     <button
                       type="button"
                       onClick={() => setShowBookPicker(true)}
@@ -1242,69 +1289,10 @@ ${shareUrl}`;
                       className="h-10 inline-flex items-center justify-center gap-1.5 rounded-lg border border-blue-700/60 bg-blue-950/40 px-3 text-sm font-semibold text-white shadow-sm active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500/40 whitespace-nowrap"
                     >
                       <span>
-                        {t('chapter')} {selectedChapter}
+                        <span className="hidden min-[375px]:inline">{t('chapter')} </span>{selectedChapter}
                       </span>
                       <ChevronDown className="w-4 h-4 shrink-0 opacity-90" />
                     </button>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-3">
-                    {/* Loupe + mémoires 1/2/3 */}
-                    <div className="flex items-center gap-2">
-                      {[0, 1, 2, 3].map(i => {
-                        const s = quickSlots[i];
-                        const filled = s !== null;
-                        const isNumeric = i !== 0;
-
-                        const base = isNumeric
-                          ? 'relative overflow-visible w-8 h-8 rounded-full border-2 text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
-                          : 'w-8 h-8 rounded-full border-2 shadow active:scale-95 inline-flex items-center justify-center transition-all box-border';
-
-                        const isActive = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
-
-                        const cls = isActive
-                          ? 'border-white bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_0_2px_rgba(37,99,235,0.9),0_0_12px_rgba(37,99,235,0.65)]'
-                          : filled
-                            ? 'border-blue-800 bg-blue-950/80 text-blue-100 hover:border-blue-600 hover:bg-blue-900'
-                            : 'border-blue-900/80 bg-blue-950/50 text-blue-200/80 hover:border-blue-700 hover:bg-blue-900/70';
-
-                        const refText = s
-                          ? `${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}`
-                          : '';
-
-                        let title: string;
-                        if (i === 0) {
-                          title = s
-                            ? `${t('searchSlotLabel')}: ${refText}`
-                            : t('searchSlotEmpty');
-                        } else {
-                          title = s
-                            ? `${t('memorySlotLabel')} ${i}: ${refText}`
-                            : `${t('memorySlotLabel')} ${i} ${t('emptySlotSuffix')}`;
-                        }
-
-                        return (
-                          <button
-                            key={`qs-m-${i}`}
-                            type="button"
-                            className={`${base} ${cls}`}
-                            onClick={() => jumpToSlot(i)}
-                            aria-label={title}
-                            title={title}
-                            aria-pressed={isActive}
-                            aria-current={isActive ? 'true' : undefined}
-                          >
-                            {i === 0 ? (
-                              <SearchIcon className="w-4 h-4" />
-                            ) : (
-                              <span className="relative z-[1]">{i}</span>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Navigation chapitre précédent / suivant visible sur mobile */}
                     <div className="flex items-center gap-1.5">
                       <button
                         type="button"
@@ -1327,10 +1315,12 @@ ${shareUrl}`;
                       </button>
                     </div>
                   </div>
+
+                  {renderQuickSlots(true)}
                 </div>
 
                 {/* DESKTOP */}
-                <div className="hidden md:flex md:items-center md:gap-3 w-full">
+                <div className="hidden md:flex md:flex-wrap md:items-center md:gap-3 w-full">
                   <div className="flex items-center gap-2 min-w-0">
                     <button
                       type="button"
@@ -1356,60 +1346,7 @@ ${shareUrl}`;
                   </div>
 
                   <div className="flex items-center gap-2 ml-auto">
-                    {/* Loupe + mémoires 1/2/3 */}
-                    <div className="flex items-center gap-2 mr-2">
-                      {[0, 1, 2, 3].map(i => {
-                        const s = quickSlots[i];
-                        const filled = s !== null;
-                        const isNumeric = i !== 0;
-
-                        const base = isNumeric
-                          ? 'relative overflow-visible w-8 h-8 rounded-full border-2 text-[11px] font-bold shadow active:scale-95 inline-flex items-center justify-center transition-all box-border'
-                          : 'w-8 h-8 rounded-full border-2 shadow active:scale-95 inline-flex items-center justify-center transition-all box-border';
-
-                        const isActive = i === 0 ? lastTappedSlot === 0 : activeSlot === i;
-
-                        const cls = isActive
-                          ? 'border-white bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_0_2px_rgba(37,99,235,0.9),0_0_12px_rgba(37,99,235,0.65)]'
-                          : filled
-                            ? 'border-blue-800 bg-blue-950/80 text-blue-100 hover:border-blue-600 hover:bg-blue-900'
-                            : 'border-blue-900/80 bg-blue-950/50 text-blue-200/80 hover:border-blue-700 hover:bg-blue-900/70';
-
-                        const refText = s
-                          ? `${s.book} ${s.chapter}${s.verse ? ':' + s.verse : ''}`
-                          : '';
-
-                        let title: string;
-                        if (i === 0) {
-                          title = s
-                            ? `${t('searchSlotLabel')}: ${refText}`
-                            : t('searchSlotEmpty');
-                        } else {
-                          title = s
-                            ? `${t('memorySlotLabel')} ${i}: ${refText}`
-                            : `${t('memorySlotLabel')} ${i} ${t('emptySlotSuffix')}`;
-                        }
-
-                        return (
-                          <button
-                            key={`qs-d-${i}`}
-                            type="button"
-                            className={`${base} ${cls}`}
-                            onClick={() => jumpToSlot(i)}
-                            aria-label={title}
-                            title={title}
-                            aria-pressed={isActive}
-                            aria-current={isActive ? 'true' : undefined}
-                          >
-                            {i === 0 ? (
-                              <SearchIcon className="w-4 h-4" />
-                            ) : (
-                              <span className="relative z-[1]">{i}</span>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
+                    {renderQuickSlots(false)}
 
                     <div className="flex items-center gap-1.5">
                       <button
@@ -2078,4 +2015,5 @@ ${shareUrl}`;
     </div>
   );
 }
+
 
