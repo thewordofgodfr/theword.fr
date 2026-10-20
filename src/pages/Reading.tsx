@@ -34,6 +34,7 @@ import {
 } from '../services/collectionsService';
 import type { VerseRef, VerseList } from '../types/collections';
 import { getBookAbbreviation } from '../utils/readingLabels';
+import { getTranslations } from '../i18n';
 
 /* ========= Helpers de stockage pour PRINCIPES (même format que Principes.tsx) ========= */
 
@@ -158,6 +159,38 @@ export default function Reading() {
 
   const [selectedVerses, setSelectedVerses] = useState<number[]>([]);
   const [copiedKey, setCopiedKey] = useState<string>('');
+  const desktopSelectionBarRef = useRef<HTMLDivElement>(null);
+  const mobileSelectionBarRef = useRef<HTMLDivElement>(null);
+  const [selectionBottomSpace, setSelectionBottomSpace] = useState(24);
+  const hasSelection = selectedVerses.length > 0;
+
+  // Laisser défiler le dernier verset au-dessus de la barre flottante.
+  // Mesurer la barre visible prend en compte les retours à la ligne,
+  // les traductions et les changements d'orientation.
+  useEffect(() => {
+    if (!hasSelection) {
+      setSelectionBottomSpace(24);
+      return;
+    }
+    const bars = [desktopSelectionBarRef.current, mobileSelectionBarRef.current];
+    const measure = () => {
+      const occupiedSpace = bars.reduce((space, bar) => {
+        if (!bar || bar.getBoundingClientRect().height === 0) return space;
+        return Math.max(space, window.innerHeight - bar.getBoundingClientRect().top);
+      }, 0);
+      setSelectionBottomSpace(Math.ceil(occupiedSpace) + 24);
+    };
+    measure();
+    const observer = typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(measure)
+      : null;
+    bars.forEach(bar => { if (bar) observer?.observe(bar); });
+    window.addEventListener('resize', measure);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [hasSelection]);
 
   const [showBookPicker, setShowBookPicker] = useState<boolean>(false);
   const [showChapterPicker, setShowChapterPicker] = useState<boolean>(false);
@@ -1258,7 +1291,9 @@ ${shareUrl}`;
 
   return (
     <div className="min-h-[100svh] bg-gray-950 transition-colors duration-200">
-      <div className="container mx-auto px-4 pb-6">
+      <div className="container mx-auto px-4 pb-6"
+        style={hasSelection ? { paddingBottom: selectionBottomSpace } : undefined}
+      >
         <div className="max-w-6xl mx-auto">
           {selectedBook && (
             <div
@@ -1381,7 +1416,7 @@ ${shareUrl}`;
 
           {/* BARRE SELECTION (desktop) EN BAS DE L'ÉCRAN */}
           {selectedVerses.length > 0 && (
-            <div className="hidden md:flex fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-full max-w-4xl px-4">
+            <div ref={desktopSelectionBarRef} className="hidden md:flex fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-full max-w-4xl px-4">
               <div className="bg-gray-900/95 backdrop-blur text-white border border-gray-700 rounded-xl shadow-lg px-4 py-3 flex items-center justify-between w-full">
                 <div className="inline-flex items-center px-3 py-1 rounded-full bg-black/90 text-white text-xs sm:text-sm shadow">
                   {selectedVerses.length} {t('versesSelectedSuffix')}
@@ -1681,7 +1716,7 @@ ${shareUrl}`;
 
           {/* BARRE SELECTION (mobile) */}
           {selectedVerses.length > 0 && (
-            <div className="sm:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-full px-3">
+            <div ref={mobileSelectionBarRef} className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-full px-3">
               <div className="bg-gray-900/95 backdrop-blur text-white border border-gray-700 shadow-xl rounded-2xl px-3 py-2 space-y-2 max-w-[500px] mx-auto">
                 {/* Ligne 1 : Notes / Principes / Autres langues */}
                 <div className="flex items-center justify-center gap-2">
@@ -1913,6 +1948,7 @@ ${shareUrl}`;
 
                 <div className="space-y-3">
                   {otherLangVerses.map(entry => {
+                    const labels = getTranslations(entry.lang);
                     const hasText = !!entry.text && !entry.error;
                     const canLoadManually = !entry.loading && !entry.text && !entry.error;
 
@@ -1941,7 +1977,7 @@ ${shareUrl}`;
                                 onClick={() => sendOtherLangVerseToNotes(entry.lang, entry.text)}
                                 className="px-2.5 py-1 rounded-full bg-gray-800 text-white border border-gray-600 hover:bg-gray-700 text-xs"
                               >
-                                {t('notes')}
+                                {labels.notes}
                               </button>
                               <button
                                 onClick={() =>
@@ -1949,19 +1985,19 @@ ${shareUrl}`;
                                 }
                                 className="px-2.5 py-1 rounded-full bg-gray-800 text-white border border-gray-600 hover:bg-gray-700 text-xs"
                               >
-                                {t('principles')}
+                                {labels.principles}
                               </button>
                               <button
                                 onClick={() => copyOtherLangVerse(entry.lang, entry.text)}
                                 className="px-2.5 py-1 rounded-full bg-blue-800 hover:bg-blue-700 text-white text-xs"
                               >
-                                {t('copyLabel')}
+                                {labels.copyLabel}
                               </button>
                               <button
                                 onClick={() => shareOtherLangVerse(entry.lang, entry.text)}
                                 className="px-2.5 py-1 rounded-full bg-blue-950 text-blue-100 border border-blue-800 hover:bg-blue-900 text-xs"
                               >
-                                {t('shareLabel')}
+                                {labels.shareLabel}
                               </button>
                             </div>
                           )}
