@@ -92,7 +92,7 @@ export default function Navigation() {
                     // Téléphone, paysage et petit écran pliable
                     'min-w-0 h-[52px] px-0.5 py-1',
                     'flex flex-col items-center justify-center gap-1',
-                    id === 'settings' ? 'order-last lg:order-none' : '',
+                    id === 'about' ? 'order-last lg:order-none' : '',
 
                     // Grand écran
                     'lg:h-auto lg:px-3 lg:py-2',
