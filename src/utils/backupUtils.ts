@@ -157,7 +157,10 @@ export async function shareOrDownloadBackup(file: File): Promise<boolean> {
   // When supported, let the user select the existing backup and confirm replacement.
   const pickerWindow = typeof window === 'undefined' ? undefined
     : window as Window & { showSaveFilePicker?: BackupSavePicker };
-  if (pickerWindow?.showSaveFilePicker) {
+  // Android may expose the picker yet reject writes to the selected Downloads URI.
+  // Keep the established share/download flow there; the picker is a desktop enhancement.
+  const isAndroid = /Android/i.test(navigator.userAgent || '');
+  if (!isAndroid && pickerWindow?.showSaveFilePicker) {
     let handle: Awaited<ReturnType<BackupSavePicker>> | undefined;
     try {
       handle = await pickerWindow.showSaveFilePicker({
@@ -181,13 +184,14 @@ export async function shareOrDownloadBackup(file: File): Promise<boolean> {
       return true;
     }
   }
-  if (navigator.share && navigator.canShare?.({ files: [file] })) {
-    try {
+  try {
+    if (navigator.share && navigator.canShare?.({ files: [file] })) {
       await navigator.share({ title: 'The Word', files: [file] });
       return true;
-    } catch (error) {
-      if (error instanceof DOMException && error.name === 'AbortError') return false;
     }
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') return false;
+    // A rejected capability check or share must still allow a normal download.
   }
   const url = URL.createObjectURL(file);
   const link = document.createElement('a');

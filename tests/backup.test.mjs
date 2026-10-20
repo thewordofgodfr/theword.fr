@@ -317,3 +317,49 @@ test('a selected file write failure is reported rather than reporting a successf
   }) };
   await assert.rejects(api.shareOrDownloadBackup(backup), /disk full/);
 });
+
+test('Android bypasses the exposed save picker and uses native file sharing', async () => {
+  const backup = api.createBackup().file;
+  navigator.userAgent = 'Mozilla/5.0 (Linux; Android 16; SM-S918B) SamsungBrowser/29.0';
+  globalThis.window = { showSaveFilePicker: async () => assert.fail('Android picker must not open') };
+  let shared;
+  navigator.canShare = () => true;
+  navigator.share = async data => { shared = data; };
+  assert.equal(await api.shareOrDownloadBackup(backup), true);
+  assert.equal(shared.files[0], backup);
+  assert.equal(shared.files[0].name, 'TheWord-sauvegarde.json');
+});
+
+test('Android downloads when native sharing is unsupported or its capability check throws', async () => {
+  for (const check of [() => false, () => { throw new TypeError('unsupported files'); }]) {
+    navigator.userAgent = 'Mozilla/5.0 (Linux; Android 16) Chrome/140.0';
+    navigator.share = async () => assert.fail('unsupported share must not open');
+    navigator.canShare = check;
+    globalThis.window = { showSaveFilePicker: async () => assert.fail('Android picker must not open') };
+    let clicked = false;
+    const link = { click() { clicked = true; }, remove() {} };
+    globalThis.document = { body: { appendChild() {} }, createElement: () => link };
+    assert.equal(await api.shareOrDownloadBackup(api.createBackup().file), true);
+    assert.equal(link.download, 'TheWord-sauvegarde.json');
+    assert.ok(clicked);
+  }
+});
+
+test('Android falls back to downloading after a rejected native file share', async () => {
+  navigator.userAgent = 'Mozilla/5.0 (Linux; Android 16) Chrome/140.0';
+  navigator.canShare = () => true;
+  navigator.share = async () => { throw new DOMException('unsupported', 'NotAllowedError'); };
+  let clicked = false;
+  const link = { click() { clicked = true; }, remove() {} };
+  globalThis.document = { body: { appendChild() {} }, createElement: () => link };
+  assert.equal(await api.shareOrDownloadBackup(api.createBackup().file), true);
+  assert.ok(clicked);
+});
+
+test('cancelling Android sharing never downloads an unwanted copy', async () => {
+  navigator.userAgent = 'Mozilla/5.0 (Linux; Android 16) Chrome/140.0';
+  navigator.canShare = () => true;
+  navigator.share = async () => { throw new DOMException('cancelled', 'AbortError'); };
+  globalThis.document = { createElement() { assert.fail('must not download after cancellation'); } };
+  assert.equal(await api.shareOrDownloadBackup(api.createBackup().file), false);
+});
