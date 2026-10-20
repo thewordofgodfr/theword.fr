@@ -2,6 +2,14 @@
 import type { TranslationDict } from './types';
 
 const zh: TranslationDict = {
+  searchRecentTitle: "最近搜索",
+  searchRecentLocal: "点按一条搜索即可再次搜索。历史记录仅保存在此设备上。",
+  searchRecentRemove: "删除这条搜索",
+  searchRecentEmpty: "你接下来的搜索会显示在这里。",
+  backupReminderTitle: "记得备份",
+  backupReminderMessage: "你在笔记或查经中添加了内容。请保存一份备份。",
+  backupReminderSave: "备份",
+  backupReminderLater: "稍后",
   discoverAndroidApp: "了解 Android 版 The Word 应用：",
   // Backup and restoration
   backupTitle: "备份与恢复",

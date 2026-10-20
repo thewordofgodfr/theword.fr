@@ -214,3 +214,24 @@ test('reminder state is local metadata and is never included in backup content',
   const file = backup.createBackup().file;
   assert.equal((await file.text()).includes(reminder.BACKUP_REMINDER_KEY), false);
 });
+
+test('all 18 languages define every reminder and recent-search label directly, without English fallback', async () => {
+  const { translations } = await bundled('src/i18n/index.ts');
+  const codes = ['fr','en','de','it','es','pt','ru','hi','zh','ar','id','sw','tr','ja','ko','yo','he','el'];
+  const keys = ['backupReminderTitle','backupReminderMessage','backupReminderSave','backupReminderLater',
+    'searchRecentTitle','searchRecentLocal','searchRecentRemove','searchRecentEmpty'];
+  for (const code of codes) {
+    const dict = translations[code];
+    assert.ok(dict, code);
+    for (const key of keys) {
+      assert.ok(Object.hasOwn(dict, key), code + ': missing direct translation of ' + key);
+      assert.equal(typeof dict[key], 'string', code + ': ' + key);
+      assert.ok(dict[key].trim().length > 0, code + ': empty ' + key);
+    }
+    if (code !== 'en') {
+      assert.notEqual(dict.backupReminderMessage, translations.en.backupReminderMessage, code + ': English message fallback');
+      assert.notEqual(dict.backupReminderLater, translations.en.backupReminderLater, code + ': English button fallback');
+      assert.notEqual(dict.searchRecentLocal, translations.en.searchRecentLocal, code + ': English history fallback');
+    }
+  }
+});

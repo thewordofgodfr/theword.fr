@@ -2,6 +2,14 @@
 import type { TranslationDict } from './types';
 
 const tr: TranslationDict = {
+  searchRecentTitle: "Son aramalar",
+  searchRecentLocal: "Tekrar aramak için bir aramaya dokunun. Geçmiş yalnızca bu cihazda saklanır.",
+  searchRecentRemove: "Bu aramayı sil",
+  searchRecentEmpty: "Sonraki aramalarınız burada görünecek.",
+  backupReminderTitle: "Yedek almayı unutmayın",
+  backupReminderMessage: "Notlar veya Çalışmalar bölümüne yeni içerik eklediniz. Bir yedek kopyasını saklayın.",
+  backupReminderSave: "Yedekle",
+  backupReminderLater: "Daha sonra",
   discoverAndroidApp: "Android için The Word uygulamasını keşfedin:",
   // Backup and restoration
   backupTitle: "Yedekleme ve geri yükleme",

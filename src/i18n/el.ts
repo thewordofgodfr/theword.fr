@@ -2,6 +2,14 @@
 import type { TranslationDict } from './types';
 
 const el: TranslationDict = {
+  searchRecentTitle: "Πρόσφατες αναζητήσεις",
+  searchRecentLocal: "Πατήστε μια αναζήτηση για να την επαναλάβετε. Το ιστορικό αποθηκεύεται μόνο σε αυτή τη συσκευή.",
+  searchRecentRemove: "Διαγραφή αυτής της αναζήτησης",
+  searchRecentEmpty: "Οι επόμενες αναζητήσεις σας θα εμφανιστούν εδώ.",
+  backupReminderTitle: "Θυμηθείτε να κρατήσετε αντίγραφο",
+  backupReminderMessage: "Προσθέσατε περιεχόμενο στις Σημειώσεις ή στις Μελέτες. Κρατήστε ένα αντίγραφο ασφαλείας.",
+  backupReminderSave: "Αντίγραφο ασφαλείας",
+  backupReminderLater: "Αργότερα",
   discoverAndroidApp: "Ανακαλύψτε την εφαρμογή The Word για Android:",
   // Backup and restoration
   backupTitle: "Αντίγραφο ασφαλείας και επαναφορά",

@@ -2,6 +2,14 @@
 import type { TranslationDict } from './types';
 
 const ko: TranslationDict = {
+  searchRecentTitle: "최근 검색",
+  searchRecentLocal: "검색어를 누르면 다시 검색할 수 있습니다. 기록은 이 기기에만 저장됩니다.",
+  searchRecentRemove: "이 검색 삭제",
+  searchRecentEmpty: "앞으로 검색한 내용이 여기에 표시됩니다.",
+  backupReminderTitle: "백업을 잊지 마세요",
+  backupReminderMessage: "노트나 성경공부에 내용이 추가되었습니다. 백업 사본을 저장해 두세요.",
+  backupReminderSave: "백업하기",
+  backupReminderLater: "나중에",
   discoverAndroidApp: "Android용 The Word 앱을 만나보세요:",
   // Backup and restoration
   backupTitle: "백업 및 복원",

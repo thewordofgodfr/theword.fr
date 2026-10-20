@@ -2,6 +2,14 @@
 import type { TranslationDict } from './types';
 
 const id: TranslationDict = {
+  searchRecentTitle: "Pencarian terbaru",
+  searchRecentLocal: "Ketuk pencarian untuk mengulanginya. Riwayat hanya disimpan di perangkat ini.",
+  searchRecentRemove: "Hapus pencarian ini",
+  searchRecentEmpty: "Pencarian berikutnya akan muncul di sini.",
+  backupReminderTitle: "Jangan lupa mencadangkan",
+  backupReminderMessage: "Anda telah menambahkan konten ke Catatan atau Studi. Simpan salinan cadangannya.",
+  backupReminderSave: "Cadangkan",
+  backupReminderLater: "Nanti",
   discoverAndroidApp: "Temukan aplikasi The Word untuk Android:",
   // Backup and restoration
   backupTitle: "Pencadangan dan pemulihan",

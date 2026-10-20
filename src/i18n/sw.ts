@@ -2,6 +2,14 @@
 import type { TranslationDict } from './types';
 
 const sw: TranslationDict = {
+  searchRecentTitle: "Utafutaji wa hivi karibuni",
+  searchRecentLocal: "Gusa utafutaji ili kuurudia. Historia huhifadhiwa kwenye kifaa hiki pekee.",
+  searchRecentRemove: "Ondoa utafutaji huu",
+  searchRecentEmpty: "Utafutaji wako unaofuata utaonekana hapa.",
+  backupReminderTitle: "Kumbuka kuhifadhi nakala",
+  backupReminderMessage: "Umeongeza maudhui kwenye Dondoo au Masomo. Hifadhi nakala yake.",
+  backupReminderSave: "Hifadhi nakala",
+  backupReminderLater: "Baadaye",
   discoverAndroidApp: "Fahamu programu ya The Word kwa Android:",
   // Backup and restoration
   backupTitle: "Hifadhi nakala na urejeshaji",

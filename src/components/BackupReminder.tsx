@@ -7,7 +7,7 @@ import { createBackup, shareOrDownloadBackup } from '../utils/backupUtils';
 const DISPLAY_MS = 20_000;
 
 export default function BackupReminder() {
-  const { t } = useTranslation();
+  const { t, lang } = useTranslation();
   const [visible, setVisible] = useState(false);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -79,7 +79,7 @@ export default function BackupReminder() {
 
   if (!visible) return null;
   return (
-    <aside className="backup-reminder" role="status" aria-live="polite" aria-labelledby="backup-reminder-title">
+    <aside className="backup-reminder" dir={lang === 'ar' || lang === 'he' ? 'rtl' : 'ltr'} role="status" aria-live="polite" aria-labelledby="backup-reminder-title">
       <h2 id="backup-reminder-title"><Download size={19} aria-hidden="true" />{t('backupReminderTitle')}</h2>
       <p>{t('backupReminderMessage')}</p>
       {failed && <p className="backup-reminder-error" role="alert">{t('backupError')}</p>}

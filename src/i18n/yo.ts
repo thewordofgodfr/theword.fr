@@ -2,6 +2,14 @@
 import type { TranslationDict } from './types';
 
 const yo: TranslationDict = {
+  searchRecentTitle: "Àwọn ìwádìí àìpẹ́",
+  searchRecentLocal: "Tẹ ìwádìí kan láti tún un ṣe. Ẹ̀rọ yìí nìkan ni a ti ń tọ́jú ìtàn ìwádìí.",
+  searchRecentRemove: "Pa ìwádìí yìí rẹ́",
+  searchRecentEmpty: "Àwọn ìwádìí rẹ tó kàn yóò hàn níbí.",
+  backupReminderTitle: "Rántí láti fi àdàkọ pamọ́",
+  backupReminderMessage: "O ti fi àkóónú kún Àkọsílẹ̀ tàbí Ìkẹ́kọ̀ọ́. Fi àdàkọ wọn pamọ́.",
+  backupReminderSave: "Fi àdàkọ pamọ́",
+  backupReminderLater: "Nígbà míì",
   discoverAndroidApp: "Ṣe ìwádìí ohun èlò The Word fún Android:",
   // Backup and restoration
   backupTitle: "Ìfipamọ́ àdàkọ àti ìmúpadàbọ̀",

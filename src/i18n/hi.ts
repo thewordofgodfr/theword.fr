@@ -2,6 +2,14 @@
 import type { TranslationDict } from './types';
 
 const hi: TranslationDict = {
+  searchRecentTitle: "हाल की खोजें",
+  searchRecentLocal: "खोज दोहराने के लिए उस पर टैप करें। इतिहास केवल इस डिवाइस पर सहेजा जाता है।",
+  searchRecentRemove: "यह खोज हटाएँ",
+  searchRecentEmpty: "आपकी अगली खोजें यहाँ दिखाई देंगी।",
+  backupReminderTitle: "बैकअप लेना न भूलें",
+  backupReminderMessage: "आपने नोट्स या अध्ययन में नई सामग्री जोड़ी है। इसकी बैकअप प्रति सुरक्षित रखें।",
+  backupReminderSave: "बैकअप लें",
+  backupReminderLater: "बाद में",
   discoverAndroidApp: "Android पर The Word ऐप के बारे में जानें:",
   // Backup and restoration
   backupTitle: "बैकअप और पुनर्स्थापना",

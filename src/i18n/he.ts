@@ -2,6 +2,14 @@
 import type { TranslationDict } from './types';
 
 const he: TranslationDict = {
+  searchRecentTitle: "חיפושים אחרונים",
+  searchRecentLocal: "לחצו על חיפוש כדי לחזור עליו. ההיסטוריה נשמרת רק במכשיר הזה.",
+  searchRecentRemove: "מחיקת החיפוש הזה",
+  searchRecentEmpty: "החיפושים הבאים שלך יופיעו כאן.",
+  backupReminderTitle: "תזכורת לגיבוי",
+  backupReminderMessage: "הוספת תוכן להערות או ללימודים. כדאי לשמור עותק גיבוי.",
+  backupReminderSave: "גיבוי",
+  backupReminderLater: "מאוחר יותר",
   discoverAndroidApp: "גלו את אפליקציית The Word ל־Android:",
   // Backup and restoration
   backupTitle: "גיבוי ושחזור",

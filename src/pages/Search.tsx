@@ -1291,7 +1291,7 @@ export default function Search() {
         </div>
 
         {!query.trim() && (
-          <section className="recent-searches workspace-card mt-5 p-4 sm:p-5" aria-labelledby="recent-searches-title">
+          <section className="recent-searches workspace-card mt-5 p-4 sm:p-5" dir={state.settings.language === 'ar' || state.settings.language === 'he' ? 'rtl' : 'ltr'} aria-labelledby="recent-searches-title">
             <h2 id="recent-searches-title" className="flex items-center gap-2 text-base font-semibold">
               <SearchIcon size={18} className="text-blue-300" aria-hidden="true" />
               {t('searchRecentTitle')}

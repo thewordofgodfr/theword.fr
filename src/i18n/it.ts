@@ -2,6 +2,14 @@
 import type { TranslationDict } from './types';
 
 const it: TranslationDict = {
+  searchRecentTitle: "Ricerche recenti",
+  searchRecentLocal: "Tocca una ricerca per ripeterla. La cronologia resta solo su questo dispositivo.",
+  searchRecentRemove: "Elimina questa ricerca",
+  searchRecentEmpty: "Le prossime ricerche appariranno qui.",
+  backupReminderTitle: "Ricordati del backup",
+  backupReminderMessage: "Hai aggiunto contenuti a Note o Studi. Conservane una copia di backup.",
+  backupReminderSave: "Salva backup",
+  backupReminderLater: "Più tardi",
   discoverAndroidApp: "Scopri l’app The Word per Android:",
   // Backup and restoration
   backupTitle: "Backup e ripristino",
