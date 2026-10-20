@@ -205,7 +205,7 @@ const en: TranslationDict = {
 
   backupTitle: 'Backup and restore',
   backupDescription:
-    'Save your Notes, Studies, reading shortcuts and preferences in one file. Restoring merges data without deleting current content.',
+    'Save your Notes, Studies, reading shortcuts, recent searches and preferences in one file. Restoring merges data without deleting current content.',
   backupCreate: 'Create a backup',
   backupRestore: 'Restore a backup',
   backupWorking: 'Processing…',

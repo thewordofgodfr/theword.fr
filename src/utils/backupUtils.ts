@@ -1,4 +1,5 @@
 import { SUPPORTED_LANGUAGES } from '../types/bible';
+import { MAX_RECENT_SEARCHES, readRecentSearches, sanitizeRecentSearches } from './recentSearches';
 
 const MAX_BACKUP_SIZE = 10 * 1024 * 1024;
 const SCROLL_PREFIX = 'twog:reading:scroll:';
@@ -10,7 +11,7 @@ const KEYS = {
   lastStudyList: 'twog:lastPrincipleId',
 } as const;
 type StoredValue = string | null;
-type BackupData = Record<keyof typeof KEYS, StoredValue> & { scrollPositions?: Record<string, string> };
+type BackupData = Record<keyof typeof KEYS, StoredValue> & { scrollPositions?: Record<string, string>; recentSearches?: Record<string, string[]> };
 type BackupFile = { application: 'TheWord'; backupVersion: 1; createdAt: string; data: BackupData };
 type Item = Record<string, unknown> & { bookId: string; chapter: number; verse: number };
 type List = Record<string, unknown> & { id: string; title: string; items: Item[]; updatedAt: number | string };
@@ -106,6 +107,13 @@ function validate(value: unknown): BackupFile {
         || !Number.isFinite(Number(y)) || Number(y) < 0) invalid();
     }
   }
+  if (data.recentSearches !== undefined) {
+    if (!isRecord(data.recentSearches)) invalid();
+    for (const [code, queries] of Object.entries(data.recentSearches)) {
+      if (!language(code) || !Array.isArray(queries) || queries.length > MAX_RECENT_SEARCHES
+        || queries.some(query => typeof query !== 'string' || query.trim().length < 2)) invalid();
+    }
+  }
   return { application: 'TheWord', backupVersion: 1, createdAt: value.createdAt, data };
 }
 function summary(data: BackupData): BackupSummary {
@@ -127,14 +135,52 @@ export function createBackup(): { file: File; summary: BackupSummary } {
   const data = Object.fromEntries(Object.entries(KEYS)
     .map(([name, key]) => [name, localStorage.getItem(key)])) as unknown as BackupData;
   data.scrollPositions = getScrollPositions();
+  data.recentSearches = {};
+  for (const code of SUPPORTED_LANGUAGES) {
+    const queries = readRecentSearches(`twog:search:recent:${code}`);
+    if (queries.length) data.recentSearches[code] = queries;
+  }
   const payload = validate({ application: 'TheWord', backupVersion: 1,
     createdAt: new Date().toISOString(), data });
   const file = new File([JSON.stringify(payload, null, 2)],
-    `TheWord-sauvegarde-${payload.createdAt.slice(0, 10)}.json`, { type: 'application/json' });
+    'TheWord-sauvegarde.json', { type: 'application/json' });
   if (file.size > MAX_BACKUP_SIZE) throw new Error('backup-too-large');
   return { file, summary: summary(data) };
 }
+type BackupSavePicker = (options: {
+  suggestedName: string;
+  types: Array<{ description: string; accept: Record<string, string[]> }>;
+}) => Promise<{
+  createWritable(): Promise<{ write(data: Blob): Promise<void>; close(): Promise<void>; abort?(): Promise<void> }>;
+}>;
 export async function shareOrDownloadBackup(file: File): Promise<boolean> {
+  // When supported, let the user select the existing backup and confirm replacement.
+  const pickerWindow = typeof window === 'undefined' ? undefined
+    : window as Window & { showSaveFilePicker?: BackupSavePicker };
+  if (pickerWindow?.showSaveFilePicker) {
+    let handle: Awaited<ReturnType<BackupSavePicker>> | undefined;
+    try {
+      handle = await pickerWindow.showSaveFilePicker({
+        suggestedName: file.name,
+        types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+      });
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return false;
+      // Some browsers expose a picker but cannot open it in this context.
+      handle = undefined;
+    }
+    if (handle) {
+      const writable = await handle.createWritable();
+      try {
+        await writable.write(file);
+        await writable.close();
+      } catch (error) {
+        try { await writable.abort?.(); } catch { /* preserve the original write error */ }
+        throw error;
+      }
+      return true;
+    }
+  }
   if (navigator.share && navigator.canShare?.({ files: [file] })) {
     try {
       await navigator.share({ title: 'The Word', files: [file] });
@@ -214,6 +260,10 @@ export async function restoreBackupByMerging(file: File): Promise<BackupSummary>
   }
   for (const [key, value] of Object.entries(data.scrollPositions ?? {})) {
     changes.push({ storage: sessionStorage, key, value });
+  }
+  for (const [code, imported] of Object.entries(data.recentSearches ?? {})) {
+    const key = `twog:search:recent:${code}`;
+    add(key, JSON.stringify(sanitizeRecentSearches([...readRecentSearches(key), ...imported])));
   }
   const before = changes.map(change => ({ ...change, previous: change.storage.getItem(change.key) }));
   const applied: typeof before = [];

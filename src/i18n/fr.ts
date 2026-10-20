@@ -208,7 +208,7 @@ const fr: TranslationDict = {
 
   backupTitle: 'Sauvegarde et restauration',
   backupDescription:
-    'Conservez vos Notes, Études, raccourcis de lecture et préférences dans un fichier. La restauration fusionne les données sans supprimer le contenu actuel.',
+    'Conservez vos Notes, Études, raccourcis de lecture, recherches récentes et préférences dans un fichier. La restauration fusionne les données sans supprimer le contenu actuel.',
   backupCreate: 'Créer une sauvegarde',
   backupRestore: 'Restaurer une sauvegarde',
   backupWorking: 'Traitement en cours…',

@@ -29,6 +29,7 @@ const get = key => JSON.parse(localStorage.getItem(key));
 const file = payload => new File([JSON.stringify(payload)], 'backup.json', { type: 'application/json' });
 async function payload() { return JSON.parse(await api.createBackup().file.text()); }
 beforeEach(() => {
+  delete globalThis.window;
   globalThis.localStorage = new MemoryStorage();
   globalThis.sessionStorage = new MemoryStorage();
   Object.defineProperty(globalThis, 'navigator', { configurable: true, value: {} });
@@ -44,7 +45,7 @@ test('complete export/restore and fresh page readers preserve notes, studies, sl
   sessionStorage.setItem('twog:reading:scroll:fr:Romans:2', '532');
   localStorage.setItem('unrelated-cache', 'do not export');
   const backup = api.createBackup();
-  assert.match(backup.file.name, /^TheWord-sauvegarde-\d{4}-\d{2}-\d{2}\.json$/);
+  assert.equal(backup.file.name, 'TheWord-sauvegarde.json');
   assert.deepEqual(backup.summary, { notes: 1, studies: 1, readingSlots: 3 });
   assert.equal((await backup.file.text()).includes('unrelated-cache'), false);
   const before = new Map(localStorage.values);
@@ -205,4 +206,114 @@ test('Settings shows both active backup buttons above Updates in all 18 language
       assert.ok(backupButtons.every(button => !/ disabled(?:=| )/.test(button)), code);
     }
   } finally { await unlink(path); delete globalThis.__backupTestApp; }
+});
+
+test('recent searches export by supported language and restore to a new device', async () => {
+  put('twog:search:recent:fr', ['amour', 'foi ']);
+  put('twog:search:recent:en', ['love']);
+  put('twog:search:recent:other', ['do not export']);
+  const backup = api.createBackup().file;
+  const saved = JSON.parse(await backup.text());
+  assert.deepEqual(saved.data.recentSearches, { fr: ['amour', 'foi '], en: ['love'] });
+  assert.ok(Number.isFinite(Date.parse(saved.createdAt)));
+  assert.equal(backup.name, api.createBackup().file.name);
+  globalThis.localStorage = new MemoryStorage();
+  globalThis.sessionStorage = new MemoryStorage();
+  await api.restoreBackupByMerging(backup);
+  assert.deepEqual(get('twog:search:recent:fr'), ['amour', 'foi ']);
+  assert.deepEqual(get('twog:search:recent:en'), ['love']);
+  assert.equal(localStorage.getItem('twog:search:recent:other'), null);
+});
+
+test('restoring recent searches preserves local entries, deduplicates and stays capped and idempotent', async () => {
+  put('twog:search:recent:fr', ['amour', 'bapteme', 'esperance']);
+  const backup = api.createBackup().file;
+  put('twog:search:recent:fr', ['paix', 'AMOUR', 'salut', 'verite', 'joie', 'pardon']);
+  await api.restoreBackupByMerging(backup);
+  const expected = ['paix', 'AMOUR', 'salut', 'verite', 'joie', 'pardon', 'bapteme', 'esperance'];
+  assert.deepEqual(get('twog:search:recent:fr'), expected);
+  await api.restoreBackupByMerging(backup);
+  assert.deepEqual(get('twog:search:recent:fr'), expected);
+});
+
+test('old backup without recent searches leaves the local history intact', async () => {
+  const saved = await payload();
+  delete saved.data.recentSearches;
+  put('twog:search:recent:fr', ['paix']);
+  await api.restoreBackupByMerging(file(saved));
+  assert.deepEqual(get('twog:search:recent:fr'), ['paix']);
+});
+
+test('invalid search history rejects the entire backup before writes', async () => {
+  const original = await payload();
+  for (const recentSearches of [
+    [], { unknown: ['amour'] }, { fr: 'amour' }, { fr: ['a'] },
+    { fr: [42] }, { fr: Array(9).fill('amour') },
+  ]) {
+    const saved = { ...original, data: { ...original.data, recentSearches } };
+    const before = new Map(localStorage.values);
+    await assert.rejects(api.restoreBackupByMerging(file(saved)));
+    assert.deepEqual(localStorage.values, before);
+  }
+});
+
+test('a late history write failure rolls back notes, settings and earlier language histories', async () => {
+  put(keys.notes, [list('backup', 2)]);
+  put('twog:search:recent:fr', ['amour']);
+  put('twog:search:recent:en', ['love']);
+  const backup = api.createBackup().file;
+  put(keys.notes, [list('local', 3)]);
+  put('twog:search:recent:fr', ['paix']);
+  put('twog:search:recent:en', ['peace']);
+  const before = new Map(localStorage.values);
+  localStorage.failAt = 'twog:search:recent:en';
+  await assert.rejects(api.restoreBackupByMerging(backup));
+  assert.deepEqual(localStorage.values, before);
+});
+
+test('recent-search helpers preserve exact queries, sanitize corruption and persist individual removals', async () => {
+  const recentBundle = await build({ entryPoints: ['src/utils/recentSearches.ts'], bundle: true,
+    write: false, platform: 'node', format: 'esm', logLevel: 'silent' });
+  const recent = await import(`data:text/javascript;base64,${Buffer.from(recentBundle.outputFiles[0].text).toString('base64')}`);
+  assert.deepEqual(recent.addRecentSearch(['AMOUR', 'paix'], 'amour'), ['amour', 'paix']);
+  assert.deepEqual(recent.addRecentSearch(['foi'], 'foi '), ['foi ', 'foi']);
+  recent.saveRecentSearches('fr', ['amour', 'paix']);
+  recent.saveRecentSearches('fr', recent.readRecentSearches('fr').filter(query => query !== 'amour'));
+  assert.deepEqual(recent.readRecentSearches('fr'), ['paix']);
+  recent.saveRecentSearches('fr', []);
+  assert.deepEqual(recent.readRecentSearches('fr'), []);
+  localStorage.setItem('fr', '{');
+  assert.deepEqual(recent.readRecentSearches('fr'), []);
+});
+
+test('supported save picker suggests the fixed filename and writes the selected file', async () => {
+  const backup = api.createBackup().file;
+  const calls = [];
+  globalThis.window = { showSaveFilePicker: async options => {
+    assert.equal(options.suggestedName, 'TheWord-sauvegarde.json');
+    return { createWritable: async () => ({
+      write: async data => calls.push(data),
+      close: async () => calls.push('closed'),
+    }) };
+  } };
+  assert.equal(await api.shareOrDownloadBackup(backup), true);
+  assert.deepEqual(calls, [backup, 'closed']);
+});
+
+test('cancelling the save picker does not download or share another copy', async () => {
+  const backup = api.createBackup().file;
+  navigator.canShare = () => true;
+  navigator.share = async () => assert.fail('must not share after cancellation');
+  globalThis.window = { showSaveFilePicker: async () => {
+    throw new DOMException('cancelled', 'AbortError');
+  } };
+  assert.equal(await api.shareOrDownloadBackup(backup), false);
+});
+
+test('a selected file write failure is reported rather than reporting a successful backup', async () => {
+  const backup = api.createBackup().file;
+  globalThis.window = { showSaveFilePicker: async () => ({
+    createWritable: async () => ({ write: async () => { throw new Error('disk full'); }, close: async () => {} }),
+  }) };
+  await assert.rejects(api.shareOrDownloadBackup(backup), /disk full/);
 });

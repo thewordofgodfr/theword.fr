@@ -695,7 +695,6 @@ export default function Search() {
     }
 
     let cancelled = false;
-    let historyHandle: number | undefined;
     const handle = window.setTimeout(
       async () => {
         if (
@@ -744,9 +743,6 @@ export default function Search() {
             }
           }
 
-          // Save only a settled, completed search, rather than every keystroke.
-          historyHandle = window.setTimeout(() => rememberQuery(query), 1200);
-
           setResults(enriched);
           setResultsKey(expandedKey);
 
@@ -762,14 +758,12 @@ export default function Search() {
     return () => {
       cancelled = true;
       window.clearTimeout(handle);
-      window.clearTimeout(historyHandle);
     };
   }, [
     query,
     currentQid,
     expandedKey,
     state.settings.language,
-    rememberQuery,
   ]);
 
   const grouped: Grouped[] =
@@ -937,6 +931,7 @@ export default function Search() {
   const toggleGroup = (
     bookId: string
   ) => {
+    if (!expanded[bookId]) rememberQuery(query);
     setExpanded(previous => {
       const next = {
         ...previous,
@@ -951,6 +946,7 @@ export default function Search() {
   };
 
   const expandAll = () => {
+    if (grouped.length) rememberQuery(query);
     const next: Record<
       string,
       boolean
@@ -979,9 +975,6 @@ export default function Search() {
   };
 
   const clearQuery = () => {
-    if (resultsKey === expandedKey && lastExecutedQidRef.current === currentQid) {
-      rememberQuery(query);
-    }
     setQuery('');
     setResults([]);
     setExpanded({});
@@ -1313,7 +1306,6 @@ export default function Search() {
                       className="recent-search-replay"
                       title={item}
                       onClick={() => {
-                        rememberQuery(item);
                         setQuery(item);
                         searchInputRef.current?.focus();
                       }}
