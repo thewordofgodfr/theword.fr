@@ -391,3 +391,33 @@ html.theme-dark-blue .app-navigation button[aria-current="page"] {
   border-radius: 0 11px 11px 0;
 }
 .recent-search-replay:hover, .recent-search-remove:hover { background: #203755; color: #f4f7fd; }
+
+/* Temporary backup reminder: overlay, so the approved home layout does not shift. */
+.backup-reminder {
+  position: fixed;
+  z-index: 70;
+  inset-inline: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  max-width: 440px;
+  margin-inline: auto;
+  padding: 16px 18px;
+  border: 1px solid #4778bc;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #1b3152, #111c2e);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .3);
+  color: #f4f7fd;
+}
+.backup-reminder h2 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; font-weight: 600; }
+.backup-reminder h2 svg { color: #a9c9ff; flex-shrink: 0; }
+.backup-reminder p { margin: 8px 0 0; font-size: 14px; line-height: 1.5; color: #c7d3e5; }
+.backup-reminder .backup-reminder-error { color: #fecaca; }
+.backup-reminder-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.backup-reminder button { min-height: 44px; padding: 9px 14px; border-radius: 10px; font-size: 14px; }
+.backup-reminder-save { background: #284d7d; color: #f4f7fd; border: 1px solid #5683bb; }
+.backup-reminder-later { color: #c7d3e5; border: 1px solid rgba(174, 189, 210, .22); }
+.backup-reminder button:hover { background: #305989; color: #fff; }
+.backup-reminder button:focus-visible { outline: 2px solid #a9c9ff; outline-offset: 3px; }
+.backup-reminder button:disabled { opacity: .6; cursor: wait; }
+@media (min-width: 1024px) {
+  .backup-reminder { inset-inline-start: auto; inset-inline-end: 24px; width: 400px; margin: 0; }
+}

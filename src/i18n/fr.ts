@@ -2,6 +2,10 @@
 import type { TranslationDict } from './types';
 
 const fr: TranslationDict = {
+  backupReminderTitle: "Pensez à sauvegarder",
+  backupReminderMessage: "Vous avez ajouté du contenu dans Notes ou Études. Conservez-en une copie.",
+  backupReminderSave: "Sauvegarder",
+  backupReminderLater: "Plus tard",
   searchRecentTitle: "Recherches récentes",
   searchRecentLocal: "Touchez une recherche pour la relancer. Historique conservé uniquement sur cet appareil.",
   searchRecentRemove: "Supprimer cette recherche",

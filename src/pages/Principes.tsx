@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
+import { trackBackupAdditions } from '../utils/backupReminder';
 
 import type {
   VerseList,
@@ -152,10 +153,10 @@ function p_getAll(): VerseList[] {
 function p_saveAll(
   lists: VerseList[]
 ) {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(lists)
-  );
+  const before = localStorage.getItem(STORAGE_KEY);
+  const after = JSON.stringify(lists);
+  localStorage.setItem(STORAGE_KEY, after);
+  trackBackupAdditions(STORAGE_KEY, before, after);
 }
 
 function p_getById(

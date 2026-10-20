@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
+import { trackBackupAdditions } from '../utils/backupReminder';
 import {
   getBibleBooks,
   getChapter,
@@ -57,7 +58,10 @@ function readAllPrinciples(): VerseList[] {
 
 function writeAllPrinciples(all: VerseList[]) {
   try {
-    localStorage.setItem(PRINCIPLES_LS_KEY, JSON.stringify(all));
+    const before = localStorage.getItem(PRINCIPLES_LS_KEY);
+    const after = JSON.stringify(all);
+    localStorage.setItem(PRINCIPLES_LS_KEY, after);
+    trackBackupAdditions(PRINCIPLES_LS_KEY, before, after);
   } catch {}
 }
 

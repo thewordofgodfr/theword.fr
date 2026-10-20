@@ -1,5 +1,12 @@
 import { SUPPORTED_LANGUAGES } from '../types/bible';
 import { MAX_RECENT_SEARCHES, readRecentSearches, sanitizeRecentSearches } from './recentSearches';
+import { backupContentSnapshot, markBackupContentSaved } from './backupReminder';
+
+const backupReminderSnapshots = new WeakMap<File, ReturnType<typeof backupContentSnapshot>>();
+function completeBackupReminder(file: File): void {
+  const snapshot = backupReminderSnapshots.get(file);
+  if (snapshot) markBackupContentSaved(snapshot);
+}
 
 const MAX_BACKUP_SIZE = 10 * 1024 * 1024;
 const SCROLL_PREFIX = 'twog:reading:scroll:';
@@ -145,6 +152,7 @@ export function createBackup(): { file: File; summary: BackupSummary } {
   const file = new File([JSON.stringify(payload, null, 2)],
     'TheWord-sauvegarde.json', { type: 'application/json' });
   if (file.size > MAX_BACKUP_SIZE) throw new Error('backup-too-large');
+  backupReminderSnapshots.set(file, backupContentSnapshot(data.notes, data.studies));
   return { file, summary: summary(data) };
 }
 type BackupSavePicker = (options: {
@@ -181,12 +189,14 @@ export async function shareOrDownloadBackup(file: File): Promise<boolean> {
         try { await writable.abort?.(); } catch { /* preserve the original write error */ }
         throw error;
       }
+      completeBackupReminder(file);
       return true;
     }
   }
   try {
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       await navigator.share({ title: 'The Word', files: [file] });
+      completeBackupReminder(file);
       return true;
     }
   } catch (error) {
@@ -199,6 +209,7 @@ export async function shareOrDownloadBackup(file: File): Promise<boolean> {
   document.body.appendChild(link);
   link.click(); link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+  completeBackupReminder(file);
   return true;
 }
 function timestamp(list: List): number {
@@ -288,5 +299,6 @@ export async function restoreBackupByMerging(file: File): Promise<BackupSummary>
     if (rollbackFailed) throw new Error('backup-rollback-failed');
     throw error;
   }
+  markBackupContentSaved(backupContentSnapshot(data.notes, data.studies));
   return summary(data);
 }

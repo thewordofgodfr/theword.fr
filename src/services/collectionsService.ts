@@ -3,6 +3,7 @@
 // API utilisée par Notes.tsx & Reading.tsx
 
 import type { VerseList, VerseRef } from '../types/collections';
+import { trackBackupAdditions } from '../utils/backupReminder';
 
 const LS_KEY = 'twog:collections:v1';
 const TEXT_SENTINEL = '__TEXT__'; // pour blocs de texte libres
@@ -16,7 +17,12 @@ function readAll(): VerseList[] {
   try { return safeParse<VerseList[]>(localStorage.getItem(LS_KEY), []); } catch { return []; }
 }
 function writeAll(all: VerseList[]) {
-  try { localStorage.setItem(LS_KEY, JSON.stringify(all)); } catch {}
+  try {
+    const before = localStorage.getItem(LS_KEY);
+    const after = JSON.stringify(all);
+    localStorage.setItem(LS_KEY, after);
+    trackBackupAdditions(LS_KEY, before, after);
+  } catch {}
 }
 function makeId() {
   return 'l_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);

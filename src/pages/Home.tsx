@@ -6,6 +6,7 @@ import { getRandomVerse, warmBibleCache } from '../services/bibleService';
 import { BibleVerse } from '../types/bible';
 import { RefreshCw, BookOpen, Search, List, BookMarked, Settings, Info, Download, ArrowUpRight } from 'lucide-react';
 import { saveSlot as saveQuickSlot } from '../services/readingSlots';
+import BackupReminder from '../components/BackupReminder';
 
 const STORAGE_KEY = 'home_random_verse';
 const STORAGE_LANG_KEY = 'home_random_verse_lang';
@@ -183,6 +184,7 @@ export default function Home() {
         </div>
       </div>
       <footer className="home-copyright">Copyright {year}</footer>
+      <BackupReminder />
     </div>
   );
 }
