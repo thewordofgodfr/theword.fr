@@ -649,7 +649,8 @@ export default function Settings() {
   }> = ({ active, flag, title, subtitle, onClick }) => (
     <button
       onClick={onClick}
-      className={`w-full flex items-center justify-between px-6 py-4 rounded-xl border-2 transition-all duration-200
+      aria-pressed={active}
+      className={`language-option w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border transition-all duration-200
         ${
           active
             ? 'bg-blue-800 border-blue-600 text-white shadow-sm ring-1 ring-blue-500/30'
@@ -677,7 +678,7 @@ export default function Settings() {
           </div>
         </div>
       </div>
-      {active && <div className="w-3 h-3 rounded-full bg-white shrink-0" />}
+      {active && <Check size={20} className="language-check shrink-0" aria-hidden="true" />}
     </button>
   );
 
@@ -707,15 +708,15 @@ export default function Settings() {
 
   return (
     <div className={`min-h-[100svh] bg-gray-900 transition-colors duration-200`}>
-      <div className="container mx-auto px-4 py-8">
+      <div className="page-shell container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className={`text-3xl md:text-4xl font-bold mb-2 text-white`}>{t('settings')}</h1>
+          <div className="mb-6">
+            <h1 className={`page-title text-white`}>{t('settings')}</h1>
           </div>
 
           {/* 1) Langue */}
-          <div className={`bg-gray-800 rounded-xl shadow-lg p-6 mb-6`}>
+          <div className={`workspace-card bg-gray-800 rounded-xl p-5 sm:p-6 mb-5`}>
             <h2 className={`text-xl font-semibold mb-4 text-white flex items-center`}>
               <Globe size={24} className="mr-3" />
               {t('language')}
@@ -811,7 +812,7 @@ export default function Settings() {
           </div>
 
           {/* 2) Apparence + Taille de police */}
-          <div className={`bg-gray-800 rounded-xl shadow-lg p-6 mb-6`}>
+          <div className={`workspace-card bg-gray-800 rounded-xl p-5 sm:p-6 mb-5`}>
             <h2 className={`text-xl font-semibold mb-6 text-white flex items-center`}>
               <Palette size={24} className="mr-3" />
               {t('appearance')}
@@ -926,7 +927,7 @@ export default function Settings() {
           </div>
 
           {/* 3) Sauvegarde et restauration */}
-          <div className={`bg-gray-800 rounded-xl shadow-lg p-6 mb-6`}>
+          <div className={`workspace-card bg-gray-800 rounded-xl p-5 sm:p-6 mb-5`}>
             <h2 className={`text-xl font-semibold mb-4 text-white flex items-center`}>
               <Download size={22} className="mr-3" />
               {t('backupTitle')}

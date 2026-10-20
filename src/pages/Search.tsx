@@ -1004,9 +1004,9 @@ export default function Search() {
           : 'bg-gray-50'
       } transition-colors`}
     >
-      <div className="max-w-4xl mx-auto px-4 py-5">
+      <div className="page-shell max-w-4xl mx-auto px-4 py-5">
         <h1
-          className={`text-xl font-semibold mb-4 ${
+              className={`page-title text-xl font-semibold mb-4 ${
             isDark
               ? 'text-white'
               : 'text-gray-900'

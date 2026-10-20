@@ -15,7 +15,7 @@ import {
 
 /** Tailles fixes du contenu */
 const H2_PX = 20;
-const TEXT_PX = 19;
+const TEXT_PX = 17;
 
 const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=fr.theword.www.twa';
 const GOOGLE_PLAY_QR = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWgAAAFoAQAAAABSnlx4AAAChklEQVR4nO2by27rMAxEZy7y/7987oIP2csCVirVSoA0ts9iwAgjkmKNfvD69xP40Ic+9KEPPZH+SJLjO8bENZak8PZ6OlnJm2gAJDnfshCyJI+n6+nej/7EH8f6RTJWhlpY+TPoxHsCjTO0dqaJlJt8Wck76I4tsmTSxn9ByZ+l009iOWMTUScuhs3MV/IOOuKdy9g4V7UxIq/HIl9H9660b/W8xUgGHQG/Auvo3pWO/LvWMI5lnWmKMDJqY1lH9660iY8odWJtV3TjfroNs5W8g/YIrBWxxSP/DkexIvAL6d6bRkYQxWRGu01FEvaXlPx1uvbLdOt2lrgXMafBdXTvThO2Hb2TbKFIdhT3Pv79EO3RH8mdUuXYUm6go1m4ju5d6faObMZ2Pp5L2vTPMFnJO+iqLyvtU3YHweokpdf7Orq3pjPtjup9dExMlZs+/e8naVDukUTUJQu6O+i4t5zubenaELGVFY7lKi9pV19N96Z05SdULe/wFFPJ4ckHH6LdeV/X9t1A6TZVl0Dr6N6adlQ5UfAgGRir2lF2fkXJS2jqsFju3BARJkLdXE/3fvToD2ZjUPfu96WdMlnJi+jIuhG4O+A9j5L9k+8oeQntaFXVIU8aTE389MdyunelwYbsTblLeVNWfvKTh+iar+pRn7Ttyr3r6TlveIa+nc+PQ8zuCOq2Z66je1f6Nh+rbhNej3ZMpS4L6d6VDj+pwlKdeZeh0LNXs5W8irYr2kTTquLufMTJTybQsUNCzw/GBtojbavq3of+XC8o+7iOxvbJz2Qlr6LrHxguh/PkMpfGGPhyurej7/OxWVy6pjZRT6Qc/36Evs/H/qaSQx/60Ic+9E9e/wFSYTPpMoQosgAAAABJRU5ErkJggg==';
@@ -163,6 +163,7 @@ export default function About() {
     state.settings.theme === 'dark';
 
   const CARD_CLASS = `
+    workspace-card
     rounded-xl
     border
     shadow-sm
@@ -238,50 +239,20 @@ export default function About() {
         }
       `}
     >
-      <div className="container mx-auto px-4 py-8">
+      <div className="page-shell container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
 
           {/* ==================================================
               EN-TÊTE
           ================================================== */}
 
-          <header className="text-center mb-8">
-            <h1
-              className={`
-                text-3xl
-                md:text-4xl
-                font-bold
-
-                ${
-                  isDark
-                    ? 'text-white'
-                    : 'text-gray-900'
-                }
-              `}
-            >
-              The Word
-            </h1>
-
-            <p
-              className={`
-                mt-4
-                max-w-3xl
-                mx-auto
-
-                ${
-                  isDark
-                    ? 'text-white/80'
-                    : 'text-gray-600'
-                }
-              `}
-              style={{
-                fontSize: `${TEXT_PX}px`,
-                lineHeight: 1.7,
-                whiteSpace: 'pre-line',
-              }}
-            >
-              {t('aboutIntro')}
-            </p>
+          <header className="about-header mb-6">
+            <h1 className="page-title about-brand">The <span>Word</span></h1>
+            <div className="about-intro">
+              {t('aboutIntro').split(/\n\s*\n/).map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
+            </div>
           </header>
 
           <div className="flex flex-col gap-5">

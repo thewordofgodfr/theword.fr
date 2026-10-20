@@ -48,7 +48,7 @@ export default function Navigation() {
       role="navigation"
       aria-label="Primary"
       className={[
-        'sticky top-0 left-0 right-0 z-50 w-full',
+        'app-navigation sticky top-0 left-0 right-0 z-50 w-full',
         isDark ? 'bg-gray-800/95' : 'bg-white/95',
         'backdrop-blur',
         isDark

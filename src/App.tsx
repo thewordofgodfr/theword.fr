@@ -108,7 +108,7 @@ function AppContent() {
   return (
     <div className={`${state.currentPage === 'home' ? 'min-h-[100dvh]' : 'min-h-screen'} transition-colors duration-200 bg-gray-900`}>
       <Navigation />
-      <main>{renderCurrentPage()}</main>
+      <main className={state.currentPage !== 'home' && state.currentPage !== 'reading' ? 'app-workspace' : undefined} data-page={state.currentPage}>{renderCurrentPage()}</main>
     </div>
   );
 }

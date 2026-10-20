@@ -255,3 +255,106 @@ html.theme-dark-blue .shadow-xl { box-shadow: 0 10px 24px rgba(0,0,0,.35) !impor
   .home-brand { grid-column: 1 / -1; }
   .home-fixed-quote { grid-column: 1 / -1; }
 }
+
+/* Pages intérieures : même palette que l'accueil, sans modifier la Lecture. */
+.app-workspace {
+  --app-accent: #a9c9ff;
+  --app-muted: #aebdd2;
+  --app-border: rgba(174, 189, 210, .18);
+}
+.app-workspace .page-shell {
+  max-width: 896px;
+  padding-top: 28px;
+  padding-bottom: 40px;
+}
+.app-workspace .page-title {
+  margin: 0 0 24px;
+  color: #f4f7fd;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -.5px;
+  text-align: left;
+}
+.app-workspace .page-title svg { color: var(--app-accent); width: 24px; height: 24px; }
+.app-workspace .page-title:has(svg) { margin-bottom: 0; }
+html.theme-dark-blue .app-workspace .bg-gray-950 { background-color: #0f172a !important; }
+html.theme-dark-blue .app-workspace :is(.workspace-card, .workspace-list, section.border.rounded-xl) {
+  background: linear-gradient(145deg, #17263d, #111c2e) !important;
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+  box-shadow: none !important;
+}
+html.theme-dark-blue .app-workspace[data-page="search"] .rounded-2xl.border {
+  background: #111c2e !important;
+  border-color: var(--app-border) !important;
+  box-shadow: none !important;
+}
+html.theme-dark-blue .app-workspace :is(.border-gray-600, .border-gray-700, .border-gray-500) {
+  border-color: var(--app-border) !important;
+}
+html.theme-dark-blue .app-workspace :is(.bg-blue-600, .bg-blue-700, .bg-blue-800) {
+  background: linear-gradient(135deg, #284d7d, #203e65) !important;
+  border-color: #5683bb !important;
+  color: #f4f7fd !important;
+  box-shadow: none !important;
+}
+html.theme-dark-blue .app-workspace button:is(.bg-blue-600, .bg-blue-700, .bg-blue-800):hover {
+  background: #305989 !important;
+}
+html.theme-dark-blue .app-workspace :is(.text-white\/90, .text-white\/80, .text-gray-300) {
+  color: #c7d3e5 !important;
+}
+html.theme-dark-blue .app-workspace :is(.text-white\/70, .text-white\/60, .text-white\/65, .text-gray-400, .text-gray-500) {
+  color: #aebdd2 !important;
+}
+html.theme-dark-blue .app-workspace :is(.text-blue-300, .text-blue-400) { color: #a9c9ff !important; }
+html.theme-dark-blue .app-workspace :is(input[type="text"], input[type="search"], textarea) {
+  background-color: #0f1a2c !important;
+  border-color: var(--app-border) !important;
+}
+.app-workspace :is(input, textarea)::placeholder { color: #91a2bc; opacity: 1; }
+.app-workspace :is(button, a, input, textarea, select):focus-visible {
+  outline: 2px solid #a9c9ff;
+  outline-offset: 3px;
+}
+.app-workspace h2 > svg { color: var(--app-accent); }
+html.theme-dark-blue .app-workspace .language-option {
+  background-color: #15233b !important;
+  box-shadow: none !important;
+}
+html.theme-dark-blue .app-workspace .language-option[aria-pressed="true"] {
+  background: linear-gradient(135deg, #1b3152, #14243c) !important;
+  border-color: #719bd5 !important;
+  box-shadow: inset 3px 0 #91b9f0 !important;
+}
+.app-workspace .language-option > div { min-width: 0; }
+.app-workspace .language-check { color: #a9c9ff; }
+.app-workspace .about-brand { margin-bottom: 24px; }
+.app-workspace .about-brand span { color: #a9c9ff; font-style: italic; }
+.app-workspace .about-intro { max-width: 720px; font-size: 17px; line-height: 1.8; color: #c7d3e5; }
+.app-workspace .about-intro p { margin: 0 0 20px; white-space: pre-line; }
+.app-workspace .about-intro p:first-child { color: #a9c9ff; font-size: 20px; }
+html.theme-dark-blue .app-navigation { border-color: rgba(174,189,210,.16) !important; box-shadow: none !important; }
+html.theme-dark-blue .app-navigation button {
+  color: #b9c8de !important;
+  border: 1px solid transparent;
+  box-shadow: none !important;
+}
+html.theme-dark-blue .app-navigation button[aria-current="page"] {
+  color: #f4f7fd !important;
+  background: linear-gradient(135deg, #1b3152, #14243c) !important;
+  border-color: #4778bc;
+}
+.app-navigation button[aria-current="page"] svg { color: #a9c9ff; }
+@media (max-width: 639px) {
+  .app-workspace .page-shell { padding-top: 24px; }
+  .app-workspace .page-title { font-size: 28px; }
+  .app-workspace .workspace-card { padding: 18px; }
+  .app-workspace .about-intro { font-size: 17px; line-height: 1.75; }
+}
+
+@media (max-width: 374px) {
+  .app-navigation button span { font-size: 8px; }
+}

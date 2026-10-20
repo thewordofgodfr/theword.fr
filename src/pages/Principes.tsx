@@ -1892,7 +1892,7 @@ https://www.theword.fr/#about`;
         }
       `}
     >
-      <div className="container mx-auto px-4 py-6 md:py-8 max-w-4xl">
+      <div className="page-shell container mx-auto px-4 py-6 md:py-8 max-w-4xl">
 
         {/* =========================
             TITRE
@@ -1901,7 +1901,7 @@ https://www.theword.fr/#about`;
         <div className="mb-6">
           <div className="flex items-center justify-between gap-3">
             <h1
-              className={`
+              className={`page-title 
                 text-2xl
                 md:text-3xl
                 font-bold
@@ -2226,7 +2226,7 @@ https://www.theword.fr/#about`;
                 return (
                   <div
                     key={list.id}
-                    className={`
+                    className={`workspace-list 
                       rounded-xl
                       border
                       shadow-sm
