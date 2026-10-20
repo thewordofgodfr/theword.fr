@@ -153,3 +153,116 @@ html.theme-dark-blue .shadow-xl { box-shadow: 0 10px 24px rgba(0,0,0,.35) !impor
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+
+/* Accueil : une seule identité, et les rubriques/commandes toujours visibles.
+   Seul l’aperçu d’un verset très long est abrégé ; un appui ouvre le texte intégral. */
+.home-screen {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: border-box;
+}
+.home-layout {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 1152px;
+  margin: 0 auto;
+  padding: clamp(8px, 1.8dvh, 16px) 16px 4px;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: clamp(8px, 1.5dvh, 14px);
+}
+.home-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  font-size: clamp(24px, 4dvh, 32px);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+.home-brand img { width: 34px; height: 34px; }
+.home-sections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.home-section {
+  min-width: 0;
+  min-height: 60px;
+  height: clamp(60px, 9dvh, 78px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px;
+}
+.home-section span { font-size: 13px; line-height: 1.2; font-weight: 600; }
+.home-section svg { width: 25px; height: 25px; flex-shrink: 0; }
+.home-feature { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.home-install { display: none; }
+.home-verse {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 12px 16px;
+}
+.home-verse-heading { font-size: 10px; line-height: 1.4; }
+.home-verse-open {
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  overflow: hidden;
+  text-align: center;
+}
+.home-verse-text {
+  margin: 0;
+  min-height: 0;
+  flex: 0 1 auto;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: clamp(16px, 2.8dvh, 22px);
+  line-height: 1.45;
+}
+.home-verse-reference { flex-shrink: 0; font-size: 12px; line-height: 1.4; }
+.home-verse-loading { min-height: 0; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.home-verse-action { display: flex; justify-content: center; }
+.home-verse-action button { min-height: 38px; }
+.home-fixed-quote { text-align: center; font-size: 11px; line-height: 1.4; }
+.home-copyright { flex-shrink: 0; padding: 4px 8px 6px; text-align: center; font-size: 10px; line-height: 1.2; }
+@media (min-width: 1024px) {
+  .home-layout { padding: 16px 24px 6px; gap: 16px; }
+  .home-sections { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .home-section { height: clamp(66px, 10dvh, 88px); }
+  .home-section svg { width: 28px; height: 28px; }
+  .home-section span { font-size: 14px; }
+  .home-feature-desktop { grid-template-columns: 180px minmax(0, 1fr); }
+  .home-install { min-height: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+  .home-qr-link { min-height: 0; flex: 0 1 auto; }
+  .home-qr { width: min(104px, 16dvh); height: auto; max-height: 100%; }
+  .home-play-link { min-height: 36px; padding: 6px 12px; flex-shrink: 0; }
+  .home-verse { padding: 16px 24px; gap: 10px; }
+  .home-fixed-quote { font-size: 13px; }
+}
+@media (max-height: 540px) {
+  .home-layout { padding-top: 6px; gap: 6px; }
+  .home-brand { font-size: 23px; }
+  .home-brand img { width: 28px; height: 28px; }
+  .home-sections { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .home-section { min-height: 48px; height: 48px; gap: 3px; padding: 4px; }
+  .home-section svg { width: 21px; height: 21px; }
+  .home-section span { font-size: 11px; }
+  .home-verse { padding: 8px 12px; gap: 5px; }
+  .home-verse-action button { min-height: 32px; }
+  .home-verse-text { font-size: 16px; }
+  .home-fixed-quote { font-size: 10px; }
+  .home-copyright { font-size: 9px; padding: 2px 8px; }
+}

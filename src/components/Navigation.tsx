@@ -110,7 +110,7 @@ export default function Navigation() {
 
                   <span
                     className="
-                      hidden
+                      block
                       w-full
                       min-w-0
                       truncate
