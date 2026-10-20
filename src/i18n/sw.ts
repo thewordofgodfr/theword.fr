@@ -2,6 +2,8 @@
 import type { TranslationDict } from './types';
 
 const sw: TranslationDict = {
+  aboutContactLabel: "Mawasiliano:",
+  aboutPrivacyPolicy: "Sera ya faragha",
   searchRecentTitle: "Utafutaji wa hivi karibuni",
   searchRecentLocal: "Gusa utafutaji ili kuurudia. Historia huhifadhiwa kwenye kifaa hiki pekee.",
   searchRecentRemove: "Ondoa utafutaji huu",

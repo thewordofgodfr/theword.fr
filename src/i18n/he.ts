@@ -2,6 +2,8 @@
 import type { TranslationDict } from './types';
 
 const he: TranslationDict = {
+  aboutContactLabel: "יצירת קשר:",
+  aboutPrivacyPolicy: "מדיניות פרטיות",
   searchRecentTitle: "חיפושים אחרונים",
   searchRecentLocal: "לחצו על חיפוש כדי לחזור עליו. ההיסטוריה נשמרת רק במכשיר הזה.",
   searchRecentRemove: "מחיקת החיפוש הזה",

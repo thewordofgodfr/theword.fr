@@ -2,6 +2,8 @@
 import type { TranslationDict } from './types';
 
 const id: TranslationDict = {
+  aboutContactLabel: "Kontak:",
+  aboutPrivacyPolicy: "Kebijakan Privasi",
   searchRecentTitle: "Pencarian terbaru",
   searchRecentLocal: "Ketuk pencarian untuk mengulanginya. Riwayat hanya disimpan di perangkat ini.",
   searchRecentRemove: "Hapus pencarian ini",

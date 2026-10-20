@@ -405,7 +405,7 @@ export default function About() {
                 <Mail size={18} />
 
                 <span>
-                  Contact :
+                  {t('aboutContactLabel')}
                 </span>
 
                 <a
@@ -454,10 +454,7 @@ export default function About() {
                     }
                   `}
                 >
-                  {state.settings.language ===
-                  'fr'
-                    ? 'Politique de confidentialité'
-                    : 'Privacy policy'}
+                  {t('aboutPrivacyPolicy')}
                 </a>
               </p>
             </footer>

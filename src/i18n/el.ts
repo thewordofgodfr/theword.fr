@@ -2,6 +2,8 @@
 import type { TranslationDict } from './types';
 
 const el: TranslationDict = {
+  aboutContactLabel: "Επικοινωνία:",
+  aboutPrivacyPolicy: "Πολιτική απορρήτου",
   searchRecentTitle: "Πρόσφατες αναζητήσεις",
   searchRecentLocal: "Πατήστε μια αναζήτηση για να την επαναλάβετε. Το ιστορικό αποθηκεύεται μόνο σε αυτή τη συσκευή.",
   searchRecentRemove: "Διαγραφή αυτής της αναζήτησης",

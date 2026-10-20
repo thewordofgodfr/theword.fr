@@ -2,6 +2,8 @@
 import type { TranslationDict } from './types';
 
 const yo: TranslationDict = {
+  aboutContactLabel: "Kàn sí wa:",
+  aboutPrivacyPolicy: "Ìlànà ìpamọ́",
   searchRecentTitle: "Àwọn ìwádìí àìpẹ́",
   searchRecentLocal: "Tẹ ìwádìí kan láti tún un ṣe. Ẹ̀rọ yìí nìkan ni a ti ń tọ́jú ìtàn ìwádìí.",
   searchRecentRemove: "Pa ìwádìí yìí rẹ́",

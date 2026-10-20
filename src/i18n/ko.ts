@@ -2,6 +2,8 @@
 import type { TranslationDict } from './types';
 
 const ko: TranslationDict = {
+  aboutContactLabel: "문의:",
+  aboutPrivacyPolicy: "개인정보 처리방침",
   searchRecentTitle: "최근 검색",
   searchRecentLocal: "검색어를 누르면 다시 검색할 수 있습니다. 기록은 이 기기에만 저장됩니다.",
   searchRecentRemove: "이 검색 삭제",

@@ -2,6 +2,8 @@
 import type { TranslationDict } from './types';
 
 const fr: TranslationDict = {
+  aboutContactLabel: "Contact :",
+  aboutPrivacyPolicy: "Politique de confidentialité",
   backupReminderTitle: "Pensez à sauvegarder",
   backupReminderMessage: "Vous avez ajouté du contenu dans Notes ou Études. Conservez-en une copie.",
   backupReminderSave: "Sauvegarder",

@@ -2,6 +2,8 @@
 import type { TranslationDict } from './types';
 
 const hi: TranslationDict = {
+  aboutContactLabel: "संपर्क:",
+  aboutPrivacyPolicy: "गोपनीयता नीति",
   searchRecentTitle: "हाल की खोजें",
   searchRecentLocal: "खोज दोहराने के लिए उस पर टैप करें। इतिहास केवल इस डिवाइस पर सहेजा जाता है।",
   searchRecentRemove: "यह खोज हटाएँ",

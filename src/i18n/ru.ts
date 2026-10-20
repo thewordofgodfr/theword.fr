@@ -2,6 +2,8 @@
 import type { TranslationDict } from './types';
 
 const ru: TranslationDict = {
+  aboutContactLabel: "Контакты:",
+  aboutPrivacyPolicy: "Политика конфиденциальности",
   searchRecentTitle: "Недавние запросы",
   searchRecentLocal: "Нажмите на запрос, чтобы повторить поиск. История хранится только на этом устройстве.",
   searchRecentRemove: "Удалить этот запрос",

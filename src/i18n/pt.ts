@@ -2,6 +2,8 @@
 import type { TranslationDict } from './types';
 
 const pt: TranslationDict = {
+  aboutContactLabel: "Contato:",
+  aboutPrivacyPolicy: "Política de privacidade",
   searchRecentTitle: "Pesquisas recentes",
   searchRecentLocal: "Toque em uma pesquisa para repeti-la. O histórico fica apenas neste dispositivo.",
   searchRecentRemove: "Remover esta pesquisa",

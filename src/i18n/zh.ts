@@ -2,6 +2,8 @@
 import type { TranslationDict } from './types';
 
 const zh: TranslationDict = {
+  aboutContactLabel: "联系：",
+  aboutPrivacyPolicy: "隐私政策",
   searchRecentTitle: "最近搜索",
   searchRecentLocal: "点按一条搜索即可再次搜索。历史记录仅保存在此设备上。",
   searchRecentRemove: "删除这条搜索",

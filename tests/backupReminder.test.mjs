@@ -1,6 +1,8 @@
 import { test, beforeEach, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { build } from 'esbuild';
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 
 async function bundled(path) {
   const result = await build({ entryPoints: [path], bundle: true, write: false,
@@ -215,11 +217,11 @@ test('reminder state is local metadata and is never included in backup content',
   assert.equal((await file.text()).includes(reminder.BACKUP_REMINDER_KEY), false);
 });
 
-test('all 18 languages define every reminder and recent-search label directly, without English fallback', async () => {
+test('all 18 languages directly define reminder, recent-search and About link labels', async () => {
   const { translations } = await bundled('src/i18n/index.ts');
   const codes = ['fr','en','de','it','es','pt','ru','hi','zh','ar','id','sw','tr','ja','ko','yo','he','el'];
   const keys = ['backupReminderTitle','backupReminderMessage','backupReminderSave','backupReminderLater',
-    'searchRecentTitle','searchRecentLocal','searchRecentRemove','searchRecentEmpty'];
+    'searchRecentTitle','searchRecentLocal','searchRecentRemove','searchRecentEmpty','aboutContactLabel','aboutPrivacyPolicy'];
   for (const code of codes) {
     const dict = translations[code];
     assert.ok(dict, code);
@@ -233,5 +235,35 @@ test('all 18 languages define every reminder and recent-search label directly, w
       assert.notEqual(dict.backupReminderLater, translations.en.backupReminderLater, code + ': English button fallback');
       assert.notEqual(dict.searchRecentLocal, translations.en.searchRecentLocal, code + ': English history fallback');
     }
+  }
+});
+
+test('About renders localized Contact and Privacy policy labels with unchanged destinations in all 18 languages', async () => {
+  const ui = await build({ entryPoints: ['src/pages/About.tsx'], bundle: true, write: false,
+    platform: 'node', format: 'esm', packages: 'external', logLevel: 'silent',
+    plugins: [{ name: 'test-about-context', setup(builder) {
+      builder.onResolve({ filter: /contexts\/AppContext$/ }, () => ({ path: 'about-context', namespace: 'fixture' }));
+      builder.onLoad({ filter: /.*/, namespace: 'fixture' }, () => ({ contents:
+        'export function useApp() { return globalThis.__aboutI18nApp; }', loader: 'js' }));
+    } }],
+  });
+  const { writeFile, unlink } = await import('node:fs/promises');
+  const path = new URL('../.about-i18n-check.mjs', import.meta.url);
+  await writeFile(path, ui.outputFiles[0].text);
+  try {
+    const { default: About } = await import(path.href);
+    const { translations } = await bundled('src/i18n/index.ts');
+    for (const code of Object.keys(translations)) {
+      globalThis.__aboutI18nApp = { state: { settings: { language: code, theme: 'dark', fontSize: 25 } } };
+      const html = renderToStaticMarkup(React.createElement(About));
+      assert.ok(html.includes(translations[code].aboutContactLabel), code + ': Contact label');
+      assert.ok(html.includes(translations[code].aboutPrivacyPolicy), code + ': Privacy policy label');
+      assert.match(html, /href="mailto:contact@theword.fr"/);
+      assert.match(html, /href="https:\/\/theword.fr\/privacy.html"/);
+      assert.ok(!html.includes('aboutContactLabel') && !html.includes('aboutPrivacyPolicy'), code + ': raw translation key');
+    }
+  } finally {
+    await unlink(path);
+    delete globalThis.__aboutI18nApp;
   }
 });
