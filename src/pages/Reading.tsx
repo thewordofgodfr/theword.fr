@@ -34,7 +34,6 @@ import {
 } from '../services/collectionsService';
 import type { VerseRef, VerseList } from '../types/collections';
 import { getBookAbbreviation } from '../utils/readingLabels';
-import { getTranslations } from '../i18n';
 
 /* ========= Helpers de stockage pour PRINCIPES (même format que Principes.tsx) ========= */
 
@@ -1948,7 +1947,6 @@ ${shareUrl}`;
 
                 <div className="space-y-3">
                   {otherLangVerses.map(entry => {
-                    const labels = getTranslations(entry.lang);
                     const hasText = !!entry.text && !entry.error;
                     const canLoadManually = !entry.loading && !entry.text && !entry.error;
 
@@ -1977,7 +1975,7 @@ ${shareUrl}`;
                                 onClick={() => sendOtherLangVerseToNotes(entry.lang, entry.text)}
                                 className="px-2.5 py-1 rounded-full bg-gray-800 text-white border border-gray-600 hover:bg-gray-700 text-xs"
                               >
-                                {labels.notes}
+                                {t('notes')}
                               </button>
                               <button
                                 onClick={() =>
@@ -1985,19 +1983,19 @@ ${shareUrl}`;
                                 }
                                 className="px-2.5 py-1 rounded-full bg-gray-800 text-white border border-gray-600 hover:bg-gray-700 text-xs"
                               >
-                                {labels.principles}
+                                {t('principles')}
                               </button>
                               <button
                                 onClick={() => copyOtherLangVerse(entry.lang, entry.text)}
                                 className="px-2.5 py-1 rounded-full bg-blue-800 hover:bg-blue-700 text-white text-xs"
                               >
-                                {labels.copyLabel}
+                                {t('copyLabel')}
                               </button>
                               <button
                                 onClick={() => shareOtherLangVerse(entry.lang, entry.text)}
                                 className="px-2.5 py-1 rounded-full bg-blue-950 text-blue-100 border border-blue-800 hover:bg-blue-900 text-xs"
                               >
-                                {labels.shareLabel}
+                                {t('shareLabel')}
                               </button>
                             </div>
                           )}
