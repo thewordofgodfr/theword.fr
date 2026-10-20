@@ -1,6 +1,6 @@
 // src/pages/Search.tsx
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { getBibleBooks, searchInBible } from '../services/bibleService';
 import type { BibleVerse } from '../types/bible';
@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { saveSlot as saveQuickSlot } from '../services/readingSlots';
 import { useTranslation } from '../hooks/useTranslation';
+import { addRecentSearch, readRecentSearches, saveRecentSearches } from '../utils/recentSearches';
 
 type ResultItem = BibleVerse & {
   occ: number;
@@ -539,6 +540,36 @@ export default function Search() {
     }
   }, [query, queryKey]);
 
+  const recentKey = `twog:search:recent:${state.settings.language}`;
+  const [recentHistory, setRecentHistory] = useState(() => ({
+    key: recentKey,
+    items: readRecentSearches(recentKey),
+  }));
+  const recentHistoryRef = useRef(recentHistory);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const history = { key: recentKey, items: readRecentSearches(recentKey) };
+    recentHistoryRef.current = history;
+    setRecentHistory(history);
+  }, [recentKey]);
+
+  const updateRecentSearches = useCallback((items: string[]) => {
+    const history = { key: recentKey, items };
+    recentHistoryRef.current = history;
+    setRecentHistory(history);
+    saveRecentSearches(recentKey, items);
+  }, [recentKey]);
+
+  const rememberQuery = useCallback((value: string) => {
+    if (value.trim().length < 2) return;
+    const current = recentHistoryRef.current;
+    const items = current.key === recentKey ? current.items : readRecentSearches(recentKey);
+    updateRecentSearches(addRecentSearch(items, value));
+  }, [recentKey, updateRecentSearches]);
+
+  const recentSearches = recentHistory.key === recentKey ? recentHistory.items : [];
+
   const currentQid = useMemo(
     () =>
       normalizeForSearch(query.trim()),
@@ -664,6 +695,7 @@ export default function Search() {
     }
 
     let cancelled = false;
+    let historyHandle: number | undefined;
     const handle = window.setTimeout(
       async () => {
         if (
@@ -712,6 +744,9 @@ export default function Search() {
             }
           }
 
+          // Save only a settled, completed search, rather than every keystroke.
+          historyHandle = window.setTimeout(() => rememberQuery(query), 1200);
+
           setResults(enriched);
           setResultsKey(expandedKey);
 
@@ -727,12 +762,14 @@ export default function Search() {
     return () => {
       cancelled = true;
       window.clearTimeout(handle);
+      window.clearTimeout(historyHandle);
     };
   }, [
     query,
     currentQid,
     expandedKey,
     state.settings.language,
+    rememberQuery,
   ]);
 
   const grouped: Grouped[] =
@@ -942,6 +979,9 @@ export default function Search() {
   };
 
   const clearQuery = () => {
+    if (resultsKey === expandedKey && lastExecutedQidRef.current === currentQid) {
+      rememberQuery(query);
+    }
     setQuery('');
     setResults([]);
     setExpanded({});
@@ -962,6 +1002,7 @@ export default function Search() {
   const openInReading = (
     verse: ResultItem
   ) => {
+    rememberQuery(query);
     persistExpandedNow(
       expanded
     );
@@ -1066,6 +1107,7 @@ export default function Search() {
             </div>
 
             <input
+              ref={searchInputRef}
               value={query}
               onChange={event =>
                 setQuery(
@@ -1254,6 +1296,47 @@ export default function Search() {
               )}
           </div>
         </div>
+
+        {!query.trim() && (
+          <section className="recent-searches workspace-card mt-5 p-4 sm:p-5" aria-labelledby="recent-searches-title">
+            <h2 id="recent-searches-title" className="flex items-center gap-2 text-base font-semibold">
+              <SearchIcon size={18} className="text-blue-300" aria-hidden="true" />
+              {t('searchRecentTitle')}
+            </h2>
+            <p className="mt-2 text-sm text-white/70">{t('searchRecentLocal')}</p>
+            {recentSearches.length ? (
+              <ul className="mt-4 flex flex-wrap gap-2" aria-label={t('searchRecentTitle')}>
+                {recentSearches.map(item => (
+                  <li key={item} className="recent-search-chip">
+                    <button
+                      type="button"
+                      className="recent-search-replay"
+                      title={item}
+                      onClick={() => {
+                        rememberQuery(item);
+                        setQuery(item);
+                        searchInputRef.current?.focus();
+                      }}
+                    >
+                      <span>{item}</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="recent-search-remove"
+                      aria-label={`${t('searchRecentRemove')} : ${item}`}
+                      title={`${t('searchRecentRemove')} : ${item}`}
+                      onClick={() => updateRecentSearches(recentSearches.filter(value => value !== item))}
+                    >
+                      <X size={16} aria-hidden="true" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-4 text-sm text-white/70">{t('searchRecentEmpty')}</p>
+            )}
+          </section>
+        )}
 
         <div className="mt-5">
           {totalOccurrences ===

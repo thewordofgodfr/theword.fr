@@ -358,3 +358,36 @@ html.theme-dark-blue .app-navigation button[aria-current="page"] {
 @media (max-width: 374px) {
   .app-navigation button span { font-size: 8px; }
 }
+
+/* Search history: separate replay/remove controls, touch-sized on mobile. */
+.recent-search-chip {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid rgba(174, 189, 210, .2);
+  border-radius: 12px;
+  background: #15233b;
+}
+.recent-search-replay {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  color: #c7d8f1;
+  text-align: start;
+  border-radius: 11px 0 0 11px;
+}
+.recent-search-replay span { overflow-wrap: anywhere; white-space: pre-wrap; }
+.recent-search-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 44px;
+  min-height: 44px;
+  color: #aebdd2;
+  border-inline-start: 1px solid rgba(174, 189, 210, .14);
+  border-radius: 0 11px 11px 0;
+}
+.recent-search-replay:hover, .recent-search-remove:hover { background: #203755; color: #f4f7fd; }

@@ -2,6 +2,10 @@
 import type { TranslationDict } from './types';
 
 const en: TranslationDict = {
+  searchRecentTitle: "Recent searches",
+  searchRecentLocal: "Tap a search to run it again. History is stored only on this device.",
+  searchRecentRemove: "Remove this search",
+  searchRecentEmpty: "Your next searches will appear here.",
   discoverAndroidApp: "Discover The Word app on Android:",
   // Navigation
   home: 'Home',
