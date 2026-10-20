@@ -264,7 +264,7 @@ Jean 8:31-32`,
 
   // Quick slots
   quickSlotsIntro:
-    'Ces 4 boutons permettent de revenir instantanément sur vos lectures fréquentes pour lire plusieurs livres en parallèle : utilisez 1/2/3 pour 3 emplacements distincts, et la loupe pour reprendre le dernier passage (verset aléatoire ou recherche).',
+    "Ces quatre onglets permettent de lire plusieurs passages en parallèle. La loupe, à gauche, reprend le dernier passage ouvert depuis une recherche ou un verset aléatoire. Les onglets 1, 2 et 3 gardent chacun leur livre, leur chapitre et leur position de lecture. La référence affichée permet de repérer chaque passage ; le nom du livre est abrégé sur mobile. L’onglet actif apparaît en bleu.",
   quickSlotsIllustrationLabel: 'Illustration des raccourcis',
   quickSlotLastPassageTooltip: 'Dernier passage',
   quickSlot1ActiveTooltip: 'Raccourci 1 (actif)',

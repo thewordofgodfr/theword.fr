@@ -260,7 +260,7 @@ John 8:31-32`,
 
   // Quick slots
   quickSlotsIntro:
-    'These 4 buttons let you instantly return to your frequent readings so you can read several books in parallel: use 1/2/3 for 3 separate slots, and the magnifying glass to return to the last passage (random verse or search result).',
+    "These four tabs let you read several passages in parallel. The magnifying glass on the left returns to the last passage opened from a search or a random verse. Tabs 1, 2 and 3 each keep their book, chapter and reading position. The displayed reference identifies each passage; book names are abbreviated on mobile. The active tab is blue.",
   quickSlotsIllustrationLabel: 'Shortcuts illustration',
   quickSlotLastPassageTooltip: 'Last passage',
   quickSlot1ActiveTooltip: 'Shortcut 1 (active)',

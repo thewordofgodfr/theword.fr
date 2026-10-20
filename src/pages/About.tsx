@@ -3,6 +3,8 @@
 import React from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
+import { bibleBooks } from '../data/bibleBooks';
+import { getBookAbbreviation } from '../utils/readingLabels';
 import {
   Shuffle,
   Search as SearchIcon,
@@ -111,110 +113,37 @@ const ANDROID_LABELS: Record<string, readonly [string, string, string]> = {
   ]
 };
 
-/* =========================================================
-   AIDE VISUELLE DES MÉMOIRES RAPIDES
-   Même palette que la page Lecture :
-   - état inactif : bleu nuit
-   - état actif : bleu vif, contour blanc et légère lueur
-========================================================= */
-
+/* Aide visuelle : mêmes onglets rectangulaires et références que Lecture. */
 const QuickSlotsHelpInline: React.FC = () => {
   const { state } = useApp();
   const { t } = useTranslation();
-
-  const isDark =
-    state.settings.theme === 'dark';
-
-  const CHIP_BASE =
-    'w-9 h-9 rounded-full border-2 inline-flex items-center justify-center text-sm font-bold shadow transition-all box-border';
-
-  const CHIP_INACTIVE =
-    'border-blue-800 bg-blue-950/80 text-blue-100';
-
-  const CHIP_ACTIVE =
-    'border-white bg-blue-600 text-white shadow-[0_0_0_2px_rgba(37,99,235,0.9),0_0_12px_rgba(37,99,235,0.65)]';
+  const examples = [
+    { number: 0, book: 'John', chapter: 3, tooltip: 'quickSlotLastPassageTooltip' },
+    { number: 1, book: 'Psalms', chapter: 119, tooltip: 'quickSlot1ActiveTooltip' },
+    { number: 2, book: 'Daniel', chapter: 8, tooltip: 'quickSlot2Tooltip' },
+    { number: 3, book: 'Romans', chapter: 8, tooltip: 'quickSlot3Tooltip' },
+  ];
 
   return (
     <div>
-      <div
-        className={`
-          flex
-          items-center
-          gap-3
-          rounded-xl
-          px-4
-          py-4
-          border
-
-          ${
-            isDark
-              ? `
-                bg-gray-900/55
-                border-gray-700
-              `
-              : `
-                bg-gray-50
-                border-gray-200
-              `
-          }
-        `}
-        aria-label={t(
-          'quickSlotsIllustrationLabel'
-        )}
-      >
-        {/* Loupe */}
-        <span
-          className={`${CHIP_BASE} ${CHIP_INACTIVE}`}
-          title={t(
-            'quickSlotLastPassageTooltip'
-          )}
-        >
-          <SearchIcon className="w-4 h-4" />
-        </span>
-
-        {/* Mémoire 1 illustrée comme active */}
-        <span
-          className={`${CHIP_BASE} ${CHIP_ACTIVE}`}
-          title={t(
-            'quickSlot1ActiveTooltip'
-          )}
-        >
-          1
-        </span>
-
-        <span
-          className={`${CHIP_BASE} ${CHIP_INACTIVE}`}
-          title={t(
-            'quickSlot2Tooltip'
-          )}
-        >
-          2
-        </span>
-
-        <span
-          className={`${CHIP_BASE} ${CHIP_INACTIVE}`}
-          title={t(
-            'quickSlot3Tooltip'
-          )}
-        >
-          3
-        </span>
+      <div className="grid grid-cols-4 gap-2" role="img" aria-label={t('quickSlotsIllustrationLabel')}>
+        {examples.map(example => {
+          const book = bibleBooks.find(item => item.name === example.book)!;
+          const name = getBookAbbreviation(book, state.settings.language);
+          const fullName = state.settings.language === 'fr' ? book.nameFr : book.nameEn;
+          return (
+            <span
+              key={example.number}
+              title={`${t(example.tooltip)} : ${fullName} ${example.chapter}`}
+              className={`min-w-0 min-h-[52px] px-1 py-1.5 flex flex-col items-center justify-center gap-1 rounded-lg border ${example.number === 1 ? 'bg-blue-600 border-blue-400 text-white' : 'bg-blue-950/50 border-blue-800 text-blue-100'}`}
+            >
+              {example.number === 0 ? <SearchIcon className="w-4 h-4" aria-hidden="true" /> : <span className="text-sm font-bold leading-none">{example.number}</span>}
+              <span className="text-[11px] leading-tight whitespace-nowrap">{name} {example.chapter}</span>
+            </span>
+          );
+        })}
       </div>
-
-      <p
-        className={`
-          ${
-            isDark
-              ? 'text-white/90'
-              : 'text-gray-700'
-          }
-          mt-4
-        `}
-        style={{
-          fontSize: `${TEXT_PX}px`,
-          lineHeight: 1.7,
-        }}
-      >
+      <p className="text-white/90 mt-4" style={{ fontSize: TEXT_PX, lineHeight: 1.7 }}>
         {t('quickSlotsIntro')}
       </p>
     </div>
