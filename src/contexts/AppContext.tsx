@@ -93,6 +93,12 @@ const HASH_PAGE_MAP: Record<string, Page> = {
 
 const getInitialPageFromHash = (): Page => {
   if (typeof window === 'undefined') return 'home';
+  // Un lien vers un verset doit ouvrir Lecture dès le premier rendu,
+  // même si le navigateur a conservé momentanément le fragment de l'accueil.
+  const params = new URLSearchParams(window.location.search);
+  const book = params.get('b') || params.get('book');
+  const chapter = Number(params.get('c') || params.get('chapter'));
+  if (book && Number.isInteger(chapter) && chapter > 0) return 'reading';
   const hash = window.location.hash;
   return HASH_PAGE_MAP[hash] || 'home';
 };
@@ -221,7 +227,10 @@ function ensureMeta(name: string, defaultContent = ''): HTMLMetaElement | null {
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(appReducer, initialState);
+  const [state, dispatch] = useReducer(appReducer, initialState, base => ({
+    ...base,
+    currentPage: getInitialPageFromHash(),
+  }));
 
   // Charger les paramètres depuis localStorage au démarrage
   useEffect(() => {
