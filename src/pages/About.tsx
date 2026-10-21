@@ -11,6 +11,8 @@ import {
   Mail,
   BookOpen,
   Languages,
+  Smartphone,
+  Settings as SettingsIcon,
 } from 'lucide-react';
 
 /** Tailles fixes du contenu */
@@ -113,6 +115,200 @@ const ANDROID_LABELS: Record<string, readonly [string, string, string]> = {
   ]
 };
 
+type WidgetHelpCopy = {
+  title: string;
+  description: string;
+  install: string;
+  customize: string;
+  timing: string;
+  verse: string;
+  refresh: string;
+  settings: string;
+};
+
+const WIDGET_HELP: Record<string, WidgetHelpCopy> = {
+  "fr": {
+    "title": "Widget Android",
+    "description": "Affichez un verset aléatoire sur l’écran d’accueil de votre téléphone, même hors connexion. Touchez le verset pour l’ouvrir directement dans Lecture.",
+    "install": "Pour l’ajouter, faites un appui long sur l’icône The Word, puis choisissez Widgets et ajoutez le widget. Selon votre téléphone, vous pouvez aussi faire un appui long sur un espace vide de l’écran d’accueil, puis choisir Widgets → The Word.",
+    "customize": "Dans les paramètres du widget, choisissez la langue, la taille du texte et le renouvellement : toutes les 15, 30 ou 60 minutes, ou uniquement manuellement. Le bouton « Nouveau verset » permet de changer de verset à tout moment.",
+    "timing": "Android peut retarder le renouvellement automatique pour économiser la batterie.",
+    "verse": "Au commencement, Dieu créa les cieux et la terre.",
+    "refresh": "Nouveau Verset",
+    "settings": "Paramètres"
+  },
+  "en": {
+    "title": "Android widget",
+    "description": "Display a random verse on your phone’s home screen, even offline. Tap the verse to open it directly in Reading.",
+    "install": "To add it, touch and hold the The Word app icon, choose Widgets and add the widget. Depending on your phone, you can also touch and hold an empty area of the home screen, then choose Widgets → The Word.",
+    "customize": "In the widget settings, choose the language, text size and refresh interval: every 15, 30 or 60 minutes, or manually only. Tap “New verse” to change the verse at any time.",
+    "timing": "Android may delay automatic refreshes to save battery.",
+    "verse": "In the beginning God created the heaven and the earth.",
+    "refresh": "New Verse",
+    "settings": "Settings"
+  },
+  "de": {
+    "title": "Android-Widget",
+    "description": "Zeigen Sie einen zufälligen Bibelvers auf dem Startbildschirm Ihres Smartphones an, auch offline. Tippen Sie auf den Vers, um ihn direkt in der Leseansicht zu öffnen.",
+    "install": "Halten Sie das App-Symbol von The Word gedrückt, wählen Sie Widgets und fügen Sie das Widget hinzu. Je nach Smartphone können Sie auch eine freie Stelle auf dem Startbildschirm gedrückt halten und dann Widgets → The Word wählen.",
+    "customize": "Wählen Sie in den Widget-Einstellungen Sprache, Schriftgröße und Aktualisierung: alle 15, 30 oder 60 Minuten oder nur manuell. Mit „Neuer Vers“ können Sie den Vers jederzeit wechseln.",
+    "timing": "Android kann automatische Aktualisierungen verzögern, um Akku zu sparen.",
+    "verse": "Am Anfang schuf Gott Himmel und Erde.",
+    "refresh": "Neuer Vers",
+    "settings": "Einstellungen"
+  },
+  "es": {
+    "title": "Widget de Android",
+    "description": "Muestra un versículo aleatorio en la pantalla de inicio del teléfono, incluso sin conexión. Toca el versículo para abrirlo directamente en Lectura.",
+    "install": "Para añadirlo, mantén pulsado el icono de The Word, selecciona Widgets y añade el widget. Según el teléfono, también puedes mantener pulsado un espacio vacío de la pantalla de inicio y elegir Widgets → The Word.",
+    "customize": "En los ajustes del widget, elige el idioma, el tamaño del texto y la actualización: cada 15, 30 o 60 minutos, o solo manualmente. Toca «Nuevo versículo» para cambiarlo en cualquier momento.",
+    "timing": "Android puede retrasar las actualizaciones automáticas para ahorrar batería.",
+    "verse": "EN el principio crió Dios los cielos y la tierra.",
+    "refresh": "Nuevo versículo",
+    "settings": "Ajustes"
+  },
+  "it": {
+    "title": "Widget Android",
+    "description": "Mostra un versetto casuale sulla schermata iniziale del telefono, anche offline. Tocca il versetto per aprirlo direttamente in Lettura.",
+    "install": "Per aggiungerlo, tieni premuta l’icona di The Word, scegli Widget e aggiungi il widget. A seconda del telefono, puoi anche tenere premuto uno spazio vuoto nella schermata iniziale, quindi scegliere Widget → The Word.",
+    "customize": "Nelle impostazioni del widget, scegli la lingua, la dimensione del testo e l’aggiornamento: ogni 15, 30 o 60 minuti, oppure solo manuale. Tocca «Nuovo versetto» per cambiarlo in qualsiasi momento.",
+    "timing": "Android può ritardare gli aggiornamenti automatici per risparmiare batteria.",
+    "verse": "Nel principio Iddio creò i cieli e la terra.",
+    "refresh": "Nuovo versetto",
+    "settings": "Impostazioni"
+  },
+  "pt": {
+    "title": "Widget Android",
+    "description": "Veja um versículo aleatório no ecrã inicial do telemóvel, mesmo sem ligação à Internet. Toque no versículo para o abrir diretamente na Leitura.",
+    "install": "Para o adicionar, mantenha premido o ícone do The Word, escolha Widgets e adicione o widget. Consoante o telemóvel, também pode manter premido um espaço vazio do ecrã inicial e escolher Widgets → The Word.",
+    "customize": "Nas definições do widget, escolha o idioma, o tamanho do texto e a atualização: a cada 15, 30 ou 60 minutos, ou apenas manualmente. Toque em «Novo versículo» para o mudar a qualquer momento.",
+    "timing": "O Android pode atrasar as atualizações automáticas para poupar bateria.",
+    "verse": "No início, Deus criou os céus e a terra.",
+    "refresh": "Novo verso",
+    "settings": "Configurações"
+  },
+  "ru": {
+    "title": "Виджет Android",
+    "description": "Разместите случайный стих на главном экране телефона, даже без интернета. Нажмите на стих, чтобы открыть его прямо на странице чтения.",
+    "install": "Чтобы добавить виджет, нажмите и удерживайте значок The Word, выберите «Виджеты» и добавьте его. На некоторых телефонах можно также удерживать свободное место на главном экране, затем выбрать «Виджеты» → The Word.",
+    "customize": "В настройках виджета выберите язык, размер текста и обновление: каждые 15, 30 или 60 минут либо только вручную. Кнопка «Новый стих» позволяет сменить стих в любое время.",
+    "timing": "Android может задерживать автоматическое обновление для экономии заряда.",
+    "verse": "В начале сотворил Бог небо и землю.",
+    "refresh": "Новый стих",
+    "settings": "Настройки"
+  },
+  "ar": {
+    "title": "أداة Android",
+    "description": "اعرض آية عشوائية على الشاشة الرئيسية لهاتفك، حتى دون اتصال بالإنترنت. اضغط على الآية لفتحها مباشرة في صفحة القراءة.",
+    "install": "لإضافتها، اضغط مطولاً على أيقونة The Word، ثم اختر الأدوات وأضف الأداة. بحسب هاتفك، يمكنك أيضاً الضغط مطولاً على مساحة فارغة من الشاشة الرئيسية، ثم اختيار الأدوات ← The Word.",
+    "customize": "في إعدادات الأداة، اختر اللغة وحجم النص والتحديث: كل 15 أو 30 أو 60 دقيقة، أو يدوياً فقط. يمكنك تغيير الآية في أي وقت بالضغط على «آية جديدة».",
+    "timing": "قد يؤخر Android التحديث التلقائي لتوفير طاقة البطارية.",
+    "verse": "فِي الْبَدْءِ خَلَقَ اللهُ السَّمَاوَاتِ وَالأَرْضَ،",
+    "refresh": "آية جديدة",
+    "settings": "الإعدادات"
+  },
+  "hi": {
+    "title": "Android विजेट",
+    "description": "फ़ोन की होम स्क्रीन पर एक यादृच्छिक बाइबिल पद देखें, इंटरनेट के बिना भी। पद को सीधे पठन पृष्ठ में खोलने के लिए उस पर टैप करें।",
+    "install": "जोड़ने के लिए The Word के आइकन को दबाकर रखें, फिर विजेट चुनें और विजेट जोड़ें। अपने फ़ोन के अनुसार, आप होम स्क्रीन की खाली जगह को दबाकर भी विजेट → The Word चुन सकते हैं।",
+    "customize": "विजेट की सेटिंग में भाषा, अक्षरों का आकार और पद बदलने का अंतराल चुनें: हर 15, 30 या 60 मिनट, या केवल हाथ से। कभी भी पद बदलने के लिए «नया पद» पर टैप करें।",
+    "timing": "बैटरी बचाने के लिए Android अपने आप पद बदलने में देरी कर सकता है।",
+    "verse": "आदि में परमेश्वर ने आकाश और पृथ्वी की सृष्टि की। (इब्रा. 1:10, इब्रा. 11:3)",
+    "refresh": "नया पद",
+    "settings": "सेटिंग्स"
+  },
+  "id": {
+    "title": "Widget Android",
+    "description": "Tampilkan ayat acak di layar utama ponsel, bahkan saat offline. Ketuk ayat untuk membukanya langsung di halaman Baca.",
+    "install": "Untuk menambahkannya, sentuh lama ikon The Word, pilih Widget, lalu tambahkan widget. Bergantung pada ponsel, Anda juga dapat menyentuh lama area kosong di layar utama, lalu memilih Widget → The Word.",
+    "customize": "Di pengaturan widget, pilih bahasa, ukuran teks dan pembaruan: setiap 15, 30 atau 60 menit, atau hanya secara manual. Ketuk “Ayat baru” untuk mengganti ayat kapan saja.",
+    "timing": "Android dapat menunda pembaruan otomatis untuk menghemat baterai.",
+    "verse": "Pada permulaan segala sesuatu, Allah menciptakan tingkat-tingkat surga dan langit serta bumi.",
+    "refresh": "Ayat baru",
+    "settings": "Pengaturan"
+  },
+  "ja": {
+    "title": "Androidウィジェット",
+    "description": "スマートフォンのホーム画面にランダムな聖句を表示できます。オフラインでも利用でき、聖句をタップすると該当箇所の読書ページが直接開きます。",
+    "install": "追加するには、The Wordのアイコンを長押しし、「ウィジェット」を選んで追加します。機種によっては、ホーム画面の空いている場所を長押しして「ウィジェット」→「The Word」から追加できます。",
+    "customize": "ウィジェットの設定で、言語、文字サイズ、更新間隔（15分・30分・60分ごと、または手動のみ）を選べます。「新しい聖句」をタップすると、いつでも聖句を切り替えられます。",
+    "timing": "バッテリーを節約するため、Androidが自動更新を遅らせることがあります。",
+    "verse": "はじめに神は天と地とを創造された。",
+    "refresh": "新しい聖句",
+    "settings": "設定"
+  },
+  "ko": {
+    "title": "Android 위젯",
+    "description": "인터넷 연결 없이도 휴대전화 홈 화면에 무작위 성경 구절을 표시합니다. 구절을 누르면 읽기 화면의 해당 구절로 바로 이동합니다.",
+    "install": "The Word 아이콘을 길게 누르고 위젯을 선택하여 추가하세요. 기종에 따라 홈 화면의 빈 공간을 길게 누른 다음 위젯 → The Word를 선택할 수도 있습니다.",
+    "customize": "위젯 설정에서 언어, 글자 크기, 갱신 간격을 선택하세요. 15분, 30분, 60분마다 자동으로 바꾸거나 수동으로만 바꿀 수 있습니다. «새 구절»을 누르면 언제든 구절을 바꿀 수 있습니다.",
+    "timing": "배터리 절약을 위해 Android가 자동 갱신을 지연할 수 있습니다.",
+    "verse": "태초에 하나님이 천지를 창조하시니라",
+    "refresh": "새 구절",
+    "settings": "설정"
+  },
+  "sw": {
+    "title": "Wijeti ya Android",
+    "description": "Onyesha aya ya nasibu kwenye skrini ya mwanzo ya simu yako, hata bila intaneti. Gusa aya ili kuifungua moja kwa moja kwenye ukurasa wa Kusoma.",
+    "install": "Ili kuiongeza, bonyeza na ushikilie ikoni ya The Word, chagua Wijeti, kisha uiongeze. Kulingana na simu yako, unaweza pia kubonyeza na kushikilia sehemu tupu ya skrini ya mwanzo, kisha uchague Wijeti → The Word.",
+    "customize": "Katika mipangilio ya wijeti, chagua lugha, ukubwa wa maandishi na muda wa kubadilisha aya: kila dakika 15, 30 au 60, au wewe mwenyewe pekee. Gusa «Aya mpya» ili kubadilisha aya wakati wowote.",
+    "timing": "Android inaweza kuchelewesha mabadiliko ya kiotomatiki ili kuokoa betri.",
+    "verse": "Hapo mwanzo Mungu aliumba mbingu na dunia.",
+    "refresh": "Aya mpya",
+    "settings": "Mipangilio"
+  },
+  "tr": {
+    "title": "Android widget’ı",
+    "description": "Telefonunuzun ana ekranında çevrimdışıyken bile rastgele bir ayet görüntüleyin. Ayete dokunarak doğrudan Okuma sayfasında açın.",
+    "install": "Eklemek için The Word simgesine basılı tutun, Widget’lar seçeneğini seçip widget’ı ekleyin. Telefonunuza bağlı olarak ana ekranda boş bir alana basılı tutup Widget’lar → The Word yolunu da izleyebilirsiniz.",
+    "customize": "Widget ayarlarında dili, yazı boyutunu ve yenilemeyi seçin: 15, 30 veya 60 dakikada bir ya da yalnızca elle. İstediğiniz zaman ayeti değiştirmek için «Yeni ayet»e dokunun.",
+    "timing": "Android, pil tasarrufu için otomatik yenilemeyi geciktirebilir.",
+    "verse": "Başlangıçta Tanrı gökleri ve yeri yarattı.",
+    "refresh": "Yeni ayet",
+    "settings": "Ayarlar"
+  },
+  "yo": {
+    "title": "Wíjẹ́ẹ̀tì Android",
+    "description": "Fi ẹsẹ Bíbélì àrìnàkò hàn lórí ojú ìbẹ̀rẹ̀ fóònù rẹ, àní láìsí ìkànnì ayélujára. Fọwọ́ kan ẹsẹ náà láti ṣí i tààrà nínú Kíkà.",
+    "install": "Láti fi kún un, tẹ àmì The Word mọ́lẹ̀ fún ìgbà díẹ̀, yan Widgets, kí o sì fi wíjẹ́ẹ̀tì náà kún un. Ó tún lè ṣeé ṣe lórí fóònù rẹ láti tẹ àyè òfo lórí ojú ìbẹ̀rẹ̀ mọ́lẹ̀, kí o sì yan Widgets → The Word.",
+    "customize": "Nínú ètò wíjẹ́ẹ̀tì, yan èdè, ìwọ̀n lẹ́tà àti bí ẹsẹ yóò ṣe máa yí padà: ní gbogbo ìṣẹ́jú 15, 30 tàbí 60, tàbí nígbà tí o bá fẹ́ nìkan. Fọwọ́ kan «Ẹsẹ tuntun» láti yí ẹsẹ padà nígbàkigbà.",
+    "timing": "Android lè fa àkókò ìyípadà aládàáṣiṣẹ́ sẹ́yìn láti fi agbára bátírì pamọ́.",
+    "verse": "Ní ìbẹ̀rẹ̀ ohun gbogbo Ọlọ́run dá àwọn ọ̀run àti ayé.",
+    "refresh": "Ẹsẹ tuntun",
+    "settings": "Ètò"
+  },
+  "zh": {
+    "title": "Android 小组件",
+    "description": "在手机主屏幕上显示随机经文，离线也能使用。点击经文即可直接打开对应的阅读页面。",
+    "install": "长按 The Word 应用图标，选择“小组件”并添加。根据手机型号，也可以长按主屏幕的空白区域，然后选择“小组件”→“The Word”。",
+    "customize": "在小组件设置中选择语言、字号和更新方式：每15、30或60分钟自动更新，或仅手动更新。点击“新经文”可随时切换经文。",
+    "timing": "为了节省电量，Android 可能会延迟自动更新。",
+    "verse": "太初，上帝创造了天地。",
+    "refresh": "新的经文",
+    "settings": "设置"
+  },
+  "he": {
+    "title": "וידג׳ט ל-Android",
+    "description": "הציגו פסוק אקראי במסך הבית של הטלפון, גם ללא חיבור לאינטרנט. הקישו על הפסוק כדי לפתוח אותו ישירות במסך הקריאה.",
+    "install": "כדי להוסיף אותו, לחצו לחיצה ארוכה על סמל The Word, בחרו בווידג׳טים והוסיפו את הווידג׳ט. בהתאם לטלפון, אפשר גם ללחוץ לחיצה ארוכה על אזור ריק במסך הבית, ואז לבחור בווידג׳טים וב-The Word.",
+    "customize": "בהגדרות הווידג׳ט בחרו שפה, גודל טקסט ורענון: בכל 15, 30 או 60 דקות, או באופן ידני בלבד. הקישו על «פסוק חדש» כדי להחליף פסוק בכל עת.",
+    "timing": "Android עשוי לעכב את הרענון האוטומטי כדי לחסוך בסוללה.",
+    "verse": "בְּרֵאשִׁ֖ית בָּרָ֣א אֱלֹהִ֑ים אֵ֥ת הַשָּׁמַ֖יִם וְאֵ֥ת הָאָֽרֶץ׃",
+    "refresh": "פסוק חדש",
+    "settings": "הגדרות"
+  },
+  "el": {
+    "title": "Γραφικό στοιχείο Android",
+    "description": "Εμφανίστε ένα τυχαίο εδάφιο στην αρχική οθόνη του τηλεφώνου σας, ακόμη και χωρίς σύνδεση. Πατήστε το εδάφιο για να το ανοίξετε απευθείας στην Ανάγνωση.",
+    "install": "Για να το προσθέσετε, πατήστε παρατεταμένα το εικονίδιο The Word, επιλέξτε Γραφικά στοιχεία και προσθέστε το. Ανάλογα με το τηλέφωνο, μπορείτε επίσης να πατήσετε παρατεταμένα σε κενό χώρο της αρχικής οθόνης και να επιλέξετε Γραφικά στοιχεία → The Word.",
+    "customize": "Στις ρυθμίσεις του στοιχείου επιλέξτε γλώσσα, μέγεθος κειμένου και ανανέωση: κάθε 15, 30 ή 60 λεπτά ή μόνο χειροκίνητα. Πατήστε «Νέο εδάφιο» για να αλλάξετε εδάφιο οποιαδήποτε στιγμή.",
+    "timing": "Το Android μπορεί να καθυστερήσει την αυτόματη ανανέωση για εξοικονόμηση μπαταρίας.",
+    "verse": "ἘΝ ἀρχῇ ἐποίησεν ὁ Θεὸς τὸν οὐρανὸν καὶ τὴν γῆν.",
+    "refresh": "Νέο εδάφιο",
+    "settings": "Ρυθμίσεις"
+  }
+};
+
 /* Aide visuelle : mêmes onglets rectangulaires et références que Lecture. */
 const QuickSlotsHelpInline: React.FC = () => {
   const { state } = useApp();
@@ -158,6 +354,9 @@ export default function About() {
   const { state } = useApp();
   const { t } = useTranslation();
   const androidLabels = ANDROID_LABELS[state.settings.language] ?? ANDROID_LABELS.en;
+  const widgetHelp = WIDGET_HELP[state.settings.language] ?? WIDGET_HELP.en;
+  const widgetRtl = state.settings.language === 'ar' || state.settings.language === 'he';
+  const widgetReference = getBookAbbreviation(bibleBooks.find(book => book.name === 'Genesis')!, state.settings.language) + ' 1:1';
 
   const isDark =
     state.settings.theme === 'dark';
@@ -336,6 +535,42 @@ export default function About() {
               <QuickSlotsHelpInline />
             </section>
 
+            <section className={CARD_CLASS} aria-labelledby="android-widget-title" data-android-widget dir={widgetRtl ? 'rtl' : 'ltr'}>
+              <h2 id="android-widget-title" className={HEADING_CLASS} style={{ fontSize: H2_PX }}>
+                <span className={ICON_BOX_CLASS}><Smartphone size={21} aria-hidden="true" /></span>
+                {widgetHelp.title}
+              </h2>
+              <p className={BODY_TEXT_CLASS} style={{ fontSize: TEXT_PX, lineHeight: 1.7 }}>{widgetHelp.description}</p>
+
+              {/* Illustration only: these controls are not interactive in the help page. */}
+              <div className="mx-auto my-6 w-full max-w-sm overflow-hidden rounded-2xl border border-blue-300/20 p-4 shadow-lg" style={{ background: 'linear-gradient(135deg, #15243b, #0f172a)', color: '#f4f7fd' }}>
+                <div className="flex items-center justify-between gap-3" dir="ltr">
+                  <div className="shrink-0">
+                    <div style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 23, lineHeight: 1.15, letterSpacing: '-0.8px' }}>
+                      The <span style={{ color: '#a9c9ff', fontStyle: 'italic' }}>Word</span>
+                    </div>
+                    <div className="mx-auto mt-1.5 h-0.5 w-7 rounded-full" style={{ background: '#568ce0' }} />
+                  </div>
+                  <span className="flex min-w-0 items-center gap-1.5 text-xs" style={{ color: '#a9c9ff' }} dir={widgetRtl ? 'rtl' : 'ltr'}>
+                    <Shuffle size={18} className="shrink-0" aria-hidden="true" />
+                    <span>{widgetHelp.refresh}</span>
+                  </span>
+                </div>
+                <p className="my-0 flex min-h-[112px] items-center py-5" style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 19, lineHeight: 1.5 }}>
+                  {widgetHelp.verse}
+                </p>
+                <div className="flex items-center justify-between gap-3 text-xs">
+                  <span style={{ color: '#9dbff3' }}><bdi>{widgetReference}</bdi></span>
+                  <span className="flex items-center gap-1.5" style={{ color: '#c7d8f1' }}><SettingsIcon size={14} aria-hidden="true" />{widgetHelp.settings}</span>
+                </div>
+              </div>
+
+              <p className={BODY_TEXT_CLASS} style={{ fontSize: TEXT_PX, lineHeight: 1.7 }}>{widgetHelp.install}</p>
+              <p className={BODY_TEXT_CLASS + ' mt-4'} style={{ fontSize: TEXT_PX, lineHeight: 1.7 }}>{widgetHelp.customize}</p>
+              <p className="mt-3 text-sm leading-relaxed opacity-75">{widgetHelp.timing}</p>
+            </section>
+
+
             {/* ==================================================
                 VERSIONS BIBLIQUES
             ================================================== */}
@@ -489,3 +724,4 @@ export default function About() {
     </div>
   );
 }
+
