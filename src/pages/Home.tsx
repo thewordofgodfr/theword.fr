@@ -1,11 +1,12 @@
 // src/pages/home.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { getRandomVerse, warmBibleCache } from '../services/bibleService';
 import { BibleVerse } from '../types/bible';
 import { RefreshCw, BookOpen, Search, List, BookMarked, Settings, Info, Download, ArrowUpRight } from 'lucide-react';
 import { saveSlot as saveQuickSlot } from '../services/readingSlots';
+import { attachHomeReadingSwipe } from '../utils/homeReadingSwipe';
 import BackupReminder from '../components/BackupReminder';
 
 const STORAGE_KEY = 'home_random_verse';
@@ -14,6 +15,13 @@ const STORAGE_LANG_KEY = 'home_random_verse_lang';
 export default function Home() {
   const { state, dispatch, navigateToVerse } = useApp();
   const { t } = useTranslation();
+  const homeRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!homeRef.current) return;
+    return attachHomeReadingSwipe(homeRef.current, () => {
+      dispatch({ type: 'SET_PAGE', payload: 'reading' });
+    });
+  }, [dispatch]);
   const [verse, setVerse] = useState<BibleVerse | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -102,7 +110,7 @@ export default function Home() {
 
 
   return (
-    <div className={`home-screen ${isDark ? 'bg-gray-900 text-white' : 'bg-blue-50 text-gray-900'}`}>
+    <div ref={homeRef} className={`home-screen ${isDark ? 'bg-gray-900 text-white' : 'bg-blue-50 text-gray-900'}`}>
       <div className="home-layout">
         <header className="home-brand">
           <h1>The <span>Word</span></h1>
