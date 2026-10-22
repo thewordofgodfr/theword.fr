@@ -242,13 +242,15 @@ const id: TranslationDict = {
     "Pratinjau ukuran huruf yang dipilih.",
   updates: "Pembaruan",
   updatesDescription:
-    "Periksa apakah ada versi baru dan terapkan.",
+    "Peningkatan diunduh otomatis saat aplikasi dimulai dengan koneksi Internet. Anda juga dapat memeriksa di sini. Pembaruan Android dilakukan secara terpisah di Play Store.",
   applyUpdate: "Terapkan pembaruan",
   checkUpdatesButton:
     "Periksa pembaruan",
+  updatesDownloading: "Mengunduh dan menyiapkan pembaruan…",
+  updatesOffline: "Offline: tidak dapat memeriksa. Versi yang telah diunduh tetap tersedia.",
   updatesChecking: "Sedang memeriksa…",
   updatesUpToDate:
-    "Aplikasi Anda sudah versi terbaru.",
+    "Tidak ada pembaruan web baru yang tersedia.",
   updatesReady:
     "Versi baru siap. Ketuk “Terapkan pembaruan”.",
   updatesUnavailable:

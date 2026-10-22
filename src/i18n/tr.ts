@@ -215,11 +215,13 @@ const tr: TranslationDict = {
   fontSizePreview: "Seçilen yazı tipi boyutunun önizlemesi.",
   updates: "Güncellemeler",
   updatesDescription:
-    "Yeni bir sürüm olup olmadığını kontrol edin ve uygulayın.",
+    "İyileştirmeler İnternet bağlantısıyla açılışta otomatik indirilir. Buradan da kontrol edebilirsiniz. Android güncellemeleri Play Store üzerinden ayrı olarak yapılır.",
   applyUpdate: "Güncellemeyi uygula",
   checkUpdatesButton: "Güncellemeleri denetle",
+  updatesDownloading: "Güncelleme indiriliyor ve hazırlanıyor…",
+  updatesOffline: "Çevrimdışı: kontrol edilemiyor. İndirilen sürüm kullanılabilir durumda.",
   updatesChecking: "Denetleniyor…",
-  updatesUpToDate: "Uygulamanız güncel.",
+  updatesUpToDate: "Yeni bir web güncellemesi yok.",
   updatesReady:
     "Yeni sürüm hazır. \"Güncellemeyi uygula\"ya tıklayın.",
   updatesUnavailable:

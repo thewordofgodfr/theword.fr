@@ -246,12 +246,14 @@ const yo: TranslationDict = {
     "Àpẹrẹ ìwọ̀n fọ́ńtì tí o yàn.",
   updates: "Ìmúdójúìwò",
   updatesDescription:
-    "Ṣàyẹ̀wò bóyá àtúnṣe tuntun wà, kí o sì lò ó.",
+    "Àwọn àtúnṣe máa ń gba sílẹ̀ fúnra wọn nígbà tí ohun èlò bá bẹ̀rẹ̀ pẹ̀lú Íńtánẹ́ẹ̀tì. O tún lè ṣàyẹ̀wò níbí. Àwọn ìmúdójúìwọ̀n Android wà lọ́tọ̀ ní Play Store.",
   applyUpdate: "Lo àtúnṣe",
   checkUpdatesButton: "Ṣàyẹ̀wò àtúnṣe",
+  updatesDownloading: "Ń gba ìmúdójúìwọ̀n sílẹ̀, ó sì ń pèsè rẹ̀…",
+  updatesOffline: "Kò sí ìsopọ̀: a kò lè ṣàyẹ̀wò. Ẹ̀yà tí a ti gbà sílẹ̀ ṣì wà fún lílò.",
   updatesChecking: "Ṣàyẹ̀wò…",
   updatesUpToDate:
-    "App rẹ wà lórí àtúnṣe tuntun jù lọ.",
+    "Kò sí ìmúdójúìwọ̀n tuntun fún ẹ̀yà wẹ́ẹ̀bù.",
   updatesReady:
     "Àtúnṣe tuntun ti ṣetán. Tẹ «Lo àtúnṣe».",
   updatesUnavailable:

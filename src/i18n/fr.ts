@@ -201,11 +201,13 @@ const fr: TranslationDict = {
   fontSizePreview: 'Aperçu de la taille de police sélectionnée.',
   updates: 'Mises à jour',
   updatesDescription:
-    "Vérifie s'il existe une nouvelle version de l'application et applique-la.",
+    "Les améliorations se téléchargent automatiquement au démarrage avec Internet. Vous pouvez aussi lancer une vérification ici. Les mises à jour Android se font séparément dans le Play Store.",
   applyUpdate: 'Appliquer la mise à jour',
   checkUpdatesButton: 'Vérifier les mises à jour',
+  updatesDownloading: "Téléchargement et préparation de la mise à jour…",
+  updatesOffline: "Sans connexion : vérification impossible. La version déjà téléchargée reste disponible.",
   updatesChecking: 'Vérification en cours…',
-  updatesUpToDate: "Votre application est à jour.",
+  updatesUpToDate: "Aucune nouvelle mise à jour web disponible.",
   updatesReady:
     'Nouvelle version prête. Cliquez sur « Appliquer la mise à jour ».',
   updatesUnavailable:

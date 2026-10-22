@@ -209,12 +209,14 @@ const de: TranslationDict = {
     "Vorschau der gewählten Schriftgröße.",
   updates: "Updates",
   updatesDescription:
-    "Prüfen, ob eine neue Version verfügbar ist, und sie anwenden.",
+    "Verbesserungen werden beim Start mit Internetverbindung automatisch heruntergeladen. Hier können Sie auch manuell prüfen. Android-Updates erfolgen separat im Play Store.",
   applyUpdate: "Update anwenden",
   checkUpdatesButton: "Nach Updates suchen",
+  updatesDownloading: "Update wird heruntergeladen und vorbereitet…",
+  updatesOffline: "Offline: Prüfung nicht möglich. Die heruntergeladene Version bleibt verfügbar.",
   updatesChecking: "Es wird geprüft…",
   updatesUpToDate:
-    "Deine App ist auf dem neuesten Stand.",
+    "Kein neues Web-Update verfügbar.",
   updatesReady:
     "Neue Version bereit. Klicke auf „Update anwenden“.",
   updatesUnavailable:

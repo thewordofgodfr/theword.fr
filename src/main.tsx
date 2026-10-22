@@ -66,6 +66,17 @@ async function sendCoreLangToSW() {
 
 // --- PWA: Service Worker (MAJ immédiate, un seul SW: /sw-v7.js) ---
 if ('serviceWorker' in navigator) {
+  // Attach before registration: activation can happen before ready resolves.
+  let reloading = false;
+  let hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    void sendCoreLangToSW();
+    if (hadController && !reloading) {
+      reloading = true;
+      window.location.reload();
+    }
+    hadController = true;
+  });
   window.addEventListener('load', async () => {
     try {
       // 1) Désenregistrer tout ancien SW qui n'est pas /sw-v7.js
@@ -87,7 +98,7 @@ if ('serviceWorker' in navigator) {
       const reg = await navigator.serviceWorker.register('/sw-v7.js', { scope: '/' });
 
       // Vérifier immédiatement les mises à jour
-      reg.update();
+      if (navigator.onLine) void reg.update().catch(() => { /* Keep the offline version. */ });
 
       // Promouvoir un SW en attente
       if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
@@ -104,11 +115,6 @@ if ('serviceWorker' in navigator) {
       // Envoyer la langue au SW dès que possible
       await sendCoreLangToSW();
 
-      // Rechargement automatique après prise de contrôle
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        sendCoreLangToSW();
-        window.location.reload();
-      });
     } catch (err) {
       console.error('[SW] registration error:', err);
     }

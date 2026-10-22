@@ -207,11 +207,13 @@ const ko: TranslationDict = {
   fontSizePreview: "선택한 글자 크기의 미리 보기입니다.",
   updates: "업데이트",
   updatesDescription:
-    "새 버전이 있는지 확인하고 적용합니다.",
+    "인터넷에 연결된 상태로 앱을 시작하면 개선 사항이 자동으로 다운로드됩니다. 여기에서도 확인할 수 있습니다. Android 업데이트는 Play 스토어에서 별도로 진행됩니다.",
   applyUpdate: "업데이트 적용",
   checkUpdatesButton: "업데이트 확인",
+  updatesDownloading: "업데이트 다운로드 및 준비 중…",
+  updatesOffline: "오프라인: 확인할 수 없습니다. 다운로드된 버전은 계속 사용할 수 있습니다.",
   updatesChecking: "확인 중…",
-  updatesUpToDate: "앱이 최신 버전입니다.",
+  updatesUpToDate: "새로운 웹 업데이트가 없습니다.",
   updatesReady:
     "새 버전이 준비되었습니다. \"업데이트 적용\"을 눌러 주세요.",
   updatesUnavailable:

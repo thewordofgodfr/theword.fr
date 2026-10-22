@@ -226,11 +226,13 @@ const it: TranslationDict = {
     "Anteprima della dimensione del testo selezionata.",
   updates: "Aggiornamenti",
   updatesDescription:
-    "Controlla se è disponibile una nuova versione e applicala.",
+    "I miglioramenti si scaricano automaticamente all’avvio con Internet. Puoi anche verificare qui. Gli aggiornamenti Android si effettuano separatamente nel Play Store.",
   applyUpdate: "Applica aggiornamento",
   checkUpdatesButton: "Controlla aggiornamenti",
+  updatesDownloading: "Download e preparazione dell’aggiornamento…",
+  updatesOffline: "Senza connessione: verifica impossibile. La versione scaricata rimane disponibile.",
   updatesChecking: "Verifica in corso…",
-  updatesUpToDate: "L'app è aggiornata.",
+  updatesUpToDate: "Nessun nuovo aggiornamento web disponibile.",
   updatesReady:
     "Nuova versione pronta. Clicca su «Applica aggiornamento».",
   updatesUnavailable:

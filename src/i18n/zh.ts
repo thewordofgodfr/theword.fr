@@ -235,12 +235,14 @@ const zh: TranslationDict = {
     "所选字体大小的预览。",
   updates: "更新",
   updatesDescription:
-    "检查是否有新版本并应用。",
+    "联网启动时会自动下载改进内容，也可在此手动检查。Android 更新需另外通过 Play 商店进行。",
   applyUpdate: "应用更新",
   checkUpdatesButton: "检查更新",
+  updatesDownloading: "正在下载并准备更新…",
+  updatesOffline: "当前离线，无法检查更新。已下载的版本仍可使用。",
   updatesChecking: "正在检查…",
   updatesUpToDate:
-    "你的应用已是最新版本。",
+    "没有可用的新网页版本更新。",
   updatesReady:
     "新版本已准备好。请点击“应用更新”。",
   updatesUnavailable:

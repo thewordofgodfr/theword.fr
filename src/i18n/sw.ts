@@ -250,13 +250,15 @@ const sw: TranslationDict = {
     "Muonekano wa ukubwa wa herufi uliyochagua.",
   updates: "Sasisho",
   updatesDescription:
-    "Kagua kama kuna toleo jipya na ulitumie.",
+    "Maboresho hupakuliwa kiotomatiki programu inapoanza ikiwa kuna Intaneti. Unaweza pia kuangalia hapa. Masasisho ya Android hufanywa kando katika Play Store.",
   applyUpdate: "Tumia sasisho",
   checkUpdatesButton:
     "Kagua sasisho",
+  updatesDownloading: "Inapakua na kuandaa sasisho…",
+  updatesOffline: "Hakuna muunganisho: haiwezekani kuangalia. Toleo lililopakuliwa bado linapatikana.",
   updatesChecking: "Inakagua…",
   updatesUpToDate:
-    "Programu yako iko katika toleo la hivi karibuni.",
+    "Hakuna sasisho jipya la wavuti linalopatikana.",
   updatesReady:
     "Toleo jipya liko tayari. Gonga “Tumia sasisho”.",
   updatesUnavailable:

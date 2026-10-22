@@ -229,11 +229,13 @@ const ja: TranslationDict = {
     "選択した文字サイズのプレビュー。",
   updates: "アップデート",
   updatesDescription:
-    "新しいバージョンがあるか確認して適用します。",
+    "インターネット接続時の起動時に改善内容が自動でダウンロードされます。ここからも確認できます。Android の更新は Play ストアで別途行われます。",
   applyUpdate: "アップデートを適用",
   checkUpdatesButton: "アップデートを確認",
+  updatesDownloading: "更新をダウンロードして準備しています…",
+  updatesOffline: "オフラインのため確認できません。ダウンロード済みのバージョンは引き続き利用できます。",
   updatesChecking: "確認中…",
-  updatesUpToDate: "アプリは最新です。",
+  updatesUpToDate: "新しいウェブ版の更新はありません。",
   updatesReady:
     "新しいバージョンの準備ができました。「アップデートを適用」をタップしてください。",
   updatesUnavailable:

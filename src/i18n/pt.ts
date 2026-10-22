@@ -230,13 +230,15 @@ const pt: TranslationDict = {
     "Pré-visualização do tamanho de fonte selecionado.",
   updates: "Atualizações",
   updatesDescription:
-    "Verifique se há uma nova versão disponível e aplique-a.",
+    "As melhorias são transferidas automaticamente ao iniciar com Internet. Também pode verificar aqui. As atualizações Android são feitas separadamente na Play Store.",
   applyUpdate: "Aplicar atualização",
   checkUpdatesButton:
     "Verificar atualizações",
+  updatesDownloading: "A transferir e preparar a atualização…",
+  updatesOffline: "Sem ligação: não é possível verificar. A versão transferida continua disponível.",
   updatesChecking: "Verificando…",
   updatesUpToDate:
-    "Seu aplicativo está atualizado.",
+    "Nenhuma nova atualização web disponível.",
   updatesReady:
     "Nova versão pronta. Clique em «Aplicar atualização».",
   updatesUnavailable:

@@ -209,11 +209,13 @@ const he: TranslationDict = {
   fontSizePreview: 'תצוגה מקדימה של גודל הגופן שנבחר.',
   updates: 'עדכונים',
   updatesDescription:
-    'בדוק אם קיימת גרסה חדשה של האפליקציה ויישם אותה.',
+    "השיפורים יורדים אוטומטית בהפעלת האפליקציה עם חיבור לאינטרנט. אפשר לבדוק גם כאן. עדכוני Android מתבצעים בנפרד בחנות Play.",
   applyUpdate: 'החל את העדכון',
   checkUpdatesButton: 'בדוק עדכונים',
+  updatesDownloading: "מוריד ומכין את העדכון…",
+  updatesOffline: "אין חיבור: לא ניתן לבדוק. הגרסה שהורדה נשארת זמינה.",
   updatesChecking: 'בודק…',
-  updatesUpToDate: 'האפליקציה שלך מעודכנת.',
+  updatesUpToDate: "אין עדכון חדש לגרסת האינטרנט.",
   updatesReady:
     'גרסה חדשה מוכנה. לחץ על «החל את העדכון».',
   updatesUnavailable:

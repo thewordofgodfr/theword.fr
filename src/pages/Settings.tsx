@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { Check, Download, Globe, Palette, RefreshCcw, Search, Upload, X } from 'lucide-react';
+import { checkForAppUpdate, type UpdateStatus } from '../services/appUpdates';
 import type { Language } from '../types/bible';
 import {
   createBackup,
@@ -517,17 +518,11 @@ export default function Settings() {
   // Recherche dans la liste des langues
   const [languageSearch, setLanguageSearch] = useState('');
 
-  const [updateStatus, setUpdateStatus] = useState<
-    'idle' | 'checking' | 'ready' | 'upToDate' | 'unavailable' | 'error'
-  >('idle');
+  const [updateStatus, setUpdateStatus] = useState<UpdateStatus>('idle');
   const [waitingSW, setWaitingSW] = useState<ServiceWorker | null>(null);
-  useEffect(() => {
-    if (!('serviceWorker' in navigator)) return;
-    const onControllerChange = () => window.location.reload();
-    navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
-    return () =>
-      navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
-  }, []);
+  const updateCheck = useRef<AbortController | null>(null);
+  const updateBusy = updateStatus === 'checking' || updateStatus === 'downloading';
+  useEffect(() => () => { updateCheck.current?.abort(); }, []);
 
   const backupInputRef = useRef<HTMLInputElement>(null);
   const [backupStatus, setBackupStatus] = useState<'idle' | 'working' | 'success' | 'error'>('idle');
@@ -576,38 +571,52 @@ export default function Settings() {
   };
 
   const handleCheckUpdates = async () => {
+    if (updateCheck.current) return;
+    setWaitingSW(null);
+    if (!navigator.onLine) {
+      setUpdateStatus('offline');
+      return;
+    }
     if (!('serviceWorker' in navigator)) {
       setUpdateStatus('unavailable');
       return;
     }
+    const controller = new AbortController();
+    updateCheck.current = controller;
+    setUpdateStatus('checking');
+    const onOffline = () => {
+      controller.abort();
+      setUpdateStatus('offline');
+    };
+    window.addEventListener('offline', onOffline);
     try {
-      setUpdateStatus('checking');
       const reg = await navigator.serviceWorker.getRegistration();
+      if (controller.signal.aborted) return;
       if (!reg) {
         setUpdateStatus('unavailable');
         return;
       }
-      const previousWaiting = reg.waiting || null;
-      await reg.update();
-      setTimeout(() => {
-        if (reg.waiting && reg.waiting !== previousWaiting) {
-          setWaitingSW(reg.waiting);
-          setUpdateStatus('ready');
-        } else {
-          setUpdateStatus('upToDate');
-        }
-      }, 800);
+      const result = await checkForAppUpdate(reg, setUpdateStatus, controller.signal);
+      if (controller.signal.aborted) return;
+      setWaitingSW(result.worker || null);
+      setUpdateStatus(navigator.onLine ? result.status : 'offline');
     } catch {
-      setUpdateStatus('error');
+      if (!controller.signal.aborted) setUpdateStatus(navigator.onLine ? 'error' : 'offline');
+    } finally {
+      window.removeEventListener('offline', onOffline);
+      updateCheck.current = null;
     }
   };
 
   const applyUpdate = () => {
-    if (waitingSW) {
+    if (waitingSW?.state === 'installed') {
+      setUpdateStatus('downloading');
       waitingSW.postMessage({ type: 'SKIP_WAITING' });
-      setTimeout(() => window.location.reload(), 1200);
-    } else {
+      // main.tsx reloads only when the new worker actually takes control.
+    } else if (waitingSW?.state === 'activated') {
       window.location.reload();
+    } else {
+      setUpdateStatus('error');
     }
   };
 
@@ -991,9 +1000,9 @@ export default function Settings() {
                 ) : (
                   <button
                     onClick={handleCheckUpdates}
-                    disabled={updateStatus === 'checking'}
+                    disabled={updateBusy}
                     className={`px-4 py-2 rounded-lg border-2 font-medium transition-all duration-200 ${
-                      updateStatus === 'checking'
+                      updateBusy
                         ? 'opacity-70 cursor-wait border-gray-500 text-gray-300'
                         : 'border-gray-600 bg-gray-700 text-white hover:border-gray-500'
                     }`}
@@ -1005,10 +1014,12 @@ export default function Settings() {
             </div>
 
             {/* Statut */}
-            <div className="mt-4 text-sm">
+            <div className="mt-4 text-sm" role="status" aria-live="polite">
               {updateStatus === 'checking' && (
                 <p className="text-white/80">{t('updatesChecking')}</p>
               )}
+              {updateStatus === 'downloading' && <p className="text-white/80">{t('updatesDownloading')}</p>}
+              {updateStatus === 'offline' && <p className="text-white/80">{t('updatesOffline')}</p>}
               {updateStatus === 'upToDate' && (
                 <p className="text-green-500">{t('updatesUpToDate')}</p>
               )}
