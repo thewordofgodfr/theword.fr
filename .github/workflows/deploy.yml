@@ -26,8 +26,8 @@ jobs:
           cache: 'npm'
 
       - run: npm ci
-      - name: Verify backup and search history
-        run: node --test tests/backup.test.mjs tests/backupReminder.test.mjs tests/widgetNavigation.test.mjs
+      - name: Verify backups, navigation and offline resilience
+        run: node --test tests/backup.test.mjs tests/backupReminder.test.mjs tests/widgetNavigation.test.mjs tests/offline.test.mjs
       - run: npm run build
 
       # Juste pour vérif visuelle dans les logs

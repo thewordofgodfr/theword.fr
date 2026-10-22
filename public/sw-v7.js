@@ -10,8 +10,8 @@ const CACHE_APP = `twog-app-${CACHE_VERSION}`;
 const CACHE_DATA_CORE = `twog-data-core-${CACHE_VERSION}`;
 const CACHE_DATA_EXTRA = `twog-data-extra-${CACHE_VERSION}`;
 
-// ⚠️ IMPORTANT : on enlève '/' du shell, on ne garde que index.html + icônes
-const APP_SHELL = ['/index.html', '/favicon.ico', '/logo192.png', '/logo512.png', '/site.webmanifest'];
+// Ressources facultatives ; index.html est publié après ses dépendances.
+const APP_SHELL = ['/favicon.ico', '/logo192.png', '/logo512.png', '/site.webmanifest'];
 
 const BIBLES_INDEX_URL = '/data/bible/bibles-index.json';
 
@@ -26,7 +26,7 @@ const ORIGIN = self.location.origin;
 
 // Timeouts (important pour éviter écran blanc sur réseau instable)
 const NAV_FETCH_TIMEOUT_MS = 2500; // navigation/doc
-const SMALL_FETCH_TIMEOUT_MS = 2500; // json, index, version, etc.
+const SMALL_FETCH_TIMEOUT_MS = 15000; // json, index, version, etc.
 
 const toHttps = (u) =>
   typeof u === 'string' && u.startsWith('http://') ? 'https://' + u.slice(7) : u;
@@ -63,7 +63,11 @@ async function fetchWithTimeout(request, timeoutMs) {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    return await fetch(request, { cache: 'no-store', signal: controller.signal });
+    const response = await fetch(request, { cache: 'no-store', signal: controller.signal });
+    // Le délai couvre aussi le corps : une coupure après les en-têtes ne bloque pas le cache.
+    if (response.type === 'opaque' || response.status === 204 || response.status === 304) return response;
+    const body = await response.arrayBuffer();
+    return new Response(body, { status: response.status, statusText: response.statusText, headers: response.headers });
   } finally {
     clearTimeout(t);
   }
@@ -163,10 +167,9 @@ async function getIndexFromCache(cache) {
 async function updateIndexAndAssets(cacheApp) {
   try {
     const res = await fetchWithTimeout('/index.html', NAV_FETCH_TIMEOUT_MS);
-    if (!res || !res.ok) return;
+    if (!res || !res.ok) return false;
 
-    await cacheApp.put('/index.html', res.clone());
-    const html = await res.text();
+    const html = await res.clone().text();
 
     const urls = new Set();
     const rx = /<(?:script|link)\b[^>]+?(?:src|href)=["']([^"']+)["']/gi;
@@ -187,13 +190,36 @@ async function updateIndexAndAssets(cacheApp) {
 
     await Promise.all(
       toCache.map(async (u) => {
-        try {
-          const r = await fetchWithTimeout(u, SMALL_FETCH_TIMEOUT_MS);
-          if (r && (r.ok || r.type === 'opaque')) await cacheApp.put(u, r.clone());
-        } catch {}
+        if (await cacheApp.match(u)) return;
+        const r = await fetchWithTimeout(u, SMALL_FETCH_TIMEOUT_MS);
+        if (!r || !r.ok || r.status === 204) throw new Error(`Asset unavailable: ${u}`);
+        await cacheApp.put(u, r);
       })
     );
-  } catch {}
+    // Publier le document seulement quand ses dépendances sont toutes disponibles.
+    await cacheApp.put('/index.html', res);
+    return true;
+  } catch {
+    return false; // La version complète précédente reste utilisable.
+  }
+}
+
+/* -------------------------------------------------- */
+/* Copier les Bibles avant de supprimer les anciens caches (échec => activation refusée). */
+async function preserveBibleCaches() {
+  const keys = (await caches.keys()).reverse();
+  for (const name of keys) {
+    const isCore = name.startsWith('twog-data-core-');
+    if ((!isCore && !name.startsWith('twog-data-extra-')) ||
+        name === CACHE_DATA_CORE || name === CACHE_DATA_EXTRA) continue;
+    const source = await caches.open(name);
+    const target = await caches.open(isCore ? CACHE_DATA_CORE : CACHE_DATA_EXTRA);
+    for (const request of await source.keys()) {
+      if (await target.match(request)) continue;
+      const response = await source.match(request);
+      if (response && response.ok && response.status !== 204) await target.put(request, response);
+    }
+  }
 }
 
 /* -------------------------------------------------- */
@@ -228,8 +254,8 @@ async function precacheCoreBibles(cacheCore) {
     await Promise.all(
       urls.slice(i, i + PRECACHE_CHUNK).map(async (u) => {
         try {
-          const r = await fetch(u, { cache: 'no-store' });
-          if (r && (r.ok || r.type === 'opaque')) await cacheCore.put(u, r.clone());
+          const r = await fetchWithTimeout(u, 30000);
+          if (r && (r.ok && r.status !== 204)) await cacheCore.put(u, r.clone());
         } catch {}
       })
     );
@@ -265,11 +291,15 @@ self.addEventListener('install', (event) => {
       const cacheApp = await caches.open(CACHE_APP);
       const cacheCore = await caches.open(CACHE_DATA_CORE);
 
-      // Precache shell
-      await cacheApp.addAll(APP_SHELL);
-
-      // MAJ + precache assets depuis index.html (robuste)
-      await updateIndexAndAssets(cacheApp);
+      // Une installation incomplète ne remplace jamais le worker encore fonctionnel.
+      if (!(await updateIndexAndAssets(cacheApp))) throw new Error('Incomplete app shell');
+      await Promise.all(APP_SHELL.map(async (url) => {
+        try {
+          const response = await fetchWithTimeout(url, SMALL_FETCH_TIMEOUT_MS);
+          if (response.ok) await cacheApp.put(url, response);
+        } catch {} // Les icônes ne doivent pas bloquer le démarrage.
+      }));
+      await preserveBibleCaches();
 
       // Precache bibles CORE
       await precacheCoreBibles(cacheCore);
@@ -284,9 +314,12 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
+      // Récupérer aussi les Bibles utilisées pendant l'installation du nouveau worker.
+      await preserveBibleCaches();
       const keys = await caches.keys();
-      const keep = new Set([CACHE_APP, CACHE_DATA_CORE, CACHE_DATA_EXTRA]);
-      await Promise.all(keys.filter((k) => !keep.has(k)).map((k) => caches.delete(k)));
+      const previousApp = keys.filter((k) => k.startsWith('twog-app-') && k !== CACHE_APP).pop();
+      const keep = new Set([CACHE_APP, CACHE_DATA_CORE, CACHE_DATA_EXTRA, previousApp]);
+      await Promise.all(keys.filter((k) => /^twog-(app|data-core|data-extra)-/.test(k) && !keep.has(k)).map((k) => caches.delete(k)));
 
       if ('navigationPreload' in self.registration) {
         await self.registration.navigationPreload.enable();
@@ -335,8 +368,7 @@ if ((req.mode === 'navigate' || req.destination === 'document') && PASS_THROUGH_
             const preload = await event.preloadResponse;
             const res = preload || (await fetchWithTimeout('/index.html', NAV_FETCH_TIMEOUT_MS));
             if (res && res.ok) {
-              await cacheApp.put('/index.html', res.clone());
-              // on tente aussi de precache les assets (best-effort)
+              // Ne pas enregistrer un document dont les dépendances sont encore absentes.
               event.waitUntil(updateIndexAndAssets(cacheApp));
               return res;
             }
@@ -366,13 +398,20 @@ if ((req.mode === 'navigate' || req.destination === 'document') && PASS_THROUGH_
           const cacheApp = await caches.open(CACHE_APP);
           const cached = await cacheApp.match(normReq);
           if (cached) return cached;
+          // Les onglets ouverts peuvent encore demander les assets de la version précédente.
+          if (url.pathname.startsWith('/assets/')) {
+            for (const name of (await caches.keys()).filter((k) => k.startsWith('twog-app-') && k !== CACHE_APP)) {
+              const previous = await (await caches.open(name)).match(normReq);
+              if (previous) return previous;
+            }
+          }
 
           try {
             const res = await fetchWithTimeout(normReq, SMALL_FETCH_TIMEOUT_MS);
-            if (res && (res.ok || res.type === 'opaque')) cacheApp.put(normReq, res.clone());
+            if (res && res.ok && res.status !== 204) await cacheApp.put(normReq, res.clone());
             return res;
           } catch {
-            return new Response('', { status: 204 });
+            return new Response('Offline: resource unavailable', { status: 503 });
           }
         })()
       );
@@ -388,7 +427,15 @@ if ((req.mode === 'navigate' || req.destination === 'document') && PASS_THROUGH_
           const isCoreLang = FIXED_CORE_LANGS.includes(lang) || (userLang && lang === userLang);
 
           const cache = await caches.open(isCoreLang ? CACHE_DATA_CORE : CACHE_DATA_EXTRA);
-          const cached = await cache.match(normReq);
+          let cached = await cache.match(normReq);
+          if (!cached) {
+            // Repli si une copie a échoué faute de place ou si la langue a changé de catégorie.
+            for (const name of (await caches.keys()).filter((k) => /^twog-data-(core|extra)-/.test(k)).reverse()) {
+              cached = await (await caches.open(name)).match(normReq);
+              if (cached && cached.ok && cached.status !== 204) break;
+              cached = undefined;
+            }
+          }
 
           if (cached) {
             // refresh silencieux
@@ -396,7 +443,7 @@ if ((req.mode === 'navigate' || req.destination === 'document') && PASS_THROUGH_
               (async () => {
                 try {
                   const res = await fetchWithTimeout(normReq, SMALL_FETCH_TIMEOUT_MS);
-                  if (res && (res.ok || res.type === 'opaque')) {
+                  if (res && (res.ok && res.status !== 204)) {
                     await cache.put(normReq, res.clone());
                     if (!isCoreLang) {
                       const cacheExtra = await caches.open(CACHE_DATA_EXTRA);
@@ -412,7 +459,7 @@ if ((req.mode === 'navigate' || req.destination === 'document') && PASS_THROUGH_
           // pas en cache : tenter réseau, sinon fallback vide
           try {
             const res = await fetchWithTimeout(normReq, SMALL_FETCH_TIMEOUT_MS);
-            if (res && (res.ok || res.type === 'opaque')) {
+            if (res && (res.ok && res.status !== 204)) {
               await cache.put(normReq, res.clone());
               if (!isCoreLang) {
                 const cacheExtra = await caches.open(CACHE_DATA_EXTRA);
@@ -421,7 +468,7 @@ if ((req.mode === 'navigate' || req.destination === 'document') && PASS_THROUGH_
             }
             return res;
           } catch {
-            return new Response('', { status: 204 });
+            return new Response('Offline: resource unavailable', { status: 503 });
           }
         })()
       );
@@ -443,11 +490,11 @@ if ((req.mode === 'navigate' || req.destination === 'document') && PASS_THROUGH_
             const idx = await getIndexFromCache(cacheApp);
             if (idx) return idx;
           }
-          return new Response('', { status: 204 });
+          return new Response('Offline: resource unavailable', { status: 503 });
         }
       })()
     );
   } catch {
-    event.respondWith((async () => new Response('', { status: 204 }))());
+    event.respondWith((async () => new Response('Offline: resource unavailable', { status: 503 }))());
   }
 });

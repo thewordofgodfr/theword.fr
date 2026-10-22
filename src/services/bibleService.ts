@@ -7,6 +7,7 @@ type VerseRow = { id: string; b: string; c: number; v: number; t: string };
 
 /** Cache du corpus par langue */
 const versesCache = new Map<Language, VerseRow[]>();
+const loadingCache = new Map<Language, Promise<void>>();
 
 /** Index chapitres: lang -> codeLivre -> chapitre -> [start,end[ dans versesCache */
 type ChapIndex = Map<string, Map<number, [number, number]>>;
@@ -129,6 +130,18 @@ function normalizeForSearch(s: string) {
 async function ensureLoaded(language: Language): Promise<void> {
   if (versesCache.has(language) && indexCache.has(language)) return;
 
+  const pending = loadingCache.get(language);
+  if (pending) return pending;
+  const loading = loadCorpus(language);
+  loadingCache.set(language, loading);
+  try {
+    await loading;
+  } finally {
+    loadingCache.delete(language); // Un échec peut être retenté après le retour du réseau.
+  }
+}
+
+async function loadCorpus(language: Language): Promise<void> {
   const url = `/data/bible/${language}/verses.jsonl`;
   const res = await fetch(url, { cache: 'force-cache' });
   if (!res.ok) throw new Error(`Fichier manquant: ${url}`);
@@ -138,7 +151,7 @@ async function ensureLoaded(language: Language): Promise<void> {
     .split(/\r?\n/)
     .filter(Boolean)
     .map(l => JSON.parse(l));
-  versesCache.set(language, rows);
+  if (!rows.length) throw new Error(`Bible vide: ${url}`);
 
   // Construit index: pour chaque (code, chapitre), repère la plage contiguë
   const idx: ChapIndex = new Map();
@@ -152,6 +165,7 @@ async function ensureLoaded(language: Language): Promise<void> {
     if (!cur) bookMap.set(r.c, [i, i + 1]);
     else cur[1] = i + 1;
   });
+  versesCache.set(language, rows);
   indexCache.set(language, idx);
 }
 
@@ -334,8 +348,11 @@ export function warmBibleCache(language: Language) {
   if (warmed[language]) return;
   warmed[language] = true;
   idle(() => {
-    if (!warmupEnabled) return;
-    ensureLoaded(language).catch(() => {});
+    if (!warmupEnabled) {
+      delete warmed[language];
+      return;
+    }
+    ensureLoaded(language).catch(() => { delete warmed[language]; });
   });
 }
 
