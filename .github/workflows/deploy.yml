@@ -27,7 +27,7 @@ jobs:
 
       - run: npm ci
       - name: Verify backups, navigation and offline resilience
-        run: node --test tests/backup.test.mjs tests/backupReminder.test.mjs tests/widgetNavigation.test.mjs tests/offline.test.mjs tests/appUpdates.test.mjs tests/homeReadingSwipe.test.mjs
+        run: node --test tests/backup.test.mjs tests/backupReminder.test.mjs tests/widgetNavigation.test.mjs tests/offline.test.mjs tests/appUpdates.test.mjs tests/homeReadingSwipe.test.mjs tests/quiz.test.mjs
       - run: npm run build
 
       # Juste pour vérif visuelle dans les logs

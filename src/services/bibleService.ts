@@ -357,3 +357,20 @@ export function warmBibleCache(language: Language) {
 }
 
 
+
+/** Quiz shares the existing corpus cache; no duplicate text storage or fallback verses. */
+export async function getQuizVerses(language: Language) {
+  await ensureLoaded(language);
+  const seen = new Set<string>();
+  const rows = versesCache.get(language)!.filter(row => {
+    if (!codeToName[row.b] || !row.t.trim() || !Number.isInteger(row.c) || !Number.isInteger(row.v)
+      || row.c < 1 || row.v < 1 || row.c > 999 || row.v > 999 || seen.has(row.id)) return false;
+    seen.add(row.id);
+    return true;
+  });
+  if (rows.length < 4) throw new Error('quiz-corpus-too-small');
+  return rows;
+}
+export function quizReference(row: { b: string; c: number; v: number }, language: Language): string {
+  return `${getBookReference(codeToName[row.b], language)} ${row.c}:${row.v}`;
+}

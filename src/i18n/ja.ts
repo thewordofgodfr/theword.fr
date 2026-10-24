@@ -2,6 +2,23 @@
 import type { TranslationDict } from './types';
 
 const ja: TranslationDict = {
+  quiz: {
+    "title": "クイズ",
+    "rules": "聖句の出典を当てましょう。正解した聖句は繰り返されません。不正解の聖句は後で再び出題されることがあります。",
+    "level": "レベル",
+    "attempts": "回答回数",
+    "question": "この聖句はどこにありますか？",
+    "correct": "正解です！",
+    "wrong": "正しい答え：",
+    "next": "次の聖句",
+    "complete": "おめでとうございます！すべての聖句を当てました！",
+    "share": "成績を共有",
+    "email": "メールで送信",
+    "copied": "成績をコピーしました！",
+    "saved": "進捗は言語ごとにこの端末に保存され、The Word のバックアップに含まれます。",
+    "error": "クイズを読み込み、または保存できません。接続や空き容量を確認して、もう一度お試しください。",
+    "retry": "再試行"
+},
   aboutContactLabel: "お問い合わせ：",
   aboutPrivacyPolicy: "プライバシーポリシー",
   searchRecentTitle: "最近の検索",

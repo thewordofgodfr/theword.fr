@@ -2,6 +2,23 @@
 import type { TranslationDict } from './types';
 
 const sw: TranslationDict = {
+  quiz: {
+    "title": "Maswali",
+    "rules": "Tafuta rejeo la mstari. Mistari uliyojibu kwa usahihi haitarudi; uliyokosea inaweza kurudi baadaye.",
+    "level": "Kiwango",
+    "attempts": "Majaribio",
+    "question": "Mstari huu unapatikana wapi?",
+    "correct": "Jibu sahihi!",
+    "wrong": "Jibu sahihi ni:",
+    "next": "Mstari unaofuata",
+    "complete": "Hongera! Umepata mistari yote!",
+    "share": "Shiriki matokeo yangu",
+    "email": "Kwa barua pepe",
+    "copied": "Matokeo yamenakiliwa!",
+    "saved": "Maendeleo yanahifadhiwa kwenye kifaa hiki kando kwa kila lugha na kujumuishwa katika nakala ya akiba ya The Word.",
+    "error": "Imeshindikana kupakia au kuhifadhi maswali. Angalia muunganisho au nafasi ya kuhifadhi, kisha ujaribu tena.",
+    "retry": "Jaribu tena"
+},
   aboutContactLabel: "Mawasiliano:",
   aboutPrivacyPolicy: "Sera ya faragha",
   searchRecentTitle: "Utafutaji wa hivi karibuni",

@@ -2,6 +2,23 @@
 import type { TranslationDict } from './types';
 
 const yo: TranslationDict = {
+  quiz: {
+    "title": "Ìdánwò",
+    "rules": "Wa ibi tí ẹsẹ náà wà. Ẹsẹ tí o bá dáhùn tọ́ kò ní tún wá; èyí tí o bá dáhùn àṣìṣe lè tún wá nígbà mìíràn.",
+    "level": "Ìpele",
+    "attempts": "Ìgbìyànjú",
+    "question": "Ibo ni ẹsẹ yìí wà?",
+    "correct": "Ìdáhùn tó tọ́!",
+    "wrong": "Ìdáhùn tó tọ́ ni:",
+    "next": "Ẹsẹ tó kàn",
+    "complete": "Ó dára! O ti rí gbogbo ẹsẹ!",
+    "share": "Pín àbájáde mi",
+    "email": "Nípasẹ̀ ímeèlì",
+    "copied": "A ti da àbájáde kọ!",
+    "saved": "A ń fi ìlọsíwájú pamọ́ sórí ẹ̀rọ yìí lọ́tọ̀ fún èdè kọ̀ọ̀kan, ó sì wà nínú ẹ̀dà àfẹ́yìntì The Word.",
+    "error": "A kò lè ṣí tàbí fi ìdánwò pamọ́. Ṣàyẹ̀wò ìsopọ̀ tàbí àyè ìpamọ́, kí o sì tún gbìyànjú.",
+    "retry": "Tún gbìyànjú"
+},
   aboutContactLabel: "Kàn sí wa:",
   aboutPrivacyPolicy: "Ìlànà ìpamọ́",
   searchRecentTitle: "Àwọn ìwádìí àìpẹ́",

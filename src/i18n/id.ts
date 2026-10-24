@@ -2,6 +2,23 @@
 import type { TranslationDict } from './types';
 
 const id: TranslationDict = {
+  quiz: {
+    "title": "Kuis",
+    "rules": "Temukan rujukan ayatnya. Ayat yang dijawab benar tidak diulang; ayat yang salah dapat muncul lagi nanti.",
+    "level": "Level",
+    "attempts": "Percobaan",
+    "question": "Di manakah ayat ini terdapat?",
+    "correct": "Jawaban benar!",
+    "wrong": "Jawaban yang benar:",
+    "next": "Ayat berikutnya",
+    "complete": "Selamat! Semua ayat telah ditemukan!",
+    "share": "Bagikan skor saya",
+    "email": "Melalui email",
+    "copied": "Skor disalin!",
+    "saved": "Kemajuan disimpan di perangkat ini secara terpisah untuk setiap bahasa dan disertakan dalam cadangan The Word.",
+    "error": "Kuis tidak dapat dimuat atau disimpan. Periksa koneksi atau ruang penyimpanan, lalu coba lagi.",
+    "retry": "Coba lagi"
+},
   aboutContactLabel: "Kontak:",
   aboutPrivacyPolicy: "Kebijakan Privasi",
   searchRecentTitle: "Pencarian terbaru",

@@ -2,6 +2,23 @@
 import type { TranslationDict } from './types';
 
 const tr: TranslationDict = {
+  quiz: {
+    "title": "Bilgi yarışması",
+    "rules": "Ayetin yerini bulun. Doğru yanıtlanan ayetler tekrarlanmaz; yanlış yanıtlananlar daha sonra tekrar gelebilir.",
+    "level": "Seviye",
+    "attempts": "Deneme",
+    "question": "Bu ayet nerede bulunur?",
+    "correct": "Doğru yanıt!",
+    "wrong": "Doğru yanıt:",
+    "next": "Sonraki ayet",
+    "complete": "Tebrikler! Tüm ayetleri buldunuz!",
+    "share": "Puanımı paylaş",
+    "email": "E-posta ile",
+    "copied": "Puan kopyalandı!",
+    "saved": "İlerleme bu cihazda her dil için ayrı kaydedilir ve The Word yedeğine dahil edilir.",
+    "error": "Yarışma yüklenemedi veya kaydedilemedi. Bağlantıyı veya depolama alanını kontrol edip tekrar deneyin.",
+    "retry": "Tekrar dene"
+},
   aboutContactLabel: "İletişim:",
   aboutPrivacyPolicy: "Gizlilik politikası",
   searchRecentTitle: "Son aramalar",

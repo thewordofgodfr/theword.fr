@@ -2,6 +2,23 @@
 import type { TranslationDict } from './types';
 
 const ko: TranslationDict = {
+  quiz: {
+    "title": "퀴즈",
+    "rules": "구절의 출처를 맞혀 보세요. 맞힌 구절은 다시 나오지 않으며, 틀린 구절은 나중에 다시 나올 수 있습니다.",
+    "level": "레벨",
+    "attempts": "시도 횟수",
+    "question": "이 구절은 어디에 있나요?",
+    "correct": "정답입니다!",
+    "wrong": "정답:",
+    "next": "다음 구절",
+    "complete": "축하합니다! 모든 구절을 맞혔습니다!",
+    "share": "점수 공유",
+    "email": "이메일로 보내기",
+    "copied": "점수가 복사되었습니다!",
+    "saved": "진행 상황은 언어별로 이 기기에 저장되며 The Word 백업에 포함됩니다.",
+    "error": "퀴즈를 불러오거나 저장할 수 없습니다. 연결 또는 저장 공간을 확인하고 다시 시도하세요.",
+    "retry": "다시 시도"
+},
   aboutContactLabel: "문의:",
   aboutPrivacyPolicy: "개인정보 처리방침",
   searchRecentTitle: "최근 검색",

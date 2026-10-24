@@ -421,3 +421,6 @@ html.theme-dark-blue .app-navigation button[aria-current="page"] {
 @media (min-width: 1024px) {
   .backup-reminder { inset-inline-start: auto; inset-inline-end: 24px; width: 400px; margin: 0; }
 }
+
+.home-footer { position: relative; width: 100%; max-width: 440px; margin-inline: auto; min-height: 40px; display: flex; align-items: center; justify-content: center; }
+.home-quiz { position: absolute; right: 20px; font-size: 13px; min-height: 44px; }

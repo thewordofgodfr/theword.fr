@@ -363,3 +363,21 @@ test('cancelling Android sharing never downloads an unwanted copy', async () => 
   globalThis.document = { createElement() { assert.fail('must not download after cancellation'); } };
   assert.equal(await api.shareOrDownloadBackup(api.createBackup().file), false);
 });
+
+test('quiz backup roundtrip preserves attempts, solved verses and pending question; old backups leave it intact', async () => {
+  const progress = {version:1,languages:{fr:{solved:{'GEN.1':'AQ=='},attempts:3,recent:['GEN.1.1'],pending:{id:'GEN.1.2',options:['GEN.1.2','GEN.1.3','GEN.1.4','GEN.1.5']}}}};
+  put('twog:quiz:v1',progress);
+  const saved = api.createBackup().file;
+  localStorage.removeItem('twog:quiz:v1');
+  await api.restoreBackupByMerging(saved);
+  assert.deepEqual(get('twog:quiz:v1'),progress);
+  await api.restoreBackupByMerging(saved);
+  assert.deepEqual(get('twog:quiz:v1'),progress);
+  const legacy = JSON.parse(await saved.text()); delete legacy.data.quiz;
+  await api.restoreBackupByMerging(file(legacy));
+  assert.deepEqual(get('twog:quiz:v1'),progress);
+  const invalid = JSON.parse(await saved.text()); invalid.data.quiz.languages.fr.attempts=-1;
+  const before=new Map(localStorage.values);
+  await assert.rejects(api.restoreBackupByMerging(file(invalid)));
+  assert.deepEqual(localStorage.values,before);
+});

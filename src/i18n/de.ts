@@ -2,6 +2,23 @@
 import type { TranslationDict } from './types';
 
 const de: TranslationDict = {
+  quiz: {
+    "title": "Quiz",
+    "rules": "Finde die Bibelstelle. Richtig beantwortete Verse kommen nicht wieder; falsche Antworten werden später erneut abgefragt.",
+    "level": "Stufe",
+    "attempts": "Versuche",
+    "question": "Wo steht dieser Vers?",
+    "correct": "Richtig!",
+    "wrong": "Die richtige Antwort ist:",
+    "next": "Nächster Vers",
+    "complete": "Geschafft! Du hast alle Verse gefunden!",
+    "share": "Ergebnis teilen",
+    "email": "Per E-Mail",
+    "copied": "Ergebnis kopiert!",
+    "saved": "Der Fortschritt wird auf diesem Gerät für jede Sprache getrennt gespeichert und in die The Word-Sicherung aufgenommen.",
+    "error": "Das Quiz konnte nicht geladen oder gespeichert werden. Prüfe Verbindung und Speicherplatz und versuche es erneut.",
+    "retry": "Erneut versuchen"
+},
   aboutContactLabel: "Kontakt:",
   aboutPrivacyPolicy: "Datenschutzerklärung",
   searchRecentTitle: "Letzte Suchen",

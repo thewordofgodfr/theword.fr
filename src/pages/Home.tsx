@@ -4,7 +4,7 @@ import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { getRandomVerse, warmBibleCache } from '../services/bibleService';
 import { BibleVerse } from '../types/bible';
-import { RefreshCw, BookOpen, Search, List, BookMarked, Settings, Info, Download, ArrowUpRight } from 'lucide-react';
+import { RefreshCw, BookOpen, Search, List, BookMarked, Settings, Info, Download, ArrowUpRight, HelpCircle } from 'lucide-react';
 import { saveSlot as saveQuickSlot } from '../services/readingSlots';
 import { attachHomeReadingSwipe } from '../utils/homeReadingSwipe';
 import BackupReminder from '../components/BackupReminder';
@@ -191,7 +191,13 @@ export default function Home() {
           </button>
         </div>
       </div>
-      <footer className="home-copyright">Copyright {year}</footer>
+      <footer className="home-copyright home-footer">
+        <span>Copyright {year}</span>
+        <button type="button" onClick={() => dispatch({ type: 'SET_PAGE', payload: 'quiz' })}
+          className="home-quiz inline-flex items-center gap-2 rounded-lg px-3 py-2 text-blue-400 hover:bg-blue-500/10 focus-visible:ring-2 focus-visible:ring-blue-400">
+          <HelpCircle size={18} aria-hidden="true" />{t('quiz.title')}
+        </button>
+      </footer>
       <BackupReminder />
     </div>
   );

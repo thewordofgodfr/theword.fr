@@ -2,6 +2,23 @@
 import type { TranslationDict } from './types';
 
 const pt: TranslationDict = {
+  quiz: {
+    "title": "Quiz",
+    "rules": "Encontre a referência do versículo. Os versículos acertados não se repetem; os errados poderão voltar mais tarde.",
+    "level": "Nível",
+    "attempts": "Tentativas",
+    "question": "Onde se encontra este versículo?",
+    "correct": "Resposta correta!",
+    "wrong": "A resposta correta é:",
+    "next": "Próximo versículo",
+    "complete": "Parabéns! Encontrou todos os versículos!",
+    "share": "Partilhar resultado",
+    "email": "Por email",
+    "copied": "Resultado copiado!",
+    "saved": "O progresso é guardado neste dispositivo separadamente para cada idioma e incluído na cópia de segurança do The Word.",
+    "error": "Não foi possível carregar ou guardar o quiz. Verifique a ligação ou o espaço disponível e tente novamente.",
+    "retry": "Tentar novamente"
+},
   aboutContactLabel: "Contato:",
   aboutPrivacyPolicy: "Política de privacidade",
   searchRecentTitle: "Pesquisas recentes",

@@ -2,6 +2,23 @@
 import type { TranslationDict } from './types';
 
 const zh: TranslationDict = {
+  quiz: {
+    "title": "测验",
+    "rules": "找出经文出处。答对的经文不会重复；答错的经文以后可能再次出现。",
+    "level": "等级",
+    "attempts": "尝试次数",
+    "question": "这节经文出自哪里？",
+    "correct": "回答正确！",
+    "wrong": "正确答案是：",
+    "next": "下一节经文",
+    "complete": "恭喜！你已找出所有经文！",
+    "share": "分享我的成绩",
+    "email": "通过邮件",
+    "copied": "成绩已复制！",
+    "saved": "进度按语言分别保存在此设备上，并包含在 The Word 备份中。",
+    "error": "无法加载或保存测验。请检查网络连接或存储空间，然后重试。",
+    "retry": "重试"
+},
   aboutContactLabel: "联系：",
   aboutPrivacyPolicy: "隐私政策",
   searchRecentTitle: "最近搜索",

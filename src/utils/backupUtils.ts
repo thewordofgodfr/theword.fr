@@ -1,3 +1,4 @@
+import { QUIZ_KEY, readQuiz, validateQuiz, mergeQuiz, type QuizStore } from '../services/quizService';
 import { SUPPORTED_LANGUAGES } from '../types/bible';
 import { MAX_RECENT_SEARCHES, readRecentSearches, sanitizeRecentSearches } from './recentSearches';
 import { backupContentSnapshot, markBackupContentSaved } from './backupReminder';
@@ -18,7 +19,7 @@ const KEYS = {
   lastStudyList: 'twog:lastPrincipleId',
 } as const;
 type StoredValue = string | null;
-type BackupData = Record<keyof typeof KEYS, StoredValue> & { scrollPositions?: Record<string, string>; recentSearches?: Record<string, string[]> };
+type BackupData = Record<keyof typeof KEYS, StoredValue> & { quiz?: QuizStore; scrollPositions?: Record<string, string>; recentSearches?: Record<string, string[]> };
 type BackupFile = { application: 'TheWord'; backupVersion: 1; createdAt: string; data: BackupData };
 type Item = Record<string, unknown> & { bookId: string; chapter: number; verse: number };
 type List = Record<string, unknown> & { id: string; title: string; items: Item[]; updatedAt: number | string };
@@ -99,6 +100,7 @@ function validate(value: unknown): BackupFile {
     if (!(key in raw) || (raw[key] !== null && typeof raw[key] !== 'string')) invalid();
   }
   const data = raw as BackupData;
+  if (data.quiz !== undefined) validateQuiz(data.quiz);
   lists(data.notes); lists(data.studies); slots(data.readingSlots); settings(data.settings);
   if (data.language !== null && !language(data.language)) invalid();
   for (const key of ['lastActiveSlot', 'lastTappedSlot'] as const) {
@@ -141,6 +143,7 @@ function getScrollPositions(): Record<string, string> {
 export function createBackup(): { file: File; summary: BackupSummary } {
   const data = Object.fromEntries(Object.entries(KEYS)
     .map(([name, key]) => [name, localStorage.getItem(key)])) as unknown as BackupData;
+  data.quiz = readQuiz();
   data.scrollPositions = getScrollPositions();
   data.recentSearches = {};
   for (const code of SUPPORTED_LANGUAGES) {
@@ -279,6 +282,9 @@ export async function restoreBackupByMerging(file: File): Promise<BackupSummary>
   for (const [code, imported] of Object.entries(data.recentSearches ?? {})) {
     const key = `twog:search:recent:${code}`;
     add(key, JSON.stringify(sanitizeRecentSearches([...readRecentSearches(key), ...imported])));
+  }
+  if (data.quiz !== undefined && Object.keys(data.quiz.languages).length) {
+    add(QUIZ_KEY, JSON.stringify(mergeQuiz(readQuiz(), data.quiz)));
   }
   const before = changes.map(change => ({ ...change, previous: change.storage.getItem(change.key) }));
   const applied: typeof before = [];

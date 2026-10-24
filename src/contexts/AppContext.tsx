@@ -10,6 +10,7 @@ import { AppSettings, Language, Theme } from '../types/bible';
 
 /** Pages supportées dans l’app */
 type Page =
+  | 'quiz'
   | 'home'
   | 'reading'
   | 'settings'
@@ -72,6 +73,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
  *  - #about
  */
 const PAGE_HASH_MAP: Record<Page, string> = {
+  quiz: '#quiz',
   home: '#home',
   reading: '#reading',
   search: '#search',
@@ -82,6 +84,7 @@ const PAGE_HASH_MAP: Record<Page, string> = {
 };
 
 const HASH_PAGE_MAP: Record<string, Page> = {
+  '#quiz': 'quiz',
   '#home': 'home',
   '#reading': 'reading',
   '#search': 'search',

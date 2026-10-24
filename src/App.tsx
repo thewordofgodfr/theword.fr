@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { AppProvider, useApp } from './contexts/AppContext';
 import Navigation from './components/Navigation';
 import Home from './pages/Home';
+import Quiz from './pages/Quiz';
 import Reading from './pages/Reading';
 import Search from './pages/Search';
 import Settings from './pages/Settings';
@@ -86,6 +87,8 @@ function AppContent() {
 
   const renderCurrentPage = () => {
     switch (state.currentPage) {
+      case 'quiz':
+        return <Quiz key={state.settings.language} />;
       case 'home':
         return <Home />;
       case 'reading':
