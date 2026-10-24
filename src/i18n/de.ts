@@ -3,6 +3,16 @@ import type { TranslationDict } from './types';
 
 const de: TranslationDict = {
   quiz: {
+    "accuracy": "Trefferquote",
+    "reset": "Neustart",
+    "resetConfirm": "Quiz in dieser Sprache zurücksetzen? Stufe und Versuche werden gelöscht. Andere Sprachen, Notizen und Studien bleiben erhalten.",
+    "badge0": "Ton",
+    "badge1": "Bronze",
+    "badge2": "Silber",
+    "badge3": "Gold",
+    "badge4": "Krone",
+    "badge5": "Cherub",
+
     "title": "Quiz",
     "rules": "Finde die Bibelstelle. Richtig beantwortete Verse kommen nicht wieder; falsche Antworten werden später erneut abgefragt.",
     "level": "Stufe",

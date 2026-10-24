@@ -3,6 +3,16 @@ import type { TranslationDict } from './types';
 
 const yo: TranslationDict = {
   quiz: {
+    "accuracy": "Ìwọ̀n àṣeyọrí",
+    "reset": "Bẹ̀rẹ̀ lẹ́ẹ̀kan sí i",
+    "resetConfirm": "Ṣé o fẹ́ bẹ̀rẹ̀ ìdánwò èdè yìí láti ìbẹ̀rẹ̀? Ìpele àti ìgbìyànjú yóò parẹ́. Àwọn èdè mìíràn, àkọsílẹ̀ àti ẹ̀kọ́ yóò wà.",
+    "badge0": "Amọ̀",
+    "badge1": "Idẹ",
+    "badge2": "Fàdákà",
+    "badge3": "Wúrà",
+    "badge4": "Adé",
+    "badge5": "Kérúbù",
+
     "title": "Ìdánwò",
     "rules": "Wa ibi tí ẹsẹ náà wà. Ẹsẹ tí o bá dáhùn tọ́ kò ní tún wá; èyí tí o bá dáhùn àṣìṣe lè tún wá nígbà mìíràn.",
     "level": "Ìpele",

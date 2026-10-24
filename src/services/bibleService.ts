@@ -362,7 +362,7 @@ export function warmBibleCache(language: Language) {
 export async function getQuizVerses(language: Language) {
   await ensureLoaded(language);
   const seen = new Set<string>();
-  const rows = versesCache.get(language)!.filter(row => {
+  const rows = versesCache.get(language)!.map(row => ({ ...row, id: `${row.b}.${row.c}.${row.v}` })).filter(row => {
     if (!codeToName[row.b] || !row.t.trim() || !Number.isInteger(row.c) || !Number.isInteger(row.v)
       || row.c < 1 || row.v < 1 || row.c > 999 || row.v > 999 || seen.has(row.id)) return false;
     seen.add(row.id);
@@ -373,4 +373,8 @@ export async function getQuizVerses(language: Language) {
 }
 export function quizReference(row: { b: string; c: number; v: number }, language: Language): string {
   return `${getBookReference(codeToName[row.b], language)} ${row.c}:${row.v}`;
+}
+
+export function quizLocation(row: { b: string; c: number; v: number }) {
+  return { book: codeToName[row.b], chapter: row.c, verse: row.v };
 }

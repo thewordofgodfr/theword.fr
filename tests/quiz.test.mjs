@@ -70,3 +70,28 @@ test('invalid progress cannot be silently restored', () => {
     assert.throws(()=>api.validateQuiz({version:1,languages:{fr:p}}));
   }
 });
+
+test('earned badge boundaries and completion follow the selected corpus', () => {
+  for (const [level,tier] of [[0,0],[99,0],[100,1],[499,1],[500,2],[4999,2],[5000,3],[19999,3],[20000,4],[31169,4],[31170,5]]) assert.equal(api.quizTier(level,31170),tier);
+  assert.equal(api.quizTier(23145,23145),5);
+  assert.equal(api.quizTier(0,0),0);
+});
+test('reset affects only the selected language and leaves input untouched', () => {
+  const p={...api.emptyProgress(),attempts:5};
+  const store={version:1,languages:{fr:p,en:p}};
+  const reset=api.resetQuizLanguage(store,'fr');
+  assert.deepEqual(reset.languages.fr,api.emptyProgress());
+  assert.deepEqual(reset.languages.en,p);
+  assert.equal(store.languages.fr.attempts,5);
+});
+test('duplicate source rows cannot produce duplicate reference choices; stale foreign-language choices are replaced', () => {
+  const corpus=[...rows,...rows.map(r=>({...r,id:r.id+'-duplicate'}))];
+  for(let i=0;i<30;i++) {
+    const q=api.nextQuestion(corpus,api.emptyProgress());
+    assert.equal(new Set(q.options).size,4);
+    assert.ok(q.options.every(id=>rows.some(r=>r.id===id)));
+  }
+  const p={...api.emptyProgress(),pending:{id:'JOH.1.1',options:['JOH.1.1','MAT.1.1','REV.1.1','GEN.1.1']}};
+  const q=api.nextQuestion(rows,p);
+  assert.ok(q.options.every(id=>id.startsWith('GEN.')));
+});

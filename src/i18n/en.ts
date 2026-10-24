@@ -3,6 +3,16 @@ import type { TranslationDict } from './types';
 
 const en: TranslationDict = {
   quiz: {
+    "accuracy": "Success rate",
+    "reset": "Restart",
+    "resetConfirm": "Reset the quiz in this language? Your level and attempts will be cleared. Other languages, notes and studies will be kept.",
+    "badge0": "Clay",
+    "badge1": "Bronze",
+    "badge2": "Silver",
+    "badge3": "Gold",
+    "badge4": "Crown",
+    "badge5": "Cherub",
+
     "title": "Quiz",
     "rules": "Find the verse reference. Solved verses never return; missed verses may return later.",
     "level": "Level",

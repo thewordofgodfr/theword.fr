@@ -3,6 +3,16 @@ import type { TranslationDict } from './types';
 
 const zh: TranslationDict = {
   quiz: {
+    "accuracy": "正确率",
+    "reset": "重新开始",
+    "resetConfirm": "重置此语言的测验吗？等级和尝试次数将被清除。其他语言、笔记和研读将保留。",
+    "badge0": "陶土",
+    "badge1": "青铜",
+    "badge2": "白银",
+    "badge3": "黄金",
+    "badge4": "冠冕",
+    "badge5": "基路伯",
+
     "title": "测验",
     "rules": "找出经文出处。答对的经文不会重复；答错的经文以后可能再次出现。",
     "level": "等级",

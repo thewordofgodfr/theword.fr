@@ -76,9 +76,14 @@ function shuffle<T>(items: T[], random: () => number): T[] {
   return items;
 }
 export function nextQuestion(rows: readonly QuizVerse[], progress: QuizProgress, random = Math.random): Question | null {
+  // Canonical references, not source row IDs, define uniqueness.
+  rows = [...new Map(rows.map(r => {
+    const id = `${r.b}.${r.c}.${r.v}`;
+    return [id, { ...r, id }] as const;
+  })).values()];
   const byId = new Map(rows.map(r => [r.id, r]));
   const pending = progress.pending;
-  if (pending && byId.has(pending.id) && pending.options.every(id => byId.has(id))
+  if (pending && new Set(pending.options).size === 4 && byId.has(pending.id) && pending.options.every(id => byId.has(id))
     && pending.options.filter(id => normalizeQuizText(byId.get(id)!.t) === normalizeQuizText(byId.get(pending.id)!.t)).length === 1) return pending;
   const remaining = rows.filter(r => !isSolved(progress, r.id));
   if (!remaining.length) return null;
@@ -115,4 +120,14 @@ export function mergeQuiz(current: QuizStore, imported: QuizStore): QuizStore {
       || (solvedCount(b) === solvedCount(a) && b.attempts > a.attempts))) languages[lang] = b;
   }
   return validateQuiz({ version: 1, languages });
+}
+
+
+/** Only the earned tier is exposed by the UI; completion follows the selected corpus. */
+export function quizTier(level: number, total: number): number {
+  if (total > 0 && level >= total) return 5;
+  return level >= 20000 ? 4 : level >= 5000 ? 3 : level >= 500 ? 2 : level >= 100 ? 1 : 0;
+}
+export function resetQuizLanguage(store: QuizStore, language: Language): QuizStore {
+  return { ...store, languages: { ...store.languages, [language]: emptyProgress() } };
 }

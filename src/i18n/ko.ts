@@ -3,6 +3,16 @@ import type { TranslationDict } from './types';
 
 const ko: TranslationDict = {
   quiz: {
+    "accuracy": "정답률",
+    "reset": "다시 시작",
+    "resetConfirm": "이 언어의 퀴즈를 초기화할까요? 레벨과 시도 횟수가 삭제됩니다. 다른 언어, 노트와 공부는 유지됩니다.",
+    "badge0": "흙",
+    "badge1": "청동",
+    "badge2": "은",
+    "badge3": "금",
+    "badge4": "왕관",
+    "badge5": "그룹",
+
     "title": "퀴즈",
     "rules": "구절의 출처를 맞혀 보세요. 맞힌 구절은 다시 나오지 않으며, 틀린 구절은 나중에 다시 나올 수 있습니다.",
     "level": "레벨",

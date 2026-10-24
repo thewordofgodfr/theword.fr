@@ -3,6 +3,16 @@ import type { TranslationDict } from './types';
 
 const tr: TranslationDict = {
   quiz: {
+    "accuracy": "Başarı oranı",
+    "reset": "Yeniden başlat",
+    "resetConfirm": "Bu dildeki yarışma sıfırlansın mı? Seviye ve denemeler silinecek. Diğer diller, notlar ve çalışmalar korunacak.",
+    "badge0": "Kil",
+    "badge1": "Bronz",
+    "badge2": "Gümüş",
+    "badge3": "Altın",
+    "badge4": "Taç",
+    "badge5": "Keruv",
+
     "title": "Bilgi yarışması",
     "rules": "Ayetin yerini bulun. Doğru yanıtlanan ayetler tekrarlanmaz; yanlış yanıtlananlar daha sonra tekrar gelebilir.",
     "level": "Seviye",

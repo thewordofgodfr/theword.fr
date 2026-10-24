@@ -3,6 +3,16 @@ import type { TranslationDict } from './types';
 
 const ja: TranslationDict = {
   quiz: {
+    "accuracy": "正答率",
+    "reset": "最初から",
+    "resetConfirm": "この言語のクイズをリセットしますか？レベルと回答回数が消去されます。他の言語、ノート、学びは保持されます。",
+    "badge0": "粘土",
+    "badge1": "銅",
+    "badge2": "銀",
+    "badge3": "金",
+    "badge4": "冠",
+    "badge5": "ケルブ",
+
     "title": "クイズ",
     "rules": "聖句の出典を当てましょう。正解した聖句は繰り返されません。不正解の聖句は後で再び出題されることがあります。",
     "level": "レベル",

@@ -3,6 +3,16 @@ import type { TranslationDict } from './types';
 
 const id: TranslationDict = {
   quiz: {
+    "accuracy": "Tingkat keberhasilan",
+    "reset": "Mulai lagi",
+    "resetConfirm": "Atur ulang kuis dalam bahasa ini? Level dan percobaan akan dihapus. Bahasa lain, catatan, dan studi akan tetap disimpan.",
+    "badge0": "Tanah liat",
+    "badge1": "Perunggu",
+    "badge2": "Perak",
+    "badge3": "Emas",
+    "badge4": "Mahkota",
+    "badge5": "Kerub",
+
     "title": "Kuis",
     "rules": "Temukan rujukan ayatnya. Ayat yang dijawab benar tidak diulang; ayat yang salah dapat muncul lagi nanti.",
     "level": "Level",

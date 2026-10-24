@@ -3,6 +3,16 @@ import type { TranslationDict } from './types';
 
 const it: TranslationDict = {
   quiz: {
+    "accuracy": "Risposte corrette",
+    "reset": "Ricomincia",
+    "resetConfirm": "Azzerare il quiz in questa lingua? Livello e tentativi saranno cancellati. Altre lingue, note e studi saranno conservati.",
+    "badge0": "Argilla",
+    "badge1": "Bronzo",
+    "badge2": "Argento",
+    "badge3": "Oro",
+    "badge4": "Corona",
+    "badge5": "Cherubino",
+
     "title": "Quiz",
     "rules": "Trova il riferimento del versetto. I versetti indovinati non tornano; quelli sbagliati potranno tornare più avanti.",
     "level": "Livello",

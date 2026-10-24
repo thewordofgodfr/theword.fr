@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, CheckCircle2, HelpCircle, Share2, Trophy } from 'lucide-react';
+import { BookOpen, CheckCircle2, RotateCcw, Share2 } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
-import { getQuizVerses, quizReference } from '../services/bibleService';
-import { QUIZ_KEY, readQuiz, saveQuiz, emptyProgress, nextQuestion, answerQuestion, isSolved,
+import { getQuizVerses, quizReference, quizLocation } from '../services/bibleService';
+import { QUIZ_KEY, readQuiz, saveQuiz, emptyProgress, nextQuestion, answerQuestion, isSolved, quizTier, resetQuizLanguage,
   type QuizProgress, type QuizVerse, type Question } from '../services/quizService';
 
+import QuizBadge from '../components/QuizBadge';
+import { saveSlot } from '../services/readingSlots';
+
 export default function Quiz() {
-  const { state, dispatch } = useApp();
+  const { state, navigateToVerse } = useApp();
   const { t, lang } = useTranslation();
   const [rows, setRows] = useState<QuizVerse[]>([]);
   const [progress, setProgress] = useState<QuizProgress>(emptyProgress);
@@ -18,10 +21,13 @@ export default function Quiz() {
   const [retry, setRetry] = useState(0);
   const [copyStatus, setCopyStatus] = useState(false);
   const locked = useRef(false);
+  const questionHeading = useRef<HTMLHeadingElement>(null);
   const isDark = state.settings.theme === 'dark';
   const surface = isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200';
-  const button = 'rounded-xl border px-4 py-3 min-h-[48px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400';
+  const button = 'rounded-xl border px-3 py-2 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400';
   const level = rows.reduce((n, r) => n + Number(isSolved(progress, r.id)), 0);
+  const rate = progress.attempts ? Math.round(level / progress.attempts * 100) : null;
+  const tier = quizTier(level, rows.length);
   const complete = rows.length > 0 && level === rows.length;
   const verse = rows.find(r => r.id === question?.id);
   const reference = (id: string) => {
@@ -68,6 +74,21 @@ export default function Quiz() {
       const updated = { ...p, pending: q };
       saveQuiz({ ...store, languages: { ...store.languages, [lang]: updated } });
       setProgress(updated); setQuestion(q); setSelected(null); locked.current = false;
+      requestAnimationFrame(() => questionHeading.current?.scrollIntoView({ block: 'start' }));
+    } catch { setError(true); }
+  };
+  const openVerse = () => {
+    if (!verse || selected === null) return;
+    const location = quizLocation(verse);
+    saveSlot(0, location);
+    navigateToVerse(location.book, location.chapter, location.verse);
+  };
+  const restart = () => {
+    if (!window.confirm(t('quiz.resetConfirm'))) return;
+    try {
+      const store = readQuiz();
+      saveQuiz(resetQuizLanguage(store, lang));
+      setCopyStatus(false); setRetry(n => n + 1);
     } catch { setError(true); }
   };
   const score = `${t('quiz.title')} — The Word\n${t('quiz.level')} ${level} / ${rows.length}\n${t('quiz.attempts')} : ${progress.attempts}\nhttps://theword.fr/#quiz`;
@@ -83,15 +104,9 @@ export default function Quiz() {
   };
 
   return (
-    <div className={`min-h-screen px-4 py-6 ${isDark ? 'bg-gray-900 text-white' : 'bg-blue-50 text-gray-900'}`} dir={lang === 'ar' || lang === 'he' ? 'rtl' : 'ltr'}>
-      <div className="max-w-xl mx-auto space-y-5">
-        <header className="flex items-center justify-between gap-3">
-          <button type="button" className={`${button} ${surface} inline-flex items-center gap-2`} onClick={() => dispatch({ type: 'SET_PAGE', payload: 'home' })}>
-            <ArrowLeft size={18} aria-hidden="true" />{t('home')}
-          </button>
-          <h1 className="text-xl font-semibold flex items-center gap-2"><HelpCircle className="text-blue-400" aria-hidden="true" />{t('quiz.title')}</h1>
-        </header>
-        <p className="text-sm opacity-80">{t('quiz.rules')}</p>
+    <div className={`quiz-screen px-3 py-3 ${isDark ? 'bg-gray-900 text-white' : 'bg-blue-50 text-gray-900'}`} dir={lang === 'ar' || lang === 'he' ? 'rtl' : 'ltr'}>
+      <div className="max-w-xl mx-auto space-y-3">
+        <h1 className="sr-only">{t('quiz.title')}</h1>
         {loading ? <p role="status">{t('loading')}</p> : error ? (
           <div role="alert" className={`${surface} rounded-2xl border p-5 space-y-3`}>
             <p>{t('quiz.error')}</p>
@@ -99,51 +114,63 @@ export default function Quiz() {
           </div>
         ) : (
           <>
-            <section aria-label={t('quiz.level')} className={`${surface} rounded-2xl border p-4`}>
-              <div className="flex justify-between items-center gap-3 flex-wrap">
-                <strong className="text-blue-400 text-lg">{t('quiz.level')} {level.toLocaleString(lang)} <span className="text-sm font-normal opacity-75">/ {rows.length.toLocaleString(lang)}</span></strong>
-                <span className="text-sm">{t('quiz.attempts')} : {progress.attempts.toLocaleString(lang)}</span>
+            <section aria-label={t('quiz.level')} className={`${surface} rounded-2xl border p-3`}>
+              <div className="flex justify-between items-center gap-2 flex-wrap">
+                <strong className="text-blue-400 text-lg inline-flex items-center gap-1">{t('quiz.level')} {level.toLocaleString(lang)} <span className="text-sm font-normal opacity-75">/ {rows.length.toLocaleString(lang)}</span><QuizBadge tier={tier} label={t(`quiz.badge${tier}`)} /></strong>
+                <span className="text-xs whitespace-nowrap">{t('quiz.attempts')} : {progress.attempts.toLocaleString(lang)} <span className="text-blue-400" aria-label={t('quiz.accuracy')} title={t('quiz.accuracy')}>· {rate === null ? '—' : `${rate.toLocaleString(lang)} %`}</span></span>
               </div>
-              <progress className="w-full h-2 mt-3 accent-blue-500" value={level} max={rows.length || 1} aria-label={t('quiz.level')} />
+              <progress className="w-full h-1 mt-2 accent-blue-500" value={level} max={rows.length || 1} aria-label={t('quiz.level')} />
             </section>
             {complete ? (
               <section role="status" className={`${surface} rounded-2xl border p-6 text-center space-y-3`}>
-                <Trophy size={42} className="mx-auto text-yellow-400" aria-hidden="true" />
+                <div className="flex justify-center"><QuizBadge tier={tier} label={t(`quiz.badge${tier}`)} large /></div>
                 <h2 className="text-2xl font-semibold">{t('quiz.complete')}</h2>
                 <p>{t('quiz.level')} {level.toLocaleString(lang)} · {t('quiz.attempts')} : {progress.attempts.toLocaleString(lang)}</p>
               </section>
-            ) : verse && question ? (
-              <section className={`${surface} rounded-2xl border p-5 space-y-5`}>
-                <h2 className="text-sm text-blue-400 font-semibold">{t('quiz.question')}</h2>
-                <blockquote style={{ fontSize: state.settings.fontSize }} className="leading-relaxed break-words">{verse.t}</blockquote>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            ) : null}
+            {verse && question && !complete ? (
+              <section className={`${surface} rounded-2xl border p-3 space-y-3`}>
+                <h2 ref={questionHeading} className="text-sm text-blue-400 font-semibold scroll-mt-20">{t('quiz.question')}</h2>
+                <blockquote style={{ fontSize: state.settings.fontSize }} className="quiz-verse leading-snug break-words">{verse.t}</blockquote>
+                <div className="grid grid-cols-2 gap-2">
                   {question.options.map(id => {
                     const correct = selected !== null && id === question.id;
                     const wrong = selected === id && id !== question.id;
                     return <button type="button" key={id} disabled={selected !== null} onClick={() => answer(id)}
-                      className={`${button} text-start transition-colors ${correct ? 'border-green-500 bg-green-500/15' : wrong ? 'border-red-400 bg-red-500/15' : `${surface} enabled:hover:border-blue-400`}`}>
+                      className={`${button} text-start text-sm break-words transition-colors ${correct ? 'border-green-500 bg-green-500/15' : wrong ? 'border-red-400 bg-red-500/15' : `${surface} enabled:hover:border-blue-400`}`}>
                       {correct ? '✓ ' : wrong ? '✗ ' : ''}{reference(id)}
                     </button>;
                   })}
                 </div>
-                {selected !== null && <div role="status" aria-live="polite" className="space-y-3">
+                {selected !== null && <div role="status" aria-live="polite" className="space-y-2">
                   <p className="font-semibold flex items-start gap-2">
                     {selected === question.id && <CheckCircle2 size={20} className="text-green-400 shrink-0" aria-hidden="true" />}
-                    {selected === question.id ? `${t('quiz.correct')} ${t('quiz.level')} ${level.toLocaleString(lang)} !` : `${t('quiz.wrong')} ${reference(question.id)}`}
+                    {selected === question.id ? t('quiz.correct') : t('quiz.wrong')}
                   </p>
+                  <div className="flex items-center gap-1 text-blue-400 text-sm">
+                    <span>{reference(question.id)}</span>
+                    <button type="button" onClick={openVerse} title={t('searchOpenInReading')} aria-label={t('searchOpenInReading')}
+                      className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-lg hover:bg-blue-500/10 focus-visible:ring-2 focus-visible:ring-blue-400">
+                      <BookOpen size={19} aria-hidden="true" />
+                    </button>
+                  </div>
                   <button type="button" onClick={next} className={`${button} w-full bg-blue-600 hover:bg-blue-700 text-white`}>{t('quiz.next')}</button>
                 </div>}
               </section>
             ) : null}
-            <div className="flex flex-wrap items-center justify-center gap-3">
+            {complete && selected !== null && verse && <div className="flex items-center justify-center gap-1 text-sm text-blue-400">
+              <span>{reference(verse.id)}</span>
+              <button type="button" onClick={openVerse} title={t('searchOpenInReading')} aria-label={t('searchOpenInReading')} className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-blue-400"><BookOpen size={19} aria-hidden="true" /></button>
+            </div>}
+            <div className="flex items-center justify-between gap-2">
               <button type="button" onClick={share} className={`${button} ${surface} flex items-center gap-2`}><Share2 size={18} aria-hidden="true" />{t('quiz.share')}</button>
-              <a className={`${button} ${surface}`} href={`mailto:?subject=${encodeURIComponent('The Word — ' + t('quiz.title'))}&body=${encodeURIComponent(score)}`}>{t('quiz.email')}</a>
+              <button type="button" onClick={restart} title={t('quiz.reset')} aria-label={t('quiz.reset')}
+                className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg opacity-60 hover:opacity-100 focus-visible:ring-2 focus-visible:ring-blue-400"><RotateCcw size={16} aria-hidden="true" /></button>
             </div>
             {copyStatus && <p role="status" className="text-center text-sm">{t('quiz.copied')}</p>}
           </>
         )}
-        <p className="text-xs opacity-70">{t('quiz.saved')}</p>
-        <button type="button" className="text-sm text-blue-400 underline min-h-[44px]" onClick={() => dispatch({ type: 'SET_PAGE', payload: 'settings' })}>{t('backupCreate')}</button>
+
       </div>
     </div>
   );

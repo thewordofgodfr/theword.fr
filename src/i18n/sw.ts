@@ -3,6 +3,16 @@ import type { TranslationDict } from './types';
 
 const sw: TranslationDict = {
   quiz: {
+    "accuracy": "Kiwango cha mafanikio",
+    "reset": "Anza upya",
+    "resetConfirm": "Uanzishe upya maswali katika lugha hii? Kiwango na majaribio vitafutwa. Lugha nyingine, maelezo na masomo vitahifadhiwa.",
+    "badge0": "Udongo",
+    "badge1": "Shaba",
+    "badge2": "Fedha",
+    "badge3": "Dhahabu",
+    "badge4": "Taji",
+    "badge5": "Kerubi",
+
     "title": "Maswali",
     "rules": "Tafuta rejeo la mstari. Mistari uliyojibu kwa usahihi haitarudi; uliyokosea inaweza kurudi baadaye.",
     "level": "Kiwango",
