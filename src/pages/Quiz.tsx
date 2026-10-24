@@ -91,7 +91,7 @@ export default function Quiz() {
       setCopyStatus(false); setRetry(n => n + 1);
     } catch { setError(true); }
   };
-  const score = `${t('quiz.title')} — The Word\n${t('quiz.level')} ${level} / ${rows.length}\n${t('quiz.attempts')} : ${progress.attempts}\nhttps://theword.fr/#quiz`;
+  const score = `${t('quiz.title')} — The Word\n${t('quiz.level')} ${level.toLocaleString(lang)} / ${rows.length.toLocaleString(lang)} — ${t(`quiz.badge${tier}`)}\n${t('quiz.attempts')} : ${progress.attempts.toLocaleString(lang)}\n${t('quiz.accuracy')} : ${rate === null ? '—' : `${rate.toLocaleString(lang)} %`}\nhttps://theword.fr/#quiz`;
   const share = async () => {
     try {
       if (navigator.share) { await navigator.share({ title: 'The Word', text: score }); return; }
