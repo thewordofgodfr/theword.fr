@@ -3,6 +3,25 @@ import type { TranslationDict } from './types';
 
 const pt: TranslationDict = {
   quiz: {
+    "ranking": "Classificação",
+    "rankingClose": "Fechar",
+    "rankingBest": "Melhores resultados · por idioma",
+    "rankingYou": "Você",
+    "rankingTop": "Topo",
+    "rankingMine": "Minha posição",
+    "rankingPlayer": "Jogador",
+    "rankingPoints": "Pontos",
+    "rankingPrevious": "Página anterior",
+    "rankingNext": "Próxima página",
+    "rankingHow": "Como funciona?",
+    "rankingLeave": "Remover minha pontuação",
+    "rankingJoin": "Participar da classificação",
+    "rankingEmpty": "Sua primeira resposta correta colocará você na classificação.",
+    "rankingOffline": "Sem conexão. Seu progresso está salvo; tente novamente para sincronizar.",
+    "rankingIntro": "Você receberá um código anônimo. Seu código, melhor pontuação e idioma serão públicos. Os resultados serão sincronizados ao reconectar. Nenhuma nota pessoal é enviada.",
+    "rankingFormula": "Pontos = respostas corretas × taxa de acerto (90 de 100 = 81 pontos). Empates: mais acertos, depois menos tentativas. O melhor resultado é mantido, mesmo após reiniciar.",
+    "rankingLeaveConfirm": "Remover seu código e pontuações online em todos os idiomas? Seu progresso local será mantido.",
+
     "accuracy": "Taxa de acerto",
     "reset": "Recomeçar",
     "resetConfirm": "Reiniciar o quiz neste idioma? O nível e as tentativas serão apagados. Os outros idiomas, notas e estudos serão mantidos.",

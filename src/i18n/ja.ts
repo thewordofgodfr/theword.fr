@@ -3,6 +3,25 @@ import type { TranslationDict } from './types';
 
 const ja: TranslationDict = {
   quiz: {
+    "ranking": "ランキング",
+    "rankingClose": "閉じる",
+    "rankingBest": "最高記録 · 言語別",
+    "rankingYou": "あなた",
+    "rankingTop": "上位へ",
+    "rankingMine": "自分の順位",
+    "rankingPlayer": "プレイヤー",
+    "rankingPoints": "ポイント",
+    "rankingPrevious": "前のページ",
+    "rankingNext": "次のページ",
+    "rankingHow": "計算方法",
+    "rankingLeave": "自分の記録を削除",
+    "rankingJoin": "ランキングに参加",
+    "rankingEmpty": "初めて正解するとランキングに表示されます。",
+    "rankingOffline": "接続できません。進行状況は保存されています。同期を再試行してください。",
+    "rankingIntro": "匿名コードが割り当てられます。コード、最高記録、言語が公開されます。再接続時に結果を同期します。個人のメモは送信されません。",
+    "rankingFormula": "ポイント＝正解数×正解率（100問中90問正解＝81ポイント）。同点では正解数が多く、次に試行回数が少ない方が上位です。リセット後も最高記録は残ります。",
+    "rankingLeaveConfirm": "コードと全言語のオンライン記録を削除しますか？端末内の進行状況は残ります。",
+
     "accuracy": "正答率",
     "reset": "最初から",
     "resetConfirm": "この言語のクイズをリセットしますか？レベルと回答回数が消去されます。他の言語、ノート、学びは保持されます。",

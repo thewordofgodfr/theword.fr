@@ -3,6 +3,25 @@ import type { TranslationDict } from './types';
 
 const zh: TranslationDict = {
   quiz: {
+    "ranking": "排行榜",
+    "rankingClose": "关闭",
+    "rankingBest": "最佳成绩 · 按语言",
+    "rankingYou": "你",
+    "rankingTop": "榜首",
+    "rankingMine": "我的位置",
+    "rankingPlayer": "玩家",
+    "rankingPoints": "积分",
+    "rankingPrevious": "上一页",
+    "rankingNext": "下一页",
+    "rankingHow": "如何计算？",
+    "rankingLeave": "移除我的成绩",
+    "rankingJoin": "加入排行榜",
+    "rankingEmpty": "首次答对后，你将进入排行榜。",
+    "rankingOffline": "无法连接。进度已保存，请重试以同步排行榜。",
+    "rankingIntro": "系统将分配匿名代码。你的代码、最佳成绩和语言将公开。重新联网时自动同步成绩，不会发送个人笔记。",
+    "rankingFormula": "积分 = 答对数量 × 正确率（100次答对90次 = 81分）。同分时先比较答对数量，再比较较少的尝试次数。重置后仍保留最佳成绩。",
+    "rankingLeaveConfirm": "移除你的代码及所有语言的在线成绩？本地进度将保留。",
+
     "accuracy": "正确率",
     "reset": "重新开始",
     "resetConfirm": "重置此语言的测验吗？等级和尝试次数将被清除。其他语言、笔记和研读将保留。",

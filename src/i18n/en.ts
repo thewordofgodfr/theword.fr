@@ -3,6 +3,25 @@ import type { TranslationDict } from './types';
 
 const en: TranslationDict = {
   quiz: {
+    "ranking": "Leaderboard",
+    "rankingClose": "Close",
+    "rankingBest": "Best scores · by language",
+    "rankingYou": "You",
+    "rankingTop": "Top",
+    "rankingMine": "My position",
+    "rankingPlayer": "Player",
+    "rankingPoints": "Points",
+    "rankingPrevious": "Previous page",
+    "rankingNext": "Next page",
+    "rankingHow": "How does it work?",
+    "rankingLeave": "Remove my score",
+    "rankingJoin": "Join the leaderboard",
+    "rankingEmpty": "Your first correct answer will put you on the leaderboard.",
+    "rankingOffline": "Connection unavailable. Your progress is saved; retry to sync the leaderboard.",
+    "rankingIntro": "You will receive an anonymous code. Your code, best score and language will be public. Results will then sync when you reconnect. No personal notes are sent.",
+    "rankingFormula": "Points = correct answers × success rate (90 out of 100 = 81 points). Ties: more correct answers, then fewer attempts. Your best result is kept, even after a reset.",
+    "rankingLeaveConfirm": "Remove your code and online scores in every language? Your local progress will be kept.",
+
     "accuracy": "Success rate",
     "reset": "Restart",
     "resetConfirm": "Reset the quiz in this language? Your level and attempts will be cleared. Other languages, notes and studies will be kept.",

@@ -3,6 +3,25 @@ import type { TranslationDict } from './types';
 
 const sw: TranslationDict = {
   quiz: {
+    "ranking": "Orodha ya washindi",
+    "rankingClose": "Funga",
+    "rankingBest": "Alama bora · kwa lugha",
+    "rankingYou": "Wewe",
+    "rankingTop": "Juu",
+    "rankingMine": "Nafasi yangu",
+    "rankingPlayer": "Mchezaji",
+    "rankingPoints": "Alama",
+    "rankingPrevious": "Ukurasa uliopita",
+    "rankingNext": "Ukurasa unaofuata",
+    "rankingHow": "Inafanyaje kazi?",
+    "rankingLeave": "Ondoa alama zangu",
+    "rankingJoin": "Jiunge na orodha",
+    "rankingEmpty": "Jibu lako la kwanza sahihi litakuingiza kwenye orodha.",
+    "rankingOffline": "Hakuna muunganisho. Maendeleo yako yamehifadhiwa; jaribu kusawazisha tena.",
+    "rankingIntro": "Utapewa msimbo usiotaja jina. Msimbo, alama bora na lugha yako vitaonekana hadharani. Matokeo yatasawazishwa utakapounganishwa tena. Madokezo binafsi hayatatumwa.",
+    "rankingFormula": "Alama = majibu sahihi × kiwango cha mafanikio (90 kati ya 100 = alama 81). Sare: majibu sahihi mengi, kisha majaribio machache. Matokeo bora yanabaki hata baada ya kuanza upya.",
+    "rankingLeaveConfirm": "Ondoa msimbo na alama zako mtandaoni katika lugha zote? Maendeleo ya kifaa chako yatabaki.",
+
     "accuracy": "Kiwango cha mafanikio",
     "reset": "Anza upya",
     "resetConfirm": "Uanzishe upya maswali katika lugha hii? Kiwango na majaribio vitafutwa. Lugha nyingine, maelezo na masomo vitahifadhiwa.",

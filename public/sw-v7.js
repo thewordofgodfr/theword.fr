@@ -336,6 +336,8 @@ self.addEventListener('fetch', (event) => {
     const req = event.request;
     if (req.method !== 'GET') return;
     const url = new URL(req.url);
+    // Authenticated online leaderboard requests are never cached or given an offline HTML fallback.
+    if (url.origin !== ORIGIN && req.headers.has('Authorization')) return;
 
     // ✅ IMPORTANT : laisser passer les pages statiques hors SPA (privacy, robots, sitemap, etc.)
 const PASS_THROUGH_PAGES = new Set([

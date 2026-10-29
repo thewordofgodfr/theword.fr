@@ -22,12 +22,12 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: 'npm'
 
       - run: npm ci
       - name: Verify backups, navigation and offline resilience
-        run: node --test tests/backup.test.mjs tests/backupReminder.test.mjs tests/widgetNavigation.test.mjs tests/offline.test.mjs tests/appUpdates.test.mjs tests/homeReadingSwipe.test.mjs tests/quiz.test.mjs
+        run: node --test tests/backup.test.mjs tests/backupReminder.test.mjs tests/widgetNavigation.test.mjs tests/offline.test.mjs tests/appUpdates.test.mjs tests/homeReadingSwipe.test.mjs tests/quiz.test.mjs tests/quizLeaderboard.test.mjs server/quiz-leaderboard/server.test.mjs
       - run: npm run build
 
       # Juste pour vérif visuelle dans les logs

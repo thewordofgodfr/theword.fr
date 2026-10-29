@@ -3,6 +3,25 @@ import type { TranslationDict } from './types';
 
 const ko: TranslationDict = {
   quiz: {
+    "ranking": "순위표",
+    "rankingClose": "닫기",
+    "rankingBest": "최고 기록 · 언어별",
+    "rankingYou": "나",
+    "rankingTop": "맨 위로",
+    "rankingMine": "내 순위",
+    "rankingPlayer": "플레이어",
+    "rankingPoints": "점수",
+    "rankingPrevious": "이전 페이지",
+    "rankingNext": "다음 페이지",
+    "rankingHow": "계산 방법",
+    "rankingLeave": "내 기록 삭제",
+    "rankingJoin": "순위표 참여",
+    "rankingEmpty": "첫 정답을 맞히면 순위표에 표시됩니다.",
+    "rankingOffline": "연결할 수 없습니다. 진행 상황은 저장되었습니다. 동기화를 다시 시도하세요.",
+    "rankingIntro": "익명 코드가 부여됩니다. 코드, 최고 기록과 언어가 공개됩니다. 다시 연결되면 결과가 동기화됩니다. 개인 메모는 전송되지 않습니다.",
+    "rankingFormula": "점수 = 정답 수 × 정답률 (100회 중 90회 정답 = 81점). 동점이면 정답 수가 많고 시도 횟수가 적은 순입니다. 초기화해도 최고 기록은 유지됩니다.",
+    "rankingLeaveConfirm": "모든 언어의 코드와 온라인 기록을 삭제할까요? 기기의 진행 상황은 유지됩니다.",
+
     "accuracy": "정답률",
     "reset": "다시 시작",
     "resetConfirm": "이 언어의 퀴즈를 초기화할까요? 레벨과 시도 횟수가 삭제됩니다. 다른 언어, 노트와 공부는 유지됩니다.",

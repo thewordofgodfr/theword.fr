@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { BookOpen, CheckCircle2, RotateCcw, Share2 } from 'lucide-react';
+import { BookOpen, CheckCircle2, RotateCcw, Share2, Trophy } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { getQuizVerses, quizReference, quizLocation } from '../services/bibleService';
@@ -7,6 +7,9 @@ import { QUIZ_KEY, readQuiz, saveQuiz, emptyProgress, nextQuestion, answerQuesti
   type QuizProgress, type QuizVerse, type Question } from '../services/quizService';
 
 import QuizBadge from '../components/QuizBadge';
+import QuizLeaderboard from '../components/QuizLeaderboard';
+import { queueScore, readPlayer } from '../services/quizPlayer';
+import { syncScores } from '../services/quizLeaderboard';
 import { saveSlot } from '../services/readingSlots';
 
 export default function Quiz() {
@@ -19,6 +22,7 @@ export default function Quiz() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [retry, setRetry] = useState(0);
+  const [rankingOpen, setRankingOpen] = useState(false);
   const [copyStatus, setCopyStatus] = useState(false);
   const locked = useRef(false);
   const questionHeading = useRef<HTMLHeadingElement>(null);
@@ -55,6 +59,23 @@ export default function Quiz() {
     window.addEventListener('storage', onStorage);
     return () => { cancelled = true; window.removeEventListener('storage', onStorage); };
   }, [lang, retry]);
+
+  useEffect(() => {
+    if (loading || error) return;
+    const sync = () => {
+      try {
+        if (!readPlayer()) return;
+        queueScore(lang, { solved: level, attempts: progress.attempts });
+        void syncScores().catch(() => { /* Keep the offline outbox for the next connection. */ });
+      } catch { /* Online ranking must never block the local quiz. */ }
+    };
+    // Persist immediately, including a peak score obtained offline.
+    try { queueScore(lang, { solved: level, attempts: progress.attempts }); } catch { /* storage unavailable */ }
+    const timer = setTimeout(sync, 1500);
+    window.addEventListener('online', sync);
+    window.addEventListener('focus', sync);
+    return () => { clearTimeout(timer); window.removeEventListener('online', sync); window.removeEventListener('focus', sync); };
+  }, [loading, error, lang, level, progress.attempts]);
 
   const answer = (id: string) => {
     if (!question || locked.current || selected !== null) return;
@@ -105,6 +126,7 @@ export default function Quiz() {
 
   return (
     <div className={`quiz-screen px-3 py-3 ${isDark ? 'bg-gray-900 text-white' : 'bg-blue-50 text-gray-900'}`} dir={lang === 'ar' || lang === 'he' ? 'rtl' : 'ltr'}>
+      {rankingOpen && <QuizLeaderboard score={{ solved: level, attempts: progress.attempts }} onClose={() => setRankingOpen(false)} />}
       <div className="max-w-xl mx-auto space-y-3">
         <h1 className="sr-only">{t('quiz.title')}</h1>
         {loading ? <p role="status">{t('loading')}</p> : error ? (
@@ -162,8 +184,9 @@ export default function Quiz() {
               <span>{reference(verse.id)}</span>
               <button type="button" onClick={openVerse} title={t('searchOpenInReading')} aria-label={t('searchOpenInReading')} className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg focus-visible:ring-2 focus-visible:ring-blue-400"><BookOpen size={19} aria-hidden="true" /></button>
             </div>}
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
               <button type="button" onClick={share} className={`${button} ${surface} flex items-center gap-2`}><Share2 size={18} aria-hidden="true" />{t('quiz.share')}</button>
+              <button type="button" onClick={() => setRankingOpen(true)} title={t('quiz.ranking')} aria-label={t('quiz.ranking')} className={`${button} ${surface} inline-flex items-center justify-center`}><Trophy size={20} aria-hidden="true" /></button>
               <button type="button" onClick={restart} title={t('quiz.reset')} aria-label={t('quiz.reset')}
                 className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg opacity-60 hover:opacity-100 focus-visible:ring-2 focus-visible:ring-blue-400"><RotateCcw size={16} aria-hidden="true" /></button>
             </div>

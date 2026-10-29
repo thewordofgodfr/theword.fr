@@ -3,6 +3,25 @@ import type { TranslationDict } from './types';
 
 const yo: TranslationDict = {
   quiz: {
+    "ranking": "Ìpele àwọn eléré",
+    "rankingClose": "Pa á dé",
+    "rankingBest": "Àbájáde tó dára jù · ní èdè kọ̀ọ̀kan",
+    "rankingYou": "Ìwọ",
+    "rankingTop": "Òkè",
+    "rankingMine": "Ipò mi",
+    "rankingPlayer": "Eléré",
+    "rankingPoints": "Ojú àmì",
+    "rankingPrevious": "Ojú ìwé tó ṣáájú",
+    "rankingNext": "Ojú ìwé tó tẹ̀lé",
+    "rankingHow": "Báwo ni ó ṣe ń ṣiṣẹ́?",
+    "rankingLeave": "Yọ àbájáde mi kúrò",
+    "rankingJoin": "Darapọ̀ mọ́ ìpele",
+    "rankingEmpty": "Ìdáhùn àkọ́kọ́ rẹ tó tọ́ yóò fi ọ sí ìpele.",
+    "rankingOffline": "Kò sí ìsopọ̀. A ti fi ìlọsíwájú rẹ pamọ́; tún gbìyànjú láti mú àbájáde dọ́gba.",
+    "rankingIntro": "A ó fún ọ ní kóòdù aláìlórúkọ. Kóòdù, àbájáde rẹ tó dára jù àti èdè rẹ yóò hàn gbangba. Àbájáde yóò dọ́gba nígbà tí ìsopọ̀ bá padà. A kì í fi àkọsílẹ̀ ara ẹni ránṣẹ́.",
+    "rankingFormula": "Ojú àmì = ìdáhùn tó tọ́ × ìwọ̀n àṣeyọrí (90 nínú 100 = 81). Bí wọ́n bá dọ́gba: ìdáhùn tó tọ́ púpọ̀ sí i, lẹ́yìn náà ìgbìyànjú díẹ̀. Àbájáde tó dára jù wà títí lẹ́yìn ìbẹ̀rẹ̀ tuntun.",
+    "rankingLeaveConfirm": "Yọ kóòdù àti àbájáde rẹ lórí ayélujára ní gbogbo èdè kúrò? Ìlọsíwájú inú ẹ̀rọ rẹ yóò wà.",
+
     "accuracy": "Ìwọ̀n àṣeyọrí",
     "reset": "Bẹ̀rẹ̀ lẹ́ẹ̀kan sí i",
     "resetConfirm": "Ṣé o fẹ́ bẹ̀rẹ̀ ìdánwò èdè yìí láti ìbẹ̀rẹ̀? Ìpele àti ìgbìyànjú yóò parẹ́. Àwọn èdè mìíràn, àkọsílẹ̀ àti ẹ̀kọ́ yóò wà.",

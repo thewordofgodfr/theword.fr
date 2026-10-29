@@ -38,7 +38,7 @@ export function openStore(path, generateCode = randomCode) {
   };
   const submit = (code, body) => {
     const { lang, solved, attempts } = body ?? {};
-    if (!Object.hasOwn(TOTALS, lang) || !Number.isSafeInteger(solved) || !Number.isSafeInteger(attempts)
+    if (typeof lang !== 'string' || !Object.hasOwn(TOTALS, lang) || !Number.isSafeInteger(solved) || !Number.isSafeInteger(attempts)
       || solved < 0 || solved > TOTALS[lang] || attempts < solved || attempts > 100000000) throw Object.assign(new Error('invalid-score'), { status: 400 });
     if (!solved) return;
     db.prepare(`INSERT INTO scores VALUES(?,?,?,?,?,?) ON CONFLICT(code,lang) DO UPDATE SET
@@ -47,7 +47,7 @@ export function openStore(path, generateCode = randomCode) {
       .run(code, lang, solved, attempts, points(solved, attempts), new Date().toISOString());
   };
   const board = (lang, code, view, requestedPage) => {
-    if (!Object.hasOwn(TOTALS, lang)) throw Object.assign(new Error('invalid-language'), { status: 400 });
+    if (typeof lang !== 'string' || !Object.hasOwn(TOTALS, lang)) throw Object.assign(new Error('invalid-language'), { status: 400 });
     const total = db.prepare('SELECT COUNT(*) AS n FROM scores WHERE lang=?').get(lang).n;
     const mine = code ? db.prepare('SELECT code, solved, attempts, points FROM scores WHERE lang=? AND code=?').get(lang, code) : null;
     const rank = mine ? 1 + db.prepare(`SELECT COUNT(*) AS n FROM scores WHERE lang=? AND

@@ -3,6 +3,25 @@ import type { TranslationDict } from './types';
 
 const id: TranslationDict = {
   quiz: {
+    "ranking": "Peringkat",
+    "rankingClose": "Tutup",
+    "rankingBest": "Skor terbaik · per bahasa",
+    "rankingYou": "Anda",
+    "rankingTop": "Teratas",
+    "rankingMine": "Posisi saya",
+    "rankingPlayer": "Pemain",
+    "rankingPoints": "Poin",
+    "rankingPrevious": "Halaman sebelumnya",
+    "rankingNext": "Halaman berikutnya",
+    "rankingHow": "Bagaimana cara kerjanya?",
+    "rankingLeave": "Hapus skor saya",
+    "rankingJoin": "Ikut peringkat",
+    "rankingEmpty": "Jawaban benar pertama akan memasukkan Anda ke peringkat.",
+    "rankingOffline": "Koneksi tidak tersedia. Progres tersimpan; coba lagi untuk menyinkronkan.",
+    "rankingIntro": "Anda akan mendapat kode anonim. Kode, skor terbaik, dan bahasa Anda akan terlihat publik. Hasil disinkronkan saat tersambung kembali. Catatan pribadi tidak dikirim.",
+    "rankingFormula": "Poin = jawaban benar × tingkat keberhasilan (90 dari 100 = 81 poin). Jika seri: lebih banyak jawaban benar, lalu lebih sedikit percobaan. Skor terbaik tetap disimpan setelah reset.",
+    "rankingLeaveConfirm": "Hapus kode dan skor daring Anda dalam semua bahasa? Progres lokal tetap disimpan.",
+
     "accuracy": "Tingkat keberhasilan",
     "reset": "Mulai lagi",
     "resetConfirm": "Atur ulang kuis dalam bahasa ini? Level dan percobaan akan dihapus. Bahasa lain, catatan, dan studi akan tetap disimpan.",

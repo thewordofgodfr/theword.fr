@@ -118,7 +118,7 @@
     <main>
       <h1>Politique de confidentialité – TheWord</h1>
 
-      <small>Dernière mise à jour&nbsp;: 21 septembre 2026</small>
+      <small>Dernière mise à jour&nbsp;: 29 octobre 2026</small>
 
       <section>
         <p>
@@ -130,7 +130,7 @@
         <p>
           Cette page explique de manière simple comment vos données sont
           traitées. TheWord est conçue pour respecter votre vie privée&nbsp;:
-          nous ne créons pas de compte utilisateur, nous ne vendons pas vos
+          aucune inscription nominative n’est nécessaire, nous ne vendons pas vos
           données et nous n'utilisons aucun outil de mesure d'audience, de
           publicité ou de suivi de navigation.
         </p>
@@ -151,6 +151,7 @@
           <li>vos réglages (thème, langue, taille de police, etc.) ;</li>
           <li>votre position de lecture récente (livre, chapitre) ;</li>
           <li>vos notes, listes de versets, collections et textes ajoutés ;</li>
+          <li>votre progression au quiz et, si vous participez au classement, votre code joueur et sa clé privée ;</li>
           <li>
             les données nécessaires au fonctionnement hors ligne (cache de
             chapitres bibliques, ressources techniques).
@@ -158,14 +159,13 @@
         </ul>
 
         <p>
-          Ces données restent sur votre appareil. Elles ne sont pas envoyées à
-          nos serveurs et nous n’y avons pas accès.
+          Vos notes et vos données de lecture restent sur votre appareil. Seuls les résultats du quiz nécessaires au classement sont envoyés si vous choisissez d’y participer (voir ci-dessous).
         </p>
 
         <h3>1.2 Journaux techniques de l’hébergeur</h3>
 
         <p>
-          Le site web est hébergé par GitHub Pages. Comme tout hébergeur, GitHub
+          Le site web est hébergé par GitHub Pages ; le classement facultatif du quiz utilise Railway. Comme tout hébergeur, GitHub
           peut traiter des journaux techniques nécessaires à la fourniture, à la
           sécurité et à la maintenance de son service (par exemple l’adresse IP,
           le navigateur, la date et la ressource demandée), conformément à sa
@@ -189,7 +189,21 @@
           à améliorer la compatibilité et la stabilité de l’application.
         </p>
 
-        <h3>1.4 Absence de mesure d’audience et de publicité</h3>
+        <h3>1.4 Classement facultatif du quiz</h3>
+        <p>Lors de votre première participation au classement, un code anonyme unique vous est attribué.
+          Le classement public affiche ce code, la langue du quiz, le meilleur résultat (nombre de bonnes réponses,
+          nombre d’essais, taux de réussite et points). Le service est hébergé sur Railway en région Europe.
+          Aucune note, aucun texte personnel, aucune adresse e-mail ni aucun nom réel n’est demandé ou envoyé.</p>
+        <p>Une clé privée conservée sur votre appareil permet de mettre à jour uniquement votre propre score.
+          Cette clé est incluse dans votre sauvegarde TheWord : gardez ce fichier privé.
+          Le serveur ne conserve qu’une empreinte de cette clé. Les résultats obtenus hors connexion sont
+          envoyés lorsque vous revenez au quiz avec une connexion. Le meilleur résultat reste enregistré
+          après une remise à zéro du jeu, jusqu’à ce que vous choisissiez « Retirer mon score » dans le classement.
+          Cette action supprime votre code et vos scores en ligne sans effacer votre progression locale.</p>
+        <p>Les requêtes réseau peuvent figurer dans les journaux techniques de Railway. Des limites temporaires
+          de requêtes protègent le service. Ces données ne servent pas à mesurer l’audience ni à suivre votre navigation.</p>
+
+        <h3>1.5 Absence de mesure d’audience et de publicité</h3>
 
         <p>
           Le site et l’application TheWord n’intègrent pas Google Analytics,

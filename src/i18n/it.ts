@@ -3,6 +3,25 @@ import type { TranslationDict } from './types';
 
 const it: TranslationDict = {
   quiz: {
+    "ranking": "Classifica",
+    "rankingClose": "Chiudi",
+    "rankingBest": "Migliori risultati · per lingua",
+    "rankingYou": "Tu",
+    "rankingTop": "In cima",
+    "rankingMine": "La mia posizione",
+    "rankingPlayer": "Giocatore",
+    "rankingPoints": "Punti",
+    "rankingPrevious": "Pagina precedente",
+    "rankingNext": "Pagina successiva",
+    "rankingHow": "Come funziona?",
+    "rankingLeave": "Rimuovi il mio punteggio",
+    "rankingJoin": "Partecipa alla classifica",
+    "rankingEmpty": "La prima risposta corretta ti farà entrare in classifica.",
+    "rankingOffline": "Connessione assente. I progressi sono salvati; riprova per sincronizzare la classifica.",
+    "rankingIntro": "Riceverai un codice anonimo. Il codice, il miglior punteggio e la lingua saranno pubblici. I risultati si sincronizzeranno alla riconnessione. Nessuna nota personale viene inviata.",
+    "rankingFormula": "Punti = risposte corrette × percentuale di successo (90 su 100 = 81 punti). Parità: più risposte corrette, poi meno tentativi. Il miglior risultato resta anche dopo un azzeramento.",
+    "rankingLeaveConfirm": "Rimuovere codice e punteggi online in tutte le lingue? I progressi locali saranno conservati.",
+
     "accuracy": "Risposte corrette",
     "reset": "Ricomincia",
     "resetConfirm": "Azzerare il quiz in questa lingua? Livello e tentativi saranno cancellati. Altre lingue, note e studi saranno conservati.",

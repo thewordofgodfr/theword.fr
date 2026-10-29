@@ -3,6 +3,25 @@ import type { TranslationDict } from './types';
 
 const tr: TranslationDict = {
   quiz: {
+    "ranking": "Sıralama",
+    "rankingClose": "Kapat",
+    "rankingBest": "En iyi sonuçlar · dile göre",
+    "rankingYou": "Siz",
+    "rankingTop": "En üst",
+    "rankingMine": "Benim yerim",
+    "rankingPlayer": "Oyuncu",
+    "rankingPoints": "Puan",
+    "rankingPrevious": "Önceki sayfa",
+    "rankingNext": "Sonraki sayfa",
+    "rankingHow": "Nasıl hesaplanır?",
+    "rankingLeave": "Puanımı kaldır",
+    "rankingJoin": "Sıralamaya katıl",
+    "rankingEmpty": "İlk doğru yanıtınızla sıralamaya gireceksiniz.",
+    "rankingOffline": "Bağlantı yok. İlerlemeniz kaydedildi; eşitlemek için yeniden deneyin.",
+    "rankingIntro": "Size anonim bir kod verilir. Kodunuz, en iyi puanınız ve diliniz herkese görünür. Yeniden bağlanınca sonuçlar eşitlenir. Kişisel notlar gönderilmez.",
+    "rankingFormula": "Puan = doğru yanıt sayısı × başarı oranı (100 denemede 90 doğru = 81 puan). Eşitlikte daha çok doğru, sonra daha az deneme öne geçer. Sıfırlamadan sonra da en iyi sonuç korunur.",
+    "rankingLeaveConfirm": "Kodunuzu ve tüm dillerdeki çevrimiçi puanlarınızı kaldıralım mı? Yerel ilerlemeniz korunur.",
+
     "accuracy": "Başarı oranı",
     "reset": "Yeniden başlat",
     "resetConfirm": "Bu dildeki yarışma sıfırlansın mı? Seviye ve denemeler silinecek. Diğer diller, notlar ve çalışmalar korunacak.",

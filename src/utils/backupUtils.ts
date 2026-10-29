@@ -1,3 +1,4 @@
+import { PLAYER_KEY, readPlayer, validatePlayer, type QuizPlayer } from '../services/quizPlayer';
 import { QUIZ_KEY, readQuiz, validateQuiz, mergeQuiz, type QuizStore } from '../services/quizService';
 import { SUPPORTED_LANGUAGES } from '../types/bible';
 import { MAX_RECENT_SEARCHES, readRecentSearches, sanitizeRecentSearches } from './recentSearches';
@@ -19,7 +20,7 @@ const KEYS = {
   lastStudyList: 'twog:lastPrincipleId',
 } as const;
 type StoredValue = string | null;
-type BackupData = Record<keyof typeof KEYS, StoredValue> & { quiz?: QuizStore; scrollPositions?: Record<string, string>; recentSearches?: Record<string, string[]> };
+type BackupData = Record<keyof typeof KEYS, StoredValue> & { quiz?: QuizStore; quizPlayer?: QuizPlayer; scrollPositions?: Record<string, string>; recentSearches?: Record<string, string[]> };
 type BackupFile = { application: 'TheWord'; backupVersion: 1; createdAt: string; data: BackupData };
 type Item = Record<string, unknown> & { bookId: string; chapter: number; verse: number };
 type List = Record<string, unknown> & { id: string; title: string; items: Item[]; updatedAt: number | string };
@@ -101,6 +102,7 @@ function validate(value: unknown): BackupFile {
   }
   const data = raw as BackupData;
   if (data.quiz !== undefined) validateQuiz(data.quiz);
+  if (data.quizPlayer !== undefined) validatePlayer(data.quizPlayer);
   lists(data.notes); lists(data.studies); slots(data.readingSlots); settings(data.settings);
   if (data.language !== null && !language(data.language)) invalid();
   for (const key of ['lastActiveSlot', 'lastTappedSlot'] as const) {
@@ -144,6 +146,8 @@ export function createBackup(): { file: File; summary: BackupSummary } {
   const data = Object.fromEntries(Object.entries(KEYS)
     .map(([name, key]) => [name, localStorage.getItem(key)])) as unknown as BackupData;
   data.quiz = readQuiz();
+  const player = readPlayer();
+  if (player) data.quizPlayer = player;
   data.scrollPositions = getScrollPositions();
   data.recentSearches = {};
   for (const code of SUPPORTED_LANGUAGES) {
@@ -286,6 +290,8 @@ export async function restoreBackupByMerging(file: File): Promise<BackupSummary>
   if (data.quiz !== undefined && Object.keys(data.quiz.languages).length) {
     add(QUIZ_KEY, JSON.stringify(mergeQuiz(readQuiz(), data.quiz)));
   }
+  // A fresh device recovers the same anonymous identity; never overwrite another local player.
+  if (data.quizPlayer && !readPlayer()) add(PLAYER_KEY, JSON.stringify(validatePlayer(data.quizPlayer)));
   const before = changes.map(change => ({ ...change, previous: change.storage.getItem(change.key) }));
   const applied: typeof before = [];
   try {
