@@ -18,7 +18,11 @@ const sw: TranslationDict = {
     "rankingJoin": "Jiunge na orodha",
     "rankingEmpty": "Jibu lako la kwanza sahihi litakuingiza kwenye orodha.",
     "rankingOffline": "Hakuna muunganisho. Maendeleo yako yamehifadhiwa; jaribu kusawazisha tena.",
-    "rankingIntro": "Utapewa msimbo usiotaja jina. Msimbo, alama bora na lugha yako vitaonekana hadharani. Matokeo yatasawazishwa utakapounganishwa tena. Madokezo binafsi hayatatumwa.",
+    "rankingIntro": "Jina la bandia linalotengenezwa kiotomatiki, alama zako bora na lugha yako vitaonekana hadharani. Matokeo husawazishwa unapounganisha tena. Madokezo binafsi hayatatumwa.",
+    "rankingRetention": "Kushiriki ni hiari. Unaweza kufuta ushiriki bila kupoteza maendeleo ya kifaa. Wasifu hufutwa baada ya miezi 24 bila shughuli.",
+    "rankingPrivacy": "Faragha na haki",
+    "rankingAdult": "Nathibitisha nina umri wa miaka 18 au zaidi.",
+    "rankingConsent": "Nakubali kuchapisha na kusawazisha jina langu la bandia na alama zangu katika orodha ya umma. Ninaweza kuondoa idhini wakati wowote.",
     "rankingFormula": "Alama = majibu sahihi × kiwango cha mafanikio (90 kati ya 100 = alama 81). Sare: majibu sahihi mengi, kisha majaribio machache. Matokeo bora yanabaki hata baada ya kuanza upya.",
     "rankingLeaveConfirm": "Ondoa msimbo na alama zako mtandaoni katika lugha zote? Maendeleo ya kifaa chako yatabaki.",
 

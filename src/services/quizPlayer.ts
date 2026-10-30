@@ -1,7 +1,9 @@
 import { SUPPORTED_LANGUAGES, type Language } from '../types/bible';
+export const QUIZ_CONSENT_VERSION = '2026-10-29.1';
+export const hasQuizConsent = (p: QuizPlayer | null) => p?.consentVersion === QUIZ_CONSENT_VERSION;
 export const PLAYER_KEY = 'twog:quiz:player:v1';
 export type ScoreSnapshot = { solved: number; attempts: number };
-export type QuizPlayer = { version: 1; token: string; code: string | null; pending: Partial<Record<Language, ScoreSnapshot>> };
+export type QuizPlayer = { version: 1; consentVersion?: string; token: string; code: string | null; pending: Partial<Record<Language, ScoreSnapshot>> };
 export const rankingPoints = (s: ScoreSnapshot) => s.attempts ? s.solved * s.solved / s.attempts : 0;
 export const betterScore = (a: ScoreSnapshot, b: ScoreSnapshot) => rankingPoints(a) > rankingPoints(b)
   || (rankingPoints(a) === rankingPoints(b) && a.solved > b.solved);
@@ -15,7 +17,7 @@ export function validatePlayer(value: unknown): QuizPlayer {
       || !Number.isSafeInteger(s.attempts) || s.solved < 0 || s.solved > 50000
       || s.attempts < s.solved || s.attempts > 100000000) throw new Error('invalid-quiz-player');
   }
-  return { version: 1, token: p.token, code: p.code, pending: p.pending };
+  return { version: 1, token: p.token, code: p.code, pending: p.pending, ...(p.consentVersion === QUIZ_CONSENT_VERSION ? { consentVersion: p.consentVersion } : {}) };
 }
 export function readPlayer(): QuizPlayer | null {
   const raw = localStorage.getItem(PLAYER_KEY);
@@ -25,7 +27,7 @@ export const savePlayer = (p: QuizPlayer) => localStorage.setItem(PLAYER_KEY, JS
 /** Capture the best offline result before a later wrong answer or reset can reduce it. */
 export function queueScore(lang: Language, score: ScoreSnapshot): void {
   const p = readPlayer();
-  if (!p || !score.solved) return;
+  if (!p || !hasQuizConsent(p) || !score.solved) return;
   const old = p.pending[lang];
   if (!old || betterScore(score, old)) savePlayer({ ...p, pending: { ...p.pending, [lang]: score } });
 }

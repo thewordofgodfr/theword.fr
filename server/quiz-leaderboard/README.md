@@ -38,3 +38,13 @@ Local: `DB_PATH=/tmp/quiz.sqlite PORT=3000 node server/quiz-leaderboard/server.m
 Tests: `node --test tests/quizLeaderboard.test.mjs server/quiz-leaderboard/server.test.mjs`.
 
 When Bible content changes, regenerate totals through `getQuizVerses`, then deploy the API and UI together. Any future ranking formula change requires an explicit database migration/recalculation; do not silently compare old-formula points with new ones.
+
+## Consent and retention
+
+POST /v1/players requires JSON `{ "version": "2026-10-29.1", "accepted": true, "adult": true, "language": "fr" }`. Only call after both unchecked boxes are selected. The immutable translated notice is archived in consent-2026-10-29.1.json. Changing the substantive notice requires a new version on client and server and fresh consent. Proof records server timestamp, version, language and adult self-declaration; no birth date is collected.
+
+GET /v1/player checks existing consent and refreshes activity; it never registers a missing profile. Legacy profiles are hidden until consent and remain deletable. A restored backup cannot silently register a deleted or expired profile.
+
+Retention: 24 calendar months after last authenticated profile activity or score synchronization. Expired profiles are hidden immediately, purged at startup and hourly, with scores and consent proof deleted by cascade. Local progress and user-owned exported backups are independent. No external database backups are configured by this change; any future backup policy must bound retention and preserve deletions during recovery.
+
+The operator must verify the Railway DPA/account agreement and applicable transfer guarantees. An EU database region alone is not an assurance that all processing stays in the EU.

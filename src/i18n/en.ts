@@ -18,7 +18,11 @@ const en: TranslationDict = {
     "rankingJoin": "Join the leaderboard",
     "rankingEmpty": "Your first correct answer will put you on the leaderboard.",
     "rankingOffline": "Connection unavailable. Your progress is saved; retry to sync the leaderboard.",
-    "rankingIntro": "You will receive an anonymous code. Your code, best score and language will be public. Results will then sync when you reconnect. No personal notes are sent.",
+    "rankingIntro": "An automatically generated pseudonym, your best score and your language will be public. Results sync when you reconnect. No personal notes are sent.",
+    "rankingRetention": "The leaderboard is optional. You can delete your participation without losing local progress. Your profile is deleted after 24 months of inactivity.",
+    "rankingPrivacy": "Privacy and rights",
+    "rankingAdult": "I confirm I am 18 or older.",
+    "rankingConsent": "I agree to publish and sync my pseudonym and scores on the public leaderboard. I can withdraw my consent at any time.",
     "rankingFormula": "Points = correct answers × success rate (90 out of 100 = 81 points). Ties: more correct answers, then fewer attempts. Your best result is kept, even after a reset.",
     "rankingLeaveConfirm": "Remove your code and online scores in every language? Your local progress will be kept.",
 

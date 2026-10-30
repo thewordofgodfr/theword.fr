@@ -1,0 +1,128 @@
+{
+  "fr": {
+    "rankingIntro": "Un pseudonyme généré automatiquement, votre meilleur score et votre langue seront publics. Vos résultats seront synchronisés à la reconnexion. Aucune note personnelle n’est envoyée.",
+    "rankingRetention": "Le classement est facultatif. Vous pouvez supprimer votre participation sans perdre votre progression locale. Votre profil est supprimé après 24 mois d’inactivité.",
+    "rankingPrivacy": "Confidentialité et droits",
+    "rankingAdult": "Je confirme avoir 18 ans ou plus.",
+    "rankingConsent": "J’accepte la publication et la synchronisation de mon pseudonyme et de mes scores dans le classement public. Je peux retirer mon accord à tout moment."
+  },
+  "en": {
+    "rankingIntro": "An automatically generated pseudonym, your best score and your language will be public. Results sync when you reconnect. No personal notes are sent.",
+    "rankingRetention": "The leaderboard is optional. You can delete your participation without losing local progress. Your profile is deleted after 24 months of inactivity.",
+    "rankingPrivacy": "Privacy and rights",
+    "rankingAdult": "I confirm I am 18 or older.",
+    "rankingConsent": "I agree to publish and sync my pseudonym and scores on the public leaderboard. I can withdraw my consent at any time."
+  },
+  "de": {
+    "rankingIntro": "Ein automatisch erzeugtes Pseudonym, Ihr Bestwert und Ihre Sprache werden öffentlich. Ergebnisse werden bei erneuter Verbindung synchronisiert. Persönliche Notizen werden nicht gesendet.",
+    "rankingRetention": "Die Rangliste ist freiwillig. Sie können Ihren Eintrag ohne Verlust des lokalen Fortschritts löschen. Ihr Profil wird nach 24 Monaten Inaktivität gelöscht.",
+    "rankingPrivacy": "Datenschutz und Rechte",
+    "rankingAdult": "Ich bestätige, mindestens 18 Jahre alt zu sein.",
+    "rankingConsent": "Ich stimme der Veröffentlichung und Synchronisierung meines Pseudonyms und meiner Ergebnisse in der öffentlichen Rangliste zu. Ich kann jederzeit widerrufen."
+  },
+  "it": {
+    "rankingIntro": "Uno pseudonimo generato automaticamente, il miglior punteggio e la lingua saranno pubblici. I risultati si sincronizzano alla riconnessione. Nessuna nota personale viene inviata.",
+    "rankingRetention": "La classifica è facoltativa. Puoi eliminare la partecipazione senza perdere i progressi locali. Il profilo viene eliminato dopo 24 mesi di inattività.",
+    "rankingPrivacy": "Privacy e diritti",
+    "rankingAdult": "Confermo di avere almeno 18 anni.",
+    "rankingConsent": "Acconsento alla pubblicazione e sincronizzazione dello pseudonimo e dei punteggi nella classifica pubblica. Posso revocare il consenso in qualsiasi momento."
+  },
+  "es": {
+    "rankingIntro": "Un seudónimo generado automáticamente, tu mejor puntuación y tu idioma serán públicos. Los resultados se sincronizan al reconectar. No se envían notas personales.",
+    "rankingRetention": "La clasificación es opcional. Puedes eliminar tu participación sin perder tu progreso local. El perfil se elimina tras 24 meses de inactividad.",
+    "rankingPrivacy": "Privacidad y derechos",
+    "rankingAdult": "Confirmo que tengo 18 años o más.",
+    "rankingConsent": "Acepto publicar y sincronizar mi seudónimo y mis puntuaciones en la clasificación pública. Puedo retirar mi consentimiento en cualquier momento."
+  },
+  "pt": {
+    "rankingIntro": "Um pseudónimo gerado automaticamente, a melhor pontuação e o idioma serão públicos. Os resultados sincronizam ao voltar a ligar. Nenhuma nota pessoal é enviada.",
+    "rankingRetention": "A classificação é opcional. Pode eliminar a participação sem perder o progresso local. O perfil é eliminado após 24 meses de inatividade.",
+    "rankingPrivacy": "Privacidade e direitos",
+    "rankingAdult": "Confirmo que tenho 18 anos ou mais.",
+    "rankingConsent": "Aceito publicar e sincronizar o meu pseudónimo e as pontuações na classificação pública. Posso retirar o consentimento a qualquer momento."
+  },
+  "ru": {
+    "rankingIntro": "Автоматически созданный псевдоним, лучший результат и язык будут общедоступны. Результаты синхронизируются при подключении. Личные заметки не отправляются.",
+    "rankingRetention": "Участие добровольное. Можно удалить участие, сохранив локальный прогресс. Профиль удаляется после 24 месяцев бездействия.",
+    "rankingPrivacy": "Конфиденциальность и права",
+    "rankingAdult": "Подтверждаю, что мне исполнилось 18 лет.",
+    "rankingConsent": "Я согласен на публикацию и синхронизацию псевдонима и результатов в общедоступном рейтинге. Я могу отозвать согласие в любое время."
+  },
+  "hi": {
+    "rankingIntro": "अपने आप बना उपनाम, आपका सर्वश्रेष्ठ स्कोर और भाषा सार्वजनिक होंगे। दोबारा जुड़ने पर परिणाम सिंक होंगे। निजी नोट नहीं भेजे जाते।",
+    "rankingRetention": "रैंकिंग वैकल्पिक है। स्थानीय प्रगति खोए बिना भागीदारी मिटा सकते हैं। 24 महीने निष्क्रिय रहने पर प्रोफ़ाइल मिटा दी जाती है।",
+    "rankingPrivacy": "गोपनीयता और अधिकार",
+    "rankingAdult": "मैं पुष्टि करता/करती हूँ कि मेरी आयु 18 वर्ष या अधिक है।",
+    "rankingConsent": "मैं सार्वजनिक रैंकिंग में अपने उपनाम और स्कोर प्रकाशित और सिंक करने की सहमति देता/देती हूँ। मैं कभी भी सहमति वापस ले सकता/सकती हूँ।"
+  },
+  "zh": {
+    "rankingIntro": "自动生成的化名、最高得分和语言将公开。重新联网时会同步成绩。不会发送个人笔记。",
+    "rankingRetention": "排行榜为自愿参加。退出并删除资料不会丢失本地进度。连续24个月不活跃后，资料将被删除。",
+    "rankingPrivacy": "隐私与权利",
+    "rankingAdult": "我确认已年满18岁。",
+    "rankingConsent": "我同意在公开排行榜中发布并同步我的化名和成绩。我可以随时撤回同意。"
+  },
+  "ar": {
+    "rankingIntro": "سيظهر للعامة اسم مستعار مولّد تلقائياً وأفضل نتيجة ولغتك. تتم مزامنة النتائج عند الاتصال مجدداً. لا تُرسل الملاحظات الشخصية.",
+    "rankingRetention": "المشاركة اختيارية. يمكنك حذف مشاركتك دون فقدان تقدمك المحلي. يُحذف ملفك بعد 24 شهراً من عدم النشاط.",
+    "rankingPrivacy": "الخصوصية والحقوق",
+    "rankingAdult": "أؤكد أن عمري 18 عاماً أو أكثر.",
+    "rankingConsent": "أوافق على نشر اسمي المستعار ونتائجي ومزامنتها في الترتيب العام. يمكنني سحب موافقتي في أي وقت."
+  },
+  "id": {
+    "rankingIntro": "Nama samaran yang dibuat otomatis, skor terbaik, dan bahasa Anda akan ditampilkan secara publik. Hasil disinkronkan saat tersambung kembali. Catatan pribadi tidak dikirim.",
+    "rankingRetention": "Papan peringkat bersifat opsional. Anda dapat menghapus keikutsertaan tanpa kehilangan progres lokal. Profil dihapus setelah 24 bulan tidak aktif.",
+    "rankingPrivacy": "Privasi dan hak",
+    "rankingAdult": "Saya menegaskan bahwa saya berusia 18 tahun atau lebih.",
+    "rankingConsent": "Saya menyetujui publikasi dan sinkronisasi nama samaran serta skor saya di papan peringkat publik. Saya dapat mencabut persetujuan kapan saja."
+  },
+  "sw": {
+    "rankingIntro": "Jina la bandia linalotengenezwa kiotomatiki, alama zako bora na lugha yako vitaonekana hadharani. Matokeo husawazishwa unapounganisha tena. Madokezo binafsi hayatatumwa.",
+    "rankingRetention": "Kushiriki ni hiari. Unaweza kufuta ushiriki bila kupoteza maendeleo ya kifaa. Wasifu hufutwa baada ya miezi 24 bila shughuli.",
+    "rankingPrivacy": "Faragha na haki",
+    "rankingAdult": "Nathibitisha nina umri wa miaka 18 au zaidi.",
+    "rankingConsent": "Nakubali kuchapisha na kusawazisha jina langu la bandia na alama zangu katika orodha ya umma. Ninaweza kuondoa idhini wakati wowote."
+  },
+  "tr": {
+    "rankingIntro": "Otomatik oluşturulan takma adınız, en iyi puanınız ve diliniz herkese açık olacaktır. Yeniden bağlanınca sonuçlar eşitlenir. Kişisel notlar gönderilmez.",
+    "rankingRetention": "Katılım isteğe bağlıdır. Yerel ilerlemenizi kaybetmeden katılımınızı silebilirsiniz. Profiliniz 24 ay etkinlik olmazsa silinir.",
+    "rankingPrivacy": "Gizlilik ve haklar",
+    "rankingAdult": "18 yaşında veya daha büyük olduğumu onaylıyorum.",
+    "rankingConsent": "Takma adımın ve puanlarımın herkese açık sıralamada yayımlanmasına ve eşitlenmesine izin veriyorum. İznimi istediğim zaman geri çekebilirim."
+  },
+  "ja": {
+    "rankingIntro": "自動生成された仮名、最高スコア、言語が公開されます。再接続時に結果が同期されます。個人のメモは送信されません。",
+    "rankingRetention": "参加は任意です。端末内の進捗を失わずに参加データを削除できます。24か月間利用がないプロフィールは削除されます。",
+    "rankingPrivacy": "プライバシーと権利",
+    "rankingAdult": "私は18歳以上であることを確認します。",
+    "rankingConsent": "公開ランキングで仮名とスコアを公開・同期することに同意します。同意はいつでも撤回できます。"
+  },
+  "ko": {
+    "rankingIntro": "자동 생성된 가명, 최고 점수와 언어가 공개됩니다. 재접속 시 결과가 동기화됩니다. 개인 메모는 전송되지 않습니다.",
+    "rankingRetention": "참여는 선택 사항입니다. 기기의 진행 상황을 유지하면서 참여 정보를 삭제할 수 있습니다. 24개월간 활동이 없으면 프로필이 삭제됩니다.",
+    "rankingPrivacy": "개인정보 및 권리",
+    "rankingAdult": "만 18세 이상임을 확인합니다.",
+    "rankingConsent": "공개 순위표에 가명과 점수를 게시하고 동기화하는 데 동의합니다. 언제든지 동의를 철회할 수 있습니다."
+  },
+  "yo": {
+    "rankingIntro": "Orúkọ àfipamọ́ tí a dá láìfọwọ́ṣe, àmì tó dára jù lọ àti èdè rẹ yóò hàn sí gbogbo ènìyàn. Àbájáde yóò múdójúìwọ̀n nígbà tí o tún sopọ̀. A kò fi àkọsílẹ̀ ara ẹni ránṣẹ́.",
+    "rankingRetention": "Kíkópa jẹ́ àṣàyàn. O lè pa ìkópa rẹ rẹ́ láìpadanu ìlọsíwájú lórí ẹ̀rọ rẹ. A ó pa àkọọlẹ rẹ rẹ́ lẹ́yìn oṣù 24 tí kò sí ìṣe.",
+    "rankingPrivacy": "Àṣírí àti ẹ̀tọ́",
+    "rankingAdult": "Mo jẹ́rìí pé mo ti pé ọmọ ọdún 18 tàbí jù bẹ́ẹ̀ lọ.",
+    "rankingConsent": "Mo gbà láti tẹ orúkọ àfipamọ́ àti àmì mi jáde àti láti mú wọn dọ́gba nínú àtòjọ gbogbo ènìyàn. Mo lè fagilé ìyọ̀nda mi nígbàkigbà."
+  },
+  "he": {
+    "rankingIntro": "כינוי שנוצר אוטומטית, התוצאה הטובה ביותר והשפה שלך יהיו גלויים לציבור. התוצאות יסונכרנו בחיבור מחדש. הערות אישיות אינן נשלחות.",
+    "rankingRetention": "ההשתתפות היא לבחירתך. ניתן למחוק אותה בלי לאבד התקדמות מקומית. הפרופיל נמחק לאחר 24 חודשים ללא פעילות.",
+    "rankingPrivacy": "פרטיות וזכויות",
+    "rankingAdult": "אני מאשר/ת שמלאו לי 18 שנים.",
+    "rankingConsent": "אני מסכים/ה לפרסום ולסנכרון הכינוי והתוצאות שלי בדירוג הציבורי. ניתן לבטל את ההסכמה בכל עת."
+  },
+  "el": {
+    "rankingIntro": "Ένα ψευδώνυμο που δημιουργείται αυτόματα, η καλύτερη βαθμολογία και η γλώσσα σας θα είναι δημόσια. Τα αποτελέσματα συγχρονίζονται κατά την επανασύνδεση. Δεν αποστέλλονται προσωπικές σημειώσεις.",
+    "rankingRetention": "Η συμμετοχή είναι προαιρετική. Μπορείτε να τη διαγράψετε χωρίς να χάσετε την τοπική πρόοδο. Το προφίλ διαγράφεται μετά από 24 μήνες αδράνειας.",
+    "rankingPrivacy": "Απόρρητο και δικαιώματα",
+    "rankingAdult": "Επιβεβαιώνω ότι είμαι τουλάχιστον 18 ετών.",
+    "rankingConsent": "Συναινώ στη δημοσίευση και στον συγχρονισμό του ψευδωνύμου και των βαθμολογιών μου στη δημόσια κατάταξη. Μπορώ να ανακαλέσω τη συγκατάθεσή μου οποτεδήποτε."
+  }
+}

@@ -18,7 +18,11 @@ const tr: TranslationDict = {
     "rankingJoin": "Sıralamaya katıl",
     "rankingEmpty": "İlk doğru yanıtınızla sıralamaya gireceksiniz.",
     "rankingOffline": "Bağlantı yok. İlerlemeniz kaydedildi; eşitlemek için yeniden deneyin.",
-    "rankingIntro": "Size anonim bir kod verilir. Kodunuz, en iyi puanınız ve diliniz herkese görünür. Yeniden bağlanınca sonuçlar eşitlenir. Kişisel notlar gönderilmez.",
+    "rankingIntro": "Otomatik oluşturulan takma adınız, en iyi puanınız ve diliniz herkese açık olacaktır. Yeniden bağlanınca sonuçlar eşitlenir. Kişisel notlar gönderilmez.",
+    "rankingRetention": "Katılım isteğe bağlıdır. Yerel ilerlemenizi kaybetmeden katılımınızı silebilirsiniz. Profiliniz 24 ay etkinlik olmazsa silinir.",
+    "rankingPrivacy": "Gizlilik ve haklar",
+    "rankingAdult": "18 yaşında veya daha büyük olduğumu onaylıyorum.",
+    "rankingConsent": "Takma adımın ve puanlarımın herkese açık sıralamada yayımlanmasına ve eşitlenmesine izin veriyorum. İznimi istediğim zaman geri çekebilirim.",
     "rankingFormula": "Puan = doğru yanıt sayısı × başarı oranı (100 denemede 90 doğru = 81 puan). Eşitlikte daha çok doğru, sonra daha az deneme öne geçer. Sıfırlamadan sonra da en iyi sonuç korunur.",
     "rankingLeaveConfirm": "Kodunuzu ve tüm dillerdeki çevrimiçi puanlarınızı kaldıralım mı? Yerel ilerlemeniz korunur.",
 

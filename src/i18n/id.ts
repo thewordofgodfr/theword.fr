@@ -18,7 +18,11 @@ const id: TranslationDict = {
     "rankingJoin": "Ikut peringkat",
     "rankingEmpty": "Jawaban benar pertama akan memasukkan Anda ke peringkat.",
     "rankingOffline": "Koneksi tidak tersedia. Progres tersimpan; coba lagi untuk menyinkronkan.",
-    "rankingIntro": "Anda akan mendapat kode anonim. Kode, skor terbaik, dan bahasa Anda akan terlihat publik. Hasil disinkronkan saat tersambung kembali. Catatan pribadi tidak dikirim.",
+    "rankingIntro": "Nama samaran yang dibuat otomatis, skor terbaik, dan bahasa Anda akan ditampilkan secara publik. Hasil disinkronkan saat tersambung kembali. Catatan pribadi tidak dikirim.",
+    "rankingRetention": "Papan peringkat bersifat opsional. Anda dapat menghapus keikutsertaan tanpa kehilangan progres lokal. Profil dihapus setelah 24 bulan tidak aktif.",
+    "rankingPrivacy": "Privasi dan hak",
+    "rankingAdult": "Saya menegaskan bahwa saya berusia 18 tahun atau lebih.",
+    "rankingConsent": "Saya menyetujui publikasi dan sinkronisasi nama samaran serta skor saya di papan peringkat publik. Saya dapat mencabut persetujuan kapan saja.",
     "rankingFormula": "Poin = jawaban benar × tingkat keberhasilan (90 dari 100 = 81 poin). Jika seri: lebih banyak jawaban benar, lalu lebih sedikit percobaan. Skor terbaik tetap disimpan setelah reset.",
     "rankingLeaveConfirm": "Hapus kode dan skor daring Anda dalam semua bahasa? Progres lokal tetap disimpan.",
 

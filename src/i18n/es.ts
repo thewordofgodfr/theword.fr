@@ -18,7 +18,11 @@ const es: TranslationDict = {
     "rankingJoin": "Participar en la clasificación",
     "rankingEmpty": "Tu primera respuesta correcta te incluirá en la clasificación.",
     "rankingOffline": "Sin conexión. Tu progreso está guardado; reintenta para sincronizar la clasificación.",
-    "rankingIntro": "Recibirás un código anónimo. Tu código, mejor puntuación e idioma serán públicos. Los resultados se sincronizarán al reconectarte. No se envían notas personales.",
+    "rankingIntro": "Un seudónimo generado automáticamente, tu mejor puntuación y tu idioma serán públicos. Los resultados se sincronizan al reconectar. No se envían notas personales.",
+    "rankingRetention": "La clasificación es opcional. Puedes eliminar tu participación sin perder tu progreso local. El perfil se elimina tras 24 meses de inactividad.",
+    "rankingPrivacy": "Privacidad y derechos",
+    "rankingAdult": "Confirmo que tengo 18 años o más.",
+    "rankingConsent": "Acepto publicar y sincronizar mi seudónimo y mis puntuaciones en la clasificación pública. Puedo retirar mi consentimiento en cualquier momento.",
     "rankingFormula": "Puntos = respuestas correctas × tasa de aciertos (90 de 100 = 81 puntos). Empates: más aciertos y luego menos intentos. Se conserva tu mejor resultado, incluso después de reiniciar.",
     "rankingLeaveConfirm": "¿Retirar tu código y puntuaciones en línea de todos los idiomas? Se conservará tu progreso local.",
 

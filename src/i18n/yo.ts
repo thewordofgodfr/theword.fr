@@ -18,7 +18,11 @@ const yo: TranslationDict = {
     "rankingJoin": "Darapọ̀ mọ́ ìpele",
     "rankingEmpty": "Ìdáhùn àkọ́kọ́ rẹ tó tọ́ yóò fi ọ sí ìpele.",
     "rankingOffline": "Kò sí ìsopọ̀. A ti fi ìlọsíwájú rẹ pamọ́; tún gbìyànjú láti mú àbájáde dọ́gba.",
-    "rankingIntro": "A ó fún ọ ní kóòdù aláìlórúkọ. Kóòdù, àbájáde rẹ tó dára jù àti èdè rẹ yóò hàn gbangba. Àbájáde yóò dọ́gba nígbà tí ìsopọ̀ bá padà. A kì í fi àkọsílẹ̀ ara ẹni ránṣẹ́.",
+    "rankingIntro": "Orúkọ àfipamọ́ tí a dá láìfọwọ́ṣe, àmì tó dára jù lọ àti èdè rẹ yóò hàn sí gbogbo ènìyàn. Àbájáde yóò múdójúìwọ̀n nígbà tí o tún sopọ̀. A kò fi àkọsílẹ̀ ara ẹni ránṣẹ́.",
+    "rankingRetention": "Kíkópa jẹ́ àṣàyàn. O lè pa ìkópa rẹ rẹ́ láìpadanu ìlọsíwájú lórí ẹ̀rọ rẹ. A ó pa àkọọlẹ rẹ rẹ́ lẹ́yìn oṣù 24 tí kò sí ìṣe.",
+    "rankingPrivacy": "Àṣírí àti ẹ̀tọ́",
+    "rankingAdult": "Mo jẹ́rìí pé mo ti pé ọmọ ọdún 18 tàbí jù bẹ́ẹ̀ lọ.",
+    "rankingConsent": "Mo gbà láti tẹ orúkọ àfipamọ́ àti àmì mi jáde àti láti mú wọn dọ́gba nínú àtòjọ gbogbo ènìyàn. Mo lè fagilé ìyọ̀nda mi nígbàkigbà.",
     "rankingFormula": "Ojú àmì = ìdáhùn tó tọ́ × ìwọ̀n àṣeyọrí (90 nínú 100 = 81). Bí wọ́n bá dọ́gba: ìdáhùn tó tọ́ púpọ̀ sí i, lẹ́yìn náà ìgbìyànjú díẹ̀. Àbájáde tó dára jù wà títí lẹ́yìn ìbẹ̀rẹ̀ tuntun.",
     "rankingLeaveConfirm": "Yọ kóòdù àti àbájáde rẹ lórí ayélujára ní gbogbo èdè kúrò? Ìlọsíwájú inú ẹ̀rọ rẹ yóò wà.",
 

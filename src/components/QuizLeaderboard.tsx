@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowUpToLine, LocateFixed, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 import { useApp } from '../contexts/AppContext';
-import { ensurePlayer, leaveRanking, loadRanking, syncScores, type RankingPage } from '../services/quizLeaderboard';
-import { queueScore, readPlayer, type ScoreSnapshot } from '../services/quizPlayer';
+import { joinRanking, ensurePlayer, leaveRanking, loadRanking, syncScores, type RankingPage } from '../services/quizLeaderboard';
+import { hasQuizConsent, queueScore, readPlayer, type ScoreSnapshot } from '../services/quizPlayer';
 import QuizBadge from './QuizBadge';
 import { quizTier } from '../services/quizService';
 
@@ -11,7 +11,9 @@ type Props = { score: ScoreSnapshot; onClose: () => void };
 export default function QuizLeaderboard({ score, onClose }: Props) {
   const { t, lang } = useTranslation();
   const { state } = useApp();
-  const [joined, setJoined] = useState(() => !!readPlayer());
+  const [joined, setJoined] = useState(() => hasQuizConsent(readPlayer()));
+  const [adult, setAdult] = useState(false);
+  const [consent, setConsent] = useState(false);
   const [data, setData] = useState<RankingPage | null>(null);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -55,6 +57,17 @@ export default function QuizLeaderboard({ score, onClose }: Props) {
     });
     return () => cancelAnimationFrame(frame);
   }, [data]);
+  useEffect(() => {
+    const reset = () => { setJoined(false); setData(null); setAdult(false); setConsent(false); };
+    window.addEventListener('twog:quiz:consent-required', reset);
+    return () => window.removeEventListener('twog:quiz:consent-required', reset);
+  }, []);
+  const join = async () => {
+    if (!adult || !consent || busy) return;
+    setBusy(true); setFailed(false);
+    try { await joinRanking(lang); setJoined(true); } catch { setFailed(true); }
+    finally { setBusy(false); }
+  };
   const leave = async () => {
     if (!window.confirm(t('quiz.rankingLeaveConfirm'))) return;
     setBusy(true);
@@ -79,7 +92,13 @@ export default function QuizLeaderboard({ score, onClose }: Props) {
       </header>
       {!joined ? <div className="p-4 space-y-4 overflow-y-auto">
         <p className="text-sm">{t('quiz.rankingIntro')}</p>
-        <button type="button" className={`${button} bg-blue-600 text-white w-full`} onClick={() => setJoined(true)}>{t('quiz.rankingJoin')}</button>
+        <p className="text-sm">{t('quiz.rankingRetention')}</p>
+        <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="block text-sm text-blue-400 underline">{t('quiz.rankingPrivacy')}</a>
+        <label className="flex items-start gap-3 text-sm"><input type="checkbox" checked={adult} onChange={e => setAdult(e.target.checked)} className="mt-1 h-5 w-5 shrink-0" />{t('quiz.rankingAdult')}</label>
+        <label className="flex items-start gap-3 text-sm"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} className="mt-1 h-5 w-5 shrink-0" />{t('quiz.rankingConsent')}</label>
+        {failed && <p role="alert" className="text-sm">{t('quiz.rankingOffline')}</p>}
+        <button type="button" disabled={busy || !adult || !consent} className={`${button} bg-blue-600 text-white w-full`} onClick={() => void join()}>{t('quiz.rankingJoin')}</button>
+        {readPlayer() && <button type="button" disabled={busy} className={button} onClick={() => void leave()}>{t('quiz.rankingLeave')}</button>}
       </div> : <>
         {busy && <p className="px-4 py-2 text-sm" role="status">{t('loading')}</p>}
         {failed && <div role="alert" className="p-3 text-sm space-y-2"><p>{t('quiz.rankingOffline')}</p><button type="button" disabled={busy} className={button} onClick={() => void load()}>{t('quiz.retry')}</button></div>}

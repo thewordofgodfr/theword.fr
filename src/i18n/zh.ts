@@ -18,7 +18,11 @@ const zh: TranslationDict = {
     "rankingJoin": "加入排行榜",
     "rankingEmpty": "首次答对后，你将进入排行榜。",
     "rankingOffline": "无法连接。进度已保存，请重试以同步排行榜。",
-    "rankingIntro": "系统将分配匿名代码。你的代码、最佳成绩和语言将公开。重新联网时自动同步成绩，不会发送个人笔记。",
+    "rankingIntro": "自动生成的化名、最高得分和语言将公开。重新联网时会同步成绩。不会发送个人笔记。",
+    "rankingRetention": "排行榜为自愿参加。退出并删除资料不会丢失本地进度。连续24个月不活跃后，资料将被删除。",
+    "rankingPrivacy": "隐私与权利",
+    "rankingAdult": "我确认已年满18岁。",
+    "rankingConsent": "我同意在公开排行榜中发布并同步我的化名和成绩。我可以随时撤回同意。",
     "rankingFormula": "积分 = 答对数量 × 正确率（100次答对90次 = 81分）。同分时先比较答对数量，再比较较少的尝试次数。重置后仍保留最佳成绩。",
     "rankingLeaveConfirm": "移除你的代码及所有语言的在线成绩？本地进度将保留。",
 
